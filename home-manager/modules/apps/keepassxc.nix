@@ -1,10 +1,9 @@
-# KeePassXC password manager — desktop entry, browser integration, Secret Service, SSH agent.
+# KeePassXC password manager — desktop entry and SSH agent environment.
 # Binary is firejail-wrapped at system level (nixos/modules/sandboxing.nix).
-{ pkgsStable, ... }:
+# Native messaging host for browser integration is managed by KeePassXC itself
+# (Settings → Browser Integration) — NOT declaratively, to avoid read-only symlink conflicts.
+_:
 
-let
-  proxyBin = "${pkgsStable.keepassxc}/bin/keepassxc-proxy";
-in
 {
   xdg.desktopEntries.keepassxc = {
     name = "KeePassXC";
@@ -19,16 +18,4 @@ in
     ];
     mimeType = [ "application/x-keepass2" ];
   };
-
-  # Native messaging host for KeePassXC-Browser extension (Brave/Chromium)
-  home.file.".config/BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json".text =
-    builtins.toJSON {
-      name = "org.keepassxc.keepassxc_browser";
-      description = "KeePassXC Browser Integration";
-      path = proxyBin;
-      type = "stdio";
-      allowed_origins = [
-        "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
-      ];
-    };
 }

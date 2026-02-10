@@ -86,11 +86,9 @@
         # MEDIUM RISK — Network-facing or semi-trusted input, smaller surfaces
         # =====================================================================
 
-        # Password manager
-        keepassxc = {
-          executable = "${pkgs.lib.getBin pkgsStable.keepassxc}/bin/keepassxc";
-          profile = "${pkgs.firejail}/etc/firejail/keepassxc.profile";
-        };
+        # KeePassXC excluded from firejail — needs SSH agent socket at
+        # $XDG_RUNTIME_DIR, D-Bus for Secret Service, and native messaging
+        # for browser integration. It encrypts its own database already.
 
         # Image viewer
         imv = {
@@ -135,6 +133,14 @@
     # LibreWolf profile works fine - firefox-common includes seccomp !chroot
     environment = {
       etc."firejail/tor-browser.profile".enable = false;
+
+      # KeePassXC browser integration — whitelist the browser socket so
+      # keepassxc-proxy (spawned inside the firejail sandbox) can reach KeePassXC.
+      etc."firejail/brave.local".text = ''
+        noblacklist ''${RUNUSER}/app
+        whitelist ''${RUNUSER}/app/org.keepassxc.KeePassXC
+        whitelist ''${RUNUSER}/org.keepassxc.KeePassXC.BrowserServer
+      '';
 
       systemPackages = with pkgs; [
         firejail
