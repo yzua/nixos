@@ -75,7 +75,7 @@
       { argv = [ "${constants.terminal}" ]; }
       { argv = [ "vesktop" ]; }
       { argv = [ "telegram-desktop" ]; }
-      { argv = [ "spotube" ]; }
+      { argv = [ "youtube-music" ]; }
     ];
 
     input = {
@@ -353,7 +353,7 @@
         }
 
         {
-          matches = [ { app-id = "^spotube$"; } ];
+          matches = [ { app-id = "^youtube-music$"; } ];
           open-on-workspace = "󰎆 media";
           default-column-width.proportion = 1.0;
         }
