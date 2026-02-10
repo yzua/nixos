@@ -8,7 +8,8 @@
 {
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
-    pkgs.spotube
+    pkgs.youtube-music
+    pkgs.obsidian
     pkgsStable.keepassxc
     pkgsStable.librewolf
 
