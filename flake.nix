@@ -60,6 +60,7 @@
       gitConfig = {
         name = "yz";
         email = "git.remarry972@simplelogin.com";
+        signingKey = "0x9C3EC618CFE2EB3D";
       };
 
       hosts = [

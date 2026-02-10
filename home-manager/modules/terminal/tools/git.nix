@@ -15,7 +15,11 @@
       settings = {
         user = {
           inherit (gitConfig) name email;
+          signingkey = gitConfig.signingKey;
         };
+
+        commit.gpgsign = true;
+        tag.gpgsign = true;
 
         alias = {
           st = "status";
