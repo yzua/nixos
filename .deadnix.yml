@@ -1,0 +1,4 @@
+# Deadnix configuration
+# Exclude files with false positives (string interpolation patterns)
+exclude:
+  - ./home-manager/modules/terminal/zellij.nix

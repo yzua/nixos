@@ -1,0 +1,358 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "title": "CPU Usage",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "100 - netdata_system_cpu_percentage_average{dimension=\"idle\"}",
+          "legendFormat": "CPU"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "title": "RAM Usage",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "100 - ((netdata_system_ram_MiB_average{dimension=\"free\"} + netdata_system_ram_MiB_average{dimension=\"cached\"} + netdata_system_ram_MiB_average{dimension=\"buffers\"}) / (netdata_system_ram_MiB_average{dimension=\"free\"} + netdata_system_ram_MiB_average{dimension=\"cached\"} + netdata_system_ram_MiB_average{dimension=\"buffers\"} + netdata_system_ram_MiB_average{dimension=\"used\"})) * 100",
+          "legendFormat": "RAM"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 4 },
+              { "color": "red", "value": 8 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "title": "System Load (15m)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "netdata_system_load_load_average{dimension=\"load15\"}",
+          "legendFormat": "Load 15m"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "title": "Failed Systemd Units",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "netdata_systemd_units_units_state_average{dimension=\"failed\"}",
+          "legendFormat": "Failed"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15,
+            "pointSize": 5,
+            "showPoints": "never"
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 5,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "CPU Usage Over Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "100 - netdata_system_cpu_percentage_average{dimension=\"idle\"}",
+          "legendFormat": "Total"
+        },
+        {
+          "expr": "netdata_system_cpu_percentage_average{dimension=\"user\"}",
+          "legendFormat": "User"
+        },
+        {
+          "expr": "netdata_system_cpu_percentage_average{dimension=\"system\"}",
+          "legendFormat": "System"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15,
+            "showPoints": "never"
+          },
+          "unit": "decmbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 6,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Memory Usage Over Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "netdata_system_ram_MiB_average{dimension=\"used\"}",
+          "legendFormat": "Used"
+        },
+        {
+          "expr": "netdata_system_ram_MiB_average{dimension=\"cached\"}",
+          "legendFormat": "Cached"
+        },
+        {
+          "expr": "netdata_system_ram_MiB_average{dimension=\"buffers\"}",
+          "legendFormat": "Buffers"
+        },
+        {
+          "expr": "netdata_system_ram_MiB_average{dimension=\"free\"}",
+          "legendFormat": "Free"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15,
+            "showPoints": "never"
+          },
+          "unit": "Kbits"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "id": 7,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Network Traffic",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "netdata_net_net_kilobits_persec_average{dimension=\"received\"}",
+          "legendFormat": "{{ family }} RX"
+        },
+        {
+          "expr": "netdata_net_net_kilobits_persec_average{dimension=\"sent\"} * -1",
+          "legendFormat": "{{ family }} TX"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15,
+            "showPoints": "never"
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "id": 8,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Disk Space Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "netdata_disk_space_GiB_average{dimension=\"used\"} / (netdata_disk_space_GiB_average{dimension=\"used\"} + netdata_disk_space_GiB_average{dimension=\"avail\"}) * 100",
+          "legendFormat": "{{ family }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "id": 9,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "System Load Average",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "netdata_system_load_load_average{dimension=\"load1\"}",
+          "legendFormat": "1 min"
+        },
+        {
+          "expr": "netdata_system_load_load_average{dimension=\"load5\"}",
+          "legendFormat": "5 min"
+        },
+        {
+          "expr": "netdata_system_load_load_average{dimension=\"load15\"}",
+          "legendFormat": "15 min"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0 }
+            ]
+          },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ]
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "id": 10,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "title": "Scrape Targets",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "up",
+          "legendFormat": "{{ job }}"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["system", "overview"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "System Overview",
+  "uid": "system-overview",
+  "version": 1
+}

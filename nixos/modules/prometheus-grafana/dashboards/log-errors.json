@@ -1,0 +1,122 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "showPoints": "never"
+          },
+          "color": { "fixedColor": "red", "mode": "fixed" }
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Error Rate by Unit",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (unit) (rate({job=\"systemd-journal\"} |~ \"(?i)error|failed|critical\" [5m]))",
+          "legendFormat": "{{ unit }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "reduceOptions": { "calcs": ["sum"] },
+        "textMode": "auto"
+      },
+      "title": "Errors by Unit (Last Hour)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "sum by (unit) (count_over_time({job=\"systemd-journal\"} |~ \"(?i)error|failed|critical\" [1h]))",
+          "legendFormat": "{{ unit }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "showPoints": "never",
+            "stacking": { "mode": "normal" }
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 3,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } },
+      "title": "Log Volume by Level",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (level) (rate({job=\"systemd-journal\"} [5m]))",
+          "legendFormat": "{{ level }}"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 16 },
+      "id": 4,
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none",
+        "enableLogDetails": true
+      },
+      "title": "Recent Errors",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"systemd-journal\"} |~ \"(?i)error|failed|critical\" | level=~\"err|crit|alert|emerg\"",
+          "legendFormat": ""
+        }
+      ]
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": ["logs", "errors"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Log Errors",
+  "uid": "log-errors",
+  "version": 1
+}

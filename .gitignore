@@ -1,0 +1,44 @@
+# Serena editor
+.serena/
+
+# Claude Code
+.claude/
+
+# Skills
+.agents/
+
+# Nix build results
+result
+result-*
+
+# Direnv
+.direnv/
+.envrc
+
+# Sisyphus (Nix garbage collection)
+.sisyphus/
+
+# Result files
+*.log
+
+# Decrypted secrets (never commit these)
+secrets/*-decrypted.yaml
+secrets/*.yaml.!backup
+!secrets/.gitkeep
+
+# Temporary files
+*~
+*.swp
+*.swo
+.#*
+
+# PRIVACY: Sensitive file patterns (prevent accidental commit of secrets/keys)
+*.pem
+*.key
+*.p12
+id_rsa*
+id_ed25519*
+.env
+.env.*
+keys.txt
+*.age

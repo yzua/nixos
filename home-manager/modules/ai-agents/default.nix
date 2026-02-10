@@ -1,0 +1,1080 @@
+# AI coding agents configuration (Claude Code, OpenCode, Codex, Gemini CLI).
+
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  cfg = config.programs.aiAgents;
+
+  inherit (builtins) toJSON;
+  sharedMcpServers = cfg.mcpServers;
+
+  claudeMcpServers = lib.mapAttrs (
+    _: server:
+    let
+      isLocal = (server.type or "local") == "local";
+    in
+    if isLocal then
+      {
+        inherit (server) command;
+        args = server.args or [ ];
+        env = server.env or { };
+      }
+    else
+      {
+        type = "http";
+        inherit (server) url;
+      }
+      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; })
+  ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+
+  opencodeMcpServers = lib.mapAttrs (
+    _: server:
+    let
+      isLocal = (server.type or "local") == "local";
+      base = {
+        type = server.type or "local";
+      };
+      localAttrs = if isLocal then { command = [ server.command ] ++ (server.args or [ ]); } else { };
+      remoteAttrs =
+        if !isLocal then
+          {
+            inherit (server) url;
+          }
+          // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; })
+        else
+          { };
+      envAttrs = lib.optionalAttrs (server.env or { } != { }) { environment = server.env; };
+    in
+    base // localAttrs // remoteAttrs // envAttrs
+  ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+
+  geminiMcpServers = lib.mapAttrs (_: server: {
+    inherit (server) command;
+    args = server.args or [ ];
+    env = server.env or { };
+  }) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+
+  agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
+    #!/usr/bin/env bash
+
+    AGENT_NAME="$1"
+    shift
+
+    LOG_DIR="${cfg.logging.directory}"
+    LOG_FILE="$LOG_DIR/$AGENT_NAME-$(date +%Y-%m-%d).log"
+    ERROR_LOG="$LOG_DIR/$AGENT_NAME-errors-$(date +%Y-%m-%d).log"
+
+    mkdir -p "$LOG_DIR"
+
+    echo "[$(date -Iseconds)] Starting $AGENT_NAME: $*" >> "$LOG_FILE"
+
+    "$@" 2> >(tee -a "$ERROR_LOG" >&2) | tee -a "$LOG_FILE"
+    EXIT_CODE=$?
+
+    echo "[$(date -Iseconds)] $AGENT_NAME exited with code $EXIT_CODE" >> "$LOG_FILE"
+
+    ${lib.optionalString cfg.logging.notifyOnError ''
+      if [ $EXIT_CODE -ne 0 ]; then
+        notify-send -u critical "AI Agent Error" "$AGENT_NAME failed with exit code $EXIT_CODE"
+      fi
+    ''}
+
+    exit $EXIT_CODE
+  '';
+
+  claudeSettings = {
+    inherit (cfg.claude) model permissions hooks;
+    env =
+      cfg.claude.env
+      // (lib.optionalAttrs cfg.logging.enableOtel {
+        CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+        OTEL_METRICS_EXPORTER = cfg.logging.otelExporter;
+        OTEL_EXPORTER_OTLP_ENDPOINT = cfg.logging.otelEndpoint;
+      });
+  }
+  // (lib.optionalAttrs (cfg.claude.extraSettings != { }) cfg.claude.extraSettings);
+
+  opencodeSettings = {
+    "$schema" = "https://opencode.ai/config.json";
+    inherit (cfg.opencode) model;
+    mcp = opencodeMcpServers;
+    plugin = cfg.opencode.plugins;
+    provider = cfg.opencode.providers;
+  }
+  // (lib.optionalAttrs (cfg.opencode.extraSettings != { }) cfg.opencode.extraSettings);
+
+  geminiSettings = {
+    mcpServers = geminiMcpServers;
+    inherit (cfg.gemini) theme sandboxMode;
+  }
+  // (lib.optionalAttrs (cfg.gemini.extraSettings != { }) cfg.gemini.extraSettings);
+
+  ohMyOpencodeSettings = {
+    "$schema" =
+      "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json";
+    google_auth = cfg.opencode.ohMyOpencode.googleAuth;
+    agents = lib.mapAttrs (
+      _: agent:
+      {
+        inherit (agent) model;
+      }
+      // (lib.optionalAttrs (agent.variant != null) { inherit (agent) variant; })
+      // (lib.optionalAttrs (agent.prompt != null) { inherit (agent) prompt; })
+      // (lib.optionalAttrs (agent.prompt_append != null) { inherit (agent) prompt_append; })
+      // (lib.optionalAttrs (agent.skills != null) { inherit (agent) skills; })
+      // (lib.optionalAttrs (agent.temperature != null) { inherit (agent) temperature; })
+      // (lib.optionalAttrs (agent.top_p != null) { inherit (agent) top_p; })
+      // (lib.optionalAttrs (agent.tools != null) { inherit (agent) tools; })
+      // (lib.optionalAttrs (agent.description != null) { inherit (agent) description; })
+      // (lib.optionalAttrs (agent.mode != null) { inherit (agent) mode; })
+      // (lib.optionalAttrs (agent.color != null) { inherit (agent) color; })
+      // (lib.optionalAttrs (agent.permission != null) {
+        permission = lib.filterAttrs (_: v: v != null) agent.permission;
+      })
+    ) cfg.opencode.ohMyOpencode.agents;
+  }
+  // (lib.optionalAttrs (
+    cfg.opencode.ohMyOpencode.extraSettings != { }
+  ) cfg.opencode.ohMyOpencode.extraSettings);
+
+in
+{
+  imports = [
+    ./log-analyzer.nix
+    ./config.nix
+  ];
+
+  options.programs.aiAgents = {
+    enable = lib.mkEnableOption "AI coding agents configuration";
+
+    secrets = {
+      zaiApiKeyFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = "/run/secrets/zai_api_key";
+        description = "Path to sops-decrypted Z.AI API key file";
+      };
+    };
+
+    skills = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of skills to install from skills.sh (e.g., 'obra/superpowers')";
+      example = [
+        "obra/superpowers"
+        "anthropics/skills"
+      ];
+    };
+
+    mcpServers = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            enable = lib.mkOption {
+              type = lib.types.bool;
+              default = true;
+              description = "Enable this MCP server";
+            };
+            type = lib.mkOption {
+              type = lib.types.enum [
+                "local"
+                "remote"
+              ];
+              default = "local";
+              description = "Server type (local stdio or remote HTTP)";
+            };
+            command = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+              description = "Command to run for local servers";
+            };
+            args = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = "Arguments for the command";
+            };
+            url = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "URL for remote MCP servers";
+            };
+            headers = lib.mkOption {
+              type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+              default = null;
+              description = "Headers for remote MCP servers";
+            };
+            env = lib.mkOption {
+              type = lib.types.attrsOf lib.types.str;
+              default = { };
+              description = "Environment variables for the server";
+            };
+          };
+        }
+      );
+      default = { };
+      description = "Shared MCP server definitions used by all agents";
+    };
+
+    logging = {
+      enable = lib.mkEnableOption "centralized logging for AI agents";
+
+      directory = lib.mkOption {
+        type = lib.types.str;
+        default = "${config.home.homeDirectory}/.local/share/ai-agents/logs";
+        description = "Directory for AI agent logs";
+      };
+
+      notifyOnError = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Send desktop notification on agent errors";
+      };
+
+      enableOtel = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Enable OpenTelemetry for supported agents";
+      };
+
+      otelEndpoint = lib.mkOption {
+        type = lib.types.str;
+        default = "http://localhost:4317";
+        description = "OpenTelemetry collector endpoint";
+      };
+
+      otelExporter = lib.mkOption {
+        type = lib.types.str;
+        default = "otlp";
+        description = "OpenTelemetry exporter type";
+      };
+
+      retentionDays = lib.mkOption {
+        type = lib.types.int;
+        default = 30;
+        description = "Days to retain log files";
+      };
+    };
+
+    claude = {
+      enable = lib.mkEnableOption "Claude Code configuration";
+
+      model = lib.mkOption {
+        type = lib.types.str;
+        default = "claude-sonnet-4-5-20250514";
+        description = "Default model for Claude Code";
+      };
+
+      env = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = { };
+        description = "Environment variables for Claude Code";
+      };
+
+      permissions = lib.mkOption {
+        type = lib.types.attrs;
+        default = {
+          allow = [ ];
+          deny = [ ];
+        };
+        description = "Permission rules for Claude Code";
+      };
+
+      hooks = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = "Lifecycle hooks for Claude Code";
+      };
+
+      extraSettings = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = "Additional Claude Code settings";
+      };
+    };
+
+    opencode = {
+      enable = lib.mkEnableOption "OpenCode configuration";
+
+      model = lib.mkOption {
+        type = lib.types.str;
+        default = "anthropic/claude-sonnet-4-5";
+        description = "Default model for OpenCode";
+      };
+
+      plugins = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "oh-my-opencode" ];
+        description = "OpenCode plugins to enable";
+      };
+
+      providers = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = "Provider configurations for OpenCode";
+      };
+
+      extraSettings = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = "Additional OpenCode settings";
+      };
+
+      ohMyOpencode = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Enable oh-my-opencode configuration";
+        };
+
+        googleAuth = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "Use Google OAuth for authentication";
+        };
+
+        agents = lib.mkOption {
+          type = lib.types.attrsOf (
+            lib.types.submodule {
+              options = {
+                model = lib.mkOption {
+                  type = lib.types.str;
+                  description = "Model to use for this agent";
+                };
+                variant = lib.mkOption {
+                  type = lib.types.nullOr lib.types.str;
+                  default = null;
+                  description = "Model variant (e.g., 'low', 'high', 'max')";
+                };
+                prompt = lib.mkOption {
+                  type = lib.types.nullOr lib.types.str;
+                  default = null;
+                  description = "System prompt for this agent";
+                };
+                prompt_append = lib.mkOption {
+                  type = lib.types.nullOr lib.types.str;
+                  default = null;
+                  description = "Additional prompt appended to system prompt";
+                };
+                skills = lib.mkOption {
+                  type = lib.types.nullOr (lib.types.listOf lib.types.str);
+                  default = null;
+                  description = "Skills to enable (playwright, frontend-ui-ux, git-master)";
+                };
+                temperature = lib.mkOption {
+                  type = lib.types.nullOr lib.types.float;
+                  default = null;
+                  description = "Sampling temperature (0-2)";
+                };
+                top_p = lib.mkOption {
+                  type = lib.types.nullOr lib.types.float;
+                  default = null;
+                  description = "Top-p sampling (0-1)";
+                };
+                tools = lib.mkOption {
+                  type = lib.types.nullOr (lib.types.attrsOf lib.types.bool);
+                  default = null;
+                  description = "Enable/disable specific tools (e.g., { Edit = false; })";
+                };
+                description = lib.mkOption {
+                  type = lib.types.nullOr lib.types.str;
+                  default = null;
+                  description = "Agent description";
+                };
+                mode = lib.mkOption {
+                  type = lib.types.nullOr (
+                    lib.types.enum [
+                      "subagent"
+                      "primary"
+                      "all"
+                    ]
+                  );
+                  default = null;
+                  description = "Agent mode";
+                };
+                color = lib.mkOption {
+                  type = lib.types.nullOr lib.types.str;
+                  default = null;
+                  description = "Hex color for UI (e.g., '#FF5500')";
+                };
+                permission = lib.mkOption {
+                  type = lib.types.nullOr (
+                    lib.types.submodule {
+                      options = {
+                        edit = lib.mkOption {
+                          type = lib.types.nullOr (
+                            lib.types.enum [
+                              "ask"
+                              "allow"
+                              "deny"
+                            ]
+                          );
+                          default = null;
+                        };
+                        bash = lib.mkOption {
+                          type = lib.types.nullOr (
+                            lib.types.either
+                              (lib.types.enum [
+                                "ask"
+                                "allow"
+                                "deny"
+                              ])
+                              (
+                                lib.types.attrsOf (
+                                  lib.types.enum [
+                                    "ask"
+                                    "allow"
+                                    "deny"
+                                  ]
+                                )
+                              )
+                          );
+                          default = null;
+                        };
+                        webfetch = lib.mkOption {
+                          type = lib.types.nullOr (
+                            lib.types.enum [
+                              "ask"
+                              "allow"
+                              "deny"
+                            ]
+                          );
+                          default = null;
+                        };
+                        doom_loop = lib.mkOption {
+                          type = lib.types.nullOr (
+                            lib.types.enum [
+                              "ask"
+                              "allow"
+                              "deny"
+                            ]
+                          );
+                          default = null;
+                        };
+                        external_directory = lib.mkOption {
+                          type = lib.types.nullOr (
+                            lib.types.enum [
+                              "ask"
+                              "allow"
+                              "deny"
+                            ]
+                          );
+                          default = null;
+                        };
+                      };
+                    }
+                  );
+                  default = null;
+                  description = "Fine-grained permission settings";
+                };
+              };
+            }
+          );
+          default = { };
+          description = "Agent configurations for oh-my-opencode";
+          example = {
+            sisyphus = {
+              model = "anthropic/claude-opus-4-6";
+              prompt = "You are Sisyphus, the relentless worker...";
+              temperature = 0.7;
+              permission = {
+                edit = "allow";
+                bash = "allow";
+              };
+            };
+          };
+        };
+
+        extraSettings = lib.mkOption {
+          type = lib.types.attrs;
+          default = { };
+          description = "Additional oh-my-opencode settings";
+        };
+      };
+    };
+
+    codex = {
+      enable = lib.mkEnableOption "Codex CLI configuration";
+
+      useWrapper = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Use logging wrapper for Codex";
+      };
+
+      model = lib.mkOption {
+        type = lib.types.str;
+        default = "gpt-5.3-codex";
+        description = "Default model for Codex";
+      };
+
+      personality = lib.mkOption {
+        type = lib.types.enum [
+          "none"
+          "friendly"
+          "pragmatic"
+        ];
+        default = "pragmatic";
+        description = "Model personality";
+      };
+
+      reasoningEffort = lib.mkOption {
+        type = lib.types.enum [
+          "none"
+          "minimal"
+          "low"
+          "medium"
+          "high"
+          "xhigh"
+        ];
+        default = "medium";
+        description = "Reasoning effort level";
+      };
+
+      approvalPolicy = lib.mkOption {
+        type = lib.types.enum [
+          "untrusted"
+          "on-failure"
+          "on-request"
+          "never"
+        ];
+        default = "on-request";
+        description = "Command approval policy";
+      };
+
+      trustedProjects = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "Paths to projects with trust_level = trusted";
+      };
+
+      extraToml = lib.mkOption {
+        type = lib.types.lines;
+        default = "";
+        description = "Extra TOML lines appended to config.toml";
+      };
+    };
+
+    gemini = {
+      enable = lib.mkEnableOption "Gemini CLI configuration";
+
+      theme = lib.mkOption {
+        type = lib.types.str;
+        default = "Default";
+        description = "Theme for Gemini CLI";
+      };
+
+      sandboxMode = lib.mkOption {
+        type = lib.types.str;
+        default = "cautious";
+        description = "Sandbox mode (none, cautious, strict)";
+      };
+
+      extraSettings = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+        description = "Additional Gemini CLI settings";
+      };
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    home = {
+      packages = [
+        agentLogWrapper
+        pkgs.tmux
+        pkgs.zig
+        pkgs.rustfmt
+      ]
+      ++ (lib.optional cfg.logging.enable (
+        pkgs.writeShellScriptBin "ai-agent-log-cleanup" ''
+          find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
+          echo "Cleaned up logs older than ${toString cfg.logging.retentionDays} days"
+        ''
+      ));
+
+      activation = {
+        # Runs after setupCodexConfig so keys can be injected.
+        patchAiAgentSecrets = lib.mkIf (cfg.secrets.zaiApiKeyFile != null) (
+          lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" ] ''
+            if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
+              ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
+              
+              OPENCODE_CFG="$HOME/.config/opencode/opencode.json"
+              if [[ -f "$OPENCODE_CFG" ]]; then
+                ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
+                  .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
+                  .mcp["web-search-prime"] = {
+                    type: "remote",
+                    url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+                    headers: { Authorization: ("Bearer " + $key) }
+                  } |
+                  .mcp["web-reader"] = {
+                    type: "remote",
+                    url: "https://api.z.ai/api/mcp/web_reader/mcp",
+                    headers: { Authorization: ("Bearer " + $key) }
+                  } |
+                  .mcp["zread"] = {
+                    type: "remote",
+                    url: "https://api.z.ai/api/mcp/zread/mcp",
+                    headers: { Authorization: ("Bearer " + $key) }
+                  }
+                ' "$OPENCODE_CFG" > "$OPENCODE_CFG.tmp" && mv "$OPENCODE_CFG.tmp" "$OPENCODE_CFG"
+                echo "✓ Patched opencode.json with Z.AI API key"
+              fi
+              
+              CLAUDE_MCP="$HOME/.mcp.json"
+              if [[ -f "$CLAUDE_MCP" ]]; then
+                ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
+                  .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key |
+                  .mcpServers["web-search-prime"] = {
+                    type: "http",
+                    url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+                    headers: { Authorization: ("Bearer " + $key) }
+                  } |
+                  .mcpServers["web-reader"] = {
+                    type: "http",
+                    url: "https://api.z.ai/api/mcp/web_reader/mcp",
+                    headers: { Authorization: ("Bearer " + $key) }
+                  } |
+                  .mcpServers["zread"] = {
+                    type: "http",
+                    url: "https://api.z.ai/api/mcp/zread/mcp",
+                    headers: { Authorization: ("Bearer " + $key) }
+                  }
+                ' "$CLAUDE_MCP" > "$CLAUDE_MCP.tmp" && mv "$CLAUDE_MCP.tmp" "$CLAUDE_MCP"
+                echo "✓ Patched .mcp.json with Z.AI API key + remote MCPs"
+              fi
+
+              CODEX_CFG="$HOME/.codex/config.toml"
+              if [[ -f "$CODEX_CFG" ]]; then
+                if grep -q '\[mcp_servers.zai-mcp-server.env\]' "$CODEX_CFG"; then
+                  ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ZAI_KEY\"" "$CODEX_CFG"
+                fi
+                echo "✓ Patched codex config.toml with Z.AI API key"
+              fi
+
+              GEMINI_CFG="$HOME/.gemini/settings.json"
+              if [[ -f "$GEMINI_CFG" ]]; then
+                ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
+                  .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key |
+                  .mcpServers["web-search-prime"] = {
+                    command: "echo",
+                    args: [],
+                    url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+                    headers: { Authorization: ("Bearer " + $key) },
+                    type: "http"
+                  } |
+                  .mcpServers["web-reader"] = {
+                    command: "echo",
+                    args: [],
+                    url: "https://api.z.ai/api/mcp/web_reader/mcp",
+                    headers: { Authorization: ("Bearer " + $key) },
+                    type: "http"
+                  }
+                ' "$GEMINI_CFG" > "$GEMINI_CFG.tmp" && mv "$GEMINI_CFG.tmp" "$GEMINI_CFG"
+                echo "✓ Patched gemini settings.json with Z.AI API key + remote MCPs"
+              fi
+            else
+              echo "⚠ ${cfg.secrets.zaiApiKeyFile} not found - run 'just nixos' first"
+            fi
+          ''
+        );
+
+        installAgentSkills = lib.mkIf (cfg.skills != [ ]) (
+          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            echo "📦 Installing agent skills from skills.sh..."
+            for skill in ${lib.escapeShellArgs cfg.skills}; do
+              echo "  → $skill"
+              $DRY_RUN_CMD ${pkgs.nodejs}/bin/npx -y skills add "$skill" --global --all --yes 2>/dev/null || true
+            done
+            echo "✓ Skills installation complete"
+          ''
+        );
+
+        setupCodexConfig = lib.mkIf cfg.codex.enable (
+          let
+            mcpToml = lib.concatStringsSep "\n" (
+              lib.mapAttrsToList (
+                name: server:
+                let
+                  argsStr = lib.concatMapStringsSep ", " (a: ''"${a}"'') (server.args or [ ]);
+                  envLines = lib.concatStringsSep "\n" (
+                    lib.mapAttrsToList (k: v: ''${k} = "${v}"'') (server.env or { })
+                  );
+                in
+                ''
+                  [mcp_servers.${name}]
+                  command = "${server.command}"
+                  args = [${argsStr}]
+                  enabled = true
+                ''
+                + lib.optionalString (server.env or { } != { }) ''
+                  [mcp_servers.${name}.env]
+                  ${envLines}
+                ''
+              ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers)
+            );
+            projectsToml = lib.concatMapStringsSep "\n" (path: ''
+              [projects."${path}"]
+              trust_level = "trusted"
+            '') cfg.codex.trustedProjects;
+          in
+          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            mkdir -p "$HOME/.codex"
+            cat > "$HOME/.codex/config.toml" << 'CODEX_EOF'
+            personality = "${cfg.codex.personality}"
+            model = "${cfg.codex.model}"
+            model_reasoning_effort = "${cfg.codex.reasoningEffort}"
+            approval_policy = "${cfg.codex.approvalPolicy}"
+            check_for_update_on_startup = true
+
+            web_search = "live"
+
+            notify = ["notify-send", "Codex"]
+
+            developer_instructions = """
+            Experienced developer. Concise communication, no preamble.
+            Evidence-based decisions. Minimal changes - fix bugs without refactoring.
+            Never suppress type errors. Never commit unless asked.
+            Run diagnostics/tests on changed files before claiming done.
+            Match existing codebase patterns and conventions.
+            """
+
+            [tui]
+            animations = true
+            notifications = true
+
+            [history]
+            persistence = "save-all"
+
+            [profiles.quick]
+            model_reasoning_effort = "low"
+            approval_policy = "on-failure"
+
+            [profiles.deep]
+            model_reasoning_effort = "xhigh"
+            approval_policy = "on-request"
+
+            [profiles.safe]
+            approval_policy = "untrusted"
+            sandbox_mode = "read-only"
+
+            [shell_environment_policy]
+            inherit = "core"
+            exclude = ["AWS_*", "AZURE_*", "GCP_*", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
+
+            [sandbox_workspace_write]
+            network_access = true
+            writable_roots = ["/home/yz/.config", "/home/yz/.local"]
+
+            ${mcpToml}
+            ${projectsToml}
+            ${cfg.codex.extraToml}
+            CODEX_EOF
+            ${pkgs.gnused}/bin/sed -i 's/^            //' "$HOME/.codex/config.toml"
+            echo "✓ Codex config.toml configured"
+          ''
+        );
+
+        # Real files (not symlinks) so plugins can modify them.
+        setupClaudeConfig = lib.mkIf cfg.claude.enable (
+          let
+            claudeSettingsFile = pkgs.writeText "claude-settings.json" (toJSON claudeSettings);
+            claudeMcpFile = pkgs.writeText "claude-mcp.json" (toJSON {
+              mcpServers = claudeMcpServers;
+            });
+          in
+          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            mkdir -p "$HOME/.claude"
+
+            CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+
+            if [[ -f "$CLAUDE_SETTINGS" ]] && [[ ! -L "$CLAUDE_SETTINGS" ]]; then
+              ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$CLAUDE_SETTINGS" "${claudeSettingsFile}" > "$CLAUDE_SETTINGS.tmp"
+              mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
+            else
+              rm -f "$CLAUDE_SETTINGS"
+              cp "${claudeSettingsFile}" "$CLAUDE_SETTINGS"
+              chmod 644 "$CLAUDE_SETTINGS"
+            fi
+            echo "✓ Claude settings.json configured"
+
+            CLAUDE_MCP="$HOME/.mcp.json"
+
+            if [[ -f "$CLAUDE_MCP" ]] && [[ ! -L "$CLAUDE_MCP" ]]; then
+              ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$CLAUDE_MCP" "${claudeMcpFile}" > "$CLAUDE_MCP.tmp"
+              mv "$CLAUDE_MCP.tmp" "$CLAUDE_MCP"
+            else
+              rm -f "$CLAUDE_MCP"
+              cp "${claudeMcpFile}" "$CLAUDE_MCP"
+              chmod 644 "$CLAUDE_MCP"
+            fi
+            echo "✓ Claude .mcp.json configured"
+          ''
+        );
+
+        installOhMyClaudeCode = lib.mkIf cfg.claude.enable (
+          lib.hm.dag.entryAfter [ "setupClaudeConfig" ] ''
+            if command -v claude &> /dev/null; then
+              if ! claude plugin marketplace list 2>/dev/null | grep -q "omc"; then
+                echo "📦 Adding oh-my-claudecode marketplace..."
+                claude plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode 2>/dev/null || true
+              fi
+              
+              if ! claude plugin list 2>/dev/null | grep -q "oh-my-claudecode"; then
+                echo "📦 Installing oh-my-claudecode plugin..."
+                claude plugin install oh-my-claudecode@omc 2>/dev/null || true
+              fi
+              echo "✓ oh-my-claudecode ready"
+            fi
+          ''
+        );
+
+        installEverythingClaudeCode = lib.mkIf cfg.claude.enable (
+          lib.hm.dag.entryAfter [ "setupClaudeConfig" ] ''
+            ECC_DIR="$HOME/.local/share/everything-claude-code"
+
+            if command -v claude &> /dev/null; then
+              if [[ -d "$ECC_DIR/.git" ]]; then
+                echo "📦 Updating everything-claude-code..."
+                ${pkgs.git}/bin/git -C "$ECC_DIR" pull --ff-only 2>/dev/null || true
+              else
+                echo "📦 Cloning everything-claude-code..."
+                rm -rf "$ECC_DIR"
+                ${pkgs.git}/bin/git clone --depth 1 https://github.com/affaan-m/everything-claude-code.git "$ECC_DIR" 2>/dev/null || true
+              fi
+
+              if ! claude plugin marketplace list 2>/dev/null | grep -q "everything-claude-code"; then
+                echo "📦 Adding everything-claude-code marketplace..."
+                claude plugin marketplace add affaan-m/everything-claude-code 2>/dev/null || true
+              fi
+
+              if ! claude plugin list 2>/dev/null | grep -q "everything-claude-code"; then
+                echo "📦 Installing everything-claude-code plugin..."
+                claude plugin install everything-claude-code@everything-claude-code 2>/dev/null || true
+              fi
+
+              if [[ -d "$ECC_DIR/rules" ]]; then
+                mkdir -p "$HOME/.claude/rules"
+                if [[ -d "$ECC_DIR/rules/common" ]]; then
+                  cp -r "$ECC_DIR/rules/common/"* "$HOME/.claude/rules/" 2>/dev/null || true
+                fi
+                if [[ -d "$ECC_DIR/rules/typescript" ]]; then
+                  cp -r "$ECC_DIR/rules/typescript/"* "$HOME/.claude/rules/" 2>/dev/null || true
+                fi
+                if [[ -d "$ECC_DIR/rules/python" ]]; then
+                  cp -r "$ECC_DIR/rules/python/"* "$HOME/.claude/rules/" 2>/dev/null || true
+                fi
+                if [[ -d "$ECC_DIR/rules/golang" ]]; then
+                  cp -r "$ECC_DIR/rules/golang/"* "$HOME/.claude/rules/" 2>/dev/null || true
+                fi
+                echo "✓ Installed ECC rules (common + typescript + python + golang)"
+              fi
+
+              echo "✓ everything-claude-code ready"
+            fi
+          ''
+        );
+      };
+
+      file = lib.mkMerge [
+        (lib.mkIf cfg.gemini.enable {
+          ".gemini/settings.json" = {
+            text = toJSON geminiSettings;
+            force = true;
+          };
+
+          ".gemini/skills/code-reviewer/SKILL.md" = {
+            text = ''
+              ---
+              name: code-reviewer
+              description: Review code for quality, security, and best practices. Use when asked to review code, PRs, or diffs.
+              ---
+
+              # Code Reviewer
+
+              ## When to Activate
+              - User asks to review code, a PR, or a diff
+              - User asks "is this code good?" or "any issues with this?"
+
+              ## Review Checklist
+              1. **Correctness**: Does the logic do what it claims?
+              2. **Edge cases**: Missing null checks, empty arrays, boundary conditions
+              3. **Security**: SQL injection, XSS, hardcoded secrets, unsafe deserialization
+              4. **Performance**: N+1 queries, unnecessary allocations, missing indexes
+              5. **Maintainability**: Clear naming, reasonable function size, no dead code
+              6. **Error handling**: Are errors caught? Are error messages useful?
+              7. **Tests**: Are critical paths tested? Are edge cases covered?
+
+              ## Output Format
+              - Rate severity: 🔴 Critical | 🟡 Warning | 🟢 Suggestion
+              - Be specific: include file path and line number
+              - Suggest fixes, not just problems
+              - Acknowledge what's done well (briefly)
+
+              ## Style
+              - Concise, no fluff
+              - Group by file
+              - Most critical issues first
+            '';
+          };
+
+          ".gemini/skills/nix-helper/SKILL.md" = {
+            text = ''
+              ---
+              name: nix-helper
+              description: Help with NixOS configuration, Nix expressions, and flake management.
+              ---
+
+              # Nix Helper
+
+              ## When to Activate
+              - User asks about NixOS configuration
+              - Working with .nix files
+              - Flake management questions
+
+              ## Key Patterns
+              1. **Module pattern**: `{ config, lib, pkgs, ... }: { options = ...; config = ...; }`
+              2. **Package list**: `environment.systemPackages = with pkgs; [ ... ]`
+              3. **Enable pattern**: `lib.mkEnableOption "description"`
+              4. **Conditional**: `lib.mkIf config.mySystem.feature.enable { ... }`
+
+              ## Validation Pipeline
+              ```bash
+              just modules   # Check imports
+              just lint      # statix + deadnix
+              just format    # nixfmt-tree
+              just check     # nix flake check
+              just home      # Apply (safe)
+              just nixos     # Apply (system)
+              ```
+
+              ## Common Fixes
+              - Missing import → add to parent default.nix
+              - deadnix warning → remove unused or prefix with _
+              - statix suggestion → apply directly
+            '';
+          };
+
+          ".gemini/skills/pr-creator/SKILL.md" = {
+            text = ''
+              ---
+              name: pr-creator
+              description: Create well-structured pull requests with clear descriptions. Use when asked to create a PR or prepare changes for review.
+              ---
+
+              # PR Creator
+
+              ## When to Activate
+              - User asks to create a PR or prepare changes for review
+              - User says "submit this" or "make a PR"
+
+              ## PR Structure
+              1. **Title**: Concise, imperative mood ("Add auth middleware", not "Added auth middleware")
+              2. **Summary**: 1-3 bullet points of what changed and why
+              3. **Type**: Feature | Fix | Refactor | Docs | Chore
+              4. **Testing**: What was tested and how
+              5. **Breaking changes**: List any, or "None"
+
+              ## Workflow
+              1. Review all uncommitted changes (`git diff`, `git status`)
+              2. Group related changes into logical commits
+              3. Write commit messages (conventional commits style)
+              4. Create PR with `gh pr create`
+              5. Add appropriate labels if available
+
+              ## Commit Message Format
+              ```
+              type(scope): brief description
+
+              Longer explanation if needed.
+              ```
+              Types: feat, fix, refactor, docs, test, chore, perf
+
+              ## Rules
+              - Never include unrelated changes
+              - Never commit secrets, .env files, or credentials
+              - Always run project lint/test before creating PR
+              - Draft PR if work is incomplete
+            '';
+          };
+          # Aider configuration
+          ".aider.conf.yml".text = builtins.toJSON {
+            model = "claude-sonnet-4-5";
+            editor-model = "claude-haiku-4-5";
+            auto-commits = false;
+            dirty-commits = false;
+            attribute-author = false;
+            attribute-committer = false;
+            dark-mode = true;
+            pretty = true;
+            stream = true;
+            map-tokens = 2048;
+            map-refresh = "auto";
+            auto-lint = true;
+            lint-cmd = "just lint";
+            auto-test = false;
+            test-cmd = "just check";
+            suggest-shell-commands = false;
+          };
+        })
+      ];
+    };
+
+    xdg.configFile = lib.mkIf cfg.opencode.enable {
+      "opencode/opencode.json" = {
+        text = toJSON opencodeSettings;
+        force = true;
+      };
+      "opencode/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
+        text = toJSON ohMyOpencodeSettings;
+        force = true;
+      };
+    };
+
+    programs.zsh.shellAliases = lib.mkIf cfg.logging.enable {
+      "cl-log" = "ai-agent-log-wrapper claude claude";
+      "oc-log" = "ai-agent-log-wrapper opencode opencode";
+      "codex-log" = "ai-agent-log-wrapper codex codex";
+      "gemini-log" = "ai-agent-log-wrapper gemini gemini";
+
+      "ai-logs" = "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null";
+      "ai-errors" =
+        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -50";
+
+      "ai-stats" = "ai-agent-analyze stats";
+      "ai-report" = "ai-agent-analyze report";
+      "ai-dash" = "ai-agent-dashboard";
+    };
+
+    systemd.user = lib.mkIf cfg.logging.enable {
+      # Create log directory declaratively (replaces createAiAgentLogDir activation script)
+      tmpfiles.rules = [
+        "d ${cfg.logging.directory} 0755 - - -"
+      ];
+
+      services.ai-agent-log-cleanup = {
+        Unit.Description = "Clean up old AI agent logs";
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.writeShellScript "cleanup" ''
+            find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
+          ''}";
+        };
+      };
+
+      timers.ai-agent-log-cleanup = {
+        Unit.Description = "Weekly AI agent log cleanup";
+        Timer = {
+          OnCalendar = "weekly";
+          Persistent = true;
+        };
+        Install.WantedBy = [ "timers.target" ];
+      };
+    };
+  };
+}
