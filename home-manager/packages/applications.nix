@@ -9,6 +9,7 @@
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
     pkgs.spotube
+    pkgsStable.keepassxc
     pkgsStable.librewolf
 
     # GTK theming
