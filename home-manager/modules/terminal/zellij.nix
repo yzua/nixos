@@ -40,32 +40,40 @@ let
   zjstatusConfig = ''
     pane size=1 borderless=true {
       plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
-        format_left   "{mode}#[bg=${constants.color.bg_soft}] {tabs}"
+        format_left   "{mode}{tabs}"
         format_center ""
-        format_right  "#[bg=${constants.color.bg_soft},fg=${constants.color.gray}]{datetime}"
+        format_right  "#[bg=${constants.color.bg_soft},fg=${constants.color.bg0}]#[bg=${constants.color.bg0},fg=${constants.color.fg_light}]  {session} #[fg=${constants.color.gray}]   {datetime} "
         format_space  "#[bg=${constants.color.bg_soft}]"
+        format_hide_on_overlength "true"
+        format_precedence "lrc"
 
-        mode_normal        "#[bg=${constants.color.gray_dim},fg=${constants.color.bg_hard},bold] NORMAL #[bg=${constants.color.bg_soft},fg=${constants.color.gray_dim}]"
-        mode_locked        "#[bg=${constants.color.yellow_dim},fg=${constants.color.bg_hard},bold] LOCKED #[bg=${constants.color.bg_soft},fg=${constants.color.yellow_dim}]"
-        mode_resize        "#[bg=${constants.color.orange},fg=${constants.color.bg_hard},bold] RESIZE #[bg=${constants.color.bg_soft},fg=${constants.color.orange}]"
-        mode_pane          "#[bg=${constants.color.green},fg=${constants.color.bg_hard},bold] PANE #[bg=${constants.color.bg_soft},fg=${constants.color.green}]"
-        mode_tab           "#[bg=${constants.color.blue},fg=${constants.color.bg_hard},bold] TAB #[bg=${constants.color.bg_soft},fg=${constants.color.blue}]"
-        mode_scroll        "#[bg=${constants.color.aqua},fg=${constants.color.bg_hard},bold] SCROLL #[bg=${constants.color.bg_soft},fg=${constants.color.aqua}]"
-        mode_enter_search  "#[bg=${constants.color.purple},fg=${constants.color.bg_hard},bold] SEARCH #[bg=${constants.color.bg_soft},fg=${constants.color.purple}]"
-        mode_search        "#[bg=${constants.color.purple},fg=${constants.color.bg_hard},bold] SEARCH #[bg=${constants.color.bg_soft},fg=${constants.color.purple}]"
-        mode_rename_tab    "#[bg=${constants.color.purple_dim},fg=${constants.color.bg_hard},bold] RENAME #[bg=${constants.color.bg_soft},fg=${constants.color.purple_dim}]"
-        mode_rename_pane   "#[bg=${constants.color.purple_dim},fg=${constants.color.bg_hard},bold] RENAME #[bg=${constants.color.bg_soft},fg=${constants.color.purple_dim}]"
-        mode_session       "#[bg=${constants.color.red},fg=${constants.color.bg_hard},bold] SESSION #[bg=${constants.color.bg_soft},fg=${constants.color.red}]"
-        mode_move          "#[bg=${constants.color.yellow},fg=${constants.color.bg_hard},bold] MOVE #[bg=${constants.color.bg_soft},fg=${constants.color.yellow}]"
-        mode_tmux          "#[bg=${constants.color.aqua_dim},fg=${constants.color.bg_hard},bold] TMUX #[bg=${constants.color.bg_soft},fg=${constants.color.aqua_dim}]"
+        border_enabled  "false"
 
-        tab_normal              "#[bg=${constants.color.bg_soft},fg=${constants.color.gray}] {index} #[bg=${constants.color.bg0},fg=${constants.color.gray}] {name} {floating_indicator}#[bg=${constants.color.bg_soft},fg=${constants.color.bg0}]"
-        tab_active              "#[bg=${constants.color.bg_soft},fg=${constants.color.yellow_dim}] {index} #[bg=${constants.color.bg1},fg=${constants.color.yellow_dim},bold] {name} {floating_indicator}#[bg=${constants.color.bg_soft},fg=${constants.color.bg1}]"
-        tab_floating_indicator  " 󰹙 "
-        tab_fullscreen_indicator " 󰊓 "
+        hide_frame_for_single_pane "true"
 
-        datetime        "#[fg=${constants.color.gray},bold] {format} "
-        datetime_format "%H:%M  %d-%b"
+        mode_normal        ""
+        mode_locked        "#[bg=${constants.color.yellow_dim},fg=${constants.color.bg_hard},bold]  LOCKED #[bg=${constants.color.bg_soft},fg=${constants.color.yellow_dim}]"
+        mode_resize        "#[bg=${constants.color.orange},fg=${constants.color.bg_hard},bold] 󰩨 RESIZE #[bg=${constants.color.bg_soft},fg=${constants.color.orange}]"
+        mode_pane          "#[bg=${constants.color.green},fg=${constants.color.bg_hard},bold]  PANE #[bg=${constants.color.bg_soft},fg=${constants.color.green}]"
+        mode_tab           "#[bg=${constants.color.blue},fg=${constants.color.bg_hard},bold]  TAB #[bg=${constants.color.bg_soft},fg=${constants.color.blue}]"
+        mode_scroll        "#[bg=${constants.color.aqua},fg=${constants.color.bg_hard},bold]  SCROLL #[bg=${constants.color.bg_soft},fg=${constants.color.aqua}]"
+        mode_enter_search  "#[bg=${constants.color.purple},fg=${constants.color.bg_hard},bold]  SEARCH #[bg=${constants.color.bg_soft},fg=${constants.color.purple}]"
+        mode_search        "#[bg=${constants.color.purple},fg=${constants.color.bg_hard},bold]  SEARCH #[bg=${constants.color.bg_soft},fg=${constants.color.purple}]"
+        mode_rename_tab    "#[bg=${constants.color.purple_dim},fg=${constants.color.bg_hard},bold] 󰑕 RENAME #[bg=${constants.color.bg_soft},fg=${constants.color.purple_dim}]"
+        mode_rename_pane   "#[bg=${constants.color.purple_dim},fg=${constants.color.bg_hard},bold] 󰑕 RENAME #[bg=${constants.color.bg_soft},fg=${constants.color.purple_dim}]"
+        mode_session       "#[bg=${constants.color.red},fg=${constants.color.bg_hard},bold]  SESSION #[bg=${constants.color.bg_soft},fg=${constants.color.red}]"
+        mode_move          "#[bg=${constants.color.yellow},fg=${constants.color.bg_hard},bold] 󰆾 MOVE #[bg=${constants.color.bg_soft},fg=${constants.color.yellow}]"
+        mode_tmux          "#[bg=${constants.color.aqua_dim},fg=${constants.color.bg_hard},bold]  TMUX #[bg=${constants.color.bg_soft},fg=${constants.color.aqua_dim}]"
+
+        tab_normal              "#[bg=${constants.color.bg0},fg=${constants.color.gray}] {index}{floating_indicator}{fullscreen_indicator} #[bg=${constants.color.bg_soft},fg=${constants.color.bg0}]"
+        tab_active              "#[bg=${constants.color.yellow_dim},fg=${constants.color.bg_hard},bold] {index}{floating_indicator}{fullscreen_indicator} #[bg=${constants.color.bg_soft},fg=${constants.color.yellow_dim}]"
+        tab_separator           ""
+        tab_floating_indicator  " 󰹙"
+        tab_fullscreen_indicator " 󰊓"
+        tab_sync_indicator      " "
+
+        datetime          " {format} "
+        datetime_format   "%H:%M  %d %b"
       }
     }
   '';
