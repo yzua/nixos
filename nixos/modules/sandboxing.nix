@@ -44,9 +44,13 @@
         };
 
         # LibreWolf upstream profile works on NixOS (seccomp !chroot handles it)
+        # Force Mesa EGL to avoid NVIDIA LLVM OOM crash during shader compilation
         librewolf = {
           executable = "${pkgs.lib.getBin pkgsStable.librewolf}/bin/librewolf";
           profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";
+          extraArgs = [
+            "--env=__EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json"
+          ];
         };
 
         # Messaging — use upstream profiles
