@@ -17,8 +17,17 @@ in
       pulse.enable = true;
       jack.enable = true;
 
-      # RNNoise mic noise cancellation for video calls
       extraConfig.pipewire = {
+        # Increase buffer size to reduce audio stuttering in Electron apps (pear-desktop).
+        # Default quantum=256 causes xruns; 1024 absorbs scheduling jitter.
+        "91-buffer-size" = {
+          "context.properties" = {
+            "default.clock.quantum" = 1024;
+            "default.clock.min-quantum" = 512;
+          };
+        };
+
+        # RNNoise mic noise cancellation for video calls
         "99-rnnoise" = {
           "context.modules" = [
             {
