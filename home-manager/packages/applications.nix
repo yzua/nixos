@@ -8,10 +8,11 @@
 {
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
-    pkgs.youtube-music
+    pkgs.pear-desktop
     pkgs.obsidian
     pkgsStable.keepassxc
     pkgsStable.librewolf
+    pkgsStable.vscode-fhs
 
     # GTK theming
     pkgsStable.gnome-themes-extra
