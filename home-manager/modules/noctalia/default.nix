@@ -192,7 +192,7 @@
             id = "brightness-card";
           }
           {
-            enabled = true;
+            enabled = false;
             id = "weather-card";
           }
           {
