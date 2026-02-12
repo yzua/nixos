@@ -54,10 +54,11 @@
     nix-index-database.comma.enable = true;
   };
 
-  # User services (auto-start tray applets and audio pipeline)
+  # User services (auto-start tray applets)
   services = {
     network-manager-applet.enable = true;
-    easyeffects.enable = true;
+    # easyeffects disabled: 8.0.9 crashes (SIGSEGV in lilv_world_load_plugin_classes)
+    # RNNoise noise cancellation is handled by PipeWire filter-chain in nixos/modules/audio.nix
   };
 
   # Desktop entries for firejail-wrapped binaries
