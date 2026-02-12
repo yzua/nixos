@@ -781,12 +781,20 @@ in
 
         installAgentSkills = lib.mkIf (cfg.skills != [ ]) (
           lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            echo "📦 Installing agent skills from skills.sh..."
-            for skill in ${lib.escapeShellArgs cfg.skills}; do
-              echo "  → $skill"
-              $DRY_RUN_CMD ${pkgs.nodejs}/bin/npx -y skills add "$skill" --global --all --yes 2>/dev/null || true
-            done
-            echo "✓ Skills installation complete"
+            SKILLS_BIN="$HOME/.bun/bin/skills"
+            if [[ ! -x "$SKILLS_BIN" ]]; then
+              SKILLS_BIN="$(command -v skills 2>/dev/null || true)"
+            fi
+            if [[ -n "$SKILLS_BIN" ]]; then
+              echo "📦 Installing agent skills from skills.sh..."
+              for skill in ${lib.escapeShellArgs cfg.skills}; do
+                echo "  → $skill"
+                $DRY_RUN_CMD "$SKILLS_BIN" add "$skill" --global --all --yes 2>&1 | tail -1 || true
+              done
+              echo "✓ Skills installation complete"
+            else
+              echo "⚠ skills CLI not found — run 'bun install -g skills' first"
+            fi
           ''
         );
 
