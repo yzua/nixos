@@ -13,20 +13,13 @@
     mcpServers = {
       context7 = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@upstash/context7-mcp@latest"
-        ];
+        command = "context7-mcp";
       };
 
       zai-mcp-server = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@z_ai/mcp-server"
-        ];
+        command = "bunx";
+        args = [ "@z_ai/mcp-server" ]; # no bin field, needs bunx
         env = {
           Z_AI_MODE = "ZAI";
         };
@@ -40,12 +33,8 @@
 
       filesystem = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@modelcontextprotocol/server-filesystem"
-          "/home/yz"
-        ];
+        command = "mcp-server-filesystem";
+        args = [ "/home/yz" ];
       };
 
       git = {
@@ -56,29 +45,17 @@
 
       memory = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@modelcontextprotocol/server-memory"
-        ];
+        command = "mcp-server-memory";
       };
 
       sequential-thinking = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@modelcontextprotocol/server-sequential-thinking"
-        ];
+        command = "mcp-server-sequential-thinking";
       };
 
       playwright = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@playwright/mcp@latest"
-        ];
+        command = "playwright-mcp";
       };
 
       cloudflare-docs = {
@@ -88,30 +65,27 @@
       };
 
       cloudflare-workers-builds = {
-        enable = true;
+        enable = false; # never connects, wastes startup time
         type = "remote";
         url = "https://builds.mcp.cloudflare.com/mcp";
       };
 
       cloudflare-workers-bindings = {
-        enable = true;
+        enable = false; # never connects, wastes startup time
         type = "remote";
         url = "https://bindings.mcp.cloudflare.com/mcp";
       };
 
       cloudflare-observability = {
-        enable = true;
+        enable = false; # never connects, wastes startup time
         type = "remote";
         url = "https://observability.mcp.cloudflare.com/mcp";
       };
 
       magic-ui = {
         enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@magicuidesign/mcp@latest"
-        ];
+        command = "bunx";
+        args = [ "@magicuidesign/mcp" ]; # bin is generic "mcp", use bunx to avoid conflicts
       };
 
     };
@@ -534,7 +508,11 @@
       ];
 
       extraSettings = {
-        tui.theme = "gruvbox";
+        tui = {
+          theme = "gruvbox";
+          show_tokens = true;
+          show_cost = true;
+        };
       };
 
       providers = {
@@ -608,7 +586,7 @@
               };
             };
             "antigravity-claude-opus-4-6-thinking" = {
-              name = "Claude Opus 4.5 Thinking (Antigravity)";
+              name = "Claude Opus 4.6 Thinking (Antigravity)";
               limit = {
                 context = 200000;
                 output = 64000;
@@ -685,6 +663,9 @@
           };
           atlas = {
             model = "anthropic/claude-sonnet-4-5";
+          };
+          hephaestus = {
+            model = "anthropic/claude-opus-4-6";
           };
         };
 

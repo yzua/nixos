@@ -14,6 +14,14 @@ let
     "@openai/codex"
     "opencode-ai"
     "skills"
+    # MCP servers (globally installed for fast startup, avoids npx cold starts)
+    "@upstash/context7-mcp"
+    "@modelcontextprotocol/server-filesystem"
+    "@modelcontextprotocol/server-memory"
+    "@modelcontextprotocol/server-sequential-thinking"
+    "@playwright/mcp"
+    "@magicuidesign/mcp"
+    "@z_ai/mcp-server"
   ];
 in
 {
