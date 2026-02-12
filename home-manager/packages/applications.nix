@@ -11,8 +11,8 @@
     pkgs.pear-desktop
     pkgs.obsidian
     pkgsStable.keepassxc
-    # LibreWolf: force Mesa EGL to avoid NVIDIA LLVM OOM crash during shader compilation.
-    # NVIDIA's EGL (10_nvidia.json) takes priority by default and its LLVM JIT OOMs on startup.
+    # LibreWolf: HM package provides .desktop file + icons for app launcher.
+    # HM binary shadows the firejail-wrapped system binary, so wrap with Mesa EGL here too.
     (pkgs.symlinkJoin {
       name = "librewolf";
       paths = [ pkgsStable.librewolf ];

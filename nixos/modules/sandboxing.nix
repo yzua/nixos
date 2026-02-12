@@ -44,7 +44,8 @@
         };
 
         # LibreWolf upstream profile works on NixOS (seccomp !chroot handles it)
-        # Force Mesa EGL to avoid NVIDIA LLVM OOM crash during shader compilation
+        # Force Mesa EGL inside sandbox — firejail strips session env vars,
+        # so the system-wide override in nvidia.nix doesn't reach sandboxed apps.
         librewolf = {
           executable = "${pkgs.lib.getBin pkgsStable.librewolf}/bin/librewolf";
           profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";

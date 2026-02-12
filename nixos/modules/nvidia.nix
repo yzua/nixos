@@ -31,6 +31,11 @@ in
       GBM_BACKEND = "nvidia-drm";
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";
 
+      # Force Mesa EGL instead of NVIDIA's EGL ICD (10_nvidia.json).
+      # NVIDIA's EGL LLVM JIT OOMs on Firefox-family browsers (Mullvad, Tor, LibreWolf).
+      # Mesa EGL works fine on Wayland — NVIDIA Vulkan/GLX remain unaffected.
+      __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
+
       # ELECTRON_OZONE_PLATFORM_HINT is set in niri/main.nix (compositor-level)
       __GL_GSYNC_ALLOWED = "1";
       __GL_VRR_ALLOWED = "1";
