@@ -106,12 +106,16 @@ let
     plugin = cfg.opencode.plugins;
     provider = cfg.opencode.providers;
   }
+  // (lib.optionalAttrs (cfg.globalInstructions != "") { instructions = [ cfg.globalInstructions ]; })
   // (lib.optionalAttrs (cfg.opencode.extraSettings != { }) cfg.opencode.extraSettings);
 
   geminiSettings = {
     mcpServers = geminiMcpServers;
     inherit (cfg.gemini) theme sandboxMode;
   }
+  // (lib.optionalAttrs (cfg.globalInstructions != "") {
+    systemInstruction = cfg.globalInstructions;
+  })
   // (lib.optionalAttrs (cfg.gemini.extraSettings != { }) cfg.gemini.extraSettings);
 
   ohMyOpencodeSettings = {
@@ -213,6 +217,12 @@ in
 
   options.programs.aiAgents = {
     enable = lib.mkEnableOption "AI coding agents configuration";
+
+    globalInstructions = lib.mkOption {
+      type = lib.types.lines;
+      default = "";
+      description = "Global instructions injected into all AI agents (Claude CLAUDE.md, OpenCode instructions, Codex developer_instructions, Gemini systemInstruction)";
+    };
 
     secrets = {
       zaiApiKeyFile = lib.mkOption {
@@ -827,6 +837,7 @@ in
             Never suppress type errors. Never commit unless asked.
             Run diagnostics/tests on changed files before claiming done.
             Match existing codebase patterns and conventions.
+            ${lib.optionalString (cfg.globalInstructions != "") cfg.globalInstructions}
             """
 
             [tui]
@@ -899,6 +910,15 @@ in
               chmod 644 "$CLAUDE_MCP"
             fi
             echo "✓ Claude .mcp.json configured"
+
+            ${lib.optionalString (cfg.globalInstructions != "") ''
+                CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+                cat > "$CLAUDE_MD" << 'CLAUDE_INSTRUCTIONS_EOF'
+              ${cfg.globalInstructions}
+              CLAUDE_INSTRUCTIONS_EOF
+                ${pkgs.gnused}/bin/sed -i 's/^            //' "$CLAUDE_MD"
+                echo "✓ Claude CLAUDE.md configured"
+            ''}
           ''
         );
 

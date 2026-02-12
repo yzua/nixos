@@ -4,6 +4,38 @@
   programs.aiAgents = {
     enable = true;
 
+    globalInstructions = ''
+      # NixOS Environment
+
+      You are running on **NixOS** (flake-based, x86_64-linux). This is NOT a standard Linux distro.
+
+      ## Key Facts
+
+      - **No apt/dnf/pacman/brew**: Packages are managed declaratively via Nix flakes. Don't suggest `apt install` or similar.
+      - **Ephemeral tools**: Use `nix-shell -p <package>` to get any tool temporarily without installing it system-wide. Examples:
+        - `nix-shell -p jq` — get jq for the current shell session
+        - `nix-shell -p python3Packages.requests` — get a Python package
+        - `nix-shell -p nodePackages.prettier` — get a Node.js tool
+        - `nix run nixpkgs#<package>` — run a package directly without entering a shell
+      - **Dev environments**: Use `nix develop` (or `direnv`) for project-specific toolchains. Most projects have a `flake.nix` or `.envrc`.
+      - **System config**: Lives at `~/System/` — a flake with NixOS modules + Home Manager (standalone, not a NixOS module).
+      - **Validation**: `just modules && just lint && just format && just check` before any Nix config changes.
+      - **Apply changes**: `just home` (user-level, safe) then `just nixos` (system-level).
+      - **Secrets**: Managed via sops-nix (age encryption). Never commit plaintext secrets. Use `just sops-edit` to modify.
+      - **FHS assumptions break**: `/usr/lib`, `/opt`, etc. don't exist. Use `nix-shell -p` or add packages to the flake.
+      - **Compositor**: Niri (scrollable tiling Wayland), not X11. Use `wl-copy`/`wl-paste` for clipboard, not `xclip`.
+      - **Multiplexer**: Zellij (not tmux). Use `zellij` for terminal multiplexing.
+
+      ## Git Conventions
+
+      - **Commit style**: Semantic commits — `feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`.
+      - **Scope**: Use parenthesized scope when clear — `feat(auth):`, `fix(niri):`, `chore(mcp):`.
+      - **Message**: Imperative mood, lowercase after prefix. First line under 72 chars. Body explains *why*, not *what*.
+      - **No force-push** to `main`/`master` unless explicitly requested.
+      - **No commits** unless explicitly asked.
+      - **Atomic commits**: One logical change per commit. Don't mix refactors with features.
+    '';
+
     skills = [
       "obra/superpowers"
       "anthropics/skills"
@@ -81,15 +113,6 @@
         enable = false; # never connects, wastes startup time
         type = "remote";
         url = "https://observability.mcp.cloudflare.com/mcp";
-      };
-
-      mermaid = {
-        enable = true;
-        command = "npx";
-        args = [
-          "-y"
-          "@mermaidchart/mcp"
-        ];
       };
 
       github = {
@@ -855,18 +878,6 @@
         personality = "pragmatic"
         model_reasoning_effort = "high"
         approval_policy = "on-request"
-
-        [profiles.deep]
-        model_reasoning_effort = "xhigh"
-        approval_policy = "on-request"
-
-        [profiles.safe]
-        approval_policy = "untrusted"
-        sandbox_mode = "read-only"
-
-        [shell_environment_policy]
-        inherit = "core"
-        exclude = ["*_SECRET", "*_TOKEN", "*_KEY", "AWS_*", "AZURE_*", "GCP_*"]
       '';
     };
 
