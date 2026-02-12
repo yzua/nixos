@@ -142,6 +142,68 @@ let
     cfg.opencode.ohMyOpencode.extraSettings != { }
   ) cfg.opencode.ohMyOpencode.extraSettings);
 
+  # GLM-5 profile: Z.AI GLM models for cost-effective coding sessions.
+  glmAgentModels = {
+    sisyphus = "zai-coding-plan/glm-5";
+    oracle = "zai-coding-plan/glm-5";
+    librarian = "zai-coding-plan/glm-4.7";
+    explore = "zai-coding-plan/glm-4.7-flash";
+    # multimodal-looker keeps its original vision-capable model
+    prometheus = "zai-coding-plan/glm-5";
+    metis = "zai-coding-plan/glm-5";
+    momus = "zai-coding-plan/glm-4.7";
+    atlas = "zai-coding-plan/glm-4.7";
+  };
+
+  glmOpencodeSettings = opencodeSettings // {
+    model = "zai-coding-plan/glm-5";
+  };
+
+  glmOhMyOpencodeSettings = ohMyOpencodeSettings // {
+    agents =
+      lib.mapAttrs (
+        name: agentCfg:
+        agentCfg
+        // (lib.optionalAttrs (builtins.hasAttr name glmAgentModels) {
+          model = glmAgentModels.${name};
+        })
+      ) ohMyOpencodeSettings.agents
+      // {
+        # Autonomous deep worker agent (defaults to gpt-5.3-codex)
+        hephaestus = {
+          model = "zai-coding-plan/glm-5";
+        };
+      };
+
+    # Override category models to use GLM instead of default providers
+    categories = {
+      "visual-engineering" = {
+        model = "zai-coding-plan/glm-5";
+      };
+      ultrabrain = {
+        model = "zai-coding-plan/glm-5";
+      };
+      deep = {
+        model = "zai-coding-plan/glm-5";
+      };
+      artistry = {
+        model = "zai-coding-plan/glm-5";
+      };
+      quick = {
+        model = "zai-coding-plan/glm-4.7-flash";
+      };
+      "unspecified-low" = {
+        model = "zai-coding-plan/glm-4.7";
+      };
+      "unspecified-high" = {
+        model = "zai-coding-plan/glm-5";
+      };
+      writing = {
+        model = "zai-coding-plan/glm-4.7";
+      };
+    };
+  };
+
 in
 {
   imports = [
@@ -603,28 +665,29 @@ in
             if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
               ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
               
-              OPENCODE_CFG="$HOME/.config/opencode/opencode.json"
-              if [[ -f "$OPENCODE_CFG" ]]; then
-                ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                  .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
-                  .mcp["web-search-prime"] = {
-                    type: "remote",
-                    url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-                    headers: { Authorization: ("Bearer " + $key) }
-                  } |
-                  .mcp["web-reader"] = {
-                    type: "remote",
-                    url: "https://api.z.ai/api/mcp/web_reader/mcp",
-                    headers: { Authorization: ("Bearer " + $key) }
-                  } |
-                  .mcp["zread"] = {
-                    type: "remote",
-                    url: "https://api.z.ai/api/mcp/zread/mcp",
-                    headers: { Authorization: ("Bearer " + $key) }
-                  }
-                ' "$OPENCODE_CFG" > "$OPENCODE_CFG.tmp" && mv "$OPENCODE_CFG.tmp" "$OPENCODE_CFG"
-                echo "✓ Patched opencode.json with Z.AI API key"
-              fi
+              for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json"; do
+                if [[ -f "$OPENCODE_CFG" ]]; then
+                  ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
+                    .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
+                    .mcp["web-search-prime"] = {
+                      type: "remote",
+                      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+                      headers: { Authorization: ("Bearer " + $key) }
+                    } |
+                    .mcp["web-reader"] = {
+                      type: "remote",
+                      url: "https://api.z.ai/api/mcp/web_reader/mcp",
+                      headers: { Authorization: ("Bearer " + $key) }
+                    } |
+                    .mcp["zread"] = {
+                      type: "remote",
+                      url: "https://api.z.ai/api/mcp/zread/mcp",
+                      headers: { Authorization: ("Bearer " + $key) }
+                    }
+                  ' "$OPENCODE_CFG" > "$OPENCODE_CFG.tmp" && mv "$OPENCODE_CFG.tmp" "$OPENCODE_CFG"
+                  echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Z.AI API key"
+                fi
+              done
               
               CLAUDE_MCP="$HOME/.mcp.json"
               if [[ -f "$CLAUDE_MCP" ]]; then
@@ -1032,6 +1095,16 @@ in
       };
       "opencode/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
         text = toJSON ohMyOpencodeSettings;
+        force = true;
+      };
+
+      # GLM-5 profile (used by oc-glm via OPENCODE_CONFIG_DIR)
+      "opencode-glm/opencode.json" = {
+        text = toJSON glmOpencodeSettings;
+        force = true;
+      };
+      "opencode-glm/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
+        text = toJSON glmOhMyOpencodeSettings;
         force = true;
       };
     };
