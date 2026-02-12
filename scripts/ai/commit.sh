@@ -24,7 +24,7 @@ print_error() { echo -e "${RED}✗${NC} $1"; }
 show_usage() {
     echo "Usage: $0 [options]"
     echo ""
-    echo "Generate conventional commit messages based on staged changes using GLM-4.6."
+    echo "Generate conventional commit messages based on staged changes using glm-5."
     echo "This script analyzes git staged changes and creates proper commit messages."
     echo ""
     echo "Examples:"

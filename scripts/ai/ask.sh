@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # ask.sh - AI API client using z.ai OpenAI-compatible API
 # Usage: ./ask.sh [-d] [-s "system prompt"] "Your prompt here"
-#   -d  Use deep model (GLM-4.6) instead of default (GLM-4.5-air)
+#   -d  Use deep model (glm-5) instead of default (GLM-4.5-air)
 #   -s  Add system prompt for context
 
 set -euo pipefail
 
 # Configuration
 API_URL="https://api.z.ai/api/coding/paas/v4"
-DEFAULT_MODEL="glm-4.6"
-DEEP_MODEL="glm-4.6"
+DEFAULT_MODEL="glm-5"
+DEEP_MODEL="glm-5"
 API_KEY_FILE="/run/secrets/zai_api_key"
 
 # Colors for output
@@ -41,7 +41,7 @@ show_usage() {
     echo "Usage: $0 [-d] [-c] [-s \"system prompt\"] \"Your prompt here\""
     echo ""
     echo "Options:"
-    echo "  -d    Use deep model (GLM-4.6) for better quality"
+    echo "  -d    Use deep model (glm-5) for better quality"
     echo "  -c    Copy response to clipboard using wl-clipboard"
     echo "  -s    Add system prompt for context"
     echo "  -h    Show this help message"
