@@ -22,7 +22,7 @@ let
     "@playwright/mcp"
     "@magicuidesign/mcp"
     "@modelcontextprotocol/server-github"
-    "@anthropic-ai/agent-browser"
+    "agent-browser"
     "@z_ai/mcp-server"
   ];
 in
