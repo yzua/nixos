@@ -3,9 +3,15 @@
 {
   constants,
   inputs,
+  pkgs,
   ...
 }:
 
+let
+  apiQuotaScript = pkgs.writeShellScript "api-quota-widget" (
+    builtins.readFile ../../../scripts/ai/api-quota.sh
+  );
+in
 {
   imports = [ inputs.noctalia.homeModules.default ];
 
@@ -89,6 +95,16 @@
                 horizontal = 12;
                 vertical = 6;
               };
+            }
+            {
+              id = "CustomButton";
+              icon = "activity";
+              showIcon = true;
+              hideMode = "alwaysExpanded";
+              parseJson = true;
+              textCommand = "${apiQuotaScript}";
+              textIntervalMs = 120000;
+              leftClickUpdateText = true;
             }
             { id = "NotificationHistory"; }
             {

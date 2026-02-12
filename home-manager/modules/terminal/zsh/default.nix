@@ -219,6 +219,38 @@
         Z_AI_API_KEY="$key" claude "$@"
       }
 
+      # OpenCode with tmux visual multi-agent panes
+      oc-tmux() {
+        local base_name
+        base_name=$(basename "$(pwd)")
+        local path_hash
+        path_hash=$(echo "$(pwd)" | md5sum | cut -c1-4)
+        local session_name="''${base_name}-''${path_hash}"
+        local oc_port
+
+        for port in $(seq 4096 5096); do
+          if ! lsof -i ":$port" >/dev/null 2>&1; then
+            oc_port=$port
+            break
+          fi
+        done
+        oc_port=''${oc_port:-4096}
+
+        export OPENCODE_PORT=$oc_port
+
+        if [[ -n "$TMUX" ]]; then
+          opencode --port "$oc_port" "$@"
+        else
+          local oc_cmd="OPENCODE_PORT=$oc_port opencode --port $oc_port $*; exec zsh"
+          if tmux has-session -t "$session_name" 2>/dev/null; then
+            tmux new-window -t "$session_name" -c "$(pwd)" "$oc_cmd"
+            tmux attach-session -t "$session_name"
+          else
+            tmux new-session -s "$session_name" -c "$(pwd)" "$oc_cmd"
+          fi
+        fi
+      }
+
       mkcd() {
         mkdir -p "$1" && cd "$1"
       }

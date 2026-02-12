@@ -8,6 +8,7 @@
       "obra/superpowers"
       "anthropics/skills"
       "affaan-m/everything-claude-code"
+      "alirezarezvani/claude-skills"
     ];
 
     mcpServers = {
@@ -82,10 +83,13 @@
         url = "https://observability.mcp.cloudflare.com/mcp";
       };
 
-      magic-ui = {
+      mermaid = {
         enable = true;
-        command = "bunx";
-        args = [ "@magicuidesign/mcp" ]; # bin is generic "mcp", use bunx to avoid conflicts
+        command = "npx";
+        args = [
+          "-y"
+          "@mermaidchart/mcp"
+        ];
       };
 
       github = {
@@ -116,6 +120,7 @@
         CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
         MAX_MCP_OUTPUT_TOKENS = "50000"; # Default 10k; raised for large codebases
         MCP_TIMEOUT = "30000"; # Default 10s; raised for npx cold starts
+        ENABLE_TOOL_SEARCH = "auto:5"; # Auto-search when >5 tools match; faster with 12+ MCPs
       };
 
       permissions = {
@@ -152,9 +157,17 @@
         ];
         deny = [
           "Bash(rm -rf /)"
+          "Bash(rm -rf ~)"
+          "Bash(rm -rf /*)"
+          "Bash(> /dev/sda*)"
+          "Bash(mkfs*)"
+          "Bash(dd if=*)"
           "Read(.env)"
           "Read(.env.*)"
           "Read(./secrets/**)"
+          "Read(.ssh/*)"
+          "Read(**/id_rsa*)"
+          "Read(**/id_ed25519*)"
         ];
       };
 
@@ -259,6 +272,22 @@
                 command = ''
                   reason=$(cat | jq -r '.stop_reason // "completed"')
                   notify-send -i dialog-information "Claude Code" "Task $reason" 2>/dev/null || true
+                '';
+              }
+            ];
+          }
+        ];
+        PostToolUseFailure = [
+          {
+            hooks = [
+              {
+                type = "command";
+                command = ''
+                  INPUT=$(cat)
+                  TOOL=$(echo "$INPUT" | jq -r '.tool // "unknown"')
+                  ERROR=$(echo "$INPUT" | jq -r '.error // "no error"' | head -5)
+                  echo "[Hook] Tool FAILED: $TOOL — $ERROR" >&2
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -521,6 +550,26 @@
           show_tokens = true;
           show_cost = true;
         };
+        small_model = "anthropic/claude-haiku-4-5"; # Cheap model for titles, summaries
+        compaction = {
+          auto = true;
+          prune = true; # Remove old tool outputs during compaction
+          reserved = 10000; # Reserved tokens after compaction
+        };
+        command = {
+          test = {
+            template = "Run the project test suite. If a justfile exists, use 'just check'. Otherwise find and run the appropriate test command.";
+            description = "Run project tests";
+          };
+          deploy = {
+            template = "Run the NixOS deployment pipeline: just modules && just lint && just format && just check && just home. Only run 'just nixos' if I explicitly confirm.";
+            description = "Deploy NixOS configuration";
+          };
+          review = {
+            template = "Review the staged git changes (git diff --staged). Check for: correctness, edge cases, security issues, performance problems, maintainability. Rate issues as CRITICAL/WARNING/SUGGESTION.";
+            description = "Review staged changes";
+          };
+        };
       };
 
       providers = {
@@ -631,9 +680,13 @@
         agents = {
           sisyphus = {
             model = "anthropic/claude-opus-4-6";
+            description = "Primary orchestrator — delegates, verifies, ships";
+            color = "#d79921"; # Gruvbox yellow
           };
           oracle = {
             model = "anthropic/claude-opus-4-6";
+            description = "Read-only consultant for architecture and debugging";
+            color = "#458588"; # Gruvbox blue
             permission = {
               edit = "deny";
               bash = "ask";
@@ -642,6 +695,8 @@
           };
           librarian = {
             model = "anthropic/claude-sonnet-4-5";
+            description = "External reference search — docs, OSS, GitHub examples";
+            color = "#b16286"; # Gruvbox purple
             permission = {
               edit = "deny";
               bash = "deny";
@@ -650,6 +705,8 @@
           };
           explore = {
             model = "anthropic/claude-haiku-4-5";
+            description = "Fast contextual grep — codebase patterns and structure";
+            color = "#98971a"; # Gruvbox green
             permission = {
               edit = "deny";
               bash = "deny";
@@ -658,34 +715,110 @@
           };
           multimodal-looker = {
             model = "google/gemini-3-flash";
+            description = "Visual content analysis — PDFs, images, diagrams";
+            color = "#689d6a"; # Gruvbox aqua
           };
           prometheus = {
             model = "anthropic/claude-opus-4-6";
             variant = "max";
+            description = "Strategic planner with interview mode";
+            color = "#cc241d"; # Gruvbox red
           };
           metis = {
             model = "anthropic/claude-opus-4-6";
+            description = "Pre-planning analysis — hidden requirements, ambiguities";
+            color = "#d65d0e"; # Gruvbox orange
           };
           momus = {
             model = "openai/gpt-5.2";
+            description = "Plan reviewer — validates clarity and completeness";
+            color = "#928374"; # Gruvbox gray
           };
           atlas = {
             model = "anthropic/claude-sonnet-4-5";
+            description = "Orchestrator/conductor — coordinates task execution";
+            color = "#fabd2f"; # Gruvbox bright yellow
           };
           hephaestus = {
             model = "anthropic/claude-opus-4-6";
+            description = "Autonomous deep worker — goal-oriented, long-running tasks";
+            color = "#fb4934"; # Gruvbox bright red
           };
         };
 
         extraSettings = {
+          # === Background Task Concurrency ===
           background_task = {
             defaultConcurrency = 5;
+            staleTimeoutMs = 180000; # Kill stale tasks after 3 minutes
             providerConcurrency = {
               anthropic = 3;
               openai = 5;
               google = 10;
             };
+            modelConcurrency = {
+              "anthropic/claude-opus-4-6" = 2; # Expensive — limit hard
+              "anthropic/claude-haiku-4-5" = 8; # Cheap — allow many
+              "google/gemini-3-flash" = 10; # Cheap — allow many
+            };
           };
+
+          # === Category Model Assignments ===
+          categories = {
+            "visual-engineering" = {
+              model = "google/antigravity-gemini-3-pro";
+            };
+            ultrabrain = {
+              model = "openai/gpt-5.3-codex";
+            };
+            deep = {
+              model = "anthropic/claude-opus-4-6";
+              variant = "max";
+            };
+            artistry = {
+              model = "google/antigravity-gemini-3-pro";
+            };
+            quick = {
+              model = "anthropic/claude-haiku-4-5";
+            };
+            "unspecified-low" = {
+              model = "anthropic/claude-sonnet-4-5";
+            };
+            "unspecified-high" = {
+              model = "anthropic/claude-opus-4-6";
+              variant = "max";
+            };
+            writing = {
+              model = "google/antigravity-gemini-3-flash";
+            };
+          };
+
+          # === Tmux Visual Multi-Agent ===
+          tmux = {
+            enabled = true;
+            layout = "main-vertical";
+            main_pane_size = 60;
+            main_pane_min_width = 120;
+            agent_pane_min_width = 40;
+          };
+
+          # === Git Master ===
+          git_master = {
+            commit_footer = false;
+            include_co_authored_by = false;
+          };
+
+          # === Experimental Features ===
+          experimental = {
+            aggressive_truncation = true; # Saves tokens on large outputs
+            preemptive_compaction = true; # Compact before hitting limits
+          };
+
+          # === Disabled Hooks ===
+          disabled_hooks = [
+            "agent-usage-reminder" # Noisy reminder (already know to use agents)
+            "startup-toast" # Startup noise
+          ];
         };
       };
     };
@@ -701,6 +834,12 @@
         "/home/yz/System"
       ];
       extraToml = ''
+        [features]
+        request_rule = true
+        web_search = "live"
+        collaboration_modes = true
+        personality = true
+
         [profiles.nix]
         model_reasoning_effort = "high"
         approval_policy = "on-request"
@@ -711,6 +850,23 @@
         Follow patterns in nearby modules. Use lib.mkIf for conditionals.
         Custom options live under mySystem.* namespace.
         """
+
+        [profiles.review]
+        personality = "pragmatic"
+        model_reasoning_effort = "high"
+        approval_policy = "on-request"
+
+        [profiles.deep]
+        model_reasoning_effort = "xhigh"
+        approval_policy = "on-request"
+
+        [profiles.safe]
+        approval_policy = "untrusted"
+        sandbox_mode = "read-only"
+
+        [shell_environment_policy]
+        inherit = "core"
+        exclude = ["*_SECRET", "*_TOKEN", "*_KEY", "AWS_*", "AZURE_*", "GCP_*"]
       '';
     };
 
@@ -722,6 +878,18 @@
       extraSettings = {
         codeExecution = true;
         searchGrounding = true;
+        context = {
+          fileName = [
+            "GEMINI.md"
+            "AGENTS.md"
+          ];
+          importFormat = "markdown";
+          fileFiltering = {
+            respectGitIgnore = true;
+            respectGeminiIgnore = true;
+            enableRecursiveFileSearch = true;
+          };
+        };
         general = {
           vimMode = true;
           enableAutoUpdate = true;
@@ -781,6 +949,17 @@
                   thinkingConfig = {
                     thinkingLevel = "HIGH";
                   };
+                };
+              };
+            };
+            code = {
+              modelConfig = {
+                model = "gemini-2.5-pro";
+                generateContentConfig = {
+                  thinkingConfig = {
+                    thinkingLevel = "HIGH";
+                  };
+                  maxOutputTokens = 65536;
                 };
               };
             };
