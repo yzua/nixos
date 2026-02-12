@@ -233,12 +233,35 @@ in
     };
 
     skills = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = lib.types.listOf (
+        lib.types.either lib.types.str (
+          lib.types.submodule {
+            options = {
+              repo = lib.mkOption {
+                type = lib.types.str;
+                description = "GitHub repository (e.g., 'vercel-labs/skills')";
+              };
+              skill = lib.mkOption {
+                type = lib.types.str;
+                description = "Individual skill name from the repository";
+              };
+            };
+          }
+        )
+      );
       default = [ ];
-      description = "List of skills to install from skills.sh (e.g., 'obra/superpowers')";
+      description = ''
+        List of skills to install from skills.sh.
+        Use a string for repo-level installs (e.g., "obra/superpowers").
+        Use an attrset { repo, skill } for individual skills
+        (e.g., { repo = "vercel-labs/skills"; skill = "find-skills"; }).
+      '';
       example = [
         "obra/superpowers"
-        "anthropics/skills"
+        {
+          repo = "vercel-labs/skills";
+          skill = "find-skills";
+        }
       ];
     };
 
@@ -779,24 +802,40 @@ in
           ''
         );
 
-        installAgentSkills = lib.mkIf (cfg.skills != [ ]) (
-          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            SKILLS_BIN="$HOME/.bun/bin/skills"
-            if [[ ! -x "$SKILLS_BIN" ]]; then
-              SKILLS_BIN="$(command -v skills 2>/dev/null || true)"
-            fi
-            if [[ -n "$SKILLS_BIN" ]]; then
-              echo "📦 Installing agent skills from skills.sh..."
-              for skill in ${lib.escapeShellArgs cfg.skills}; do
-                echo "  → $skill"
-                $DRY_RUN_CMD "$SKILLS_BIN" add "$skill" --global --all --yes 2>&1 | tail -1 || true
-              done
-              echo "✓ Skills installation complete"
-            else
-              echo "⚠ skills CLI not found — run 'bun install -g skills' first"
-            fi
-          ''
-        );
+        installAgentSkills =
+          let
+            # Pre-generate install commands at Nix eval time
+            skillCommands = map (
+              s:
+              if builtins.isString s then
+                # Repo-level: skills add "owner/repo" --global --all --yes
+                ''
+                  echo "  → ${s}"
+                  $DRY_RUN_CMD "$SKILLS_BIN" add "${s}" --global --all --yes 2>&1 | tail -1 || true
+                ''
+              else
+                # Individual: skills add https://github.com/owner/repo --skill name --global --all --yes
+                ''
+                  echo "  → ${s.repo}#${s.skill}"
+                  $DRY_RUN_CMD "$SKILLS_BIN" add "https://github.com/${s.repo}" --skill "${s.skill}" --global --all --yes 2>&1 | tail -1 || true
+                ''
+            ) cfg.skills;
+          in
+          lib.mkIf (cfg.skills != [ ]) (
+            lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              SKILLS_BIN="$HOME/.bun/bin/skills"
+              if [[ ! -x "$SKILLS_BIN" ]]; then
+                SKILLS_BIN="$(command -v skills 2>/dev/null || true)"
+              fi
+              if [[ -n "$SKILLS_BIN" ]]; then
+                echo "📦 Installing agent skills from skills.sh..."
+                ${lib.concatStringsSep "" skillCommands}
+                echo "✓ Skills installation complete"
+              else
+                echo "⚠ skills CLI not found — run 'bun install -g skills' first"
+              fi
+            ''
+          );
 
         setupCodexConfig = lib.mkIf cfg.codex.enable (
           let

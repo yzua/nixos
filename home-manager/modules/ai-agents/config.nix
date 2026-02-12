@@ -36,10 +36,38 @@
     '';
 
     skills = [
+      # Repo-level installs (all skills from repo)
       "obra/superpowers"
       "anthropics/skills"
       "affaan-m/everything-claude-code"
       "alirezarezvani/claude-skills"
+
+      # Individual skills (--skill flag)
+      {
+        repo = "vercel-labs/skills";
+        skill = "find-skills";
+      }
+
+      {
+        repo = "vercel-labs/agent-skills";
+        skill = "vercel-react-best-practices";
+      }
+      {
+        repo = "vercel-labs/agent-skills";
+        skill = "web-design-guidelines";
+      }
+      {
+        repo = "remotion-dev/skills";
+        skill = "remotion-best-practices";
+      }
+      {
+        repo = "anthropics/skills";
+        skill = "frontend-design";
+      }
+      {
+        repo = "vercel-labs/agent-browser";
+        skill = "agent-browser";
+      }
     ];
 
     mcpServers = {
@@ -88,6 +116,10 @@
       playwright = {
         enable = true;
         command = "playwright-mcp";
+        args = [
+          "--executable-path"
+          "/run/current-system/sw/bin/chromium"
+        ];
       };
 
       cloudflare-docs = {
