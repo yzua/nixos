@@ -38,8 +38,15 @@
     skills = [
       "obra/superpowers"
       "anthropics/skills"
+      "anthropics/skills/frontend-design"
       "affaan-m/everything-claude-code"
       "alirezarezvani/claude-skills"
+      "vercel-labs/skills/find-skills"
+      "vercel-labs/agent-skills/vercel-react-best-practices"
+      "vercel-labs/agent-skills/web-design-guidelines"
+      "vercel-labs/agent-browser/agent-browser"
+      "sickn33/antigravity-awesome-skills/playwright-skill"
+      "remotion-dev/skills/remotion-best-practices"
     ];
 
     mcpServers = {
