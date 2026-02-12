@@ -89,7 +89,7 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`
 
 | Setting | Value | Why |
 |---------|-------|-----|
-| Model | `openai/gpt-5.2-codex` | Primary coding model |
+| Model | `anthropic/claude-opus-4-6` | Primary coding model |
 | Theme | `gruvbox` | Matches system theme |
 | Small model | `claude-haiku-4-5` | Cheap model for titles, summaries |
 | Compaction | Auto + prune | Remove old tool outputs, reserve 10k tokens |

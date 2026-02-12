@@ -20,7 +20,6 @@
       - **Dev environments**: Use `nix develop` (or `direnv`) for project-specific toolchains. Most projects have a `flake.nix` or `.envrc`.
       - **System config**: Lives at `~/System/` — a flake with NixOS modules + Home Manager (standalone, not a NixOS module).
       - **Apply changes**: `just home` (user-level, safe) then `just nixos` (system-level).
-      - **Secrets**: Managed via sops-nix (age encryption). Never commit plaintext secrets. Use `just sops-edit` to modify.
       - **FHS assumptions break**: `/usr/lib`, `/opt`, etc. don't exist. Use `nix-shell -p` or add packages to the flake.
       - **Compositor**: Niri (scrollable tiling Wayland), not X11. Use `wl-copy`/`wl-paste` for clipboard, not `xclip`.
       - **Multiplexer**: Zellij (not tmux). Use `zellij` for terminal multiplexing.
@@ -590,7 +589,7 @@
 
     opencode = {
       enable = true;
-      model = "openai/gpt-5.2-codex";
+      model = "anthropic/claude-opus-4-6";
 
       plugins = [
         "oh-my-opencode"
@@ -784,7 +783,7 @@
             color = "#d65d0e"; # Gruvbox orange
           };
           momus = {
-            model = "openai/gpt-5.2";
+            model = "anthropic/claude-opus-4-6";
             description = "Plan reviewer — validates clarity and completeness";
             color = "#928374"; # Gruvbox gray
           };
@@ -823,7 +822,7 @@
               model = "google/antigravity-gemini-3-pro";
             };
             ultrabrain = {
-              model = "openai/gpt-5.3-codex";
+              model = "anthropic/claude-opus-4-6";
             };
             deep = {
               model = "anthropic/claude-opus-4-6";
