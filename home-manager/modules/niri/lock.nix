@@ -1,13 +1,15 @@
 # Swaylock screen locker (fallback — Noctalia lock screen is primary).
 # Colors handled by Stylix (base16 → swaylock color mapping).
 
+{ constants, ... }:
+
 {
   programs.swaylock = {
     enable = true;
 
     settings = {
       # Font
-      font = "JetBrains Mono";
+      font = constants.font.mono;
       font-size = 24;
 
       # Indicator

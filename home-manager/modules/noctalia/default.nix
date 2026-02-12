@@ -146,7 +146,7 @@ in
         viewMode = "grid";
         showCategories = true;
         showIconBackground = false;
-        terminalCommand = "ghostty -e";
+        terminalCommand = "${constants.terminal} -e";
       };
 
       wallpaper = {

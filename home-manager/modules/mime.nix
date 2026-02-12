@@ -1,6 +1,10 @@
 # MIME type associations for default applications.
 
-{ lib, ... }:
+{
+  lib,
+  constants,
+  ...
+}:
 
 let
   inherit (lib) listToAttrs flatten mapAttrsToList;
@@ -14,7 +18,7 @@ let
     directory = [ "nautilus.desktop" ]; # File manager
     office = [ "libreoffice.desktop" ]; # Office suite
     pdf = [ "zathura.desktop" ]; # PDF viewer
-    terminal = [ "com.mitchellh.ghostty.desktop" ]; # Terminal emulator
+    terminal = [ "${constants.terminalAppId}.desktop" ]; # Terminal emulator
     archive = [ "org.gnome.Nautilus.desktop" ]; # Nautilus handles archives via file-roller
   };
 

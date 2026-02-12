@@ -1,5 +1,7 @@
 # Zathura PDF viewer configuration.
 
+{ constants, ... }:
+
 {
   programs.zathura = {
     enable = true;
@@ -11,7 +13,7 @@
     };
 
     options = {
-      font = "JetBrains Mono Bold 13";
+      font = "${constants.font.mono} Bold ${toString constants.font.size}";
     };
   };
 }
