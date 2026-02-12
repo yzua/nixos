@@ -195,14 +195,23 @@
 
       clg() {
         local key; key="$(_load_zai_key)" || return 1
-        ANTHROPIC_API_KEY="$key" \
+        ANTHROPIC_AUTH_TOKEN="$key" \
         ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+        API_TIMEOUT_MS="3000000" \
+        ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \
+        ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5" \
+        ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5" \
         claude --dangerously-skip-permissions "$@"
       }
 
       oc-sops() {
         local key; key="$(_load_zai_key)" || return 1
         Z_AI_API_KEY="$key" opencode "$@"
+      }
+
+      oc-glm() {
+        local key; key="$(_load_zai_key)" || return 1
+        OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" Z_AI_API_KEY="$key" opencode "$@"
       }
 
       cl-sops() {
