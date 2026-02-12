@@ -61,6 +61,17 @@
         };
       };
 
+      includes = [
+        {
+          condition = "hasconfig:remote.*.url:https://github.com/**";
+          contents.user.email = gitConfig.githubEmail;
+        }
+        {
+          condition = "hasconfig:remote.*.url:git@github.com:*/**";
+          contents.user.email = gitConfig.githubEmail;
+        }
+      ];
+
       ignores = [
         ".cache/"
         ".DS_Store"
