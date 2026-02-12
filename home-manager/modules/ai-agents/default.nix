@@ -1098,7 +1098,7 @@ in
         force = true;
       };
 
-      # GLM-5 profile (used by oc-glm via OPENCODE_CONFIG_DIR)
+      # GLM-5 profile (used by ocg via OPENCODE_CONFIG_DIR)
       "opencode-glm/opencode.json" = {
         text = toJSON glmOpencodeSettings;
         force = true;

@@ -56,7 +56,7 @@
       of = "onefetch";
 
       # AI tools
-      cl = "claude";
+      cl = "claude --dangerously-skip-permissions";
       oc = "opencode";
       "ac" = "ai-commit";
       "ak" = "ai-ask";

@@ -209,7 +209,7 @@
         Z_AI_API_KEY="$key" opencode "$@"
       }
 
-      oc-glm() {
+      ocg() {
         local key; key="$(_load_zai_key)" || return 1
         OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" Z_AI_API_KEY="$key" opencode "$@"
       }
