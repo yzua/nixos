@@ -268,7 +268,6 @@ Defined once in `config.nix`, shared across Claude Code, OpenCode, Gemini CLI, a
 | filesystem | Project filesystem access | Enabled (all agents) |
 | git | Git repository operations | Enabled (all agents) |
 | github | GitHub API (issues, PRs, code search) | Enabled (all agents) |
-| mermaid | Diagram generation (architecture, flowcharts, ER) | Enabled (all agents) |
 | cloudflare-docs | Cloudflare documentation search | Enabled (remote) |
 | web-search-prime | Web search via Z.AI | Injected at activation |
 | web-reader | Read web pages via Z.AI | Injected at activation |
