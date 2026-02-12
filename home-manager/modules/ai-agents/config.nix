@@ -19,7 +19,6 @@
         - `nix run nixpkgs#<package>` — run a package directly without entering a shell
       - **Dev environments**: Use `nix develop` (or `direnv`) for project-specific toolchains. Most projects have a `flake.nix` or `.envrc`.
       - **System config**: Lives at `~/System/` — a flake with NixOS modules + Home Manager (standalone, not a NixOS module).
-      - **Validation**: `just modules && just lint && just format && just check` before any Nix config changes.
       - **Apply changes**: `just home` (user-level, safe) then `just nixos` (system-level).
       - **Secrets**: Managed via sops-nix (age encryption). Never commit plaintext secrets. Use `just sops-edit` to modify.
       - **FHS assumptions break**: `/usr/lib`, `/opt`, etc. don't exist. Use `nix-shell -p` or add packages to the flake.
@@ -52,7 +51,7 @@
       zai-mcp-server = {
         enable = true;
         command = "bunx";
-        args = [ "@z_ai/mcp-server" ]; # no bin field, needs bunx
+        args = [ "@z_ai/mcp-server" ];
         env = {
           Z_AI_MODE = "ZAI";
         };
