@@ -744,6 +744,28 @@ in
             else
               echo "⚠ ${cfg.secrets.zaiApiKeyFile} not found - run 'just nixos' first"
             fi
+
+            # Inject GitHub token from gh CLI into all agent configs
+            if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+              GH_TOKEN="$(gh auth token)"
+              for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json"; do
+                if [[ -f "$OPENCODE_CFG" ]]; then
+                  ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$OPENCODE_CFG"
+                fi
+              done
+              if [[ -f "$HOME/.mcp.json" ]]; then
+                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$HOME/.mcp.json"
+              fi
+              if [[ -f "$HOME/.codex/config.toml" ]]; then
+                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$HOME/.codex/config.toml"
+              fi
+              if [[ -f "$HOME/.gemini/settings.json" ]]; then
+                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$HOME/.gemini/settings.json"
+              fi
+              echo "✓ Patched GitHub token from gh CLI into all agent configs"
+            else
+              echo "⚠ gh CLI not authenticated - GitHub MCP will not work (run 'gh auth login')"
+            fi
           ''
         );
 

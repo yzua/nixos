@@ -88,6 +88,14 @@
         args = [ "@magicuidesign/mcp" ]; # bin is generic "mcp", use bunx to avoid conflicts
       };
 
+      github = {
+        enable = true;
+        command = "mcp-server-github";
+        env = {
+          GITHUB_PERSONAL_ACCESS_TOKEN = "__GITHUB_TOKEN_PLACEHOLDER__"; # patched at activation via gh auth token
+        };
+      };
+
     };
 
     logging = {

@@ -21,6 +21,7 @@ let
     "@modelcontextprotocol/server-sequential-thinking"
     "@playwright/mcp"
     "@magicuidesign/mcp"
+    "@modelcontextprotocol/server-github"
     "@z_ai/mcp-server"
   ];
 in
