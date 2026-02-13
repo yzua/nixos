@@ -24,8 +24,8 @@
   terminalAppId = "com.mitchellh.ghostty"; # Wayland app-id — used in window rules and dock
 
   # Default text editor
-  editor = "zeditor";
-  editorAppId = "dev.zed.Zed"; # Wayland app-id — used in window rules
+  editor = "code";
+  editorAppId = "code-url-handler"; # Wayland app-id — used in window rules
 
   # Fonts
   font = {

@@ -10,7 +10,6 @@ let
     rustfmt # Rust formatter (system-wide for conform.nvim)
     clippy # Rust linter (system-wide for outside devShells)
     uv # Python package manager; provides uvx for MCP servers
-    zed-editor
   ];
 
   stable = with pkgsStable; [

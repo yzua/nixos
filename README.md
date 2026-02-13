@@ -35,8 +35,8 @@ Edit `shared/constants.nix` — this is the single source of truth for your pers
 
   terminal = "ghostty";           # Your terminal emulator
   terminalAppId = "com.mitchellh.ghostty";  # Wayland app-id (for window rules)
-  editor = "zeditor";             # Your editor
-  editorAppId = "dev.zed.Zed";    # Wayland app-id
+  editor = "code";                 # Your editor
+  editorAppId = "code-url-handler"; # Wayland app-id
 
   font = {
     mono = "JetBrains Mono";
