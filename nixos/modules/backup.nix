@@ -36,7 +36,9 @@
         "/home/${user}/System"
         "/home/${user}/.gnupg"
         "/home/${user}/.ssh"
-        "/home/${user}/.config/sops"
+        # SECURITY: .config/sops excluded — contains age private key.
+        # Backing up the key alongside encrypted secrets defeats encryption.
+        # Back up the age key separately via offline means (USB, paper).
       ];
 
       exclude = [

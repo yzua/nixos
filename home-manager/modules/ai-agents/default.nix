@@ -823,7 +823,9 @@ in
               CODEX_CFG="$HOME/.codex/config.toml"
               if [[ -f "$CODEX_CFG" ]]; then
                 if grep -q '\[mcp_servers.zai-mcp-server.env\]' "$CODEX_CFG"; then
-                  ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ZAI_KEY\"" "$CODEX_CFG"
+                  ESCAPED_ZAI=$(printf '%s\n' "$ZAI_KEY" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g')
+                  ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ESCAPED_ZAI\"" "$CODEX_CFG"
+                  unset ESCAPED_ZAI
                 fi
                 echo "✓ Patched codex config.toml with Z.AI API key"
               fi
@@ -856,20 +858,29 @@ in
             # Inject GitHub token from gh CLI into all agent configs
             if command -v gh &> /dev/null && gh auth status &> /dev/null; then
               GH_TOKEN="$(gh auth token)"
+              # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
               for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
                 if [[ -f "$OPENCODE_CFG" ]]; then
-                  ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$OPENCODE_CFG"
+                  ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
+                    walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
+                  ' "$OPENCODE_CFG" > "$OPENCODE_CFG.tmp" && mv "$OPENCODE_CFG.tmp" "$OPENCODE_CFG"
                 fi
               done
               if [[ -f "$HOME/.mcp.json" ]]; then
-                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$HOME/.mcp.json"
+                ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
+                  walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
+                ' "$HOME/.mcp.json" > "$HOME/.mcp.json.tmp" && mv "$HOME/.mcp.json.tmp" "$HOME/.mcp.json"
               fi
               if [[ -f "$HOME/.codex/config.toml" ]]; then
-                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$HOME/.codex/config.toml"
+                ESCAPED_TOKEN=$(printf '%s\n' "$GH_TOKEN" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g')
+                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$ESCAPED_TOKEN/g" "$HOME/.codex/config.toml"
               fi
               if [[ -f "$HOME/.gemini/settings.json" ]]; then
-                ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$HOME/.gemini/settings.json"
+                ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
+                  walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
+                ' "$HOME/.gemini/settings.json" > "$HOME/.gemini/settings.json.tmp" && mv "$HOME/.gemini/settings.json.tmp" "$HOME/.gemini/settings.json"
               fi
+              unset GH_TOKEN
               echo "✓ Patched GitHub token from gh CLI into all agent configs"
             else
               echo "⚠ gh CLI not authenticated - GitHub MCP will not work (run 'gh auth login')"

@@ -91,6 +91,13 @@
       enable = true;
       wheelNeedsPassword = true;
       execWheelOnly = true;
+      extraConfig = ''
+        # SECURITY: Log all sudo commands for audit trail
+        Defaults use_pty
+        Defaults log_input
+        Defaults log_output
+        Defaults logfile="/var/log/sudo.log"
+      '';
     };
 
     # Audit disabled — AppArmor + auditd kernel interaction causes

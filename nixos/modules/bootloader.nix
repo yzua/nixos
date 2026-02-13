@@ -7,8 +7,11 @@
     loader = {
       timeout = 5; # Show generation menu for 5 seconds (hold Space to pause)
       efi.canTouchEfiVariables = true;
-      systemd-boot.enable = true;
-      systemd-boot.configurationLimit = 10;
+      systemd-boot = {
+        enable = true;
+        editor = false; # SECURITY: Prevent editing boot entries (root shell via init=/bin/sh)
+        configurationLimit = 10;
+      };
     };
 
     # PRIVACY: RAM-backed /tmp so temp files don't persist on disk

@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./aide.nix # AIDE file integrity monitoring (weekly)
     ./audit-logging.nix # Security event logging with fail2ban
     ./audit.nix # Security audit timer and service
     ./firewall.nix # Network firewall configuration

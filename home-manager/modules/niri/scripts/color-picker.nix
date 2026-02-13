@@ -1,6 +1,7 @@
 { pkgsStable, ... }:
 pkgsStable.writeScriptBin "color-picker" ''
   #!${pkgsStable.bash}/bin/bash
+  set -euo pipefail
   color=$(${pkgsStable.grim}/bin/grim -g "$(${pkgsStable.slurp}/bin/slurp -p)" -t ppm - \
     | ${pkgsStable.imagemagick}/bin/magick - -format '%[hex:p{0,0}]' info:-)
   if [[ -n "$color" ]]; then

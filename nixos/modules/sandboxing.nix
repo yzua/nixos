@@ -81,6 +81,12 @@
           profile = "${pkgs.firejail}/etc/firejail/celluloid.profile";
         };
 
+        # Discord client (Vencord plugins execute arbitrary JS)
+        vesktop = {
+          executable = "${pkgs.lib.getBin pkgs.vesktop}/bin/vesktop";
+          profile = "${pkgs.firejail}/etc/firejail/discord.profile";
+        };
+
         # Torrent client
         qbittorrent = {
           executable = "${pkgs.lib.getBin pkgsStable.qbittorrent}/bin/qbittorrent";
