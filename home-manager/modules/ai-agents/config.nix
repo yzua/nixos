@@ -353,11 +353,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v biome >/dev/null 2>&1; then
                     biome check --write "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -368,11 +369,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v rustfmt >/dev/null 2>&1; then
                     rustfmt "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -383,11 +385,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v zig >/dev/null 2>&1; then
                     zig fmt "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -398,11 +401,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v gofmt >/dev/null 2>&1; then
                     gofmt -w "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -413,11 +417,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v nixfmt >/dev/null 2>&1; then
                     nixfmt "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -428,11 +433,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v ruff >/dev/null 2>&1; then
                     ruff format "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
@@ -443,11 +449,12 @@
               {
                 type = "command";
                 command = ''
-                  file_path=$(cat | jq -r '.tool_input.file_path // ""')
+                  INPUT=$(cat)
+                  file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
                   if [ -n "$file_path" ] && command -v prettier >/dev/null 2>&1; then
                     prettier --write "$file_path" 2>&1 | head -3 >&2
                   fi
-                  cat
+                  echo "$INPUT"
                 '';
               }
             ];
