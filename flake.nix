@@ -56,10 +56,10 @@
           hostname = "pc";
           stateVersion = "25.11";
         }
-        {
-          hostname = "thinkpad";
-          stateVersion = "25.11";
-        }
+        # {
+        #   hostname = "laptop";
+        #   stateVersion = "25.11";
+        # }
       ];
 
       # Single source of truth for all nixpkgs instances
