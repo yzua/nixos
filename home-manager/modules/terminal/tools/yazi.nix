@@ -2,6 +2,7 @@
 
 {
   constants,
+  pkgs,
   ...
 }:
 
@@ -10,6 +11,26 @@
   programs.yazi = {
     enable = true;
     enableZshIntegration = true;
+
+    plugins = {
+      inherit (pkgs.yaziPlugins) git diff full-border;
+    };
+
+    initLua = ''
+      require("full-border"):setup()
+      require("git"):setup()
+    '';
+
+    keymap.manager.prepend_keymap = [
+      {
+        on = [
+          "g"
+          "d"
+        ];
+        run = "plugin diff";
+        desc = "Diff selected file with hovered file";
+      }
+    ];
 
     settings = {
       manager = {
@@ -42,6 +63,19 @@
           }
         ];
       };
+
+      plugin.prepend_fetchers = [
+        {
+          id = "git";
+          name = "*";
+          run = "git";
+        }
+        {
+          id = "git";
+          name = "*/";
+          run = "git";
+        }
+      ];
     };
   };
 }

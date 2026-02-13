@@ -89,6 +89,12 @@ clean:
 	nix store optimise
 	@echo -e "✔ Cleanup completed!"
 
+# Install git pre-commit hook for config validation
+install-hooks:
+    @cp scripts/build/pre-commit-hook.sh .git/hooks/pre-commit
+    @chmod +x .git/hooks/pre-commit
+    @echo "✔ Pre-commit hook installed!"
+
 # Edit secrets with SOPS (uses RAM-backed tmpfs for security)
 sops-edit:
     @echo -e "\n➤ Editing secrets with SOPS…"
