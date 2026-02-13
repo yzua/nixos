@@ -68,11 +68,10 @@ in
           listenAddress = "127.0.0.1";
           port = 9093;
 
-          # Route all alerts to local log receiver (no external notification channel configured yet)
-          # TODO: Add ntfy or Gotify webhook when notification service is set up
+          # Route all alerts via alertmanager-ntfy bridge → ntfy.sh
           configuration = {
             route = {
-              receiver = "local-log";
+              receiver = "ntfy";
               group_by = [
                 "alertname"
                 "severity"
@@ -83,10 +82,10 @@ in
             };
             receivers = [
               {
-                name = "local-log";
+                name = "ntfy";
                 webhook_configs = [
                   {
-                    url = "http://127.0.0.1:9099/alertmanager"; # Placeholder — alerts logged to journal via alertmanager
+                    url = "http://127.0.0.1:${toString config.mySystem.ntfy.port}/hook";
                     send_resolved = true;
                   }
                 ];
@@ -173,9 +172,12 @@ in
         MemoryMax = "128M";
         MemoryHigh = "64M";
       };
-      grafana.serviceConfig = {
-        MemoryMax = "256M";
-        MemoryHigh = "192M";
+      grafana = {
+        restartTriggers = [ config.sops.secrets.grafana_admin_password.path ];
+        serviceConfig = {
+          MemoryMax = "256M";
+          MemoryHigh = "192M";
+        };
       };
     };
   };

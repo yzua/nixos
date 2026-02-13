@@ -22,7 +22,9 @@
       grafana_admin_password = {
         owner = "grafana";
         mode = "0400";
-        restartUnits = [ "grafana.service" ]; # Restart Grafana on password rotation
+      };
+      ntfy_topic = {
+        mode = "0444"; # Bridge runs as DynamicUser, needs read access
       };
     };
   };

@@ -52,6 +52,9 @@
     ./waydroid.nix # Waydroid Android emulation
     ./nix-ld.nix # Dynamic linker for non-Nix binaries
 
+    # Notifications
+    ./ntfy.nix # Alertmanager → ntfy.sh push notifications
+
     # Monitoring and observability
     ./monitoring.nix # Sensors, vnStat, bandwhich
     ./netdata.nix # Real-time system monitoring dashboard

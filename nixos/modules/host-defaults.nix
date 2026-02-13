@@ -40,6 +40,7 @@
       nvidia.enable = lib.mkDefault true;
       fwupd.enable = lib.mkDefault true;
       backup.enable = lib.mkDefault false; # Requires restic-password sops secret
+      ntfy.enable = lib.mkDefault true;
       observability.enable = lib.mkDefault true;
       loki.enable = lib.mkDefault true;
       systemReport.enable = lib.mkDefault true;
