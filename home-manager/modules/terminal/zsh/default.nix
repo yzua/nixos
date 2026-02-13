@@ -210,8 +210,11 @@
       }
 
       ocg() {
-        local key; key="$(_load_zai_key)" || return 1
-        OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" Z_AI_API_KEY="$key" opencode "$@"
+        OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" opencode "$@"
+      }
+
+      ocgem() {
+        OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gemini" opencode "$@"
       }
 
       cl-sops() {

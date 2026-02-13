@@ -159,6 +159,29 @@ let
     atlas = "zai-coding-plan/glm-4.7";
   };
 
+  # Gemini profile: Google Antigravity models for Gemini-native coding sessions.
+  geminiAgentModels = {
+    sisyphus = "google/antigravity-gemini-3-pro";
+    oracle = "google/antigravity-gemini-3-pro";
+    librarian = "google/antigravity-gemini-3-flash";
+    explore = "google/antigravity-gemini-3-flash";
+    # multimodal-looker keeps its original vision-capable model
+    prometheus = "google/antigravity-gemini-3-pro";
+    metis = "google/antigravity-gemini-3-pro";
+    momus = "google/antigravity-gemini-3-pro";
+    atlas = "google/antigravity-gemini-3-flash";
+    hephaestus = "google/antigravity-gemini-3-pro";
+  };
+
+  # Variant overrides for Gemini agents (thinking levels per role).
+  geminiAgentVariants = {
+    prometheus = "high"; # Strategic planning — max thinking
+    momus = "low"; # Plan review — lighter thinking
+    librarian = "medium"; # Reference search — moderate
+    atlas = "medium"; # Coordination — moderate
+    explore = "minimal"; # Fast grep — speed over depth
+  };
+
   glmOpencodeSettings = opencodeSettings // {
     model = "zai-coding-plan/glm-5";
   };
@@ -204,6 +227,58 @@ let
       };
       writing = {
         model = "zai-coding-plan/glm-4.7";
+      };
+    };
+  };
+
+  # Gemini profile: Google Antigravity models for Gemini-native coding sessions.
+  geminiOpencodeSettings = opencodeSettings // {
+    model = "google/antigravity-gemini-3-pro";
+  };
+
+  geminiOhMyOpencodeSettings = ohMyOpencodeSettings // {
+    agents = lib.mapAttrs (
+      name: agentCfg:
+      agentCfg
+      // (lib.optionalAttrs (builtins.hasAttr name geminiAgentModels) {
+        model = geminiAgentModels.${name};
+      })
+      // (lib.optionalAttrs (builtins.hasAttr name geminiAgentVariants) {
+        variant = geminiAgentVariants.${name};
+      })
+    ) ohMyOpencodeSettings.agents;
+
+    # Override category models to use Gemini Antigravity instead of default providers
+    categories = {
+      "visual-engineering" = {
+        model = "google/antigravity-gemini-3-pro";
+      };
+      ultrabrain = {
+        model = "google/antigravity-gemini-3-pro";
+        variant = "high";
+      };
+      deep = {
+        model = "google/antigravity-gemini-3-pro";
+        variant = "high";
+      };
+      artistry = {
+        model = "google/antigravity-gemini-3-pro";
+      };
+      quick = {
+        model = "google/antigravity-gemini-3-flash";
+        variant = "minimal";
+      };
+      "unspecified-low" = {
+        model = "google/antigravity-gemini-3-flash";
+        variant = "medium";
+      };
+      "unspecified-high" = {
+        model = "google/antigravity-gemini-3-pro";
+        variant = "high";
+      };
+      writing = {
+        model = "google/antigravity-gemini-3-flash";
+        variant = "medium";
       };
     };
   };
@@ -698,7 +773,7 @@ in
             if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
               ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
               
-              for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json"; do
+              for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
                 if [[ -f "$OPENCODE_CFG" ]]; then
                   ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
                     .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
@@ -781,7 +856,7 @@ in
             # Inject GitHub token from gh CLI into all agent configs
             if command -v gh &> /dev/null && gh auth status &> /dev/null; then
               GH_TOKEN="$(gh auth token)"
-              for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json"; do
+              for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
                 if [[ -f "$OPENCODE_CFG" ]]; then
                   ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$GH_TOKEN/g" "$OPENCODE_CFG"
                 fi
@@ -1194,6 +1269,16 @@ in
       };
       "opencode-glm/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
         text = toJSON glmOhMyOpencodeSettings;
+        force = true;
+      };
+
+      # Gemini Antigravity profile (used by ocgem via OPENCODE_CONFIG_DIR)
+      "opencode-gemini/opencode.json" = {
+        text = toJSON geminiOpencodeSettings;
+        force = true;
+      };
+      "opencode-gemini/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
+        text = toJSON geminiOhMyOpencodeSettings;
         force = true;
       };
     };
