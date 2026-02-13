@@ -1,4 +1,4 @@
-# ThinkPad kernel params for backlight and NVIDIA framebuffer.
+# Laptop kernel params for backlight and NVIDIA framebuffer.
 _:
 
 {

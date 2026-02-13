@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Flake-based NixOS + Home Manager personal system configuration. Two hosts (`pc` desktop, `thinkpad` laptop), Niri compositor (scrollable tiling Wayland), Gruvbox theming via Stylix, extensive security hardening.
+Flake-based NixOS + Home Manager personal system configuration. Hosts: `pc` (desktop). Niri compositor (scrollable tiling Wayland), Gruvbox theming via Stylix, extensive security hardening. Dormant `laptop` host available for future use.
 
 ## Commands
 

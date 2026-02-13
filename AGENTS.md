@@ -1,6 +1,6 @@
 # NixOS Configuration - Agent Guidelines
 
-Repository: Flake-based NixOS + Home Manager (hosts: pc, thinkpad)
+Repository: Flake-based NixOS + Home Manager (active host: pc; dormant: laptop)
 Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck
 Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox theming (stylix)
 

@@ -1,8 +1,8 @@
-# TLP power management for ThinkPad.
+# TLP power management for laptop.
 { config, lib, ... }:
 
 {
-  options.mySystem.thinkpad = {
+  options.mySystem.laptop = {
     battery = {
       startChargeThreshold = lib.mkOption {
         type = lib.types.ints.between 1 100;
@@ -46,8 +46,8 @@
           PLATFORM_PROFILE_ON_BAT = "low-power";
 
           # CRITICAL for ThinkPad battery longevity (75-80% optimal range)
-          START_CHARGE_THRESH_BAT0 = config.mySystem.thinkpad.battery.startChargeThreshold;
-          STOP_CHARGE_THRESH_BAT0 = config.mySystem.thinkpad.battery.stopChargeThreshold;
+          START_CHARGE_THRESH_BAT0 = config.mySystem.laptop.battery.startChargeThreshold;
+          STOP_CHARGE_THRESH_BAT0 = config.mySystem.laptop.battery.stopChargeThreshold;
 
           # Wireless power management
           WIFI_PWR_ON_AC = "off";

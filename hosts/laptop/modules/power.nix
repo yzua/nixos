@@ -1,4 +1,4 @@
-# ThinkPad power management and kernel modules.
+# Laptop power management and kernel modules.
 _:
 
 {

@@ -1,12 +1,14 @@
 # Host Configurations
 
-Two hosts consuming the factory pattern. Each sets `mySystem.hostProfile` for profile-based defaults (via `host-defaults.nix`) and overrides specific options as needed.
+Active host: `pc`. Dormant host: `laptop` (commented out in `flake.nix`, kept for future use).
+
+Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defaults.nix`) and overrides specific options as needed.
 
 ---
 
 ## Host Comparison
 
-| Setting | pc (desktop) | thinkpad (laptop) |
+| Setting | pc (desktop) | laptop (dormant) |
 |---------|-------------|-------------------|
 | Gaming | enabled + Gamescope | disabled |
 | Bluetooth | disabled | enabled (manual start) |
@@ -34,10 +36,10 @@ hosts/<hostname>/
 ### PC modules
 - No host-specific modules (empty `default.nix` — desktop needs no hardware overrides)
 
-### ThinkPad modules
+### Laptop modules
 - `boot.nix` — Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)
 - `nvidia.nix` — Optimus offload mode (bus IDs from flake, fine-grained power mgmt)
-- `power.nix` — Disables power-profiles-daemon, loads ThinkPad kernel modules
+- `power.nix` — Disables power-profiles-daemon, loads laptop kernel modules (thinkpad_acpi, tp_smapi)
 - `tlp.nix` — Battery thresholds (75-80%), CPU governor, WiFi power saving
 - `thermal.nix` — thermald for Intel DPTF thermal zone management
 
@@ -45,14 +47,14 @@ hosts/<hostname>/
 
 ## Host-Specific Options
 
-ThinkPad defines extra options not used by pc:
+Laptop defines extra options not used by pc:
 ```nix
 mySystem.nvidia.intelBusId    # PCI bus ID for Intel GPU
 mySystem.nvidia.nvidiaBusId   # PCI bus ID for NVIDIA GPU
-mySystem.thinkpad.battery.startChargeThreshold  # Default: 75
-mySystem.thinkpad.battery.stopChargeThreshold   # Default: 80
+mySystem.laptop.battery.startChargeThreshold  # Default: 75
+mySystem.laptop.battery.stopChargeThreshold   # Default: 80
 ```
-Bus IDs are defined as `mySystem.nvidia.*` mkOption in `hosts/thinkpad/modules/nvidia.nix` and set in the ThinkPad's `configuration.nix`.
+Bus IDs are defined as `mySystem.nvidia.*` mkOption in `hosts/laptop/modules/nvidia.nix` and set in the laptop's `configuration.nix`.
 
 ---
 

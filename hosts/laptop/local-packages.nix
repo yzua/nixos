@@ -1,4 +1,4 @@
-# Local system packages for the 'thinkpad' host.
+# Local system packages for the 'laptop' host.
 { pkgs, pkgsStable, ... }:
 {
   environment.systemPackages =
