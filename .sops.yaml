@@ -1,10 +1,6 @@
 keys:
   - &primary age1cl84e6k30g8r0qx7zyrjsy9d66ker93due3kw3qjd9g8suz7hp2qynfjj6
-  # TODO: Generate a backup age key and store it offline (USB drive or printed paper).
-  # Without a backup, losing ~/.config/sops/age/keys.txt means ALL secrets are permanently lost.
-  # Generate with: age-keygen -o backup-key.txt
-  # Then add here: - &backup age1<BACKUP_PUBLIC_KEY>
-  # And add *backup to the key_groups list below.
+  - &backup age1977w869pzpd4m4srd5dfjfcx3wyhdjmj6rgdk8ts38qntxd7wpdql6mzup
 
 creation_rules:
   # Match any .yaml files in secrets directory (including temporary files)
@@ -12,3 +8,4 @@ creation_rules:
     key_groups:
       - age:
         - *primary
+        - *backup
