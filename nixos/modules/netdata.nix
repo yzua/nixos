@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -62,6 +63,6 @@
       RestrictSUIDSGID = lib.mkForce true;
     };
 
-    environment.systemPackages = [ pkgs.smartmontools ];
+    environment.systemPackages = [ pkgsStable.smartmontools ];
   };
 }

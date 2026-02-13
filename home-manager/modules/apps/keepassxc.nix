@@ -1,5 +1,5 @@
 # KeePassXC password manager — desktop entry and SSH agent environment.
-# Binary is firejail-wrapped at system level (nixos/modules/sandboxing.nix).
+# Binary is NOT firejail-wrapped (excluded in nixos/modules/sandboxing.nix).
 # Native messaging host for browser integration is managed by KeePassXC itself
 # (Settings → Browser Integration) — NOT declaratively, to avoid read-only symlink conflicts.
 _:

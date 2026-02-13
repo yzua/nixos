@@ -118,6 +118,7 @@ This configuration uses a custom `mySystem` namespace pattern for organizing opt
 
 | Option | Description |
 |---------|-------------|
+| `mySystem.hostInfo.enable` | Automatic hostname and stateVersion from flake arguments |
 | `mySystem.hostProfile` | Host profile (`"desktop"` or `"laptop"`) — sets sensible defaults for all options below |
 | `mySystem.gaming.enable` | Enable gaming support (Steam, Lutris, Wine, MangoHud) |
 | `mySystem.gaming.enableGamescope` | Enable Gamescope compositor session for Steam |
@@ -243,9 +244,9 @@ systemctl --user status opensnitch-ui
 | Glance | `nixos/modules/glance.nix` | — |
 | Netdata | `nixos/modules/netdata.nix` | — |
 | Scrutiny | `nixos/modules/scrutiny.nix` | — |
-| OpenSnitch | `nixos/modules/opensnitch.nix` | `home-manager/modules/opensnitch-ui.nix` |
+| OpenSnitch | `nixos/modules/opensnitch.nix` | `home-manager/modules/apps/opensnitch-ui.nix` |
 | vnStat + bandwhich | `nixos/modules/monitoring.nix` | — |
-| ActivityWatch | — | `home-manager/modules/activitywatch.nix` |
+| ActivityWatch | — | `home-manager/modules/apps/activitywatch.nix` |
 
 ---
 
@@ -294,7 +295,7 @@ This configuration uses the following flakes:
 - **noctalia** - Noctalia Shell (all-in-one desktop shell)
 - **nixcord** - Declarative Discord (Vesktop + Vencord)
 - **nix-index-database** - Pre-built nix-index database for instant lookups
-- **lanzaboote** - Secure Boot support for NixOS
+<!-- lanzaboote (Secure Boot) — removed from flake, re-add when needed -->
 
 ---
 
@@ -317,37 +318,38 @@ This configuration uses the following flakes:
 │   │   │   ├── default.nix        ← Module options, MCP servers, logging, activation scripts
 │   │   │   ├── config.nix         ← Actual agent configuration values
 │   │   │   └── log-analyzer.nix   ← AI agent log analysis and dashboard
-│   │   ├── apps/                  ← Application-specific configs (OBS, Syncthing, KeePassXC)
+│   │   ├── apps/                  ← Application configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, etc.)
 │   │   ├── niri/                  ← Niri compositor (scrollable tiling Wayland)
 │   │   │   ├── default.nix        ← Import hub
-│   │   │   ├── main.nix           ← Compositor settings, window rules, autostart
-│   │   │   ├── binds.nix          ← Keybindings and scripts
+│   │   │   ├── main.nix           ← Compositor settings (autostart, workspaces, environment)
+│   │   │   ├── binds.nix          ← Keybindings and custom scripts
+│   │   │   ├── input.nix          ← Input devices (keyboard, mouse, touchpad)
+│   │   │   ├── layout.nix         ← Layout settings (columns, gaps, focus)
+│   │   │   ├── rules.nix          ← Window rules (opacity, floating, workspace assignments)
 │   │   │   ├── idle.nix           ← Idle management (DPMS, lock)
-│   │   │   └── lock.nix           ← Screen locker
+│   │   │   ├── lock.nix           ← Screen locker
+│   │   │   └── scripts/           ← Extracted helper scripts (color-picker, books, screenshot)
 │   │   ├── noctalia/              ← Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD)
-│   │   │   └── default.nix
+│   │   │   ├── default.nix        ← Import hub
+│   │   │   ├── bar.nix            ← Bar widgets configuration
+│   │   │   └── settings.nix       ← Shell settings (theme, dock, wallpaper, OSD, hooks)
 │   │   ├── neovim/                ← Neovim editor with LSP, completion, and modern plugins
 │   │   │   ├── default.nix        ← Plugin declarations, treesitter, Lua config loading
 │   │   │   ├── lua/               ← Lua configuration (options, keymaps, LSP, plugins)
 │   │   │   └── plugins/           ← Plugin-specific configs (wakatime)
-│   │   ├── languages/             ← Programming language setups (Go, JS, Python)
-│   │   ├── terminal/              ← Terminal and shell configs
+│   │   ├── languages/             ← Language tooling (Go, JS, Python, LSP servers, Mise)
+│   │   ├── terminal/              ← Terminal, shell, and CLI tools
 │   │   │   ├── ghostty.nix        ← Ghostty terminal emulator
 │   │   │   ├── zellij.nix         ← Terminal multiplexer
 │   │   │   ├── direnv.nix         ← Per-directory environments
+│   │   │   ├── scripts.nix        ← Custom utility scripts (ai-ask, ai-help, etc.)
+│   │   │   ├── shell.nix          ← Nix shell integration and dev tools
 │   │   │   ├── zsh/               ← Zsh + Oh My Zsh (oxide theme, aliases)
 │   │   │   └── tools/             ← CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, git, htop, lazygit, starship, yazi, zathura, zoxide)
-│   │   ├── activitywatch.nix      ← ActivityWatch app usage tracking
 │   │   ├── browser-isolation.nix  ← Browser sandboxing and Tor routing
 │   │   ├── gpg.nix                ← GPG key management
-│   │   ├── lsp-servers.nix        ← Language servers for editors
 │   │   ├── mime.nix               ← MIME type associations
-│   │   ├── mise.nix               ← Mise runtime manager
-│   │   ├── nautilus.nix           ← Nautilus dconf preferences
-│   │   ├── nixcord.nix            ← Discord (Vesktop + Vencord)
-│   │   ├── opensnitch-ui.nix      ← OpenSnitch application firewall GUI
 │   │   ├── qt.nix                 ← Qt theming
-│   │   ├── shell.nix              ← Shell integrations
 │   │   └── stylix.nix             ← System theming (Gruvbox)
 │   └── packages/                  ← Grouped package lists (12 domain chunks)
 │       ├── applications.nix
@@ -387,7 +389,7 @@ This configuration uses the following flakes:
 │       ├── bluetooth.nix          ← Bluetooth support
 │       ├── bootloader.nix         ← Boot loader configuration
 │       ├── browser-deps.nix       ← Chrome/Chromium dependencies (Wayland + X11)
-│       ├── cleanup/               ← Automated cleanup services (monolithic default.nix)
+│       ├── cleanup/               ← Automated cleanup services (downloads, caches, Docker)
 │       ├── default.nix            ← Module imports
 │       ├── dnscrypt-proxy.nix     ← DNSCrypt-Proxy for encrypted DNS
 │       ├── environment.nix        ← Environment variables
@@ -396,6 +398,7 @@ This configuration uses the following flakes:
 │       ├── glance.nix             ← Glance minimal dashboard (Gruvbox theme)
 │       ├── greetd.nix             ← greetd display manager with tuigreet
 │       ├── host-defaults.nix      ← Profile-based defaults (desktop/laptop)
+│       ├── host-info.nix          ← Hostname and stateVersion from flake args
 │       ├── i18n.nix               ← Internationalization
 │       ├── libinput.nix           ← Input device support
 │       ├── loki.nix               ← Loki log aggregation with Promtail
@@ -413,7 +416,6 @@ This configuration uses the following flakes:
 │       ├── printing.nix           ← Print services
 │       ├── prometheus-grafana.nix ← Prometheus + Grafana observability
 │       ├── sandboxing.nix         ← Application sandboxing (Firejail, bubblewrap)
-│       ├── scripts.nix            ← Custom utility scripts
 │       ├── scrutiny.nix           ← Scrutiny SMART disk health monitoring
 │       ├── security/              ← System security hardening
 │       │   ├── default.nix        ← Import hub
@@ -442,7 +444,7 @@ This configuration uses the following flakes:
 ├── secrets/                       ← Encrypted secrets (sops-nix)
 │   └── secrets.yaml
 ├── shared/                        ← Shared configuration constants
-│   └── constants.nix              ← Terminal, editor, font, theme, keyboard settings
+│   └── constants.nix              ← Terminal, editor, font, theme, keyboard, user identity
 ├── themes/                        ← Custom themes and wallpapers
 ├── AGENTS.md                      ← Guidelines for AI agents (authoritative)
 ├── .sops.yaml                     ← SOPS encryption rules (age keys, path patterns)

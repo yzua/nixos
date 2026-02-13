@@ -1,8 +1,8 @@
-# Custom utility scripts added to system PATH.
+# Custom utility scripts added to user PATH.
 { pkgs, user, ... }:
 
 {
-  environment.systemPackages = with pkgs; [
+  home.packages = with pkgs; [
     (writeShellScriptBin "ai-ask" ''
       exec /home/${user}/System/scripts/ai/ask.sh "$@"
     '')
@@ -16,6 +16,4 @@
       exec /home/${user}/System/scripts/nvidia-fans.sh "$@"
     '')
   ];
-
-  systemd.tmpfiles.rules = [ "d /home/${user}/.local/bin 0755 ${user} users -" ];
 }

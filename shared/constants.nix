@@ -10,6 +10,15 @@
 #   { config.programs.ghostty.settings.font-family = constants.font.mono; }
 
 {
+  # User Identity (Git, GitHub, Contact)
+  user = {
+    handle = "yz";
+    name = "yz";
+    email = "git.remarry972@simplelogin.com";
+    githubEmail = "260740417+yzua@users.noreply.github.com";
+    signingKey = "0x9C3EC618CFE2EB3D";
+  };
+
   # Terminal emulator
   terminal = "ghostty";
   terminalAppId = "com.mitchellh.ghostty"; # Wayland app-id — used in window rules and dock

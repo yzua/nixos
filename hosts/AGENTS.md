@@ -80,11 +80,10 @@ Every host `configuration.nix` follows the same structure:
     ./modules                     # Host-specific modules
   ];
 
-  networking.hostName = hostname;
-  system = { inherit stateVersion; };
-
+  # Host identity managed by nixos/modules/host-info.nix
   mySystem = {
-    hostProfile = "desktop"; # or "laptop" — sets defaults via host-defaults.nix
+    hostInfo.enable = true;       # Sets networking.hostName and system.stateVersion from flake args
+    hostProfile = "desktop";      # or "laptop" — sets defaults via host-defaults.nix
     # Override specific defaults as needed
   };
 }

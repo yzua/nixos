@@ -148,7 +148,7 @@ flake.nix                             # Entry point, makeSystem factory
 | Per-host feature toggle | `hosts/<hostname>/configuration.nix` (set `mySystem.*`) |
 | Theming/styling | `home-manager/modules/stylix.nix` |
 | AI agent configuration | `home-manager/modules/ai-agents/` |
-| Shared constants | `shared/constants.nix` |
+| Shared constants (terminal, editor, font, user identity) | `shared/constants.nix` |
 | Utility scripts | `scripts/` (ai, browser, build, sops) |
 | Secrets | `secrets/secrets.yaml` (edit with `just sops-edit`) |
 

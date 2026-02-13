@@ -6,5 +6,7 @@
     ./ghostty.nix # Ghostty terminal emulator (GPU-accelerated, native Wayland)
     ./zellij.nix # Zellij terminal multiplexer
     ./direnv.nix # Per-directory environment loading
+    ./scripts.nix # Custom utility scripts
+    ./shell.nix # Nix shell integration and dev tools
   ];
 }

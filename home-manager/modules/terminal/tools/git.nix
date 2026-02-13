@@ -1,6 +1,6 @@
 # Git version control configuration.
 
-{ gitConfig, ... }:
+{ constants, ... }:
 
 {
   programs = {
@@ -14,8 +14,8 @@
 
       settings = {
         user = {
-          inherit (gitConfig) name email;
-          signingkey = gitConfig.signingKey;
+          inherit (constants.user) name email;
+          signingkey = constants.user.signingKey;
         };
 
         commit.gpgsign = true;
@@ -64,11 +64,11 @@
       includes = [
         {
           condition = "hasconfig:remote.*.url:https://github.com/**";
-          contents.user.email = gitConfig.githubEmail;
+          contents.user.email = constants.user.githubEmail;
         }
         {
           condition = "hasconfig:remote.*.url:git@github.com:*/**";
-          contents.user.email = gitConfig.githubEmail;
+          contents.user.email = constants.user.githubEmail;
         }
       ];
 

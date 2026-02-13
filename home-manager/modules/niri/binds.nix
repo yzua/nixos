@@ -17,39 +17,9 @@ let
     ]
     ++ (lib.splitString " " cmd);
 
-  booksDir = "$HOME/Downloads/books";
-
-  booksScript = pkgsStable.writeScriptBin "open_books" ''
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    BOOKS_DIR="${booksDir}"
-
-    # Find all book files and present them in a menu via wofi fallback
-    BOOK=$(find "$BOOKS_DIR" -type f \( -iname "*.pdf" -o -iname "*.epub" -o -iname "*.djvu" \) | wofi --dmenu -p "Select a book" --width 1200 --lines 15)
-
-    if [[ -n "$BOOK" ]]; then
-        zathura "$BOOK" &
-    else
-        echo "No book selected."
-    fi
-  '';
-
-  screenshotAnnotate = pkgsStable.writeScriptBin "screenshot-annotate" ''
-    #!${pkgsStable.bash}/bin/bash
-    ${pkgsStable.grim}/bin/grim -g "$(${pkgsStable.slurp}/bin/slurp)" - | ${pkgsStable.swappy}/bin/swappy -f -
-  '';
-
-  colorPicker = pkgsStable.writeScriptBin "color-picker" ''
-    #!${pkgsStable.bash}/bin/bash
-    color=$(${pkgsStable.grim}/bin/grim -g "$(${pkgsStable.slurp}/bin/slurp -p)" -t ppm - \
-      | ${pkgsStable.imagemagick}/bin/magick - -format '%[hex:p{0,0}]' info:-)
-    if [[ -n "$color" ]]; then
-      echo "#$color" | ${pkgsStable.wl-clipboard}/bin/wl-copy --trim-newline
-      ${pkgsStable.libnotify}/bin/notify-send "Color Picker" "#$color copied to clipboard"
-    fi
-  '';
-
+  booksScript = import ./scripts/open-books.nix { inherit pkgsStable; };
+  screenshotAnnotate = import ./scripts/screenshot.nix { inherit pkgsStable; };
+  colorPicker = import ./scripts/color-picker.nix { inherit pkgsStable; };
 in
 {
   home.packages = [
@@ -188,6 +158,7 @@ in
     ];
     "Mod+Alt+Print".action.spawn = [ "${screenshotAnnotate}/bin/screenshot-annotate" ];
     "Mod+Shift+I".action.spawn = [ "${colorPicker}/bin/color-picker" ];
+    "Mod+O".action.spawn = [ "${booksScript}/bin/open_books" ];
 
     # Volume
     "Mod+Equal".action.spawn = [

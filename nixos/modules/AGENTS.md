@@ -20,6 +20,7 @@ Directories (`cleanup/`, `security/`) contain sub-modules imported via their own
 | `stability.nix` | System stability optimizations | None |
 | `cleanup/` | Automated cleanup timers (downloads, caches, Docker, Telegram) | `mySystem.cleanup.enable` |
 | `host-defaults.nix` | Profile-based defaults (desktop/laptop) for all `mySystem.*` options | `mySystem.hostProfile` |
+| `host-info.nix` | Sets hostname and stateVersion from flake arguments | `mySystem.hostInfo.enable` |
 | `backup.nix` | Automated restic backup service | `mySystem.backup.*` |
 
 ### Security & Privacy
@@ -69,7 +70,6 @@ Directories (`cleanup/`, `security/`) contain sub-modules imported via their own
 | `android.nix` | Android tools and platform support | None |
 | `browser-deps.nix` | Chrome/Chromium dependencies (Wayland + X11) | None |
 | `waydroid.nix` | Waydroid Android emulation (LXC container) | `mySystem.waydroid.enable` |
-| `scripts.nix` | Custom utility scripts | None |
 
 ### Cross-Cutting
 | Module | Purpose |
@@ -81,9 +81,13 @@ Directories (`cleanup/`, `security/`) contain sub-modules imported via their own
 ## Directory Modules
 
 ### `cleanup/`
-Monolithic module in `default.nix`. Guarded by `mySystem.cleanup.enable`.
-Contains all cleanup timers: downloads, screenshots, caches (pip, npm, bun, go, Playwright), Docker prune, Telegram Desktop cache, and clipboard history wipe (OPSEC).
-Uses a reusable `mkCleanupTimer` helper function for DRY timer definitions.
+Split into sub-modules. Guarded by `mySystem.cleanup.enable`.
+| Sub-module | Purpose |
+|------------|---------|
+| `default.nix` | Import hub + `mySystem.cleanup.enable` option definition |
+| `lib.nix` | Reusable `mkCleanupTimer` helper (imported manually by sub-modules, not in `default.nix`) |
+| `downloads.nix` | Download, screenshot, Telegram, and clipboard cleanup timers |
+| `cache.nix` | Cache cleanup timers (pip, npm, bun, go, Playwright), Docker prune |
 
 ### `security/`
 Split from monolithic `security.nix`. Always-on (no enable guard).

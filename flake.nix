@@ -37,12 +37,6 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # lanzaboote kept for future Secure Boot — uncomment when ready
-    # lanzaboote = {
-    #   url = "github:nix-community/lanzaboote";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
   };
 
   outputs =
@@ -56,13 +50,6 @@
       system = "x86_64-linux";
       homeStateVersion = "25.11";
       user = "yz";
-
-      gitConfig = {
-        name = "yz";
-        email = "git.remarry972@simplelogin.com";
-        githubEmail = "260740417+yzua@users.noreply.github.com";
-        signingKey = "0x9C3EC618CFE2EB3D";
-      };
 
       hosts = [
         {
@@ -105,7 +92,6 @@
               stateVersion
               hostname
               user
-              gitConfig
               pkgsStable
               pkgConfig
               constants
@@ -131,7 +117,6 @@
                 inputs
                 homeStateVersion
                 user
-                gitConfig
                 pkgsStable
                 constants
                 ;

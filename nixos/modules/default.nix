@@ -10,6 +10,7 @@
     ./environment.nix # Session variables and XDG paths
     ./stability.nix # Resource limits and sysctl tuning
     ./host-defaults.nix # Profile-based defaults for mySystem options
+    ./host-info.nix # Hostname and state version management
     ./validation.nix # Cross-module conflict assertions
 
     # Hardware
@@ -66,7 +67,6 @@
     # Maintenance
     ./cleanup # Automated cleanup timers
     ./backup.nix # Restic backups with retention
-    ./scripts.nix # Custom utility scripts
     ./nh.nix # Nix Helper build tool
   ];
 }

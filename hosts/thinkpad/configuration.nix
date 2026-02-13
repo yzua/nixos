@@ -9,8 +9,8 @@
     ./modules
   ];
 
-  networking.hostName = hostname;
-  system = { inherit stateVersion; };
+  # Host identity managed by nixos/modules/host-info.nix
+  mySystem.hostInfo.enable = true;
 
   mySystem = {
     hostProfile = "laptop";

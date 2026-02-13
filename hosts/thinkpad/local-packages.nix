@@ -3,7 +3,7 @@
 {
   environment.systemPackages =
     (with pkgs; [
-      tlp
+      # tlp provided by services.tlp
     ])
     ++ (with pkgsStable; [
       acpi

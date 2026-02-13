@@ -13,39 +13,55 @@ modules/
 │   ├── default.nix     # Module with programs.aiAgents options, MCP servers, logging
 │   ├── config.nix      # Actual agent configuration values
 │   └── log-analyzer.nix # AI agent log analysis and dashboard
-├── apps/               # App configs (OBS, Syncthing, KeePassXC)
+├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, etc.)
+│   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
+│   ├── keepassxc.nix   # KeePassXC desktop entry and SSH agent
+│   ├── nautilus.nix    # Nautilus (GNOME Files) dconf preferences
+│   ├── nixcord.nix     # Discord (Vesktop + Vencord) declarative config
+│   ├── obs.nix         # OBS Studio with CUDA and plugins
+│   ├── opensnitch-ui.nix # OpenSnitch application firewall GUI
+│   └── syncthing.nix   # Syncthing local file sync
 ├── niri/               # Niri compositor (scrollable tiling Wayland)
 │   ├── default.nix     # Import hub
-│   ├── main.nix        # Compositor settings, window rules, autostart
-│   ├── binds.nix       # Keybindings and scripts
+│   ├── main.nix        # Compositor settings (autostart, workspaces, environment, animations)
+│   ├── binds.nix       # Keybindings and custom scripts
+│   ├── input.nix       # Input devices (keyboard, mouse, touchpad, trackpoint)
+│   ├── layout.nix      # Layout settings (columns, gaps, focus ring, border)
+│   ├── rules.nix       # Window rules (opacity, rounding, floating, workspace assignments)
 │   ├── idle.nix        # Idle management (DPMS, lock)
-│   └── lock.nix        # Screen locker
+│   ├── lock.nix        # Screen locker
+│   └── scripts/        # Extracted helper scripts
+│       ├── color-picker.nix  # Wayland color picker (grim + slurp + imagemagick)
+│       ├── open-books.nix    # Book launcher (find + wofi + zathura)
+│       └── screenshot.nix    # Screenshot annotator (grim + slurp + swappy)
 ├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD)
-│   └── default.nix     # Bar, launcher, notifications, lock screen, wallpaper, control center, dock, OSD
+│   ├── default.nix     # Import hub, apiQuotaScript, status-notifier-watcher
+│   ├── bar.nix         # Bar widgets (left, center, right panels)
+│   └── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)
 ├── neovim/             # Neovim editor with LSP, completion, and modern plugins
 │   ├── default.nix     # Plugin declarations, treesitter, Lua config loading
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)
 │   └── plugins/        # Plugin-specific configs (wakatime)
-├── languages/          # Language tooling (Go, JS, Python)
-├── terminal/           # Shell and terminal
+├── languages/          # Language tooling (Go, JS, Python, LSP servers, Mise)
+│   ├── go.nix          # Go toolchain, env vars, and aliases
+│   ├── javascript.nix  # JS/TS tooling, LSP servers, and aliases
+│   ├── python.nix      # Python tooling, LSP servers, and aliases
+│   ├── lsp-servers.nix # Language servers for editors
+│   └── mise.nix        # Mise polyglot runtime manager
+├── terminal/           # Shell, terminal, and CLI tools
 │   ├── ghostty.nix     # Ghostty terminal emulator
 │   ├── zellij.nix      # Terminal multiplexer
 │   ├── direnv.nix      # Per-directory environments
+│   ├── scripts.nix     # Custom utility scripts (ai-ask, ai-help, ai-commit, nvidia-fans)
+│   ├── shell.nix       # Nix shell integration and dev tools
 │   ├── zsh/            # Zsh + Oh My Zsh (oxide theme)
 │   │   ├── default.nix # Main zsh config with setOptions, OMZ, initContent
 │   │   └── aliases.nix # Shell aliases
 │   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, git, htop, lazygit, starship, yazi, zathura, zoxide)
-├── activitywatch.nix   # ActivityWatch app usage tracking (Wayland)
 ├── browser-isolation.nix # Isolated browser profiles (work, personal, Tor)
 ├── gpg.nix             # GPG agent and keys
-├── lsp-servers.nix     # Language servers for editors
 ├── mime.nix            # Default app associations
-├── mise.nix            # Runtime version manager
-├── nautilus.nix        # Nautilus (GNOME Files) dconf preferences
-├── nixcord.nix         # Discord (Vesktop + Vencord) declarative config
-├── opensnitch-ui.nix   # OpenSnitch application firewall GUI
 ├── qt.nix              # Qt theming (Kvantum + Gruvbox)
-├── shell.nix           # Shell integration (direnv, nix-your-shell)
 └── stylix.nix          # Theming engine (Gruvbox)
 ```
 
@@ -128,8 +144,8 @@ For subdirectory modules (e.g., new tool in `terminal/tools/`):
 
 ## Notes
 
-- `home.nix` receives `{ inputs, homeStateVersion, user, gitConfig, pkgsStable, constants, hostname }` via `extraSpecialArgs` from flake
+- `home.nix` receives `{ inputs, homeStateVersion, user, pkgsStable, constants, hostname }` via `extraSpecialArgs` from flake
 - `hostname` available for host-specific HM config
-- `gitConfig` available for Git module configuration
-- `constants` available from `shared/constants.nix` (terminal, editor, font, theme, keyboard)
+- `constants` available from `shared/constants.nix` (terminal, editor, font, theme, keyboard, user identity)
+- Git identity (name, email, signingKey, githubEmail) lives in `constants.user.*` — used by `terminal/tools/git.nix`
 - No custom options namespace — HM modules are simpler than NixOS modules
