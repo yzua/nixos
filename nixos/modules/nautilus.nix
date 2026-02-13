@@ -2,6 +2,7 @@
 {
   config,
   lib,
+  pkgs,
   pkgsStable,
   ...
 }:
@@ -39,7 +40,7 @@
       webp-pixbuf-loader
       f3d # 3D model thumbnails (STL, OBJ, glTF)
 
-      loupe # GNOME image viewer (modern GTK4 replacement for imv)
+      pkgs.loupe # GNOME image viewer — unstable for glycin NixOS sandbox patches
     ];
 
     services = {
