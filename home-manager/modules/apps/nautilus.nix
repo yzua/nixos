@@ -1,8 +1,8 @@
-# Nautilus (GNOME Files) dconf preferences and sidebar bookmarks.
+# Nautilus (GNOME Files) dconf preferences, bookmarks, and document templates.
 { config, ... }:
 
 {
-  # Sidebar bookmarks for fstab-mounted disks (not auto-detected by udisks2)
+  # Sidebar bookmarks (only existing directories)
   home.file.".config/gtk-3.0/bookmarks" = {
     force = true;
     text = ''
@@ -11,8 +11,25 @@
       file:///home/${config.home.username}/Videos
       file:///home/${config.home.username}/Music
       file:///home/${config.home.username}/Downloads
-      file:///mnt/data Data
-      file:///mnt/archive Archive
+    '';
+  };
+
+  # Document templates — populates Nautilus "New Document" context menu
+  home.file = {
+    "Templates/Text File.txt".text = "";
+    "Templates/Markdown.md".text = "";
+    "Templates/Shell Script.sh".text = ''
+      #!/usr/bin/env bash
+      set -euo pipefail
+    '';
+    "Templates/Python Script.py".text = ''
+      #!/usr/bin/env python3
+    '';
+    "Templates/Nix Expression.nix".text = ''
+      { pkgs, ... }:
+
+      {
+      }
     '';
   };
 

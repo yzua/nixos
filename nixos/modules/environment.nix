@@ -15,6 +15,10 @@ in
     # Default terminal emulator for applications that need one
     TERMINAL = terminal;
 
+    # Session class for systemd user services (e.g. localsearch indexer).
+    # greetd/PAM doesn't set this, so systemd ConditionEnvironment checks fail.
+    XDG_SESSION_CLASS = "user";
+
     # Default text editor for applications that need one
     EDITOR = editor;
 

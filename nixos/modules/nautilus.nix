@@ -22,6 +22,14 @@
       file-roller
       sushi # Quick Look-style file previewer
 
+      # Nautilus requires tracker for search, rename, and file metadata
+      tinysparql # formerly tracker3
+      localsearch # formerly tracker-miners
+
+      # MIME type database and XDG directory management
+      shared-mime-info
+      xdg-user-dirs
+
       # Thumbnail generation
       gst_all_1.gst-plugins-good
       gst_all_1.gst-plugins-bad
@@ -31,7 +39,7 @@
       webp-pixbuf-loader
       f3d # 3D model thumbnails (STL, OBJ, glTF)
 
-      loupe # GNOME image viewer
+      loupe # GNOME image viewer (modern GTK4 replacement for imv)
     ];
 
     services = {

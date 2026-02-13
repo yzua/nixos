@@ -12,12 +12,12 @@ let
   defaultApps = {
     browser = [ "brave-browser.desktop" ];
     text = [ "org.gnome.TextEditor.desktop" ]; # Plain text editor
-    image = [ "imv.desktop" ]; # Image viewer
+    image = [ "org.gnome.Loupe.desktop" ]; # GNOME Image Viewer (GTK4, Wayland-native)
     audio = [ "io.bassi.Amberol.desktop" ]; # Audio player (GNOME Amberol)
     video = [ "io.github.celluloid_player.Celluloid.desktop" ]; # Video player (GTK Celluloid)
-    directory = [ "nautilus.desktop" ]; # File manager
-    office = [ "libreoffice.desktop" ]; # Office suite
-    pdf = [ "zathura.desktop" ]; # PDF viewer
+    directory = [ "org.gnome.Nautilus.desktop" ]; # File manager
+    office = [ "libreoffice-startcenter.desktop" ]; # Office suite (firejail-wrapped)
+    pdf = [ "org.pwmt.zathura.desktop" ]; # PDF viewer
     terminal = [ "${constants.terminalAppId}.desktop" ]; # Terminal emulator
     archive = [ "org.gnome.Nautilus.desktop" ]; # Nautilus handles archives via file-roller
   };

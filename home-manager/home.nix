@@ -92,6 +92,52 @@
         "x-scheme-handler/https"
       ];
     };
+    "io.github.celluloid_player.Celluloid" = {
+      name = "Celluloid";
+      exec = "celluloid %U";
+      icon = "io.github.celluloid_player.Celluloid";
+      comment = "GTK video player powered by mpv (firejail-wrapped)";
+      categories = [
+        "AudioVideo"
+        "Video"
+        "Player"
+        "GTK"
+      ];
+      mimeType = [
+        "video/mp4"
+        "video/x-matroska"
+        "video/webm"
+        "video/mpeg"
+        "video/ogg"
+        "video/x-msvideo"
+        "video/mp2t"
+        "video/x-flv"
+        "audio/mpeg"
+        "audio/ogg"
+        "audio/flac"
+      ];
+    };
+    "libreoffice-startcenter" = {
+      name = "LibreOffice";
+      exec = "libreoffice %U";
+      icon = "libreoffice-startcenter";
+      comment = "Office suite (firejail-wrapped)";
+      categories = [
+        "Office"
+      ];
+      mimeType = [
+        "application/vnd.oasis.opendocument.text"
+        "application/vnd.oasis.opendocument.spreadsheet"
+        "application/vnd.oasis.opendocument.presentation"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        "application/msword"
+        "application/vnd.ms-excel"
+        "application/vnd.ms-powerpoint"
+        "application/rtf"
+      ];
+    };
   };
 
   # Stylix sets GTK theme but not dconf color-scheme key — without this,
