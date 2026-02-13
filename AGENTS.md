@@ -4,7 +4,7 @@ Repository: Flake-based NixOS + Home Manager (hosts: pc, thinkpad)
 Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck
 Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox theming (stylix)
 
-Sub-directory `AGENTS.md` files exist in `nixos/modules/` and `home-manager/modules/` with deeper module-level guidance. Read them when working in those areas.
+Sub-directory `AGENTS.md` files exist in `nixos/modules/`, `home-manager/modules/`, `home-manager/modules/niri/`, and `hosts/` with deeper module-level guidance. Read them when working in those areas.
 
 ---
 
@@ -118,11 +118,12 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ```
 flake.nix                             # Entry point, makeSystem factory
   hosts/<hostname>/configuration.nix  # Per-host NixOS config
-    nixos/modules/default.nix         # ~52 shared system modules
+    nixos/modules/default.nix         # ~56 shared system modules (48 top-level + sub-modules)
     hosts/<hostname>/modules/         # Host-specific modules
   home-manager/home.nix               # HM entry point (standalone, NOT NixOS module)
     home-manager/modules/default.nix  # User-level modules
     home-manager/packages/            # Package chunks (cli.nix, dev.nix, etc.)
+  devShells/                          # Per-language dev environments (standalone flakes)
 ```
 
 ### Package strategy
@@ -149,8 +150,12 @@ flake.nix                             # Entry point, makeSystem factory
 | Theming/styling | `home-manager/modules/stylix.nix` |
 | AI agent configuration | `home-manager/modules/ai-agents/` |
 | Shared constants (terminal, editor, font, user identity) | `shared/constants.nix` |
-| Utility scripts | `scripts/` (ai, browser, build, sops) |
+| Utility scripts | `scripts/` (ai, browser, build, sops, system) |
 | Secrets | `secrets/secrets.yaml` (edit with `just sops-edit`) |
+| Dev environments | `devShells/<lang>/flake.nix` (Node, Python, Rust, Go, etc.) |
+| Firmware updates | `nixos/modules/fwupd.nix` |
+| Boot optimization | `nixos/modules/boot-optimization.nix` (defer monitoring from boot) |
+| System health reports | `nixos/modules/system-report.nix` |
 
 ---
 

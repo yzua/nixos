@@ -35,10 +35,11 @@ hosts/<hostname>/
 - No host-specific modules (empty `default.nix` — desktop needs no hardware overrides)
 
 ### ThinkPad modules
-- `boot.nix` — Kernel params (`acpi_backlight=native`)
-- `nvidia.nix` — Optimus offload mode (bus IDs from flake)
+- `boot.nix` — Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)
+- `nvidia.nix` — Optimus offload mode (bus IDs from flake, fine-grained power mgmt)
 - `power.nix` — Disables power-profiles-daemon, loads ThinkPad kernel modules
-- `tlp.nix` — Battery thresholds, CPU governor, WiFi power saving
+- `tlp.nix` — Battery thresholds (75-80%), CPU governor, WiFi power saving
+- `thermal.nix` — thermald for Intel DPTF thermal zone management
 
 ---
 

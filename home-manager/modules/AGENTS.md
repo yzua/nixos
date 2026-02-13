@@ -58,7 +58,6 @@ modules/
 │   │   ├── default.nix # Main zsh config with setOptions, OMZ, initContent
 │   │   └── aliases.nix # Shell aliases
 │   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, git, htop, lazygit, starship, yazi, zathura, zoxide)
-├── browser-isolation.nix # Isolated browser profiles (work, personal, Tor)
 ├── gpg.nix             # GPG agent and keys
 ├── mime.nix            # Default app associations
 ├── qt.nix              # Qt theming (Kvantum + Gruvbox)

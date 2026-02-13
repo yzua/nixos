@@ -1,7 +1,7 @@
 # NixOS System Modules
 
-~52 shared modules imported by all hosts via `default.nix`. Each module handles one subsystem.
-Directories (`cleanup/`, `security/`) contain sub-modules imported via their own `default.nix`.
+~56 shared modules (48 top-level imports + sub-modules in `security/`, `cleanup/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
+Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
 
 ---
 
@@ -22,11 +22,12 @@ Directories (`cleanup/`, `security/`) contain sub-modules imported via their own
 | `host-defaults.nix` | Profile-based defaults (desktop/laptop) for all `mySystem.*` options | `mySystem.hostProfile` |
 | `host-info.nix` | Sets hostname and stateVersion from flake arguments | `mySystem.hostInfo.enable` |
 | `backup.nix` | Automated restic backup service | `mySystem.backup.*` |
+| `boot-optimization.nix` | Defer monitoring services from blocking boot | None |
 
 ### Security & Privacy
 | Module | Purpose | Custom Options |
 |--------|---------|----------------|
-| `security/` | Kernel hardening, firewall, Avahi, audit timers (split into hardening, firewall, services, audit) | None (always-on) |
+| `security/` | Kernel hardening, firewall, dbus-broker, audit timers, opsec (split into 6 sub-modules) | None (always-on) |
 | `sandboxing.nix` | Firejail, bubblewrap | `mySystem.sandboxing.*` |
 | `tor.nix` | Tor SOCKS proxy (9050/9150) | `mySystem.tor.enable` |
 | `mullvad-vpn.nix` | Mullvad VPN client | `mySystem.mullvadVpn.enable` |
@@ -45,6 +46,7 @@ Directories (`cleanup/`, `security/`) contain sub-modules imported via their own
 | `xdg-desktop-portal.nix` | XDG portals for Wayland | None |
 | `libinput.nix` | Touchpad/mouse input | None |
 | `upower.nix` | Power/battery monitoring | None |
+| `fwupd.nix` | Firmware updates (fwupd/LVFS) | None |
 | `printing.nix` | CUPS print services | `mySystem.printing.enable` |
 | `monitoring.nix` | Hardware sensors, vnStat, bandwhich | None |
 
@@ -56,7 +58,8 @@ Directories (`cleanup/`, `security/`) contain sub-modules imported via their own
 | `glance.nix` | Minimal dashboard with Gruvbox theme (localhost:8082) | `mySystem.glance.enable` |
 | `opensnitch.nix` | Application firewall with network logging | `mySystem.opensnitch.enable` |
 | `loki.nix` | Loki log aggregation with Promtail | `mySystem.loki.enable` |
-| `prometheus-grafana.nix` | Prometheus + Grafana observability stack | `mySystem.observability.enable` |
+| `prometheus-grafana/` | Prometheus + Alertmanager + Grafana stack (includes JSON dashboards) | `mySystem.observability.enable` |
+| `system-report.nix` | Unified system health reporting (aggregates monitoring sources) | `mySystem.systemReport.enable` |
 
 ### Applications & Services
 | Module | Purpose | Custom Options |
