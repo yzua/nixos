@@ -72,10 +72,19 @@
 
       { argv = [ "brave" ]; }
       { argv = [ "${constants.editor}" ]; }
-      { argv = [ "${constants.terminal}" ]; }
+      {
+        argv = [
+          "${constants.terminal}"
+          "-e"
+          "zellij"
+          "attach"
+          "--create"
+          "main"
+        ];
+      }
       { argv = [ "vesktop" ]; }
       { argv = [ "telegram-desktop" ]; }
-      { argv = [ "youtube-music" ]; }
+      { argv = [ "pear-desktop" ]; }
     ];
 
     animations = {

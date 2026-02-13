@@ -173,7 +173,7 @@
       }
 
       {
-        matches = [ { app-id = "^youtube-music$"; } ];
+        matches = [ { app-id = "^com\\.github\\.th_ch\\.youtube_music$"; } ];
         open-on-workspace = "󰎆 media";
         default-column-width.proportion = 1.0;
       }
