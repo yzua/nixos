@@ -100,7 +100,11 @@ security-audit:
     @echo -e "\n➤ Auditing systemd unit hardening…"
     @systemd-analyze security --no-pager 2>/dev/null | grep -E "EXPOSED|UNSAFE" || echo "✔ No EXPOSED/UNSAFE units found"
     @echo -e "\n➤ Running vulnix on system closure…"
-    @vulnix --system 2>/dev/null || echo "⚠ vulnix not available (run 'just home' first)"
+    @if command -v vulnix >/dev/null 2>&1; then \
+        vulnix --system 2>/dev/null || echo "⚠ vulnix found advisories (non-zero exit)"; \
+      else \
+        echo "⚠ vulnix not available (run 'just home' first)"; \
+      fi
 
 # Edit secrets with SOPS (uses RAM-backed tmpfs for security)
 sops-edit:

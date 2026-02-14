@@ -11,7 +11,6 @@
     ];
 
     sessionVariables = {
-      GTK_USE_PORTAL = "0";
       GDK_DEBUG = "none";
       NO_AT_BRIDGE = "1";
     };
