@@ -27,7 +27,9 @@
     trash-cli # Safe rm replacement
 
     # General utilities
+    actionlint
     bc
+    codespell
     rsync
     typos
     watchexec
@@ -75,6 +77,8 @@
     htmlq
     jq
     ripgrep
+    ast-grep
+    semgrep
     sd
     yq
 
