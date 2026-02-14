@@ -146,15 +146,7 @@ in
       $DRY_RUN_CMD ${pkgs.nodejs}/bin/npm config set prefix "$HOME/.npm-global"
 
       echo "📦 Managing global npm packages with bun..."
-      for package in ${lib.escapeShellArgs globalNpmPackages}; do
-        if ${pkgs.bun}/bin/bun pm ls -g 2>/dev/null | grep -q "$(echo "$package" | sed 's/@.*//')"; then
-          echo "Updating $package..."
-          $DRY_RUN_CMD ${pkgs.bun}/bin/bun update -g "$package" || echo "❌ Failed to update $package"
-        else
-          echo "Installing $package..."
-          $DRY_RUN_CMD ${pkgs.bun}/bin/bun install -g "$package" || echo "❌ Failed to install $package"
-        fi
-      done
+      $DRY_RUN_CMD ${pkgs.bun}/bin/bun add --global --cwd "$HOME" --no-summary ${lib.escapeShellArgs globalNpmPackages} || echo "❌ Failed to manage global npm packages"
       echo "✔ Global packages management completed"
     '';
   };
