@@ -26,6 +26,11 @@ just nixos     # NixOS switch (system-level) - run AFTER just home
 just all       # Full pipeline: modules -> lint -> format -> check -> nixos -> home
 ```
 
+### Security auditing
+```bash
+just security-audit  # systemd unit hardening check + vulnix CVE scan
+```
+
 ### Single-test guidance
 No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) → `just home` (user build) → `just nixos` (system, last resort).
 
@@ -81,6 +86,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 - Both file (`./file.nix`) and directory (`./subdir`) imports are valid
 - Each import gets a short inline comment: `./audio.nix # Audio system (PipeWire)`
 - After adding/removing a `.nix` file, update `default.nix` and run `just modules`
+- Files prefixed with `_` (e.g., `_lib.nix`, `_helpers.nix`) are **helper files** imported manually by other modules, NOT listed in `default.nix`. The modules-check script skips them.
 
 ### Options and naming
 - Custom options live under `mySystem.*` (e.g., `mySystem.gaming.enable`)
@@ -109,6 +115,8 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 - Use `[[ ... ]]` for conditionals, not `[ ... ]`
 - Use `mapfile` for reading arrays from commands
 - Error functions: `error_exit "message" code`
+- Shared logging helpers live in `scripts/lib/logging.sh` — source it instead of defining `log_info`/`print_info` locally
+- Sourced library files (`scripts/lib/`) do NOT include `set -euo pipefail` (inherited from caller)
 
 ---
 
@@ -150,7 +158,7 @@ flake.nix                             # Entry point, makeSystem factory
 | Theming/styling | `home-manager/modules/stylix.nix` |
 | AI agent configuration | `home-manager/modules/ai-agents/` |
 | Shared constants (terminal, editor, font, user identity) | `shared/constants.nix` |
-| Utility scripts | `scripts/` (ai, browser, build, sops, system) |
+| Utility scripts | `scripts/` (ai, browser, build, lib, sops, system) |
 | Secrets | `secrets/secrets.yaml` (edit with `just sops-edit`) |
 | Dev environments | `dev-shells/<lang>/flake.nix` (Node, Python, Rust, Go, etc.) |
 | Firmware updates | `nixos/modules/fwupd.nix` |

@@ -10,8 +10,21 @@ No custom options — modules directly configure `programs.*`, `services.*`, `ho
 ```
 modules/
 ├── ai-agents/          # AI coding agent config (Claude Code, OpenCode, Codex, Gemini CLI, oh-my-opencode)
-│   ├── default.nix     # Module with programs.aiAgents options, MCP servers, logging
-│   ├── config.nix      # Actual agent configuration values
+│   ├── default.nix     # Import hub (options, activation, files, services, log-analyzer, config)
+│   ├── options.nix     # All programs.aiAgents option definitions
+│   ├── _mcp-transforms.nix  # MCP server transform helpers (not a module, imported by others)
+│   ├── _settings-builders.nix # Per-agent settings builders (not a module, imported by others)
+│   ├── activation.nix  # Activation scripts (secret patching, config setup, plugin installs)
+│   ├── files.nix       # home.file + xdg.configFile declarations
+│   ├── services.nix    # Packages, zsh aliases, systemd user services/timers
+│   ├── config.nix      # Pass-through to config/ subdirectory
+│   ├── config/         # Split configuration values
+│   │   ├── default.nix      # Import hub
+│   │   ├── instructions.nix # Global instructions + skills
+│   │   ├── mcp-servers.nix  # MCP server definitions + logging
+│   │   ├── permissions.nix  # Claude permissions, hooks, settings
+│   │   ├── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)
+│   │   └── agents.nix       # Oh-My-OpenCode agent definitions
 │   └── log-analyzer.nix # AI agent log analysis and dashboard
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, etc.)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
@@ -19,8 +32,14 @@ modules/
 │   ├── nautilus.nix    # Nautilus (GNOME Files) dconf preferences
 │   ├── nixcord.nix     # Discord (Vesktop + Vencord) declarative config
 │   ├── obs.nix         # OBS Studio with CUDA and plugins
+│   ├── obsidian.nix    # Obsidian Markdown notes app defaults
 │   ├── opensnitch-ui.nix # OpenSnitch application firewall GUI
-│   └── syncthing.nix   # Syncthing local file sync
+│   ├── pear-desktop.nix # Pear Desktop theme + plugin baseline
+│   ├── syncthing.nix   # Syncthing local file sync
+│   └── vscode/         # VS Code editor
+│       ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)
+│       ├── extensions.nix   # Extensions (nixpkgs + marketplace)
+│       └── activation.nix   # Writes mutable settings.json
 ├── niri/               # Niri compositor (scrollable tiling Wayland)
 │   ├── default.nix     # Import hub
 │   ├── main.nix        # Compositor settings (autostart, workspaces, environment, animations)

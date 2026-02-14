@@ -124,6 +124,7 @@ just all                 # Full pipeline: lint -> format -> check -> build -> sw
 | `just diff` | Diff current vs previous NixOS generation |
 | `just sops-edit` | Edit encrypted secrets |
 | `just sops-view` | View decrypted secrets |
+| `just security-audit` | Systemd unit hardening + vulnix CVE scan |
 
 ### Development workflow
 
