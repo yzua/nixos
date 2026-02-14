@@ -97,61 +97,17 @@ install-hooks:
 
 # Edit secrets with SOPS (uses RAM-backed tmpfs for security)
 sops-edit:
-    @echo -e "\n➤ Editing secrets with SOPS…"
-    @TMPFILE=$$(mktemp /dev/shm/secrets-XXXXXX.yaml) && \
-    trap 'rm -f "$$TMPFILE"' EXIT INT TERM && \
-    echo "Decrypting secrets to RAM..." && \
-    sops --decrypt secrets/secrets.yaml > "$$TMPFILE" && \
-    echo "Opening Zed (close the tab/window when done editing)..." && \
-    zeditor --wait "$$TMPFILE" && \
-    echo "Encrypting secrets back..." && \
-    sops --encrypt "$$TMPFILE" > secrets/secrets.yaml && \
-    rm -f "$$TMPFILE" && \
-    echo "✔ Encrypted and cleaned up!"
+	@echo -e "\n➤ Editing secrets with SOPS…"
+	@./scripts/sops/sops-edit.sh || if [ $$? -eq 200 ]; then echo "No changes made."; else exit $$?; fi
 
 # View decrypted secrets (read-only)
 sops-view:
 	@echo -e "\n➤ Viewing decrypted secrets…"
-	sops --decrypt secrets/secrets.yaml
-
-# Decrypt secrets to RAM-backed file for manual editing
-sops-decrypt:
-	@echo -e "\n➤ Decrypting secrets to /dev/shm/secrets-decrypted.yaml…"
-	sops --decrypt secrets/secrets.yaml > /dev/shm/secrets-decrypted.yaml
-	@echo "Edit /dev/shm/secrets-decrypted.yaml then run: just sops-encrypt"
-	@echo "⚠ File is in RAM — will be lost on reboot (this is intentional for security)"
-
-# Encrypt file back to secrets
-sops-encrypt:
-	@echo -e "\n➤ Encrypting /dev/shm/secrets-decrypted.yaml to secrets/secrets.yaml…"
-	sops --encrypt /dev/shm/secrets-decrypted.yaml > secrets/secrets.yaml
-	@rm -f /dev/shm/secrets-decrypted.yaml
-	@echo "✔ Encrypted and cleaned up!"
+	@nix run nixpkgs#sops -- --decrypt secrets/secrets.yaml
 
 # Add a single secret (reads value from stdin to avoid process list exposure)
 secrets-add key:
-	@echo "{{key}}" | grep -qE '^[a-zA-Z_][a-zA-Z0-9_]*$' || (echo "✗ Invalid key name. Use alphanumeric characters and underscores only." && exit 1)
+	@echo "{{key}}" | grep -qE '^[a-zA-Z_][a-zA-Z0-9_]*$$' || (echo "✗ Invalid key name. Use alphanumeric characters and underscores only." && exit 1)
 	@read -s -p "Enter secret value for '{{key}}': " VALUE && echo "" && \
-	sops --set "[\"{{key}}\"] \"$$VALUE\"" secrets/secrets.yaml && \
+	nix run nixpkgs#sops -- --set "[\"{{key}}\"] \"$$VALUE\"" secrets/secrets.yaml && \
 	echo "✔ Secret added!"
-
-# Setup SOPS age key
-sops-setup:
-	@echo -e "\n➤ Setting up SOPS age key…"
-	./scripts/sops/sops-setup.sh
-
-# Setup SSH and GPG keys from SOPS
-setup-keys:
-	@echo -e "\n➤ Setting up SSH and GPG keys from SOPS…"
-	./scripts/sops/setup-keys.sh
-
-# Show SOPS public key
-sops-key:
-	@echo -e "\n➤ SOPS public key:"
-	@sops --version && echo ""
-	@if [ -f ~/.config/sops/age/keys.txt ]; then \
-		echo "Public key:"; \
-		nix shell nixpkgs#age -c age-keygen -y ~/.config/sops/age/keys.txt; \
-	else \
-		echo "No age key found. Run 'just sops-setup' to create one."; \
-	fi

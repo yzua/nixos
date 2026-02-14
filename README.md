@@ -101,7 +101,7 @@ hosts = [
 ### Step 7: Setup secrets and deploy
 
 ```bash
-just sops-setup          # Create age key
+# Place your age key at ~/.config/sops/age/keys.txt
 just sops-edit           # Add your secrets (API keys, etc.)
 just all                 # Full pipeline: lint -> format -> check -> build -> switch
 ```
@@ -244,8 +244,7 @@ devShells/                    # Per-language dev environments (Node, Python, Rus
 Uses `sops-nix` with age encryption. Private key at `~/.config/sops/age/keys.txt`.
 
 ```bash
-just sops-setup    # Create age key
-just sops-edit     # Edit secrets (auto encrypt/decrypt)
-just sops-view     # View decrypted
-just secrets-add key value  # Add single secret
+just sops-edit              # Edit secrets (auto encrypt/decrypt via RAM-backed tmpfs)
+just sops-view              # View decrypted (read-only)
+just secrets-add key        # Add single secret (reads value from stdin)
 ```
