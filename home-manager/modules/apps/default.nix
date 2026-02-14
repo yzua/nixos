@@ -10,5 +10,6 @@
     ./nautilus.nix # Nautilus (GNOME Files) dconf preferences
     ./vscode.nix # VS Code editor with extensions and settings
     ./obsidian.nix # Obsidian Markdown notes app defaults
+    ./pear-desktop.nix # Pear Desktop theme + plugin baseline
   ];
 }
