@@ -7,7 +7,7 @@ This is a minimal template for Python development with venv.
 ## Initialization
 
 ```bash
-nix flake init -t "github:82163/nixos-config/main?dir=dev-shells#python-venv"
+nix flake init -t "https://github.com/yzua/nixos-config/main?dir=dev-shells#python-venv"
 ```
 
 ## Usage

@@ -5,7 +5,7 @@ Minimal C/C++ development template with common build and debugging tools.
 ## Initialization
 
 ```bash
-nix flake init -t "github:82163/nixos-config/main?dir=dev-shells#cpp"
+nix flake init -t "https://github.com/yzua/nixos-config/main?dir=dev-shells#cpp"
 ```
 
 ## Usage
