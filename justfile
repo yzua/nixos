@@ -95,6 +95,13 @@ install-hooks:
     @chmod +x .git/hooks/pre-commit
     @echo "✔ Pre-commit hook installed!"
 
+# Audit systemd unit security exposure
+security-audit:
+    @echo -e "\n➤ Auditing systemd unit hardening…"
+    @systemd-analyze security --no-pager 2>/dev/null | grep -E "EXPOSED|UNSAFE" || echo "✔ No EXPOSED/UNSAFE units found"
+    @echo -e "\n➤ Running vulnix on system closure…"
+    @vulnix --system 2>/dev/null || echo "⚠ vulnix not available (run 'just home' first)"
+
 # Edit secrets with SOPS (uses RAM-backed tmpfs for security)
 sops-edit:
 	@echo -e "\n➤ Editing secrets with SOPS…"

@@ -46,5 +46,10 @@ in
     socat # Network relay
     srm # Secure file removal
     veracrypt # Disk encryption
+
+    # Supply-chain and vulnerability scanning
+    gitleaks # Pre-commit/pre-push secret scanning
+    trivy # Vulnerability, misconfiguration, and secret scanning
+    vulnix # Nix closure CVE checker
   ];
 }
