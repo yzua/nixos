@@ -18,7 +18,7 @@
           id = "SystemMonitor";
           compactMode = false;
           showGpuTemp = true;
-          showNetworkStats = false;
+          showNetworkStats = true;
           showDiskUsage = true;
         }
         {
@@ -49,6 +49,10 @@
         }
       ];
       right = [
+        {
+          id = "Network";
+          displayMode = "onhover";
+        }
         {
           id = "Tray";
           drawerEnabled = false;
