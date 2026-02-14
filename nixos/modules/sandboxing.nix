@@ -143,15 +143,27 @@
     # Disable only tor-browser profile (has hardcoded paths incompatible with NixOS)
     # LibreWolf profile works fine - firefox-common includes seccomp !chroot
     environment = {
-      etc."firejail/tor-browser.profile".enable = false;
+      etc = {
+        "firejail/tor-browser.profile".enable = false;
 
-      # KeePassXC browser integration — whitelist the browser socket so
-      # keepassxc-proxy (spawned inside the firejail sandbox) can reach KeePassXC.
-      etc."firejail/brave.local".text = ''
-        noblacklist ''${RUNUSER}/app
-        whitelist ''${RUNUSER}/app/org.keepassxc.KeePassXC
-        whitelist ''${RUNUSER}/org.keepassxc.KeePassXC.BrowserServer
-      '';
+        # KeePassXC browser integration — whitelist the browser socket so
+        # keepassxc-proxy (spawned inside the firejail sandbox) can reach KeePassXC.
+        # Whitelists both the socket, the symlink, and the legacy kpxc_server path.
+        "firejail/brave.local".text = ''
+          noblacklist ''${RUNUSER}/app
+          whitelist ''${RUNUSER}/app/org.keepassxc.KeePassXC
+          whitelist ''${RUNUSER}/kpxc_server
+          whitelist ''${RUNUSER}/org.keepassxc.KeePassXC.BrowserServer
+        '';
+
+        # Apply same KeePassXC whitelist to LibreWolf
+        "firejail/librewolf.local".text = ''
+          noblacklist ''${RUNUSER}/app
+          whitelist ''${RUNUSER}/app/org.keepassxc.KeePassXC
+          whitelist ''${RUNUSER}/kpxc_server
+          whitelist ''${RUNUSER}/org.keepassxc.KeePassXC.BrowserServer
+        '';
+      };
 
       systemPackages = with pkgs; [
         firejail
