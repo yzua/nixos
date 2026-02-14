@@ -772,7 +772,7 @@ in
           lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "setupClaudeConfig" ] ''
             if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
               ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
-              
+
               for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
                 if [[ -f "$OPENCODE_CFG" ]]; then
                   ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
@@ -796,7 +796,7 @@ in
                   echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Z.AI API key"
                 fi
               done
-              
+
               CLAUDE_MCP="$HOME/.mcp.json"
               if [[ -f "$CLAUDE_MCP" ]]; then
                 ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
@@ -1062,7 +1062,7 @@ in
                 echo "📦 Adding oh-my-claudecode marketplace..."
                 claude plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode 2>/dev/null || true
               fi
-              
+
               if ! claude plugin list 2>/dev/null | grep -q "oh-my-claudecode"; then
                 echo "📦 Installing oh-my-claudecode plugin..."
                 claude plugin install oh-my-claudecode@omc 2>/dev/null || true

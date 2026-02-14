@@ -896,7 +896,6 @@
       extraToml = ''
         [features]
         request_rule = true
-        web_search = "live"
         collaboration_modes = true
         personality = true
 
