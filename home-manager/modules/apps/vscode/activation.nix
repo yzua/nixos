@@ -83,6 +83,7 @@ let
     "git.autofetch" = true;
     "git.confirmSync" = false;
     "git.enableSmartCommit" = true;
+    "git.enableCommitSigning" = true;
     "nix.enableLanguageServer" = true;
     "nix.serverPath" = "nil";
     "nix.serverSettings" = {
