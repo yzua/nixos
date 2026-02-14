@@ -25,7 +25,7 @@
 
   # Default text editor
   editor = "code";
-  editorAppId = "Code|code-url-handler"; # Wayland app-id — used in window rules (Code is primary, code-url-handler for URL opens)
+  editorAppId = "code|Code|code-url-handler"; # Wayland app-id — used in window rules (lowercase for vscode-fhs, Code for upstream, code-url-handler for URL opens)
 
   # Fonts
   font = {
