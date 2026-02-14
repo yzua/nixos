@@ -20,6 +20,8 @@ let
     glmOhMyOpencodeSettings
     geminiOpencodeSettings
     geminiOhMyOpencodeSettings
+    sonnetOpencodeSettings
+    sonnetOhMyOpencodeSettings
     ;
 in
 {
@@ -279,6 +281,16 @@ in
       };
       "opencode-gemini/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
         text = toJSON geminiOhMyOpencodeSettings;
+        force = true;
+      };
+
+      # Sonnet profile (used by ocs via OPENCODE_CONFIG_DIR)
+      "opencode-sonnet/opencode.json" = {
+        text = toJSON sonnetOpencodeSettings;
+        force = true;
+      };
+      "opencode-sonnet/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
+        text = toJSON sonnetOhMyOpencodeSettings;
         force = true;
       };
     };

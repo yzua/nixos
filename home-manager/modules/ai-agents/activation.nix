@@ -26,7 +26,7 @@ in
           if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
             ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
 
-            for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
+            for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json" "$HOME/.config/opencode-sonnet/opencode.json"; do
               if [[ -f "$OPENCODE_CFG" ]]; then
                 ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
                   .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
@@ -112,7 +112,7 @@ in
           if ${pkgs.gh}/bin/gh auth status &> /dev/null; then
             GH_TOKEN="$(${pkgs.gh}/bin/gh auth token)"
             # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
-            for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
+            for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json" "$HOME/.config/opencode-sonnet/opencode.json"; do
               if [[ -f "$OPENCODE_CFG" ]]; then
                 ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
                   walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)

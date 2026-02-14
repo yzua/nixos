@@ -10,6 +10,18 @@ let
   cfg = config.programs.aiAgents;
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
+  sonnetModel = "anthropic/claude-sonnet-4-5";
+
+  replaceOpusWithSonnet =
+    value:
+    if builtins.isAttrs value then
+      lib.mapAttrs (_: replaceOpusWithSonnet) value
+    else if builtins.isList value then
+      map replaceOpusWithSonnet value
+    else if builtins.isString value && value == "anthropic/claude-opus-4-6" then
+      sonnetModel
+    else
+      value;
 
   claudeSettings = {
     inherit (cfg.claude) model permissions hooks;
@@ -206,6 +218,13 @@ let
       };
     };
   };
+
+  # Sonnet profile: Default OpenCode config with Opus replaced by Sonnet for lower cost.
+  sonnetOpencodeSettings = opencodeSettings // {
+    model = sonnetModel;
+  };
+
+  sonnetOhMyOpencodeSettings = replaceOpusWithSonnet ohMyOpencodeSettings;
 in
 {
   inherit
@@ -217,5 +236,7 @@ in
     glmOhMyOpencodeSettings
     geminiOpencodeSettings
     geminiOhMyOpencodeSettings
+    sonnetOpencodeSettings
+    sonnetOhMyOpencodeSettings
     ;
 }
