@@ -81,7 +81,7 @@
           hideMode = "alwaysExpanded";
           parseJson = true;
           textCommand = "${apiQuotaScript}";
-          textIntervalMs = 120000;
+          textIntervalMs = 300000;
           leftClickUpdateText = true;
         }
         { id = "NotificationHistory"; }

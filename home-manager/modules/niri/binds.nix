@@ -11,9 +11,16 @@ let
   noctalia =
     cmd:
     [
-      "noctalia-shell"
-      "ipc"
-      "call"
+      "sh"
+      "-c"
+      ''
+        if ! noctalia-shell ipc call "$@" >/dev/null 2>&1; then
+          nohup noctalia-shell >/dev/null 2>&1 &
+          sleep 0.35
+          noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
+        fi
+      ''
+      "sh"
     ]
     ++ (lib.splitString " " cmd);
 
