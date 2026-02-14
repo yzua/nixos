@@ -9,7 +9,7 @@
   programs.zsh.shellAliases =
     let
       inherit (constants) editor;
-      nixTemplates = "github:82163/nixos-config/main?dir=dev-shells#";
+      nixTemplates = "git+https://codeberg.org/yztr/nixos?ref=main&dir=dev-shells#";
     in
     {
       # Agent-safe defaults (agents expect standard stdout)
