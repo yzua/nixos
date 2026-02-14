@@ -8,5 +8,7 @@
     ./activitywatch.nix # ActivityWatch app usage tracking
     ./opensnitch-ui.nix # OpenSnitch application firewall GUI
     ./nautilus.nix # Nautilus (GNOME Files) dconf preferences
+    ./vscode.nix # VS Code editor with extensions and settings
+    ./obsidian.nix # Obsidian Markdown notes app defaults
   ];
 }

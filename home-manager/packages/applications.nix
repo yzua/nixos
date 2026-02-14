@@ -22,8 +22,6 @@
           --set __EGL_VENDOR_LIBRARY_FILENAMES /run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json
       '';
     })
-    pkgsStable.vscode-fhs
-
     # GTK theming
     pkgsStable.gnome-themes-extra
     pkgsStable.gruvbox-gtk-theme
