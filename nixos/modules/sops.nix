@@ -24,7 +24,7 @@
         mode = "0400";
       };
       ntfy_topic = {
-        mode = "0444"; # Bridge runs as DynamicUser, needs read access
+        mode = "0444"; # DynamicUser service — no persistent user/group to grant access
       };
     };
   };

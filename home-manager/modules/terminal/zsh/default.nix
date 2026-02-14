@@ -276,10 +276,14 @@
       }
 
       # Pipe last command's error output to Claude for fixing
+      # Uses script(1) to capture output safely instead of re-executing via eval
       fix() {
+        local last_cmd
+        last_cmd=$(fc -ln -1 | sed 's/^[[:space:]]*//')
+        echo "Re-running: $last_cmd"
         local last_output
-        last_output=$(eval "$(fc -ln -1)" 2>&1)
-        echo "$last_output" | claude "Fix this error. Be concise. The command was: $(fc -ln -1)"
+        last_output=$(script -qc "$last_cmd" /dev/null 2>&1) || true
+        echo "$last_output" | claude "Fix this error. Be concise. The command was: $last_cmd"
       }
 
       # Quick nix build error fix

@@ -9,29 +9,8 @@ LOG_FILE="${TMPDIR:-/tmp}/nixos-build-errors-$$.log"
 MAX_RETRIES=3
 RETRY_DELAY=5
 
-# Color codes for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-# Logging functions
-log_error() {
-	echo -e "${RED}[ERROR]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $*" | tee -a "$LOG_FILE" >&2
-}
-
-log_warning() {
-	echo -e "${YELLOW}[WARNING]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $*" | tee -a "$LOG_FILE" >&2
-}
-
-log_info() {
-	echo -e "${BLUE}[INFO]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $*" | tee -a "$LOG_FILE"
-}
-
-log_success() {
-	echo -e "${GREEN}[SUCCESS]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $*" | tee -a "$LOG_FILE"
-}
+# shellcheck source=/dev/null
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/logging.sh"
 
 # Initialize log file
 init_logging() {
@@ -168,12 +147,19 @@ recover_from_error() {
 	*flake-check* | *check*)
 		log_info "Flake check failed - attempting recovery..."
 
-		# Clear flake lock and try again
+		# Restore flake lock from backup or update inputs (never delete outright)
 		if [[ -f "flake.lock" ]]; then
 			cp flake.lock flake.lock.backup
-			rm flake.lock
-			log_info "Removed flake.lock, retrying..."
-			return 0 # Signal to retry
+			log_info "Backed up flake.lock -> flake.lock.backup"
+			log_info "Updating flake inputs instead of removing lockfile..."
+			if nix flake update 2>/dev/null; then
+				log_info "Flake inputs updated, retrying..."
+				return 0 # Signal to retry
+			else
+				log_warning "Flake update failed, restoring backup lockfile"
+				cp flake.lock.backup flake.lock
+				return 1
+			fi
 		fi
 		;;
 	*switch* | *rebuild*)
