@@ -944,7 +944,7 @@ in
                   [mcp_servers.${name}.env]
                   ${envLines}
                 ''
-              ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers)
+              ) (lib.filterAttrs (_: s: s.enable && (s.type or "local") == "local") sharedMcpServers)
             );
             projectsToml = lib.concatMapStringsSep "\n" (path: ''
               [projects."${path}"]
@@ -979,6 +979,7 @@ in
 
             [history]
             persistence = "save-all"
+            max_bytes = 52428800
 
             [profiles.quick]
             model_reasoning_effort = "low"
@@ -994,6 +995,7 @@ in
 
             [shell_environment_policy]
             inherit = "core"
+            include_only = ["PATH", "HOME", "USER", "SHELL", "TERM", "EDITOR", "VISUAL", "LANG", "LC_ALL", "PWD"]
             exclude = ["AWS_*", "AZURE_*", "GCP_*", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
 
             [sandbox_workspace_write]
@@ -1120,11 +1122,96 @@ in
       };
 
       file = lib.mkMerge [
+        (lib.mkIf cfg.claude.enable {
+          ".claude/agents/nix-evaluator.md".text = ''
+            ---
+            name: nix-evaluator
+            description: Evaluate Nix expressions and diagnose flake or module errors without editing files.
+            tools: Read,Grep,Glob,Bash
+            ---
+
+            You are a read-only Nix evaluator.
+
+            Rules:
+            - Do not modify files.
+            - Prefer `just modules`, `just check`, and `nix flake check --no-build`.
+            - Explain failures concisely with concrete fix suggestions and exact file paths.
+          '';
+
+          ".claude/agents/lint-fixer.md".text = ''
+            ---
+            name: lint-fixer
+            description: Apply minimal lint and formatting fixes that match repository conventions.
+            tools: Read,Grep,Glob,Edit,MultiEdit,Write,Bash
+            ---
+
+            You are a focused lint fixer.
+
+            Rules:
+            - Make minimal changes only.
+            - Use repository tools (`just lint`, `just format`, and language-specific formatters).
+            - Do not refactor unrelated code.
+            - Re-run relevant diagnostics after edits.
+          '';
+
+          ".claude/agents/release-notes.md".text = ''
+            ---
+            name: release-notes
+            description: Generate concise release notes from git history and staged changes.
+            tools: Read,Grep,Glob,Bash
+            ---
+
+            You write release notes from repository evidence.
+
+            Rules:
+            - Use `git log`, `git diff --staged`, and changelog files as sources.
+            - Do not edit code.
+            - Output grouped bullets for features, fixes, docs, chores, and breaking changes.
+          '';
+        })
+
         (lib.mkIf cfg.gemini.enable {
           ".gemini/settings.json" = {
             text = toJSON geminiSettings;
             force = true;
           };
+
+          ".gemini/commands/nix-check.toml".text = ''
+            description = "Run Nix module and flake validation"
+            prompt = """
+            Validate this NixOS/Home Manager repository with minimal noise.
+            Run:
+            1) just modules
+            2) just check
+            Summarize failing checks, root causes, and smallest fixes.
+            """
+          '';
+
+          ".gemini/commands/lint-fix.toml".text = ''
+            description = "Run lint and apply minimal fixes"
+            prompt = """
+            Run linting and formatting for this repository:
+            1) just lint
+            2) just format
+            Apply minimal fixes only and avoid unrelated refactors.
+            Re-run lint and report what changed.
+            """
+          '';
+
+          ".gemini/commands/review-staged.toml".text = ''
+            description = "Review staged git changes"
+            prompt = """
+            Review staged changes from:
+            !{git diff --staged}
+
+            Classify findings by severity:
+            - CRITICAL
+            - WARNING
+            - SUGGESTION
+
+            Include concrete file references and recommended fixes.
+            """
+          '';
 
           ".gemini/skills/code-reviewer/SKILL.md" = {
             text = ''
@@ -1297,6 +1384,7 @@ in
     programs.zsh.shellAliases = lib.mkIf cfg.logging.enable {
       "cl-log" = "ai-agent-log-wrapper claude claude";
       "oc-log" = "ai-agent-log-wrapper opencode opencode";
+      "oc-port" = "opencode --port 4096";
       "codex-log" = "ai-agent-log-wrapper codex codex";
       "gemini-log" = "ai-agent-log-wrapper gemini gemini";
 

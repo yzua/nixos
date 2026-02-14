@@ -742,6 +742,7 @@
             model = "anthropic/claude-opus-4-6";
             description = "Primary orchestrator — delegates, verifies, ships";
             color = "#d79921"; # Gruvbox yellow
+            skills = [ "git-master" ];
           };
           oracle = {
             model = "anthropic/claude-opus-4-6";
@@ -777,6 +778,7 @@
             model = "google/gemini-3-flash";
             description = "Visual content analysis — PDFs, images, diagrams";
             color = "#689d6a"; # Gruvbox aqua
+            skills = [ "playwright" ];
           };
           prometheus = {
             model = "anthropic/claude-opus-4-6";
@@ -798,6 +800,7 @@
             model = "anthropic/claude-sonnet-4-5";
             description = "Orchestrator/conductor — coordinates task execution";
             color = "#fabd2f"; # Gruvbox bright yellow
+            skills = [ "git-master" ];
           };
           hephaestus = {
             model = "anthropic/claude-opus-4-6";
@@ -898,6 +901,7 @@
         request_rule = true
         collaboration_modes = true
         personality = true
+        model_reasoning_summary = true
 
         [profiles.nix]
         model_reasoning_effort = "high"
