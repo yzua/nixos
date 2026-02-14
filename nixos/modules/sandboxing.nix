@@ -38,9 +38,14 @@
         # =====================================================================
 
         # Browsers — use upstream profiles (handle NixOS properly via seccomp)
+        # Force Mesa EGL inside sandbox — firejail strips session env vars,
+        # so the system-wide override in nvidia.nix doesn't reach sandboxed apps.
         brave = {
           executable = "${pkgs.lib.getBin pkgs.brave}/bin/brave";
           profile = "${pkgs.firejail}/etc/firejail/brave.profile";
+          extraArgs = [
+            "--env=__EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json"
+          ];
         };
 
         # LibreWolf upstream profile works on NixOS (seccomp !chroot handles it)
@@ -162,6 +167,21 @@
           whitelist ''${RUNUSER}/app/org.keepassxc.KeePassXC
           whitelist ''${RUNUSER}/kpxc_server
           whitelist ''${RUNUSER}/org.keepassxc.KeePassXC.BrowserServer
+        '';
+
+        # Telegram drag-and-drop support for files outside ~/Downloads.
+        "firejail/telegram.local".text = ''
+          noblacklist ''${HOME}/Documents
+          noblacklist ''${HOME}/Pictures
+          noblacklist ''${HOME}/Videos
+          noblacklist ''${HOME}/Music
+          noblacklist ''${HOME}/Desktop
+
+          whitelist ''${HOME}/Documents
+          whitelist ''${HOME}/Pictures
+          whitelist ''${HOME}/Videos
+          whitelist ''${HOME}/Music
+          whitelist ''${HOME}/Desktop
         '';
       };
 
