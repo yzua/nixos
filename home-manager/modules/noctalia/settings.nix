@@ -18,30 +18,46 @@
     };
 
     notifications = {
-      location = "top-right";
+      location = "top_right";
     };
 
     general = {
       compactLockScreen = false;
       showChangelogOnStartup = false;
+      dimmerOpacity = 0.57;
+    };
+
+    ui = {
+      panelBackgroundOpacity = 1;
     };
 
     appLauncher = {
       enableClipboardHistory = true;
-      viewMode = "grid";
+      viewMode = "list";
       showCategories = true;
       showIconBackground = false;
       terminalCommand = "${constants.terminal} -e";
     };
 
     wallpaper = {
-      enabled = true;
+      enabled = false;
       fillMode = "crop";
       transitionDuration = 1500;
       transitionType = "fade";
       automationEnabled = true;
       wallpaperChangeMode = "random";
       randomIntervalSec = 600;
+    };
+
+    systemMonitor = {
+      enableDgpuMonitoring = true;
+      useCustomColors = false;
+      warningColor = constants.color.blue; # #83a598
+      criticalColor = constants.color.red; # #fb4934
+    };
+
+    audio = {
+      visualizerType = "mirrored";
     };
 
     dock = {

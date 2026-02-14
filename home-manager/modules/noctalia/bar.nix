@@ -6,11 +6,6 @@
     widgets = {
       left = [
         {
-          id = "Launcher";
-          icon = "layout-grid";
-          usePrimaryColor = true;
-        }
-        {
           id = "Clock";
           formatHorizontal = "hh:mm a ddd, MMM dd";
         }
@@ -20,12 +15,6 @@
           showGpuTemp = true;
           showNetworkStats = true;
           showDiskUsage = true;
-        }
-        {
-          id = "ActiveWindow";
-          showIcon = true;
-          maxWidth = 200;
-          scrollingMode = "hover";
         }
       ];
       center = [
@@ -50,11 +39,23 @@
       ];
       right = [
         {
+          id = "MediaMini";
+          hideMode = "hidden";
+          maxWidth = 145;
+          showArtistFirst = true;
+          showProgressRing = true;
+          scrollingMode = "hover";
+          panelShowAlbumArt = true;
+          panelShowVisualizer = true;
+          visualizerType = "linear";
+        }
+        {
           id = "Network";
           displayMode = "onhover";
         }
         {
           id = "Tray";
+          colorizeIcons = true;
           drawerEnabled = false;
           hidePassive = false;
         }
@@ -88,7 +89,10 @@
           id = "Microphone";
           displayMode = "onhover";
         }
-        { id = "Volume"; }
+        {
+          id = "Volume";
+          displayMode = "onhover";
+        }
         {
           id = "ControlCenter";
           icon = "settings";
