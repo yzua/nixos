@@ -5,7 +5,7 @@ This is a minimal template for Rust development on the nightly channel.
 ## Initialization
 
 ```bash
-nix flake init -t "https://github.com/yzua/nixos-config/main?dir=dev-shells#rust-nightly"
+nix flake init -t "github:yzua/nixos/master?dir=dev-shells#rust-nightly"
 ```
 
 ## Usage

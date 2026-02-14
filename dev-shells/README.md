@@ -17,7 +17,7 @@ This directory provides reusable Nix flake templates for development shells.
 
 ```bash
 # Replace <name> with one of the template names above.
-nix flake init -t "https://github.com/yzua/nixos-config/main?dir=dev-shells#<name>"
+nix flake init -t "github:yzua/nixos/master?dir=dev-shells#<name>"
 ```
 
 ## Local template usage
