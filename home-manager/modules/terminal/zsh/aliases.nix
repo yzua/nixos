@@ -57,10 +57,11 @@
 
       # AI tools
       cl = "claude --dangerously-skip-permissions";
+      cx = "codex --dangerously-bypass-approvals-and-sandbox";
       oc = "opencode";
-      "ac" = "ai-commit";
-      "ak" = "ai-ask";
-      "ah" = "ai-help";
+      ac = "ai-commit";
+      ak = "ai-ask";
+      ah = "ai-help";
       rmx = "repomix";
       "rmx-clip" = "repomix --copy"; # Bundle repo to clipboard for AI context
       gprai = "claude 'Create a PR for my current changes. Use gh pr create.'";
