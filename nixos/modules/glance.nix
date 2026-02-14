@@ -168,27 +168,40 @@
 
                   # YouTube feeds
                   {
-                    type = "rss";
+                    type = "videos";
                     title = "YouTube";
-                    style = "horizontal-cards";
-                    limit = 12;
-                    feeds = [
-                      {
-                        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA";
-                        title = "Fireship";
-                      }
-                      {
-                        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ";
-                        title = "ThePrimeagen";
-                      }
-                      {
-                        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UCc0YbtMkRdhcqwhu3Oad-lw";
-                        title = "No Boilerplate";
-                      }
-                      {
-                        url = "https://www.youtube.com/feeds/videos.xml?channel_id=UC2Xd-TjJByJyK2w1zNwY0zQ";
-                        title = "Beyond Fireship";
-                      }
+                    style = "grid-cards";
+                    channels = [
+                      # Fireship
+                      "UCsBjURrPoezykLs9EqgamOA"
+                      # ThePrimeagen
+                      "UCUyeluBRhGPCW4rPe_UvBZQ"
+                      # No Boilerplate
+                      "UCc0YbtMkRdhcqwhu3Oad-lw"
+                      # Beyond Fireship
+                      "UC2Xd-TjJByJyK2w1zNwY0zQ"
+                      # Better Stack
+                      "UCkVfrGwV-iG9bSsgCbrNPxQ"
+                      # codingjerk
+                      "UCFPTbsXLqWLHcXosYYw3D6Q"
+                      # PwnFunction
+                      "UCW6MNdOsqv2E9AjQkv9we7A"
+                      # ByteByteGo
+                      "UCZgt6AzoyjslHTC9dz0UoTw"
+                      # Dreams of Code
+                      "UCWQaM7SpSECp9FELz-cHzuQ"
+                      # Seytonic
+                      "UCW6xlqxSY3gGur4PkGPEUeA"
+                      # Bubble Brian
+                      "UCvF3C7NCZBHuE9iJvmsxO3w"
+                      # bigboxSWE
+                      "UC5--wS0Ljbin1TjWQX6eafA"
+                      # Code to the Moon
+                      "UCjREVt2ZJU8ql-NC9Gu-TJw"
+                      # Mental Outlaw
+                      "UC7YOGHUfC1Tb6E4pudI9STA"
+                      # Vimjoyer
+                      "UC_zBdZ0_H_jn41FDRG7q4Tw"
                     ];
                   }
                 ];
@@ -240,9 +253,24 @@
                             icon = "si:x";
                           }
                           {
-                            title = "LinkedIn";
-                            url = "https://www.linkedin.com/in/yz/";
-                            icon = "si:linkedin";
+                            title = "SimpleLogin";
+                            url = "https://app.simplelogin.io/dashboard/";
+                            icon = "mdi:shield-lock-outline";
+                          }
+                          {
+                            title = "Codeberg";
+                            url = "https://codeberg.org/";
+                            icon = "si:codeberg";
+                          }
+                          {
+                            title = "YouTube";
+                            url = "https://www.youtube.com/";
+                            icon = "si:youtube";
+                          }
+                          {
+                            title = "Reddit";
+                            url = "https://www.reddit.com/";
+                            icon = "si:reddit";
                           }
                         ];
                       }
