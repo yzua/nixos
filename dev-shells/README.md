@@ -11,5 +11,5 @@ To get started fast just use the following command:
 
 ```bash
 # [deno, rust, python, tauri, ...]
-nix flake init -t "github:82163/nixos-config/main?dir=devShells#<name>"
+nix flake init -t "github:82163/nixos-config/main?dir=dev-shells#<name>"
 ```

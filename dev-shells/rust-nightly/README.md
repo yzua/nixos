@@ -1,13 +1,11 @@
-## Rust stable
+# Rust nightly
 
-This is a minimal template for Rust development on the stable channel.
-
----
+This is a minimal template for Rust development on the nightly channel.
 
 ## Initialization
 
 ```bash
-nix flake init -t "github:82163/nixos-config/main?dir=devShells#rust-stable"
+nix flake init -t "github:82163/nixos-config/main?dir=dev-shells#rust-nightly"
 ```
 
 ## Usage

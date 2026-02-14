@@ -234,7 +234,7 @@ home-manager/
   packages/                   # 12 domain chunks (cli, dev, multimedia, privacy, etc.)
 scripts/                      # Utility scripts (ai, browser, build, sops)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix, age)
-devShells/                    # Per-language dev environments (Node, Python, Rust, Go, etc.)
+dev-shells/                    # Per-language dev environments (Node, Python, Rust, Go, etc.)
 ```
 
 ---

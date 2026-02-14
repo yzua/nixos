@@ -116,7 +116,7 @@
   };
 
   home = {
-    # Project-specific deps should use devShells or uv
+    # Project-specific deps should use dev-shells or uv
     packages = with pkgs; [
       python3
       python3Packages.pip

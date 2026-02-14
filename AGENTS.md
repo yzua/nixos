@@ -123,7 +123,7 @@ flake.nix                             # Entry point, makeSystem factory
   home-manager/home.nix               # HM entry point (standalone, NOT NixOS module)
     home-manager/modules/default.nix  # User-level modules
     home-manager/packages/            # Package chunks (cli.nix, dev.nix, etc.)
-  devShells/                          # Per-language dev environments (standalone flakes)
+  dev-shells/                          # Per-language dev environments (standalone flakes)
 ```
 
 ### Package strategy
@@ -152,7 +152,7 @@ flake.nix                             # Entry point, makeSystem factory
 | Shared constants (terminal, editor, font, user identity) | `shared/constants.nix` |
 | Utility scripts | `scripts/` (ai, browser, build, sops, system) |
 | Secrets | `secrets/secrets.yaml` (edit with `just sops-edit`) |
-| Dev environments | `devShells/<lang>/flake.nix` (Node, Python, Rust, Go, etc.) |
+| Dev environments | `dev-shells/<lang>/flake.nix` (Node, Python, Rust, Go, etc.) |
 | Firmware updates | `nixos/modules/fwupd.nix` |
 | Boot optimization | `nixos/modules/boot-optimization.nix` (defer monitoring from boot) |
 | System health reports | `nixos/modules/system-report.nix` |
