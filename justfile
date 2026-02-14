@@ -23,6 +23,8 @@ lint:
     @echo -e "\n➤ Checking Bash scripts…"
     @\time -f "⏱ Completed in %E" find . -name "*.sh" -not -path "./.git/*" -exec nix run nixpkgs#shellcheck -- {} +
     @echo "✔ ShellCheck passed!"
+    @echo -e "\n➤ Checking inline Nix shell scripts…"
+    @\time -f "⏱ Completed in %E" bash ./scripts/build/shellcheck-nix-inline.sh
     @echo -e "\n➤ Linting Markdown files…"
     @\time -f "⏱ Completed in %E" find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 | xargs -0 -r nix run nixpkgs#markdownlint-cli --
     @echo "✔ Markdown linting passed!"
@@ -93,11 +95,13 @@ clean:
 	nix store optimise
 	@echo -e "✔ Cleanup completed!"
 
-# Install git pre-commit hook for config validation
+# Install git hooks for local validation/signing policy
 install-hooks:
     @cp scripts/build/pre-commit-hook.sh .git/hooks/pre-commit
     @chmod +x .git/hooks/pre-commit
-    @echo "✔ Pre-commit hook installed!"
+    @cp scripts/build/pre-push-hook.sh .git/hooks/pre-push
+    @chmod +x .git/hooks/pre-push
+    @echo "✔ Pre-commit and pre-push hooks installed!"
 
 # Audit systemd unit security exposure
 security-audit:
