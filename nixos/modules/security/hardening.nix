@@ -2,8 +2,10 @@
 { lib, ... }:
 
 {
-  # GrapheneOS-inspired hardened allocator: guard pages, randomization, quarantine
-  environment.memoryAllocator.provider = "graphene-hardened";
+  # graphene-hardened removed — crashes glycin/bwrap image loaders (Loupe, Nautilus
+  # thumbnails) because the allocator is preloaded system-wide via ld-nix.so.preload
+  # and glycin-image-rs sandbox children die with coredump signals.
+  # Revisit if glycin upstream adds hardened-malloc compatibility.
 
   services.logind.settings.Login = {
     IdleAction = "lock";
