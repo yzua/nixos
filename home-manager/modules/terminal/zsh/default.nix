@@ -193,7 +193,7 @@
         cat "$key_file"
       }
 
-      clg() {
+      claude_glm() {
         local key; key="$(_load_zai_key)" || return 1
         ANTHROPIC_AUTH_TOKEN="$key" \
         ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
@@ -209,12 +209,16 @@
         Z_AI_API_KEY="$key" opencode "$@"
       }
 
-      ocg() {
+      opencode_glm() {
         OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" opencode "$@"
       }
 
-      ocgem() {
+      opencode_gemini() {
         OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gemini" opencode "$@"
+      }
+
+      opencode_sonnet() {
+        OPENCODE_CONFIG_DIR="$HOME/.config/opencode-sonnet" opencode "$@"
       }
 
       cl-sops() {
