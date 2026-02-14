@@ -767,9 +767,9 @@ in
       ));
 
       activation = {
-        # Runs after setupCodexConfig so keys can be injected.
+        # Runs after all config writers so keys can be injected last.
         patchAiAgentSecrets = lib.mkIf (cfg.secrets.zaiApiKeyFile != null) (
-          lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" ] ''
+          lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "setupClaudeConfig" ] ''
             if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
               ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
               
@@ -856,8 +856,8 @@ in
             fi
 
             # Inject GitHub token from gh CLI into all agent configs
-            if command -v gh &> /dev/null && gh auth status &> /dev/null; then
-              GH_TOKEN="$(gh auth token)"
+            if ${pkgs.gh}/bin/gh auth status &> /dev/null; then
+              GH_TOKEN="$(${pkgs.gh}/bin/gh auth token)"
               # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
               for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json"; do
                 if [[ -f "$OPENCODE_CFG" ]]; then
