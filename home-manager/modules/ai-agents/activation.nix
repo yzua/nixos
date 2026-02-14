@@ -178,6 +178,48 @@ in
 
       setupCodexConfig = lib.mkIf cfg.codex.enable (
         let
+          codexNotifyScript = pkgs.writeShellScript "codex-notify" ''
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            payload=""
+            for arg in "$@"; do
+              if [[ -n "$arg" ]] && ${pkgs.jq}/bin/jq -e . >/dev/null 2>&1 <<< "$arg"; then
+                payload="$arg"
+                break
+              fi
+            done
+
+            if [[ -z "$payload" ]]; then
+              payload="$*"
+            fi
+
+            if [[ -z "$payload" ]] && [[ ! -t 0 ]]; then
+              payload="$(cat)"
+            fi
+
+            summary="Codex"
+            body="$payload"
+
+            if [[ -n "$payload" ]] && ${pkgs.jq}/bin/jq -e . >/dev/null 2>&1 <<< "$payload"; then
+              summary="$(${pkgs.jq}/bin/jq -r 'if type == "object" then (.title // .summary // "Codex") else "Codex" end' <<< "$payload")"
+              body="$(${pkgs.jq}/bin/jq -r '
+                if type == "object" then
+                  (.message // .body // ."last-assistant-message" // .content // .type // "Codex notification")
+                else
+                  .
+                end
+              ' <<< "$payload")"
+            fi
+
+            body="$(printf '%s' "$body" | tr '\n' ' ')"
+            body="$(printf '%s' "$body" | ${pkgs.gnused}/bin/sed -E 's/[[:space:]]+/ /g; s/^ //; s/ $//')"
+            if [[ -z "$body" ]]; then
+              body="Notification"
+            fi
+
+            notify-send -a "Codex" -i dialog-information "$summary" "$body" 2>/dev/null || true
+          '';
           mcpToml = lib.concatStringsSep "\n" (
             lib.mapAttrsToList (
               name: server:
@@ -215,7 +257,7 @@ in
 
           web_search = "live"
 
-          notify = ["notify-send", "Codex"]
+          notify = ["${codexNotifyScript}"]
 
           developer_instructions = """
           Experienced developer. Concise communication, no preamble.
