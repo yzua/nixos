@@ -198,11 +198,7 @@ let
     "telemetry.telemetryLevel" = "off";
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
-    "cSpell.enableFiletypes" = [
-      "nix"
-      "shellscript"
-      "dockerfile"
-    ];
+    "window.zoomLevel" = 0.5;
   };
 in
 {
@@ -305,7 +301,6 @@ in
           christian-kohler.path-intellisense # File path autocomplete
           ms-vscode.live-server # Local dev server with live reload
           alefragnani.bookmarks # Navigate code with bookmarks
-          streetsidesoftware.code-spell-checker # Catch typos in code and comments
 
           # --- Theming ---
           jdinhlife.gruvbox # Gruvbox color theme
