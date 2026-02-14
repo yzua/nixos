@@ -11,22 +11,12 @@ TEST_RESULTS="${TMPDIR:-/tmp}/nixos-config-tests-$$.log"
 FAILED_TESTS=0
 PASSED_TESTS=0
 
-# Logging functions (missing from original implementation)
-log_info() {
-	echo "[INFO] $*" | tee -a "$TEST_RESULTS"
-}
+# shellcheck source=/dev/null
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/logging.sh"
 
-log_error() {
-	echo "[ERROR] $*" | tee -a "$TEST_RESULTS"
-}
-
-log_success() {
-	echo "[SUCCESS] $*" | tee -a "$TEST_RESULTS"
-}
-
-log_warning() {
-	echo "[WARNING] $*" | tee -a "$TEST_RESULTS"
-}
+# Set LOG_FILE for logging functions to use
+# shellcheck disable=SC2034  # Used by sourced logging.sh
+LOG_FILE="$TEST_RESULTS"
 
 # Test result functions
 test_pass() {

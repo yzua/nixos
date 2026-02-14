@@ -8,48 +8,40 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ASK_SCRIPT="$SCRIPT_DIR/ask.sh"
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-# Function to print colored output
-print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
-print_success() { echo -e "${GREEN}✓${NC} $1"; }
-print_error() { echo -e "${RED}✗${NC} $1"; }
+# shellcheck source=/dev/null
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/logging.sh"
 
 # Function to show usage
 show_usage() {
-    echo "Usage: $0 \"your question about commands\""
-    echo ""
-    echo "Examples:"
-    echo "  $0 \"how to list files\""
-    echo "  $0 \"find large files in directory\""
-    echo "  $0 \"compress a folder\""
-    echo "  $0 \"check disk space\""
-    echo ""
-    echo "This script provides one-line command answers without explanations."
-    echo "Commands are automatically copied to clipboard."
+	echo "Usage: $0 \"your question about commands\""
+	echo ""
+	echo "Examples:"
+	echo "  $0 \"how to list files\""
+	echo "  $0 \"find large files in directory\""
+	echo "  $0 \"compress a folder\""
+	echo "  $0 \"check disk space\""
+	echo ""
+	echo "This script provides one-line command answers without explanations."
+	echo "Commands are automatically copied to clipboard."
 }
 
 # Check if ask.sh exists
 if [[ ! -f "$ASK_SCRIPT" ]]; then
-    print_error "ask.sh not found at $ASK_SCRIPT"
-    exit 1
+	print_error "ask.sh not found at $ASK_SCRIPT"
+	exit 1
 fi
 
 # Check if question is provided
 if [[ $# -eq 0 ]]; then
-    print_error "No question provided"
-    echo ""
-    show_usage
-    exit 1
+	print_error "No question provided"
+	echo ""
+	show_usage
+	exit 1
 fi
 
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-    show_usage
-    exit 0
+	show_usage
+	exit 0
 fi
 
 QUESTION="$*"
