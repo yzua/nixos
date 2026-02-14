@@ -14,7 +14,7 @@ format:
     @nix fmt
     @echo "✔ Formatting passed!"
 
-# Lint all .nix files and bash scripts
+# Lint all .nix files, bash scripts, and markdown docs
 lint:
     @echo -e "\n➤ Linting Nix files…"
     @\time -f "⏱ Completed in %E" nix run nixpkgs#statix -- check --ignore '.git/**'
@@ -23,6 +23,9 @@ lint:
     @echo -e "\n➤ Checking Bash scripts…"
     @\time -f "⏱ Completed in %E" find . -name "*.sh" -not -path "./.git/*" -exec nix run nixpkgs#shellcheck -- {} +
     @echo "✔ ShellCheck passed!"
+    @echo -e "\n➤ Linting Markdown files…"
+    @\time -f "⏱ Completed in %E" find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 | xargs -0 -r nix run nixpkgs#markdownlint-cli --
+    @echo "✔ Markdown linting passed!"
 
 # Scan for unused code in .nix files
 dead:
