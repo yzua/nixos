@@ -51,11 +51,6 @@
           description = "Go development template";
         };
 
-        typescript = {
-          path = ./typescript;
-          description = "TypeScript fullstack development template";
-        };
-
         cpp = {
           path = ./cpp;
           description = "C/C++ development template";

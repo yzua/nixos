@@ -12,13 +12,12 @@ This directory provides reusable Nix flake templates for development shells.
 - `python-venv`: Python shell with `venv` workflow
 - `rust-nightly`: Rust nightly toolchain via Fenix
 - `rust-stable`: Rust stable toolchain
-- `typescript`: Fullstack TypeScript tooling shell
 
 ## Quickstart
 
 ```bash
 # Replace <name> with one of the template names above.
-nix flake init -t "github:82163/nixos-config/main?dir=dev-shells#<name>"
+nix flake init -t "https://github.com/yzua/nixos-config/main?dir=dev-shells#<name>"
 ```
 
 ## Local template usage
