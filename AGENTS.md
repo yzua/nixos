@@ -11,6 +11,7 @@ Sub-directory `AGENTS.md` files exist in `nixos/modules/`, `home-manager/modules
 ## Commands
 
 ### Validation pipeline (run before commits, in this order)
+
 ```bash
 just modules   # Validate default.nix imports match .nix files on disk (fastest)
 just lint      # statix + deadnix + shellcheck
@@ -20,6 +21,7 @@ just check     # nix flake check --no-build (evaluates flake without building)
 ```
 
 ### Apply changes
+
 ```bash
 just home      # Home Manager switch (safe, user-level) - always run FIRST
 just nixos     # NixOS switch (system-level) - run AFTER just home
@@ -27,14 +29,17 @@ just all       # Full pipeline: modules -> lint -> format -> check -> nixos -> h
 ```
 
 ### Security auditing
+
 ```bash
 just security-audit  # systemd unit hardening check + vulnix CVE scan
 ```
 
 ### Single-test guidance
+
 No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) → `just home` (user build) → `just nixos` (system, last resort).
 
 ### Secrets (sops-nix with age encryption)
+
 `just sops-view` (read-only) | `just sops-edit` (edit + auto encrypt/decrypt) | `just secrets-add key value`
 
 ---
@@ -42,6 +47,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ## Code Style
 
 ### Module layout (canonical pattern)
+
 ```nix
 # One-line comment explaining module purpose.
 {
@@ -67,12 +73,14 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ```
 
 ### Formatting (nixfmt-tree)
+
 - Formatter: `nixfmt-tree` (via `nix fmt`). Do NOT manually format; run `just format`.
 - Multi-param function args: one-per-line with trailing comma (see module layout above).
 - Single-param args stay inline: `{ pkgs, ... }:`
 - Lists with comments get one item per line; short lists can be inline.
 
 ### Nix conventions
+
 - **inherit**: `{ inherit user; }` not `user = user;`
 - **Conditionals**: `lib.mkIf` for conditional attr sets, not `lib.optional`
 - **Grouped attrs**: Combine related: `environment = { systemPackages = [...]; sessionVariables = {...}; };`
@@ -82,6 +90,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 - **allowBroken**: Always `false` (enforced in flake.nix)
 
 ### Imports
+
 - Every directory with `.nix` files must have a `default.nix` listing all imports
 - Both file (`./file.nix`) and directory (`./subdir`) imports are valid
 - Each import gets a short inline comment: `./audio.nix # Audio system (PipeWire)`
@@ -89,6 +98,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 - Files prefixed with `_` (e.g., `_lib.nix`, `_helpers.nix`) are **helper files** imported manually by other modules, NOT listed in `default.nix`. The modules-check script skips them.
 
 ### Options and naming
+
 - Custom options live under `mySystem.*` (e.g., `mySystem.gaming.enable`)
 - Use `lib.mkEnableOption` for boolean enable flags
 - Use `lib.mkOption` with `lib.types.*` for typed options
@@ -97,18 +107,21 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 - Standard abbreviations: `pkgs`, `lib`, `cfg`, `config`
 
 ### Comments
+
 - Every module starts with a one-line `# Purpose comment.` (period at end)
 - Inline comments for non-obvious values: `DiscoverableTimeout = 30; # seconds`
 - Section headers use `# === Section Name ===` (in validation/security modules)
 - Commented-out code must explain why: `# prometheus removed due to service failures`
 
 ### Error handling and validation
+
 - Cross-module conflicts go in `nixos/modules/validation.nix` as assertions
 - Assertions use descriptive messages explaining both the conflict and the fix
 - Use `lib.optional` for conditional warnings in the `warnings` list
 - Document non-default security values inline
 
 ### Shell scripts
+
 - Start with `#!/usr/bin/env bash` and `set -euo pipefail`
 - Must pass `shellcheck` (via `just lint`)
 - Quote all variables: `"$var"`, `"${array[@]}"`
@@ -123,7 +136,8 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ## Architecture
 
 ### Flake structure
-```
+
+```text
 flake.nix                             # Entry point, makeSystem factory
   hosts/<hostname>/configuration.nix  # Per-host NixOS config
     nixos/modules/default.nix         # ~56 shared system modules (48 top-level + sub-modules)
@@ -135,6 +149,7 @@ flake.nix                             # Entry point, makeSystem factory
 ```
 
 ### Package strategy
+
 - `pkgs` (nixpkgs unstable) — default for all apps
 - `pkgsStable` (nixos-25.11) — critical/stable tools only
 - Package chunks receive `{ pkgs, pkgsStable }` and return a list, aggregated via `builtins.concatLists`
@@ -146,7 +161,7 @@ flake.nix                             # Entry point, makeSystem factory
 ## Where to Look
 
 | Task | Location |
-|------|----------|
+| ----- | -------- |
 | Add system service/feature | `nixos/modules/*.nix` (use `mySystem.*` option pattern) |
 | Add user package | `home-manager/packages/*.nix` (pick domain chunk) |
 | Configure program (dotfiles) | `home-manager/modules/` (`programs.*` pattern) |
@@ -170,7 +185,7 @@ flake.nix                             # Entry point, makeSystem factory
 ## Forbidden Patterns
 
 | Pattern | Reason |
-|---------|--------|
+| ------- | ------ |
 | PulseAudio + PipeWire simultaneously | Audio stack conflict (validated) |
 | Multiple power daemons (TLP + power-profiles-daemon + thermald) | Service conflicts (validated) |
 | nouveau + NVIDIA proprietary drivers | Driver conflict (validated) |
@@ -191,6 +206,7 @@ flake.nix                             # Entry point, makeSystem factory
 3. Test: `just home` (safe) → `just nixos` (system)
 
 ### Common fixes
+
 - **Missing import**: Add to the parent `default.nix` imports list
 - **deadnix warning**: Remove unused binding or prefix with `_`
 - **statix suggestion**: Apply the suggested fix directly

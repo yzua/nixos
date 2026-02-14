@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148,SC1036,SC1088,SC2121
 set shell := ["/usr/bin/env", "bash", "-c"]
 set quiet
 
