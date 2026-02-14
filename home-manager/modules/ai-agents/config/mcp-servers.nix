@@ -31,7 +31,7 @@
       };
 
       git = {
-        enable = true;
+        enable = false; # gitpython cannot GPG-sign commits; use Bash(git *) instead
         command = "uvx";
         args = [ "mcp-server-git" ];
       };
