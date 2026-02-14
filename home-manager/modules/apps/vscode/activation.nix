@@ -9,7 +9,7 @@
 let
   settingsJson = builtins.toJSON {
     "workbench.colorTheme" = "Gruvbox Dark Soft";
-    "workbench.iconTheme" = "vscode-icons";
+    "workbench.iconTheme" = "vs-seti";
     "workbench.activityBar.location" = "top";
     "workbench.sideBar.location" = "right";
     "workbench.layoutControl.enabled" = false;
@@ -145,7 +145,7 @@ let
       "editor.wordWrap" = "on";
       "files.trimTrailingWhitespace" = false;
     };
-    "shellcheck.executablePath" = "shellcheck";
+    "shellcheck.executablePath" = "${pkgs.shellcheck}/bin/shellcheck";
     "[shellscript]"."editor.tabSize" = 2;
     "[yaml]" = {
       "editor.tabSize" = 2;

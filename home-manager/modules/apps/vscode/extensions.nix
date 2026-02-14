@@ -11,7 +11,6 @@ in
   programs.vscode.profiles.default.extensions =
     (with pkgs.vscode-extensions; [
       # --- Nix ---
-      arrterian.nix-env-selector # Nix environment selector
       jnoortheen.nix-ide # Nix language support (syntax, LSP, formatting)
       mkhl.direnv # direnv integration
 
@@ -21,7 +20,6 @@ in
       ms-python.vscode-pylance # Python type checker and IntelliSense
       charliermarsh.ruff # Ruff linter/formatter
       njpwerner.autodocstring # Docstring generator
-      ms-toolsai.jupyter # Jupyter notebook support
 
       # --- Go ---
       golang.go # Go language support (IntelliSense, debugging, linting)
@@ -80,7 +78,6 @@ in
 
       # --- Git ---
       eamodio.gitlens # Git blame, history, comparison
-      github.vscode-pull-request-github # GitHub PR review in editor
 
       # --- AI Agents ---
       anthropic.claude-code # Claude Code
@@ -95,7 +92,6 @@ in
 
       # --- Theming ---
       jdinhlife.gruvbox # Gruvbox color theme
-      vscode-icons-team.vscode-icons # File icons
     ])
     ++ [
       # --- Marketplace extensions (not in nixpkgs) ---
