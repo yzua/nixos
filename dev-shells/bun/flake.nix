@@ -10,6 +10,7 @@
     {
       nixpkgs,
       utils,
+      ...
     }:
 
     utils.lib.eachDefaultSystem (
@@ -18,7 +19,7 @@
         pkgs = import nixpkgs { inherit system; };
       in
       {
-        devShell = pkgs.mkShell {
+        devShells.default = pkgs.mkShell {
           name = "bun-app";
           buildInputs = with pkgs; [
             bun

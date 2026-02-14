@@ -4,7 +4,7 @@
   description = "A collection of flake templates";
 
   outputs =
-    { nixpkgs }:
+    { nixpkgs, ... }:
 
     let
       system = "x86_64-linux";
@@ -33,7 +33,7 @@
 
         deno = {
           path = ./deno;
-          description = "Deno runtime development template using deno2nix";
+          description = "Deno runtime development template";
         };
 
         bun = {
@@ -61,10 +61,6 @@
           description = "C/C++ development template";
         };
 
-        postgresql = {
-          path = ./postgresql;
-          description = "PostgreSQL development template";
-        };
       };
     };
 }

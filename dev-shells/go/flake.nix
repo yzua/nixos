@@ -37,11 +37,13 @@
 
           env = {
             GO111MODULE = "on";
-            GOPATH = "$PWD/.go";
-            GOBIN = "$PWD/.go/bin";
           };
 
           shellHook = ''
+            export GOPATH="$PWD/.go"
+            export GOBIN="$GOPATH/bin"
+            mkdir -p "$GOBIN"
+
             if [ ! -f go.mod ]; then
               echo "No go.mod found. Initialize with: go mod init <module-name>"
             else
