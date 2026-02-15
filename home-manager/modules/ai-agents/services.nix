@@ -26,21 +26,25 @@ in
       ''
     ));
 
-    programs.zsh.shellAliases = lib.mkIf cfg.logging.enable {
-      "cl-log" = "ai-agent-log-wrapper claude claude";
-      "oc-log" = "ai-agent-log-wrapper opencode opencode";
-      "oc-port" = "opencode --port 4096";
-      "codex-log" = "ai-agent-log-wrapper codex codex";
-      "gemini-log" = "ai-agent-log-wrapper gemini gemini";
+    programs.zsh.shellAliases =
+      (lib.mkIf cfg.logging.enable {
+        "cl-log" = "ai-agent-log-wrapper claude claude";
+        "oc-log" = "ai-agent-log-wrapper opencode opencode";
+        "oc-port" = "opencode --port 4096";
+        "codex-log" = "ai-agent-log-wrapper codex codex";
+        "gemini-log" = "ai-agent-log-wrapper gemini gemini";
 
-      "ai-logs" = "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null";
-      "ai-errors" =
-        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -50";
+        "ai-logs" = "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null";
+        "ai-errors" =
+          "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -50";
 
-      "ai-stats" = "ai-agent-analyze stats";
-      "ai-report" = "ai-agent-analyze report";
-      "ai-dash" = "ai-agent-dashboard";
-    };
+        "ai-stats" = "ai-agent-analyze stats";
+        "ai-report" = "ai-agent-analyze report";
+        "ai-dash" = "ai-agent-dashboard";
+      })
+      // {
+        "ai-mcp-scan" = "uvx mcp-scan@latest --skills";
+      };
 
     systemd.user = lib.mkIf cfg.logging.enable {
       # Create log directory declaratively (replaces createAiAgentLogDir activation script)
