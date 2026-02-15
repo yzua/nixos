@@ -90,6 +90,7 @@
       cxsafe = "command codex --no-alt-screen -p safe"; # Start Codex safe profile (read-only/untrusted).
       cxauto = "command codex --no-alt-screen --full-auto"; # Codex low-friction automation mode.
       cxexec = "command codex exec"; # Codex one-shot non-interactive execution.
+      cxcm = "command codex --no-alt-screen 'Review all current git changes, propose a commit plan that splits work into minimal logical commits, then execute it commit-by-commit using signed commits (git commit -S). For each commit, stage only relevant hunks/files, run relevant checks for touched files, and use a clear conventional commit message. Show the plan before creating the first commit.'"; # Codex commit-splitting + signed-commit workflow.
 
       # Nix
       ns = "nix-shell";
