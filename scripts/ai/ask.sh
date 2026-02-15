@@ -8,33 +8,13 @@ set -euo pipefail
 
 # Configuration
 API_URL="https://api.z.ai/api/coding/paas/v4"
-DEFAULT_MODEL="glm-5"
+DEFAULT_MODEL="glm-4.5-air"
 DEEP_MODEL="glm-5"
 API_KEY_FILE="/run/secrets/zai_api_key"
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Function to print colored output
-print_info() {
-    echo -e "${BLUE}ℹ${NC} $1"
-}
-
-print_success() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}✗${NC} $1"
-}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
 
 # Function to show usage
 show_usage() {
