@@ -1,12 +1,19 @@
-# Obsidian Markdown notes app configuration.
-_:
-
+# Obsidian Markdown notes app with a ready-to-use default vault.
+{
+  config,
+  pkgs,
+  ...
+}:
+let
+  defaultVault = "Vault";
+  defaultVaultPath = "${config.home.homeDirectory}/${defaultVault}";
+in
 {
   xdg.desktopEntries.obsidian = {
     name = "Obsidian";
     genericName = "Markdown Notes";
     comment = "Markdown knowledge base";
-    exec = "obsidian %U";
+    exec = "obsidian --vault ${defaultVaultPath} %U";
     icon = "obsidian";
     terminal = false;
     categories = [
@@ -19,14 +26,13 @@ _:
     ];
   };
 
-  # Baseline global defaults; vault-specific preferences remain user-managed.
-  xdg.configFile."obsidian/obsidian.json".text = builtins.toJSON {
-    alwaysUpdateLinks = true;
-    newFileLocation = "current";
-    newLinkFormat = "relative";
-    promptDelete = false;
-    showLineNumber = true;
-    trashOption = "local";
-    useMarkdownLinks = true;
+  # Register default vault in Obsidian while keeping vault-local settings user-managed.
+  programs.obsidian = {
+    enable = true;
+    package = pkgs.obsidian;
+
+    vaults.${defaultVault} = {
+      target = defaultVault;
+    };
   };
 }
