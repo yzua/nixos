@@ -8,6 +8,10 @@
   ...
 }:
 
+let
+  mesaEglVendorFile = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
+  mesaEglFirejailArg = "--env=__EGL_VENDOR_LIBRARY_FILENAMES=${mesaEglVendorFile}";
+in
 {
   options.mySystem.sandboxing = {
     enable = lib.mkEnableOption "application sandboxing with Firejail and bubblewrap";
@@ -43,9 +47,7 @@
         brave = {
           executable = "${pkgs.lib.getBin pkgs.brave}/bin/brave";
           profile = "${pkgs.firejail}/etc/firejail/brave.profile";
-          extraArgs = [
-            "--env=__EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json"
-          ];
+          extraArgs = [ mesaEglFirejailArg ];
         };
 
         # LibreWolf upstream profile works on NixOS (seccomp !chroot handles it)
@@ -54,9 +56,7 @@
         librewolf = {
           executable = "${pkgs.lib.getBin pkgsStable.librewolf}/bin/librewolf";
           profile = "${pkgs.firejail}/etc/firejail/librewolf.profile";
-          extraArgs = [
-            "--env=__EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json"
-          ];
+          extraArgs = [ mesaEglFirejailArg ];
         };
 
         # Messaging — use upstream profiles
