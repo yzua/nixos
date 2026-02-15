@@ -151,7 +151,7 @@
       reasoningEffort = "medium";
       approvalPolicy = "on-request";
       trustedProjects = [
-        "/home/yz/System"
+        "${config.home.homeDirectory}/System"
       ];
       extraToml = ''
         [features]
@@ -159,6 +159,7 @@
         collaboration_modes = true
         personality = true
         model_reasoning_summary = true
+        child_agents_md = true
 
         [profiles.nix]
         model_reasoning_effort = "high"
@@ -186,6 +187,30 @@
       extraSettings = {
         codeExecution = true;
         searchGrounding = true;
+        security = {
+          folderTrust = {
+            enabled = true;
+          };
+        };
+        mcp = {
+          allowed = [
+            "context7"
+            "zai-mcp-server"
+            "filesystem"
+            "memory"
+            "sequential-thinking"
+            "playwright"
+            "cloudflare-docs"
+            "github"
+          ];
+          excluded = [
+            "git"
+            "web-search-prime"
+            "cloudflare-workers-builds"
+            "cloudflare-workers-bindings"
+            "cloudflare-observability"
+          ];
+        };
         context = {
           fileName = [
             "GEMINI.md"
