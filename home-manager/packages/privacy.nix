@@ -8,21 +8,8 @@
 }:
 
 let
-  # Force Mesa EGL to avoid NVIDIA LLVM OOM crash during shader compilation.
-  # NVIDIA's EGL (10_nvidia.json) takes priority by default and its LLVM JIT
-  # OOMs on Firefox-family browsers. Also set system-wide in nvidia.nix, but
-  # wrapProgram ensures it works even before relogin or in non-login shells.
-  wrapWithMesaEgl =
-    name: pkg:
-    pkgs.symlinkJoin {
-      inherit name;
-      paths = [ pkg ];
-      buildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/${name} \
-          --set __EGL_VENDOR_LIBRARY_FILENAMES /run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json
-      '';
-    };
+  eglWrap = import ./_egl-wrap.nix { inherit pkgs; };
+  inherit (eglWrap) wrapWithMesaEgl;
 in
 {
   home.packages = with pkgsStable; [
