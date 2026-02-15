@@ -11,6 +11,9 @@ let
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   sonnetModel = "anthropic/claude-sonnet-4-5";
+  gptMainModel = "openai/gpt-5.3-codex";
+  gptStandardModel = "openai/gpt-5.3";
+  gptFastModel = "opencode/gpt-5-nano";
 
   replaceOpusWithSonnet =
     value:
@@ -118,6 +121,20 @@ let
     explore = "minimal"; # Fast grep — speed over depth
   };
 
+  # GPT profile: OpenAI GPT models for GPT-first coding sessions.
+  gptAgentModels = {
+    sisyphus = gptMainModel;
+    oracle = gptStandardModel;
+    librarian = gptStandardModel;
+    explore = gptFastModel;
+    # multimodal-looker keeps its original vision-capable model
+    prometheus = gptMainModel;
+    metis = gptMainModel;
+    momus = gptStandardModel;
+    atlas = gptStandardModel;
+    hephaestus = gptMainModel;
+  };
+
   glmOpencodeSettings = opencodeSettings // {
     model = "zai-coding-plan/glm-5";
   };
@@ -132,7 +149,7 @@ let
         })
       ) ohMyOpencodeSettings.agents
       // {
-        # Autonomous deep worker agent (defaults to gpt-5.3-codex)
+        # Autonomous deep worker agent (defaults to openai/gpt-5.3-codex)
         hephaestus = {
           model = "zai-coding-plan/glm-5";
         };
@@ -219,6 +236,49 @@ let
     };
   };
 
+  # GPT profile: OpenAI GPT models for GPT-first coding sessions.
+  gptOpencodeSettings = opencodeSettings // {
+    model = gptMainModel;
+  };
+
+  gptOhMyOpencodeSettings = ohMyOpencodeSettings // {
+    agents = lib.mapAttrs (
+      name: agentCfg:
+      agentCfg
+      // (lib.optionalAttrs (builtins.hasAttr name gptAgentModels) {
+        model = gptAgentModels.${name};
+      })
+    ) ohMyOpencodeSettings.agents;
+
+    # Override category models to use GPT defaults instead of mixed providers
+    categories = {
+      "visual-engineering" = {
+        model = gptMainModel;
+      };
+      ultrabrain = {
+        model = gptMainModel;
+      };
+      deep = {
+        model = gptMainModel;
+      };
+      artistry = {
+        model = gptMainModel;
+      };
+      quick = {
+        model = gptFastModel;
+      };
+      "unspecified-low" = {
+        model = gptStandardModel;
+      };
+      "unspecified-high" = {
+        model = gptMainModel;
+      };
+      writing = {
+        model = gptStandardModel;
+      };
+    };
+  };
+
   # Sonnet profile: Default OpenCode config with Opus replaced by Sonnet for lower cost.
   sonnetOpencodeSettings = opencodeSettings // {
     model = sonnetModel;
@@ -236,6 +296,8 @@ in
     glmOhMyOpencodeSettings
     geminiOpencodeSettings
     geminiOhMyOpencodeSettings
+    gptOpencodeSettings
+    gptOhMyOpencodeSettings
     sonnetOpencodeSettings
     sonnetOhMyOpencodeSettings
     ;
