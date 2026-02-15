@@ -20,9 +20,47 @@ let
     glmOhMyOpencodeSettings
     geminiOpencodeSettings
     geminiOhMyOpencodeSettings
+    gptOpencodeSettings
+    gptOhMyOpencodeSettings
     sonnetOpencodeSettings
     sonnetOhMyOpencodeSettings
     ;
+
+  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+  opencodeProfileNames = opencodeProfiles.names;
+
+  opencodeSettingsByProfile = {
+    opencode = opencodeSettings;
+    "opencode-glm" = glmOpencodeSettings;
+    "opencode-gemini" = geminiOpencodeSettings;
+    "opencode-gpt" = gptOpencodeSettings;
+    "opencode-sonnet" = sonnetOpencodeSettings;
+  };
+
+  ohMyOpencodeSettingsByProfile = {
+    opencode = ohMyOpencodeSettings;
+    "opencode-glm" = glmOhMyOpencodeSettings;
+    "opencode-gemini" = geminiOhMyOpencodeSettings;
+    "opencode-gpt" = gptOhMyOpencodeSettings;
+    "opencode-sonnet" = sonnetOhMyOpencodeSettings;
+  };
+
+  opencodeConfigFiles = lib.foldl' (
+    acc: name:
+    acc
+    // {
+      "${name}/opencode.json" = {
+        text = toJSON opencodeSettingsByProfile.${name};
+        force = true;
+      };
+    }
+    // (lib.optionalAttrs cfg.opencode.ohMyOpencode.enable {
+      "${name}/oh-my-opencode.json" = {
+        text = toJSON ohMyOpencodeSettingsByProfile.${name};
+        force = true;
+      };
+    })
+  ) { } opencodeProfileNames;
 in
 {
   config = lib.mkIf cfg.enable {
@@ -254,45 +292,6 @@ in
       })
     ];
 
-    xdg.configFile = lib.mkIf cfg.opencode.enable {
-      "opencode/opencode.json" = {
-        text = toJSON opencodeSettings;
-        force = true;
-      };
-      "opencode/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
-        text = toJSON ohMyOpencodeSettings;
-        force = true;
-      };
-
-      # GLM-5 profile (used by ocg via OPENCODE_CONFIG_DIR)
-      "opencode-glm/opencode.json" = {
-        text = toJSON glmOpencodeSettings;
-        force = true;
-      };
-      "opencode-glm/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
-        text = toJSON glmOhMyOpencodeSettings;
-        force = true;
-      };
-
-      # Gemini Antigravity profile (used by ocgem via OPENCODE_CONFIG_DIR)
-      "opencode-gemini/opencode.json" = {
-        text = toJSON geminiOpencodeSettings;
-        force = true;
-      };
-      "opencode-gemini/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
-        text = toJSON geminiOhMyOpencodeSettings;
-        force = true;
-      };
-
-      # Sonnet profile (used by ocs via OPENCODE_CONFIG_DIR)
-      "opencode-sonnet/opencode.json" = {
-        text = toJSON sonnetOpencodeSettings;
-        force = true;
-      };
-      "opencode-sonnet/oh-my-opencode.json" = lib.mkIf cfg.opencode.ohMyOpencode.enable {
-        text = toJSON sonnetOhMyOpencodeSettings;
-        force = true;
-      };
-    };
+    xdg.configFile = lib.mkIf cfg.opencode.enable opencodeConfigFiles;
   };
 }

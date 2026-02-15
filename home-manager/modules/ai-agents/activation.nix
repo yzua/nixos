@@ -8,6 +8,7 @@
 
 let
   cfg = config.programs.aiAgents;
+  homeDir = config.home.homeDirectory;
 
   inherit (builtins) toJSON;
 
@@ -16,6 +17,10 @@ let
 
   settingsBuilders = import ./_settings-builders.nix { inherit config lib pkgs; };
   inherit (settingsBuilders) claudeSettings;
+
+  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+  opencodeConfigPaths = builtins.map opencodeProfiles.configPath opencodeProfiles.names;
+  opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
 in
 {
   config = lib.mkIf cfg.enable {
@@ -26,7 +31,7 @@ in
           if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
             ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
 
-            for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json" "$HOME/.config/opencode-sonnet/opencode.json"; do
+            for OPENCODE_CFG in ${opencodeConfigPathList}; do
               if [[ -f "$OPENCODE_CFG" ]]; then
                 ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
                   .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
@@ -112,7 +117,7 @@ in
           if ${pkgs.gh}/bin/gh auth status &> /dev/null; then
             GH_TOKEN="$(${pkgs.gh}/bin/gh auth token)"
             # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
-            for OPENCODE_CFG in "$HOME/.config/opencode/opencode.json" "$HOME/.config/opencode-glm/opencode.json" "$HOME/.config/opencode-gemini/opencode.json" "$HOME/.config/opencode-sonnet/opencode.json"; do
+            for OPENCODE_CFG in ${opencodeConfigPathList}; do
               if [[ -f "$OPENCODE_CFG" ]]; then
                 ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
                   walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
@@ -295,7 +300,7 @@ in
 
           [sandbox_workspace_write]
           network_access = true
-          writable_roots = ["/home/yz/.config", "/home/yz/.local"]
+          writable_roots = ["${homeDir}/.config", "${homeDir}/.local"]
 
           ${mcpToml}
           ${projectsToml}
