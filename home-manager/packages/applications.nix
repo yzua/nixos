@@ -9,7 +9,6 @@
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
     pkgs.pear-desktop
-    pkgs.obsidian
     pkgsStable.keepassxc
     # LibreWolf: HM package provides .desktop file + icons for app launcher.
     # HM binary shadows the firejail-wrapped system binary, so wrap with Mesa EGL here too.
