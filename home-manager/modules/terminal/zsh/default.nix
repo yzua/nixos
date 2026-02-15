@@ -217,6 +217,10 @@
         OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gemini" opencode "$@"
       }
 
+      opencode_gpt() {
+        OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode "$@"
+      }
+
       opencode_sonnet() {
         OPENCODE_CONFIG_DIR="$HOME/.config/opencode-sonnet" opencode "$@"
       }

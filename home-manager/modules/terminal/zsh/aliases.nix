@@ -10,6 +10,7 @@
     let
       inherit (constants) editor;
       nixTemplates = "git+https://codeberg.org/yztr/nixos?ref=main&dir=dev-shells#";
+      commitSplitPrompt = "Review all current git changes, propose a commit plan that splits work into minimal logical commits, then execute it commit-by-commit using signed commits (git commit -S). For each commit, stage only relevant hunks/files, run relevant checks for touched files, and use a clear conventional commit message. Show the plan before creating the first commit.";
     in
     {
       # Agent-safe defaults (agents expect standard stdout)
@@ -72,13 +73,14 @@
       oc = "opencode"; # Launch OpenCode interactive session.
       ocg = "opencode_glm"; # OpenCode using GLM profile config.
       ocgem = "opencode_gemini"; # OpenCode using Gemini profile config.
+      ocgpt = "opencode_gpt"; # OpenCode using GPT profile config.
       ocs = "opencode_sonnet"; # OpenCode using Sonnet-only profile config.
       occ = "opencode --continue"; # Continue last OpenCode session.
       ocl = "opencode session list"; # List OpenCode sessions.
       ocr = "opencode run --continue"; # Non-interactive OpenCode run on last session.
       ocf = "opencode --continue --fork"; # Continue OpenCode session in a forked branch.
       ocrun = "opencode run"; # Non-interactive OpenCode run.
-      occm = "opencode_sonnet --prompt 'Review all current git changes, propose a commit plan that splits work into minimal logical commits, then execute it commit-by-commit using signed commits (git commit -S). For each commit, stage only relevant hunks/files, run relevant checks for touched files, and use a clear conventional commit message. Show the plan before creating the first commit.'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
+      occm = "opencode_sonnet --prompt '${commitSplitPrompt}'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
 
       cx = "command codex --no-alt-screen"; # Launch Codex with zellij-friendly scrollback.
       cxyolo = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"; # Codex fully unrestricted mode (risky).
@@ -90,7 +92,7 @@
       cxsafe = "command codex --no-alt-screen -p safe"; # Start Codex safe profile (read-only/untrusted).
       cxauto = "command codex --no-alt-screen --full-auto"; # Codex low-friction automation mode.
       cxexec = "command codex exec"; # Codex one-shot non-interactive execution.
-      cxcm = "command codex --no-alt-screen 'Review all current git changes, propose a commit plan that splits work into minimal logical commits, then execute it commit-by-commit using signed commits (git commit -S). For each commit, stage only relevant hunks/files, run relevant checks for touched files, and use a clear conventional commit message. Show the plan before creating the first commit.'"; # Codex commit-splitting + signed-commit workflow.
+      cxcm = "command codex --no-alt-screen '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow.
 
       # Nix
       ns = "nix-shell";
