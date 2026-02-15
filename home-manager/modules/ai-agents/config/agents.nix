@@ -74,7 +74,7 @@
             skills = [ "git-master" ];
           };
           hephaestus = {
-            model = "anthropic/claude-opus-4-6";
+            model = "openai/gpt-5.3-codex";
             description = "Autonomous deep worker — goal-oriented, long-running tasks";
             color = "#fb4934"; # Gruvbox bright red
           };

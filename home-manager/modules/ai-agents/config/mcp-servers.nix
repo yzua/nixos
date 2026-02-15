@@ -27,7 +27,7 @@
       filesystem = {
         enable = true;
         command = "mcp-server-filesystem";
-        args = [ "/home/yz" ];
+        args = [ config.home.homeDirectory ];
       };
 
       git = {
