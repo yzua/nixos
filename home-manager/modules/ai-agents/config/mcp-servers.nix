@@ -1,17 +1,17 @@
 # MCP server definitions and logging configuration.
-{ config, constants, ... }:
+{ config, pkgs, ... }:
 
 {
   programs.aiAgents = {
     mcpServers = {
       context7 = {
         enable = true;
-        command = "context7-mcp";
+        command = "${config.home.homeDirectory}/.bun/bin/context7-mcp";
       };
 
       zai-mcp-server = {
         enable = true;
-        command = "bunx";
+        command = "${pkgs.bun}/bin/bunx";
         args = [ "@z_ai/mcp-server" ];
         env = {
           Z_AI_MODE = "ZAI";
@@ -26,29 +26,29 @@
 
       filesystem = {
         enable = true;
-        command = "mcp-server-filesystem";
+        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-filesystem";
         args = [ config.home.homeDirectory ];
       };
 
       git = {
         enable = false; # gitpython cannot GPG-sign commits; use Bash(git *) instead
-        command = "uvx";
+        command = "${pkgs.uv}/bin/uvx";
         args = [ "mcp-server-git" ];
       };
 
       memory = {
         enable = true;
-        command = "mcp-server-memory";
+        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-memory";
       };
 
       sequential-thinking = {
         enable = true;
-        command = "mcp-server-sequential-thinking";
+        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-sequential-thinking";
       };
 
       playwright = {
         enable = true;
-        command = "playwright-mcp";
+        command = "${config.home.homeDirectory}/.bun/bin/playwright-mcp";
         args = [
           "--executable-path"
           "/run/current-system/sw/bin/chromium"
@@ -81,7 +81,7 @@
 
       github = {
         enable = true;
-        command = "mcp-server-github";
+        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-github";
         env = {
           GITHUB_PERSONAL_ACCESS_TOKEN = "__GITHUB_TOKEN_PLACEHOLDER__"; # patched at activation via gh auth token
         };

@@ -13,7 +13,7 @@ in
     name = "Obsidian";
     genericName = "Markdown Notes";
     comment = "Markdown knowledge base";
-    exec = "obsidian --vault ${defaultVaultPath} %U";
+    exec = "${pkgs.obsidian}/bin/obsidian --vault ${defaultVaultPath} %U";
     icon = "obsidian";
     terminal = false;
     categories = [

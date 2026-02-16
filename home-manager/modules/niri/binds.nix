@@ -2,6 +2,7 @@
 
 {
   constants,
+  pkgs,
   pkgsStable,
   lib,
   ...
@@ -11,13 +12,13 @@ let
   noctalia =
     cmd:
     [
-      "sh"
+      "${pkgs.bash}/bin/sh"
       "-c"
       ''
-        if ! noctalia-shell ipc call "$@" >/dev/null 2>&1; then
-          nohup noctalia-shell >/dev/null 2>&1 &
-          sleep 0.35
-          noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
+        if ! ${pkgs.noctalia-shell}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1; then
+          ${pkgs.coreutils}/bin/nohup ${pkgs.noctalia-shell}/bin/noctalia-shell >/dev/null 2>&1 &
+          ${pkgs.coreutils}/bin/sleep 0.35
+          ${pkgs.noctalia-shell}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
         fi
       ''
       "sh"
@@ -40,7 +41,7 @@ in
     "Mod+Return".action.spawn = [
       "${constants.terminal}"
       "-e"
-      "zellij"
+      "${pkgs.zellij}/bin/zellij"
       "attach"
       "--create"
       "main"
@@ -84,10 +85,10 @@ in
     "Mod+Ctrl+End".action.move-column-to-last = [ ];
 
     "Mod+Ctrl+L".action.spawn = noctalia "lockScreen lock";
-    "Mod+Shift+R".action.spawn = [ "nautilus" ];
-    "Mod+B".action.spawn = [ "brave" ];
+    "Mod+Shift+R".action.spawn = [ "${pkgs.nautilus}/bin/nautilus" ];
+    "Mod+B".action.spawn = [ "/run/current-system/sw/bin/brave" ];
     "Mod+E".action.spawn = [
-      "bemoji"
+      "${pkgsStable.bemoji}/bin/bemoji"
       "-cn"
     ];
 
@@ -154,14 +155,14 @@ in
     # Screenshots
     "Print".action.screenshot = [ ];
     "Mod+Print".action.spawn = [
-      "sh"
+      "${pkgs.bash}/bin/sh"
       "-c"
-      "niri msg action screenshot-screen && notify-send 'Screenshot' 'Screen captured'"
+      "${pkgs.niri}/bin/niri msg action screenshot-screen && ${pkgs.libnotify}/bin/notify-send 'Screenshot' 'Screen captured'"
     ];
     "Mod+Shift+Print".action.spawn = [
-      "sh"
+      "${pkgs.bash}/bin/sh"
       "-c"
-      "niri msg action screenshot-window && notify-send 'Screenshot' 'Window captured'"
+      "${pkgs.niri}/bin/niri msg action screenshot-window && ${pkgs.libnotify}/bin/notify-send 'Screenshot' 'Window captured'"
     ];
     "Mod+Alt+Print".action.spawn = [ "${screenshotAnnotate}/bin/screenshot-annotate" ];
     "Mod+Shift+I".action.spawn = [ "${colorPicker}/bin/color-picker" ];
@@ -169,7 +170,7 @@ in
 
     # Volume
     "Mod+Equal".action.spawn = [
-      "wpctl"
+      "${pkgs.wireplumber}/bin/wpctl"
       "set-volume"
       "-l"
       "1"
@@ -177,7 +178,7 @@ in
       "5%+"
     ];
     "Mod+Minus".action.spawn = [
-      "wpctl"
+      "${pkgs.wireplumber}/bin/wpctl"
       "set-volume"
       "@DEFAULT_AUDIO_SINK@"
       "5%-"
@@ -186,7 +187,7 @@ in
     "XF86AudioRaiseVolume" = {
       allow-when-locked = true;
       action.spawn = [
-        "wpctl"
+        "${pkgs.wireplumber}/bin/wpctl"
         "set-volume"
         "-l"
         "1"
@@ -197,7 +198,7 @@ in
     "XF86AudioLowerVolume" = {
       allow-when-locked = true;
       action.spawn = [
-        "wpctl"
+        "${pkgs.wireplumber}/bin/wpctl"
         "set-volume"
         "@DEFAULT_AUDIO_SINK@"
         "5%-"
@@ -206,7 +207,7 @@ in
     "XF86AudioMute" = {
       allow-when-locked = true;
       action.spawn = [
-        "wpctl"
+        "${pkgs.wireplumber}/bin/wpctl"
         "set-mute"
         "@DEFAULT_AUDIO_SINK@"
         "toggle"
@@ -215,7 +216,7 @@ in
     "XF86AudioMicMute" = {
       allow-when-locked = true;
       action.spawn = [
-        "wpctl"
+        "${pkgs.wireplumber}/bin/wpctl"
         "set-mute"
         "@DEFAULT_AUDIO_SOURCE@"
         "toggle"
@@ -224,12 +225,12 @@ in
 
     # Brightness
     "Mod+BracketRight".action.spawn = [
-      "brightnessctl"
+      "${pkgsStable.brightnessctl}/bin/brightnessctl"
       "s"
       "10%+"
     ];
     "Mod+BracketLeft".action.spawn = [
-      "brightnessctl"
+      "${pkgsStable.brightnessctl}/bin/brightnessctl"
       "s"
       "10%-"
     ];
@@ -237,28 +238,28 @@ in
     "XF86AudioNext" = {
       allow-when-locked = true;
       action.spawn = [
-        "playerctl"
+        "${pkgsStable.playerctl}/bin/playerctl"
         "next"
       ];
     };
     "XF86AudioPrev" = {
       allow-when-locked = true;
       action.spawn = [
-        "playerctl"
+        "${pkgsStable.playerctl}/bin/playerctl"
         "previous"
       ];
     };
     "XF86AudioPlay" = {
       allow-when-locked = true;
       action.spawn = [
-        "playerctl"
+        "${pkgsStable.playerctl}/bin/playerctl"
         "play-pause"
       ];
     };
     "XF86AudioPause" = {
       allow-when-locked = true;
       action.spawn = [
-        "playerctl"
+        "${pkgsStable.playerctl}/bin/playerctl"
         "play-pause"
       ];
     };

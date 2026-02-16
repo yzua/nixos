@@ -65,7 +65,7 @@
   xdg.desktopEntries = {
     "org.telegram.desktop" = {
       name = "Telegram Desktop";
-      exec = "telegram-desktop -- %U";
+      exec = "/run/current-system/sw/bin/telegram-desktop -- %U";
       icon = "telegram";
       comment = "Official Telegram Desktop client (firejail-wrapped)";
       categories = [
@@ -77,7 +77,7 @@
     };
     "brave-browser" = {
       name = "Brave Web Browser";
-      exec = "brave %U";
+      exec = "/run/current-system/sw/bin/brave %U";
       icon = "brave-browser";
       comment = "Brave Web Browser (firejail-wrapped)";
       categories = [
@@ -94,7 +94,7 @@
     };
     "io.github.celluloid_player.Celluloid" = {
       name = "Celluloid";
-      exec = "celluloid %U";
+      exec = "/run/current-system/sw/bin/celluloid %U";
       icon = "io.github.celluloid_player.Celluloid";
       comment = "GTK video player powered by mpv (firejail-wrapped)";
       categories = [
@@ -119,7 +119,7 @@
     };
     "libreoffice-startcenter" = {
       name = "LibreOffice";
-      exec = "libreoffice %U";
+      exec = "/run/current-system/sw/bin/libreoffice %U";
       icon = "libreoffice-startcenter";
       comment = "Office suite (firejail-wrapped)";
       categories = [

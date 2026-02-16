@@ -2,6 +2,7 @@
 
 {
   constants,
+  pkgs,
   ...
 }:
 
@@ -38,53 +39,53 @@
     };
 
     spawn-at-startup = [
-      { argv = [ "xwayland-satellite" ]; }
-      { argv = [ "noctalia-shell" ]; }
-      { argv = [ "keepassxc" ]; }
-      { argv = [ "mullvad-vpn" ]; }
+      { argv = [ "${pkgs.xwayland-satellite}/bin/xwayland-satellite" ]; }
+      { argv = [ "${pkgs.noctalia-shell}/bin/noctalia-shell" ]; }
+      { argv = [ "${pkgs.keepassxc}/bin/keepassxc" ]; }
+      { argv = [ "${pkgs.mullvad-vpn}/bin/mullvad-vpn" ]; }
       {
         argv = [
-          "wl-paste"
+          "${pkgs.wl-clipboard}/bin/wl-paste"
           "--type"
           "text"
           "--watch"
-          "cliphist"
+          "${pkgs.cliphist}/bin/cliphist"
           "store"
         ];
       }
       {
         argv = [
-          "wl-paste"
+          "${pkgs.wl-clipboard}/bin/wl-paste"
           "--type"
           "image"
           "--watch"
-          "cliphist"
+          "${pkgs.cliphist}/bin/cliphist"
           "store"
         ];
       }
       {
         argv = [
-          "wl-clip-persist"
+          "${pkgs.wl-clip-persist}/bin/wl-clip-persist"
           "--clipboard"
           "regular"
         ];
       }
 
-      { argv = [ "brave" ]; }
+      { argv = [ "/run/current-system/sw/bin/brave" ]; }
       { argv = [ "${constants.editor}" ]; }
       {
         argv = [
           "${constants.terminal}"
           "-e"
-          "zellij"
+          "${pkgs.zellij}/bin/zellij"
           "attach"
           "--create"
           "main"
         ];
       }
-      { argv = [ "vesktop" ]; }
-      { argv = [ "telegram-desktop" ]; }
-      { argv = [ "pear-desktop" ]; }
+      { argv = [ "/run/current-system/sw/bin/vesktop" ]; }
+      { argv = [ "/run/current-system/sw/bin/telegram-desktop" ]; }
+      { argv = [ "${pkgs.pear-desktop}/bin/pear-desktop" ]; }
     ];
 
     animations = {

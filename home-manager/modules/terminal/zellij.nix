@@ -2,6 +2,7 @@
 # deadnix false-positive: constants IS used in zjstatusConfig string interpolation.
 # deadnix: hide
 {
+  config,
   constants,
   pkgs,
   ...
@@ -106,10 +107,10 @@ in
 
         tab name="code" focus=true {
           pane split_direction="vertical" {
-            pane size="75%" command="nvim" focus=true
+            pane size="75%" command="${pkgs.neovim}/bin/nvim" focus=true
             pane split_direction="horizontal" size="25%" {
               pane name="shell"
-              pane name="git" command="lazygit"
+              pane name="git" command="${pkgs.lazygit}/bin/lazygit"
             }
           }
         }
@@ -129,12 +130,12 @@ in
 
         tab name="agent" focus=true {
           pane split_direction="vertical" {
-            pane size="60%" name="claude" command="claude"
+            pane size="60%" name="claude" command="${config.home.homeDirectory}/.bun/bin/claude"
             pane split_direction="horizontal" {
-              pane size="50%" name="logs" command="bash" {
+              pane size="50%" name="logs" command="${pkgs.bash}/bin/bash" {
                 args "-c" "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null || echo 'No agent logs yet. Waiting...'; sleep infinity"
               }
-              pane name="git" command="lazygit"
+              pane name="git" command="${pkgs.lazygit}/bin/lazygit"
             }
           }
         }
@@ -150,13 +151,13 @@ in
 
         tab name="system" focus=true {
           pane split_direction="horizontal" {
-            pane command="btop"
-            pane command="nvtop"
+            pane command="${pkgs.btop}/bin/btop"
+            pane command="${pkgs.nvtopPackages.full}/bin/nvtop"
           }
         }
 
         tab name="logs" {
-          pane name="journal" command="journalctl" {
+          pane name="journal" command="/run/current-system/sw/bin/journalctl" {
             args "-f"
           }
         }
@@ -171,7 +172,7 @@ in
 
     settings = {
       theme = "default"; # Stylix generates ~/.config/zellij/themes/stylix.kdl defining "default"
-      default_shell = "zsh";
+      default_shell = "${pkgs.zsh}/bin/zsh";
       default_layout = "default";
 
       pane_frames = false;
@@ -180,11 +181,11 @@ in
       auto_layout = true;
       mouse_mode = true;
 
-      copy_command = "wl-copy";
+      copy_command = "${pkgs.wl-clipboard}/bin/wl-copy";
       copy_on_select = true;
 
       scroll_buffer_size = 50000;
-      scrollback_editor = "nvim";
+      scrollback_editor = "${pkgs.neovim}/bin/nvim";
 
       session_serialization = true;
       pane_viewport_serialization = true;

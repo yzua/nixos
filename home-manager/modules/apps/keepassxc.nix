@@ -2,14 +2,14 @@
 # Binary is NOT firejail-wrapped (excluded in nixos/modules/sandboxing.nix).
 # Native messaging host for browser integration is managed by KeePassXC itself
 # (Settings → Browser Integration) — NOT declaratively, to avoid read-only symlink conflicts.
-_:
+{ pkgsStable, ... }:
 
 {
   xdg.desktopEntries.keepassxc = {
     name = "KeePassXC";
     genericName = "Password Manager";
     comment = "Cross-platform password manager";
-    exec = "keepassxc %f";
+    exec = "${pkgsStable.keepassxc}/bin/keepassxc %f";
     icon = "keepassxc";
     terminal = false;
     categories = [

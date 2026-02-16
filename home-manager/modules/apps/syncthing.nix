@@ -1,5 +1,5 @@
 # Syncthing decentralized file sync.
-_:
+{ pkgs, ... }:
 
 {
   services.syncthing = {
@@ -7,7 +7,7 @@ _:
 
     tray = {
       enable = true;
-      command = "syncthingtray --wait";
+      command = "${pkgs.syncthingtray}/bin/syncthingtray --wait";
     };
   };
 }
