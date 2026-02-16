@@ -13,7 +13,7 @@ let
       };
       plugins = {
         "disable-autoplay" = {
-          enabled = true;
+          enabled = false;
         };
         "playback-speed" = {
           enabled = true;
