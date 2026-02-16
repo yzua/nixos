@@ -128,6 +128,7 @@
       killall = "pkill -f";
 
       # Network
+      ssh = "TERM=xterm-256color command ssh";
       ports = "lsof -i -P -n | grep LISTEN";
       myip = "curl -s https://am.i.mullvad.net/ip"; # Privacy-respecting IP check
       localip = "ip route get 1.1.1.1 | awk '{print $7}'";
