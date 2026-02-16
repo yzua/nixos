@@ -195,6 +195,7 @@
         mcp = {
           allowed = [
             "context7"
+            "better-context"
             "zai-mcp-server"
             "filesystem"
             "memory"

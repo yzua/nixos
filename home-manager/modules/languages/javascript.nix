@@ -13,6 +13,7 @@ let
     "@google/gemini-cli"
     "@openai/codex"
     "opencode-ai"
+    "btca"
     "skills"
     # MCP servers (globally installed for fast startup, avoids npx cold starts)
     "@upstash/context7-mcp"

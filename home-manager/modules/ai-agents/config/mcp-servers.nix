@@ -9,6 +9,12 @@
         command = "${config.home.homeDirectory}/.bun/bin/context7-mcp";
       };
 
+      better-context = {
+        enable = true;
+        command = "${config.home.homeDirectory}/.bun/bin/btca";
+        args = [ "mcp" ];
+      };
+
       zai-mcp-server = {
         enable = true;
         command = "${pkgs.bun}/bin/bunx";
