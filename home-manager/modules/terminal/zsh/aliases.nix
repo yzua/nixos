@@ -75,6 +75,7 @@
       ocgem = "opencode_gemini"; # OpenCode using Gemini profile config.
       ocgpt = "opencode_gpt"; # OpenCode using GPT profile config.
       ocs = "opencode_sonnet"; # OpenCode using Sonnet-only profile config.
+      bs = "btca-svelte-ask"; # Ask better-context against Svelte docs/source.
       occ = "opencode --continue"; # Continue last OpenCode session.
       ocl = "opencode session list"; # List OpenCode sessions.
       ocr = "opencode run --continue"; # Non-interactive OpenCode run on last session.

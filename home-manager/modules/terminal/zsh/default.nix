@@ -225,6 +225,14 @@
         OPENCODE_CONFIG_DIR="$HOME/.config/opencode-sonnet" opencode "$@"
       }
 
+      btca-svelte-ask() {
+        if [[ $# -eq 0 ]]; then
+          echo "Usage: btca-svelte-ask <question>" >&2
+          return 1
+        fi
+        btca ask --resource svelte --question "$*"
+      }
+
       cl-sops() {
         local key; key="$(_load_zai_key)" || return 1
         Z_AI_API_KEY="$key" claude "$@"
