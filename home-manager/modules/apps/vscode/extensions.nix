@@ -92,6 +92,7 @@ in
 
       # --- Theming ---
       jdinhlife.gruvbox # Gruvbox color theme
+      vscode-icons-team.vscode-icons # VS Code file icon theme
     ])
     ++ [
       # --- Marketplace extensions (not in nixpkgs) ---

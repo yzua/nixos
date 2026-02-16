@@ -6,7 +6,7 @@
 
 {
   "workbench.colorTheme" = "Gruvbox Dark Soft";
-  "workbench.iconTheme" = "vs-seti";
+  "workbench.iconTheme" = "vscode-icons";
   "workbench.activityBar.location" = "top";
   "workbench.sideBar.location" = "right";
   "workbench.layoutControl.enabled" = false;
