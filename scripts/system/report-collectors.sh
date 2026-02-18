@@ -33,7 +33,7 @@ collect_systemd_errors() {
             | .[:20]
         ' 2>/dev/null)
 
-	if [[ -z "$errors" || "$errors" == "null" || "$errors" == "[]" ]]; then
+	if json_is_empty "$errors"; then
 		echo "No priority 0-3 errors in the last ${since}h."
 	else
 		echo "| Unit | Count | Severity |"
@@ -47,7 +47,7 @@ collect_systemd_timers() {
 
 	local timers
 	timers=$(safe_cmd systemctl list-timers --no-pager --no-legend --plain |
-		awk '{print $NF, $1, $2, $3}' | head -20)
+		awk 'NF >= 4 { printf "%s|%s %s %s\n", $(NF-1), $1, $2, $3 }' | head -20)
 
 	if [[ -z "$timers" ]]; then
 		echo "No active timers."
@@ -55,10 +55,9 @@ collect_systemd_timers() {
 		echo "| Timer | Next Run |"
 		echo "|-------|----------|"
 		while IFS= read -r line; do
-			local name next_parts
-			name=$(echo "$line" | awk '{print $1}')
-			next_parts=$(echo "$line" | awk '{$1=""; print $0}' | xargs)
-			echo "| ${name} | ${next_parts} |"
+			local timer next_run
+			IFS='|' read -r timer next_run <<<"$line"
+			echo "| ${timer} | ${next_run} |"
 		done <<<"$timers"
 	fi
 }
@@ -137,7 +136,7 @@ collect_loki_errors() {
 	fi
 
 	local start errors
-	start=$(date -d "24 hours ago" +%s 2>/dev/null || date -v-24H +%s 2>/dev/null || echo "")
+	start=$(epoch_hours_ago 24)
 
 	if [[ -z "$start" ]]; then
 		echo "[unavailable] Could not compute time range."
@@ -146,7 +145,7 @@ collect_loki_errors() {
 
 	errors=$(query_loki 'sum by (unit) (count_over_time({job="systemd-journal"} |~ "(?i)error|fail|panic" [24h]))' "$start")
 
-	if [[ -z "$errors" || "$errors" == "null" || "$errors" == "[]" ]]; then
+	if json_is_empty "$errors"; then
 		echo "No error logs found in Loki (24h)."
 	else
 		echo "| Unit | Error Lines |"
@@ -204,7 +203,7 @@ collect_scrutiny_health() {
 	local devices
 	devices=$(echo "$summary" | jq -r '.data.summary // empty' 2>/dev/null)
 
-	if [[ -z "$devices" || "$devices" == "null" ]]; then
+	if json_is_empty "$devices"; then
 		echo "No disk data available."
 		return
 	fi
@@ -312,7 +311,7 @@ collect_nix_builds() {
 	fi
 
 	local week_ago total success failure rate last_fail
-	week_ago=$(date -d "7 days ago" -Iseconds 2>/dev/null || date -v-7d -Iseconds 2>/dev/null || echo "")
+	week_ago=$(iso_days_ago 7)
 
 	if [[ -z "$week_ago" ]]; then
 		echo "[unavailable] Could not compute date range."

@@ -3,9 +3,36 @@
 
 section() { printf '\n## %s\n\n' "$1"; }
 
+debug_log() {
+	if [[ "${SYSTEM_REPORT_DEBUG:-false}" == "true" ]]; then
+		printf '[system-report] %s\n' "$*" >&2
+	fi
+}
+
+json_is_empty() {
+	local json="${1:-}"
+	[[ -z "$json" || "$json" == "null" || "$json" == "[]" || "$json" == "{}" ]]
+}
+
+epoch_hours_ago() {
+	local hours="$1"
+	date -d "${hours} hours ago" +%s 2>/dev/null || date -v-"${hours}"H +%s 2>/dev/null || echo ""
+}
+
+iso_days_ago() {
+	local days="$1"
+	date -d "${days} days ago" -Iseconds 2>/dev/null || date -v-"${days}"d -Iseconds 2>/dev/null || echo ""
+}
+
 query_api() {
 	local url="$1"
-	curl -sf --max-time "$CURL_TIMEOUT" "$url" 2>/dev/null || echo ""
+	local response
+	if response=$(curl -sf --max-time "$CURL_TIMEOUT" "$url" 2>/dev/null); then
+		printf '%s\n' "$response"
+		return 0
+	fi
+	debug_log "query_api failed: ${url}"
+	echo ""
 }
 
 query_prometheus() {
@@ -27,7 +54,13 @@ query_loki() {
 }
 
 safe_cmd() {
-	timeout "${CMD_TIMEOUT}s" "$@" 2>/dev/null || echo ""
+	local output
+	if output=$(timeout "${CMD_TIMEOUT}s" "$@" 2>/dev/null); then
+		printf '%s\n' "$output"
+		return 0
+	fi
+	debug_log "safe_cmd failed: $*"
+	echo ""
 }
 
 status_label() {
