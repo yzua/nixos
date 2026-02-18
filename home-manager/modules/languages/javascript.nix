@@ -20,7 +20,7 @@ let
     "@modelcontextprotocol/server-filesystem"
     "@modelcontextprotocol/server-memory"
     "@modelcontextprotocol/server-sequential-thinking"
-    "@playwright/mcp"
+    "@playwright/cli"
     "@magicuidesign/mcp"
     "@modelcontextprotocol/server-github"
     "agent-browser"
@@ -93,6 +93,19 @@ in
   };
 
   home = {
+    # Wrapper sets system Chromium path before every playwright-cli invocation.
+    # ~/.local/bin (pos 3 in PATH) takes priority over ~/.bun/bin (pos 6),
+    # so this intercepts all calls regardless of env var inheritance.
+    file.".local/bin/playwright-cli" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        export PLAYWRIGHT_MCP_BROWSER=chromium
+        export PLAYWRIGHT_MCP_EXECUTABLE_PATH=/run/current-system/sw/bin/chromium
+        exec "$HOME/.bun/bin/playwright-cli" "$@"
+      '';
+    };
+
     packages = with pkgs; [
       nodejs
       bun

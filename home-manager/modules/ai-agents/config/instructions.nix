@@ -78,6 +78,7 @@
       "anthropics/skills"
       "affaan-m/everything-claude-code"
       "alirezarezvani/claude-skills"
+      "microsoft/playwright-cli"
 
       # Individual skills (--skill flag)
       {
