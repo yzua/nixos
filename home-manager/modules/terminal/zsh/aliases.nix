@@ -93,7 +93,7 @@
       cxsafe = "command codex --no-alt-screen -p safe"; # Start Codex safe profile (read-only/untrusted).
       cxauto = "command codex --no-alt-screen --full-auto"; # Codex low-friction automation mode.
       cxexec = "command codex exec"; # Codex one-shot non-interactive execution.
-      cxcm = "command codex --no-alt-screen '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow.
+      cxcm = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow in YOLO mode.
 
       # Nix
       ns = "nix-shell";
