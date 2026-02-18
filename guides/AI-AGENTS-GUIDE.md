@@ -360,13 +360,9 @@ Defined once in `config.nix`, shared across Claude Code, OpenCode, Gemini CLI, a
 | Server              | Purpose                                    | Status                          |
 | ------------------- | ------------------------------------------ | ------------------------------- |
 | context7            | Library documentation context              | Enabled (all agents)            |
-| better-context      | Source-code-grounded library/framework Q&A | Enabled (all agents)            |
-| memory              | Persistent knowledge graph across sessions | Enabled (all agents)            |
 | sequential-thinking | Step-by-step reasoning with backtracking   | Enabled (all agents)            |
 | zai-mcp-server      | Z.AI tools (key injected from sops)        | Enabled (all agents)            |
-| playwright          | Browser automation and testing             | Enabled (all agents)            |
 | filesystem          | Project filesystem access                  | Enabled (all agents)            |
-| git                 | Git repository operations                  | Enabled (all agents)            |
 | github              | GitHub API (issues, PRs, code search)      | Enabled (all agents)            |
 | cloudflare-docs     | Cloudflare documentation search            | Enabled (remote)                |
 | web-search-prime    | Web search via Z.AI                        | Injected at activation          |
@@ -374,6 +370,19 @@ Defined once in `config.nix`, shared across Claude Code, OpenCode, Gemini CLI, a
 | zread               | Document reader via Z.AI                   | Injected (Claude/OpenCode only) |
 
 Remote MCP servers are injected into all 4 agents by `patchAiAgentSecrets` using the sops-decrypted Z.AI API key.
+
+### playwright-cli (Browser CLI Skill)
+
+Browser automation is handled by [`@playwright/cli`](https://github.com/microsoft/playwright-cli) — a token-efficient CLI tool rather than an MCP server. It avoids loading large tool schemas into context, making it better suited for coding agents working with large codebases.
+
+```bash
+playwright-cli open https://example.com   # open browser
+playwright-cli snapshot                   # capture page snapshot
+playwright-cli screenshot                 # take screenshot
+playwright-cli install --skills           # install skill into a project
+```
+
+The skill is installed globally via the `skills` CLI activation. Set `PLAYWRIGHT_CLI_SESSION=<name>` to isolate sessions per project.
 
 ### BTCA Resources
 
