@@ -42,16 +42,22 @@ remaining_color() {
 
 format_tokens() {
 	local val="$1"
+	local val_int
 	if [[ -z "$val" || "$val" == "null" ]]; then
 		printf "?"
 		return
 	fi
-	if ((val >= 1000000)); then
+	if [[ ! "$val" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+		printf "?"
+		return
+	fi
+	val_int=$(printf "%.0f" "$val")
+	if ((val_int >= 1000000)); then
 		printf "%.1fM" "$(echo "$val / 1000000" | bc -l)"
-	elif ((val >= 1000)); then
+	elif ((val_int >= 1000)); then
 		printf "%.0fK" "$(echo "$val / 1000" | bc -l)"
 	else
-		printf "%s" "$val"
+		printf "%s" "$val_int"
 	fi
 }
 
@@ -68,10 +74,80 @@ time_until() {
 	if ((h > 0)); then printf "%dh %dm" "$h" "$m"; else printf "%dm" "$m"; fi
 }
 
+numeric_pct_to_remaining() {
+	local used_pct="$1"
+	local used_int
+	if [[ ! "$used_pct" =~ ^-?[0-9]+([.][0-9]+)?$ ]]; then
+		return 1
+	fi
+	used_int=$(printf "%.0f" "$used_pct")
+	if ((used_int < 0)); then used_int=0; fi
+	if ((used_int > 100)); then used_int=100; fi
+	printf "%d" "$((100 - used_int))"
+}
+
+resolve_reset_epoch() {
+	local reset_value="$1"
+	local reset_format="$2"
+	case "$reset_format" in
+	epoch)
+		if [[ "$reset_value" =~ ^[0-9]+$ ]]; then
+			printf "%s" "$reset_value"
+			return 0
+		fi
+		;;
+	iso8601)
+		date -d "$reset_value" +%s 2>/dev/null || return 1
+		return 0
+		;;
+	esac
+	return 1
+}
+
+build_window_tip() {
+	local title="$1"
+	local used_pct="$2"
+	local reset_value="$3"
+	local seven_day_pct="$4"
+	local reset_format="${5:-none}"
+
+	local remaining color tip
+	remaining=$(numeric_pct_to_remaining "$used_pct") || return 1
+	color=$(remaining_color "$remaining")
+
+	tip="<b>${title}</b> <span style='color:${color}'><b>${remaining}% left</b></span>"
+	tip+="${NL}<tt>Left: [$(progress_bar "$remaining")] ${remaining}%</tt>"
+	tip+="${NL}5h used: $(printf "%.1f" "$used_pct")%"
+
+	local epoch
+	if epoch=$(resolve_reset_epoch "$reset_value" "$reset_format"); then
+		tip+=" | Reset: $(time_until "$epoch")"
+	fi
+
+	if [[ -n "$seven_day_pct" ]]; then
+		local seven_remaining
+		if seven_remaining=$(numeric_pct_to_remaining "$seven_day_pct"); then
+			tip+="${NL}7d used: $(printf "%.1f" "$seven_day_pct")% (left ${seven_remaining}%)"
+		fi
+	fi
+
+	printf "%s" "$tip"
+}
+
+cache_mtime_epoch() {
+	local file="$1"
+	stat -c %Y "$file" 2>/dev/null || stat -f %m "$file" 2>/dev/null || echo ""
+}
+
 read_cache() {
 	local f="${CACHE_DIR}/${1}.json"
 	if [[ -f "$f" ]]; then
-		local age=$(($(date +%s) - $(stat -c %Y "$f")))
+		local mtime age
+		mtime=$(cache_mtime_epoch "$f")
+		if [[ -z "$mtime" ]]; then
+			return 1
+		fi
+		age=$(($(date +%s) - mtime))
 		if ((age < CACHE_TTL)); then
 			cat "$f"
 			return 0
@@ -87,6 +163,19 @@ write_cache() {
 
 output_error() { jq -c -n --arg tip "$1" '{"pct":"?","tip":$tip}'; }
 
+fetch_cached_response() {
+	local cache_key="$1"
+	local endpoint="$2"
+	shift 2
+
+	local response
+	if ! response=$(read_cache "$cache_key"); then
+		response=$(curl -s -m 8 -f "$endpoint" "$@" 2>/dev/null) || response=""
+		[[ -n "$response" ]] && write_cache "$cache_key" "$response"
+	fi
+	printf "%s" "$response"
+}
+
 fetch_zai() {
 	if [[ ! -f "$ZAI_KEY_FILE" ]]; then
 		output_error "Z.ai: key not found"
@@ -95,12 +184,9 @@ fetch_zai() {
 	local zai_key response
 	zai_key=$(cat "$ZAI_KEY_FILE")
 
-	if ! response=$(read_cache "zai"); then
-		response=$(curl -s -m 8 -f "$ZAI_ENDPOINT" \
-			-H "Authorization: Bearer ${zai_key}" \
-			-H "Content-Type: application/json" 2>/dev/null) || response=""
-		[[ -n "$response" ]] && write_cache "zai" "$response"
-	fi
+	response=$(fetch_cached_response "zai" "$ZAI_ENDPOINT" \
+		-H "Authorization: Bearer ${zai_key}" \
+		-H "Content-Type: application/json")
 	[[ -z "$response" ]] && {
 		output_error "Z.ai: API unreachable"
 		return
@@ -117,7 +203,10 @@ fetch_zai() {
 	}
 
 	local remaining
-	remaining=$(printf "%.0f" "$(echo "100 - $pct" | bc -l)")
+	if ! remaining=$(numeric_pct_to_remaining "$pct"); then
+		output_error "Z.ai: bad response"
+		return
+	fi
 	local color
 	color=$(remaining_color "$remaining")
 
@@ -160,13 +249,10 @@ fetch_claude() {
 	fi
 
 	local response
-	if ! response=$(read_cache "claude"); then
-		response=$(curl -s -m 8 -f "$CLAUDE_ENDPOINT" \
-			-H "Authorization: Bearer ${token}" \
-			-H "anthropic-version: 2023-06-01" \
-			-H "anthropic-beta: oauth-2025-04-20" 2>/dev/null) || response=""
-		[[ -n "$response" ]] && write_cache "claude" "$response"
-	fi
+	response=$(fetch_cached_response "claude" "$CLAUDE_ENDPOINT" \
+		-H "Authorization: Bearer ${token}" \
+		-H "anthropic-version: 2023-06-01" \
+		-H "anthropic-beta: oauth-2025-04-20")
 	[[ -z "$response" ]] && {
 		output_error "Claude: API unreachable"
 		return
@@ -181,25 +267,12 @@ fetch_claude() {
 		return
 	}
 
-	local five_int remaining
-	five_int=$(printf "%.0f" "$five_h")
-	remaining=$((100 - five_int))
-	local color
-	color=$(remaining_color "$remaining")
-
-	local tip
-	tip="<b>Claude Max (20x)</b> <span style='color:${color}'><b>${remaining}% left</b></span>"
-	tip+="${NL}<tt>Left: [$(progress_bar "$remaining")] ${remaining}%</tt>"
-	tip+="${NL}5h used: $(printf "%.1f" "$five_h")%"
-	if [[ -n "$five_h_reset" && "$five_h_reset" != "null" ]]; then
-		local epoch
-		epoch=$(date -d "$five_h_reset" +%s 2>/dev/null) || true
-		[[ -n "$epoch" ]] && tip+=" | Reset: $(time_until "$epoch")"
+	local remaining tip
+	if ! remaining=$(numeric_pct_to_remaining "$five_h"); then
+		output_error "Claude: unexpected response"
+		return
 	fi
-	if [[ -n "$seven_d" ]]; then
-		local sd_int=$(($(printf "%.0f" "$seven_d")))
-		tip+="${NL}7d used: $(printf "%.1f" "$seven_d")% (left $((100 - sd_int))%)"
-	fi
+	tip=$(build_window_tip "Claude Max (20x)" "$five_h" "$five_h_reset" "$seven_d" "iso8601")
 
 	jq -c -n --arg pct "$remaining" --arg tip "$tip" '{"pct":$pct,"tip":$tip}'
 }
@@ -236,53 +309,51 @@ fetch_codex() {
 		return
 	}
 
-	local five_int remaining
-	five_int=$(printf "%.0f" "$five_h")
-	remaining=$((100 - five_int))
-	local color
-	color=$(remaining_color "$remaining")
-
-	local tip
-	tip="<b>OpenAI Codex</b> <span style='color:${color}'><b>${remaining}% left</b></span>"
-	tip+="${NL}<tt>Left: [$(progress_bar "$remaining")] ${remaining}%</tt>"
-	tip+="${NL}5h used: $(printf "%.1f" "$five_h")%"
-	if [[ "$five_h_reset" =~ ^[0-9]+$ ]]; then
-		tip+=" | Reset: $(time_until "$five_h_reset")"
+	local remaining tip
+	if ! remaining=$(numeric_pct_to_remaining "$five_h"); then
+		output_error "Codex: unexpected local data"
+		return
 	fi
-	if [[ -n "$seven_d" ]]; then
-		local sd_int
-		sd_int=$(printf "%.0f" "$seven_d")
-		tip+="${NL}7d used: $(printf "%.1f" "$seven_d")% (left $((100 - sd_int))%)"
-	fi
+	tip=$(build_window_tip "OpenAI Codex" "$five_h" "$five_h_reset" "$seven_d" "epoch")
 
 	jq -c -n --arg pct "$remaining" --arg tip "$tip" '{"pct":$pct,"tip":$tip}'
 }
 
-zai_json=$(fetch_zai)
-claude_json=$(fetch_claude)
-codex_json=$(fetch_codex)
+main() {
+	local zai_json claude_json codex_json
+	zai_json=$(fetch_zai)
+	claude_json=$(fetch_claude)
+	codex_json=$(fetch_codex)
 
-zai_pct=$(echo "$zai_json" | jq -r '.pct')
-claude_pct=$(echo "$claude_json" | jq -r '.pct')
-codex_pct=$(echo "$codex_json" | jq -r '.pct')
-zai_tip=$(echo "$zai_json" | jq -r '.tip')
-claude_tip=$(echo "$claude_json" | jq -r '.tip')
-codex_tip=$(echo "$codex_json" | jq -r '.tip')
+	local zai_pct claude_pct codex_pct zai_tip claude_tip codex_tip
+	zai_pct=$(echo "$zai_json" | jq -r '.pct')
+	claude_pct=$(echo "$claude_json" | jq -r '.pct')
+	codex_pct=$(echo "$codex_json" | jq -r '.pct')
+	zai_tip=$(echo "$zai_json" | jq -r '.tip')
+	claude_tip=$(echo "$claude_json" | jq -r '.tip')
+	codex_tip=$(echo "$codex_json" | jq -r '.tip')
 
-icon="activity"
-for pct in "$zai_pct" "$claude_pct" "$codex_pct"; do
-	if [[ "$pct" =~ ^[0-9]+$ ]]; then
-		if ((pct <= 20)); then
-			icon="alert-triangle"
-			break
-		elif ((pct <= 40)); then icon="alert-circle"; fi
-	fi
-done
+	local icon="activity"
+	local pct
+	for pct in "$zai_pct" "$claude_pct" "$codex_pct"; do
+		if [[ "$pct" =~ ^[0-9]+$ ]]; then
+			if ((pct <= 20)); then
+				icon="alert-triangle"
+				break
+			elif ((pct <= 40)); then icon="alert-circle"; fi
+		fi
+	done
 
-tooltip="${zai_tip}${NL}${NL}${claude_tip}${NL}${NL}${codex_tip}${NL}${NL}<span style='color:#a89984'>Updated: $(date +%H:%M)</span>"
+	local tooltip
+	tooltip="${zai_tip}${NL}${NL}${claude_tip}${NL}${NL}${codex_tip}${NL}${NL}<span style='color:#a89984'>Updated: $(date +%H:%M)</span>"
 
-# Wrap in left-aligned HTML — Noctalia tooltip defaults to centered text
-tooltip="<p align='left'>${tooltip}</p>"
+	# Wrap in left-aligned HTML — Noctalia tooltip defaults to centered text
+	tooltip="<p align='left'>${tooltip}</p>"
 
-# Single-line JSON output — critical for Noctalia parseJson (multi-line breaks parser)
-jq -c -n --arg icon "$icon" --arg tooltip "$tooltip" '{"text":"","icon":$icon,"tooltip":$tooltip}'
+	# Single-line JSON output — critical for Noctalia parseJson (multi-line breaks parser)
+	jq -c -n --arg icon "$icon" --arg tooltip "$tooltip" '{"text":"","icon":$icon,"tooltip":$tooltip}'
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+	main "$@"
+fi
