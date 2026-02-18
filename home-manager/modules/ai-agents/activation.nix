@@ -259,6 +259,7 @@ in
           model_reasoning_effort = "${cfg.codex.reasoningEffort}"
           approval_policy = "${cfg.codex.approvalPolicy}"
           check_for_update_on_startup = true
+          suppress_unstable_features_warning = true
 
           web_search = "live"
 
