@@ -166,7 +166,7 @@ in
           ) cfg.skills;
         in
         lib.mkIf (cfg.skills != [ ]) (
-          lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          lib.hm.dag.entryAfter [ "writeBoundary" "createJSWorkspace" ] ''
             SKILLS_BIN="$HOME/.bun/bin/skills"
             if [[ ! -x "$SKILLS_BIN" ]]; then
               SKILLS_BIN="$(command -v skills 2>/dev/null || true)"
@@ -337,7 +337,7 @@ in
           CLAUDE_MCP="$HOME/.mcp.json"
 
           if [[ -f "$CLAUDE_MCP" ]] && [[ ! -L "$CLAUDE_MCP" ]]; then
-            ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$CLAUDE_MCP" "${claudeMcpFile}" > "$CLAUDE_MCP.tmp"
+            ${pkgs.jq}/bin/jq -s '(.[1].mcpServers) as $mcpServers | .[0] * .[1] | .mcpServers = $mcpServers' "$CLAUDE_MCP" "${claudeMcpFile}" > "$CLAUDE_MCP.tmp"
             mv "$CLAUDE_MCP.tmp" "$CLAUDE_MCP"
           else
             rm -f "$CLAUDE_MCP"
