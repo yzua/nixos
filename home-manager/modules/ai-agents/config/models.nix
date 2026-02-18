@@ -188,6 +188,9 @@
         codeExecution = true;
         searchGrounding = true;
         security = {
+          auth = {
+            selectedType = "gemini-api-key";
+          };
           folderTrust = {
             enabled = true;
           };
@@ -228,7 +231,7 @@
           vimMode = true;
           enableAutoUpdate = true;
           enableAutoUpdateNotification = true;
-          checkpointing.enabled = true;
+          checkpointing.enabled = false; # NixOS: simple-git .env() strips PATH → git ENOENT (upstream bug)
           sessionRetention = {
             enabled = true;
             maxAge = "30d";
