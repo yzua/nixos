@@ -4,92 +4,206 @@
 
 set -euo pipefail
 
-error_count=0
-
-# Enhanced error handling function
-error_exit() {
-	local msg="$1"
-	local code="${2:-1}"
-	echo "ERROR: $msg" >&2
-	echo "Script failed with exit code $code" >&2
-	exit "$code"
-}
-
-# shellcheck disable=SC2329
-cleanup() {
-	local exit_code=$?
-	if [[ $exit_code -ne 0 ]]; then
-		echo "Script exited with error code $exit_code" >&2
-	fi
-}
-
-trap cleanup EXIT
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
 
 # Validate script dependencies
 check_dependencies() {
-	local deps=("find" "grep" "sed")
+	local deps=("awk" "find" "sort")
 	for dep in "${deps[@]}"; do
 		if ! command -v "$dep" >/dev/null 2>&1; then
-			error_exit "Required dependency '$dep' not found in PATH"
+			print_error "Required dependency '$dep' not found in PATH" >&2
+			exit 1
 		fi
 	done
 }
 
-check_dependencies
+parse_imports() {
+	local default_file="$1"
 
-# Find all default.nix files in the project
-mapfile -t defaults < <(find . -type f -name default.nix)
+	# Extract:
+	# 1) explicit .nix references anywhere in default.nix (including helper imports)
+	# 2) directory entries from imports = [ ... ] lists.
+	awk '
+		function count_char(str, ch,    i, n) {
+			n = 0
+			for (i = 1; i <= length(str); i++) {
+				if (substr(str, i, 1) == ch) {
+					n += 1
+				}
+			}
+			return n
+		}
 
-# Check each default.nix file for import consistency
-for default in "${defaults[@]}"; do
-	dir=$(dirname "$default")
-	echo "⟳ Checking $default" >&2
+		function extract_nix_paths(line,    remaining, path) {
+			remaining = line
+			while (match(remaining, /\.\/[[:alnum:]_./-]+\.nix/)) {
+				path = substr(remaining, RSTART + 2, RLENGTH - 2)
+				print path
+				remaining = substr(remaining, RSTART + RLENGTH)
+			}
+		}
 
-	pushd "$dir" >/dev/null
+		function extract_directory_imports(line,    remaining, path) {
+			remaining = line
+			while (match(remaining, /\.\/[[:alnum:]_./-]+/)) {
+				path = substr(remaining, RSTART + 2, RLENGTH - 2)
+				if (path !~ /\.nix$/) {
+					print path
+				}
+				remaining = substr(remaining, RSTART + RLENGTH)
+			}
+		}
 
-	# Extract all relative imports from default.nix (e.g., ./module.nix)
-	# Remove the "./" prefix to get just the filename
-	mapfile -t imported < <(
-		grep -oE '\./[^ ]+\.nix' default.nix | sed 's#\./##'
-	)
+		{
+			raw_line = $0
+			extract_nix_paths(raw_line)
 
-	# Create a lookup table of imported modules for fast checking
-	unset imp
-	declare -A imp
-	for m in "${imported[@]}"; do
-		imp["$m"]=1
-	done
+			line = raw_line
+			sub(/#.*/, "", line)
 
-	# Find all .nix files in current directory (excluding default.nix and _-prefixed helpers)
-	mapfile -t locals < <(
-		find . -maxdepth 1 -type f -name '*.nix' \
-			! -name default.nix ! -name '_*.nix' -printf '%f\n'
-	)
+			if (!in_imports) {
+				if (line ~ /imports[[:space:]]*=/) {
+					if (index(line, "[") > 0) {
+						in_imports = 1
+						bracket_depth = count_char(line, "[") - count_char(line, "]")
+						extract_directory_imports(line)
+						if (bracket_depth <= 0) {
+							in_imports = 0
+							bracket_depth = 0
+						}
+					} else {
+						waiting_for_open_bracket = 1
+					}
+				} else if (waiting_for_open_bracket && index(line, "[") > 0) {
+					in_imports = 1
+					waiting_for_open_bracket = 0
+					bracket_depth = count_char(line, "[") - count_char(line, "]")
+					extract_directory_imports(line)
+					if (bracket_depth <= 0) {
+						in_imports = 0
+						bracket_depth = 0
+					}
+				}
+				next
+			}
 
-	# Check for .nix files that exist but aren't imported
-	for f in "${locals[@]}"; do
-		if [[ -z "${imp[$f]:-}" ]]; then
-			echo "✗  Missing import: $dir/$f" >&2
+			extract_directory_imports(line)
+			bracket_depth += count_char(line, "[") - count_char(line, "]")
+			if (bracket_depth <= 0) {
+				in_imports = 0
+				bracket_depth = 0
+			}
+		}
+	' "$default_file"
+}
+
+parse_manual_helpers() {
+	local default_file="$1"
+
+	awk '
+		{
+			line = $0
+			lower_line = tolower(line)
+
+			if (line ~ /#/ && lower_line ~ /imported manually/) {
+				while (match(line, /\.\/[[:alnum:]_./-]+\.nix/)) {
+					path = substr(line, RSTART + 2, RLENGTH - 2)
+					sub(/^.*\//, "", path)
+					print path
+					line = substr(line, RSTART + RLENGTH)
+				}
+			}
+		}
+	' "$default_file"
+}
+
+main() {
+	local error_count=0
+	check_dependencies
+
+	local -a defaults=()
+	mapfile -t defaults < <(find . -type f -name default.nix | sort)
+
+	if (( ${#defaults[@]} == 0 )); then
+		print_warning "No default.nix files found." >&2
+		return 0
+	fi
+
+	local default
+	for default in "${defaults[@]}"; do
+		local dir
+		dir=$(dirname "$default")
+		echo "⟳ Checking $default" >&2
+
+		local -a imported=()
+		mapfile -t imported < <(parse_imports "$default")
+
+		local -a manual_helpers=()
+		mapfile -t manual_helpers < <(parse_manual_helpers "$default")
+		declare -A manual_helper_set=()
+		local helper_name
+		for helper_name in "${manual_helpers[@]}"; do
+			manual_helper_set["$helper_name"]=1
+		done
+
+		declare -A imported_set=()
+		local -a unique_imports=()
+		local import_path
+		for import_path in "${imported[@]}"; do
+			[[ -n "$import_path" ]] || continue
+			if [[ -z "${imported_set[$import_path]:-}" ]]; then
+				imported_set["$import_path"]=1
+				unique_imports+=("$import_path")
+			fi
+		done
+
+		local -a local_modules=()
+		mapfile -t local_modules < <(
+			find "$dir" -maxdepth 1 -type f -name '*.nix' \
+				! -name default.nix ! -name '_*.nix' -printf '%f\n' | sort
+		)
+
+		local module_file
+		for module_file in "${local_modules[@]}"; do
+			if [[ -n "${manual_helper_set[$module_file]:-}" ]]; then
+				continue
+			fi
+			if [[ -z "${imported_set[$module_file]:-}" ]]; then
+				echo "✗  Missing import: $dir/$module_file" >&2
+				((error_count++))
+			fi
+		done
+
+		for import_path in "${unique_imports[@]}"; do
+			local resolved_path="${dir}/${import_path}"
+
+			if [[ -f "$resolved_path" ]]; then
+				continue
+			fi
+
+			if [[ -d "$resolved_path" ]]; then
+				if [[ ! -f "${resolved_path}/default.nix" ]]; then
+					echo "✗  Bad import (directory import missing default.nix): $dir/$import_path" >&2
+					((error_count++))
+				fi
+				continue
+			fi
+
+			echo "✗  Bad import (no such file or directory): $dir/$import_path" >&2
 			((error_count++))
-		fi
+		done
 	done
 
-	# Check for imports that point to non-existent files
-	for m in "${imported[@]}"; do
-		if [[ ! -f $m ]]; then
-			echo "✗  Bad import (no such file): $dir/$m" >&2
-			((error_count++))
-		fi
-	done
+	if ((error_count > 0)); then
+		echo "➤ Found $error_count import error(s)." >&2
+		return 1
+	fi
 
-	popd >/dev/null
-done
-
-# Report results and exit with appropriate status code
-if ((error_count > 0)); then
-	echo "➤ Found $error_count import error(s)." >&2
-	exit 1
-else
 	echo "➤ All imports OK!" >&2
-	exit 0
-fi
+	return 0
+}
+
+main "$@"
