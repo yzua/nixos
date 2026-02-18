@@ -19,6 +19,10 @@
         owner = user;
         mode = "0400";
       };
+      gemini_api_key = {
+        owner = user;
+        mode = "0400";
+      };
       grafana_admin_password = {
         owner = "grafana";
         mode = "0400";
