@@ -183,6 +183,11 @@
         nix repl --expr "builtins.getFlake \"$PWD\""
       }
 
+      # Load Gemini API key from sops (needed by gemini CLI)
+      if [[ -f /run/secrets/gemini_api_key ]]; then
+        export GEMINI_API_KEY="$(cat /run/secrets/gemini_api_key)"
+      fi
+
       # Sops-enabled agent wrappers
       _load_zai_key() {
         local key_file="/run/secrets/zai_api_key"
