@@ -26,7 +26,7 @@
             };
           };
           librarian = {
-            model = "anthropic/claude-sonnet-4-5";
+            model = "anthropic/claude-sonnet-4-6";
             description = "External reference search — docs, OSS, GitHub examples";
             color = "#b16286"; # Gruvbox purple
             permission = {
@@ -68,7 +68,7 @@
             color = "#928374"; # Gruvbox gray
           };
           atlas = {
-            model = "anthropic/claude-sonnet-4-5";
+            model = "anthropic/claude-sonnet-4-6";
             description = "Orchestrator/conductor — coordinates task execution";
             color = "#fabd2f"; # Gruvbox bright yellow
             skills = [ "git-master" ];
@@ -116,7 +116,7 @@
               model = "anthropic/claude-haiku-4-5";
             };
             "unspecified-low" = {
-              model = "anthropic/claude-sonnet-4-5";
+              model = "anthropic/claude-sonnet-4-6";
             };
             "unspecified-high" = {
               model = "anthropic/claude-opus-4-6";

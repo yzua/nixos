@@ -96,8 +96,8 @@
                 };
               };
             };
-            "antigravity-claude-sonnet-4-5" = {
-              name = "Claude Sonnet 4.5 (Antigravity)";
+            "antigravity-claude-sonnet-4-6" = {
+              name = "Claude Sonnet 4.6 (Antigravity)";
               limit = {
                 context = 200000;
                 output = 64000;

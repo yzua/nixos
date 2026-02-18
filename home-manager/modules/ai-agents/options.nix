@@ -150,7 +150,7 @@
 
       model = lib.mkOption {
         type = lib.types.str;
-        default = "claude-sonnet-4-5-20250514";
+        default = "claude-sonnet-4-6";
         description = "Default model for Claude Code";
       };
 
@@ -187,7 +187,7 @@
 
       model = lib.mkOption {
         type = lib.types.str;
-        default = "anthropic/claude-sonnet-4-5";
+        default = "anthropic/claude-sonnet-4-6";
         description = "Default model for OpenCode";
       };
 

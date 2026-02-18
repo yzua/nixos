@@ -272,7 +272,7 @@ in
         };
         # Aider configuration
         ".aider.conf.yml".text = builtins.toJSON {
-          model = "claude-sonnet-4-5";
+          model = "claude-sonnet-4-6";
           editor-model = "claude-haiku-4-5";
           auto-commits = false;
           dirty-commits = false;

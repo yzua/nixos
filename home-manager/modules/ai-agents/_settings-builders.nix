@@ -10,7 +10,7 @@ let
   cfg = config.programs.aiAgents;
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
-  sonnetModel = "anthropic/claude-sonnet-4-5";
+  sonnetModel = "anthropic/claude-sonnet-4-6";
   gptMainModel = "openai/gpt-5.3-codex";
   gptStandardModel = "openai/gpt-5.3";
   gptFastModel = "opencode/gpt-5-nano";
