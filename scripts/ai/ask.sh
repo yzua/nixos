@@ -167,6 +167,7 @@ fi
 
 # Create temporary file for response
 TEMP_RESPONSE=$(mktemp)
+trap 'rm -f "$TEMP_RESPONSE"' EXIT
 
 # Start API request in background and capture response to temp file
 curl -s \
