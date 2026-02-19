@@ -7,7 +7,7 @@
 
     tray = {
       enable = true;
-      command = "${pkgs.syncthingtray}/bin/syncthingtray --wait";
+      command = "syncthingtray --wait";
     };
   };
 }
