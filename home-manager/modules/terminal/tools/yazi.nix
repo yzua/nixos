@@ -11,6 +11,7 @@
   programs.yazi = {
     enable = true;
     enableZshIntegration = true;
+    shellWrapperName = "y";
 
     plugins = {
       inherit (pkgs.yaziPlugins) git diff full-border;
