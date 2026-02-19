@@ -6,8 +6,8 @@
     systemPackages = with pkgs; [
       ungoogled-chromium
       # Xvfb still needed on Wayland for headless browser testing
-      xorg.xvfb
-      xorg.xauth
+      xvfb
+      xauth
     ];
 
     variables = {

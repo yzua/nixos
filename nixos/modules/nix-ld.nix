@@ -28,22 +28,22 @@
         cups
 
         # X11 and graphics
-        xorg.libxcb
-        xorg.libX11
-        xorg.libXext
-        xorg.libXi
-        xorg.libXrender
-        xorg.libXft
-        xorg.libXcursor
-        xorg.libXrandr
-        xorg.libXinerama
-        xorg.libXcomposite
-        xorg.libXdamage
-        xorg.libXfixes
-        xorg.libXScrnSaver
-        xorg.libXtst
-        xorg.libxkbfile
-        xorg.libxshmfence
+        libxcb
+        libx11
+        libxext
+        libxi
+        libxrender
+        libxft
+        libxcursor
+        libxrandr
+        libxinerama
+        libxcomposite
+        libxdamage
+        libxfixes
+        libxscrnsaver
+        libxtst
+        libxkbfile
+        libxshmfence
         libGL
 
         # GTK/rendering stack (Chrome/Chromium)
