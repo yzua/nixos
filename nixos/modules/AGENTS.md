@@ -1,7 +1,9 @@
 # NixOS System Modules
 
-~56 shared modules (48 top-level imports + sub-modules in `security/`, `cleanup/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
+~61 shared modules (48 top-level imports + sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
 Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
+
+Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values and security module guidance.
 
 ---
 
@@ -27,7 +29,7 @@ Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules
 ### Security & Privacy
 | Module | Purpose | Custom Options |
 |--------|---------|----------------|
-| `security/` | Kernel hardening, firewall, dbus-broker, audit timers, opsec (split into 6 sub-modules) | None (always-on) |
+| `security/` | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | None (always-on, except `mySystem.auditLogging.enable` for fail2ban) |
 | `sandboxing.nix` | Firejail, bubblewrap | `mySystem.sandboxing.*` |
 | `tor.nix` | Tor SOCKS proxy (9050/9150) | `mySystem.tor.enable` |
 | `mullvad-vpn.nix` | Mullvad VPN client | `mySystem.mullvadVpn.enable` |
@@ -60,6 +62,7 @@ Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules
 | `loki.nix` | Loki log aggregation with Promtail | `mySystem.loki.enable` |
 | `prometheus-grafana/` | Prometheus + Alertmanager + Grafana stack (includes JSON dashboards) | `mySystem.observability.enable` |
 | `system-report.nix` | Unified system health reporting (aggregates monitoring sources) | `mySystem.systemReport.enable` |
+| `ntfy.nix` | Alertmanager → ntfy.sh push notifications | `mySystem.ntfy.enable` |
 
 ### Applications & Services
 | Module | Purpose | Custom Options |
@@ -93,16 +96,17 @@ Split into sub-modules. Guarded by `mySystem.cleanup.enable`.
 | `cache.nix` | Cache cleanup timers (pip, npm, bun, go, Playwright), Docker prune |
 
 ### `security/`
-Split from monolithic `security.nix`. Always-on (no enable guard).
+Split from monolithic `security.nix`. Always-on (no enable guard), except audit-logging. See `security/AGENTS.md` for detailed hardening values.
 | Sub-module | Purpose |
 |------------|---------|
 | `default.nix` | Import hub |
 | `hardening.nix` | sysctl hardening, PAM core dumps, AppArmor, sudo, hidepid, coredump |
-| `firewall.nix` | `networking.firewall` block |
+| `firewall.nix` | `networking.firewall` block, LLMNR/NetBIOS/SMB hostname leak prevention |
 | `services.nix` | dbus broker, Avahi (authoritative config), systemd Manager timeouts |
 | `audit.nix` | security-audit timer + service (weekly Lynis scan) |
 | `audit-logging.nix` | Security event logging with fail2ban (`mySystem.auditLogging.enable`) |
 | `opsec.nix` | Operational security (MAC randomization, kexec, metadata, zram, NTS, Thunderbolt) |
+| `aide.nix` | AIDE file integrity monitoring (weekly scan) |
 
 ---
 

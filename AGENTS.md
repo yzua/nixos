@@ -4,7 +4,16 @@ Repository: Flake-based NixOS + Home Manager (active host: pc; dormant: laptop)
 Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck
 Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox theming (stylix)
 
-Sub-directory `AGENTS.md` files exist in `nixos/modules/`, `home-manager/modules/`, `home-manager/modules/niri/`, and `hosts/` with deeper module-level guidance. Read them when working in those areas.
+Sub-directory `AGENTS.md` files exist at these locations with deeper module-level guidance. Read them when working in those areas:
+- `nixos/modules/` — NixOS module categories, option patterns, validation deps
+- `nixos/modules/security/` — Hardening values, always-on security modules
+- `home-manager/modules/` — HM module hierarchy, theming, config patterns
+- `home-manager/modules/niri/` — Niri compositor keybindings, workspaces, window rules
+- `home-manager/modules/ai-agents/` — Multi-agent orchestration (Claude, OpenCode, Codex, Gemini)
+- `home-manager/modules/terminal/` — Shell, terminal, CLI tools, one-per-tool pattern
+- `hosts/` — Host comparison, adding new hosts
+- `scripts/` — Shell script conventions, shared logging, script inventory
+- `dev-shells/` — Per-language dev environment templates
 
 ---
 

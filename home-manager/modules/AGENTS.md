@@ -14,6 +14,7 @@ modules/
 │   ├── options.nix     # All programs.aiAgents option definitions
 │   ├── _mcp-transforms.nix  # MCP server transform helpers (not a module, imported by others)
 │   ├── _settings-builders.nix # Per-agent settings builders (not a module, imported by others)
+│   ├── _opencode-profiles.nix # OpenCode profile names and config paths (not a module)
 │   ├── activation.nix  # Activation scripts (secret patching, config setup, plugin installs)
 │   ├── files.nix       # home.file + xdg.configFile declarations
 │   ├── services.nix    # Packages, zsh aliases, systemd user services/timers
@@ -36,10 +37,13 @@ modules/
 │   ├── opensnitch-ui.nix # OpenSnitch application firewall GUI
 │   ├── pear-desktop.nix # Pear Desktop theme + plugin baseline
 │   ├── syncthing.nix   # Syncthing local file sync
-│   └── vscode/         # VS Code editor
-│       ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)
-│       ├── extensions.nix   # Extensions (nixpkgs + marketplace)
-│       └── activation.nix   # Writes mutable settings.json
+│   ├── vscode/         # VS Code editor
+│   │   ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)
+│   │   ├── extensions.nix   # Extensions (nixpkgs + marketplace)
+│   │   └── activation.nix   # Writes mutable settings.json
+│   └── brave/          # Brave browser
+│       ├── default.nix      # Import hub
+│       └── extensions.nix   # 30+ declarative extensions (privacy, dev tools, YouTube)
 ├── niri/               # Niri compositor (scrollable tiling Wayland)
 │   ├── default.nix     # Import hub
 │   ├── main.nix        # Compositor settings (autostart, workspaces, environment, animations)
@@ -157,6 +161,17 @@ For subdirectory modules (e.g., new tool in `terminal/tools/`):
 1. Create the `.nix` file in the subdirectory
 2. Add import to that subdirectory's `default.nix`
 3. Same validation pipeline
+
+---
+
+## Sub-directory AGENTS.md
+
+More detailed module-level guidance exists at:
+- `ai-agents/AGENTS.md` — Multi-agent architecture, profile variants, activation, hooks
+- `terminal/AGENTS.md` — Shell, multiplexer, CLI tools, one-per-tool pattern
+- `niri/AGENTS.md` — Compositor keybindings, workspaces, window rules
+
+Read these when working in those areas.
 
 ---
 
