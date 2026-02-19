@@ -1,3 +1,4 @@
+# Helper library for creating cleanup timers.
 { pkgs, user }:
 {
   mkCleanupTimer =

@@ -1,3 +1,4 @@
+# Cache cleanup timers (PIP, Playwright, Bun, Go, npm, Docker).
 {
   config,
   lib,
@@ -7,7 +8,7 @@
 }:
 
 let
-  cleanupLib = import ./lib.nix { inherit pkgs user; };
+  cleanupLib = import ./_lib.nix { inherit pkgs user; };
   inherit (cleanupLib) mkCleanupTimer;
   bash = "${pkgs.bash}/bin/bash";
   find = "${pkgs.findutils}/bin/find";
