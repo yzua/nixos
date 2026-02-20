@@ -46,7 +46,7 @@
             };
           };
           multimodal-looker = {
-            model = "google/gemini-3-flash";
+            model = "anthropic/claude-sonnet-4-6";
             description = "Visual content analysis — PDFs, images, diagrams";
             color = "#689d6a"; # Gruvbox aqua
             skills = [ "playwright" ];
@@ -93,7 +93,7 @@
             modelConcurrency = {
               "anthropic/claude-opus-4-6" = 2; # Expensive — limit hard
               "anthropic/claude-haiku-4-5" = 8; # Cheap — allow many
-              "google/gemini-3-flash" = 10; # Cheap — allow many
+              "google/antigravity-gemini-3-flash" = 10; # Cheap — allow many
             };
           };
 
