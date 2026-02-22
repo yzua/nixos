@@ -12,6 +12,7 @@ in
 {
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
+    pkgs.localsend
     pkgs.pear-desktop
     pkgsStable.keepassxc
     # LibreWolf: HM package provides .desktop file + icons for app launcher.

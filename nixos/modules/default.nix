@@ -46,6 +46,7 @@
     ./gaming.nix # Steam, Lutris, Wine, MangoHud
     ./printing.nix # CUPS printing services
     ./android.nix # ADB and Fastboot support
+    ./kdeconnect.nix # KDE Connect phone-desktop integration
 
     # Virtualisation
     ./virtualisation.nix # Docker and libvirt/QEMU

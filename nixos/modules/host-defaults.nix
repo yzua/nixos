@@ -36,6 +36,7 @@
       opensnitch.enable = lib.mkDefault true;
       scrutiny.enable = lib.mkDefault true;
       waydroid.enable = lib.mkDefault true;
+      kdeconnect.enable = lib.mkDefault true;
       greetd.enable = lib.mkDefault true;
       nvidia.enable = lib.mkDefault true;
       fwupd.enable = lib.mkDefault true;

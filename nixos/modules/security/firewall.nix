@@ -7,8 +7,8 @@ _:
     enable = true;
     logRefusedConnections = true;
     rejectPackets = false; # Drop instead of reject for stealth
-    allowedTCPPorts = [ ];
-    allowedUDPPorts = [ ];
+    allowedTCPPorts = [ 53317 ]; # LocalSend
+    allowedUDPPorts = [ 53317 ]; # LocalSend
     allowedTCPPortRanges = [ ];
     allowedUDPPortRanges = [ ];
 

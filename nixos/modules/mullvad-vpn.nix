@@ -77,8 +77,8 @@
         $mullvad obfuscation set mode auto
 
         # === Local Network ===
-        # Block LAN access while connected (no local device leaks)
-        $mullvad lan set block
+        # Allow LAN access for KDE Connect and LocalSend
+        $mullvad lan set allow
       '';
     };
   };
