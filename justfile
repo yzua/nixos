@@ -95,13 +95,15 @@ clean:
 	nix store optimise
 	@echo -e "✔ Cleanup completed!"
 
-# Install git hooks for local validation/signing policy
+# Install repo-local git hooks for NixOS-specific validation.
+# Global hooks (secrets, signing, conventional commits) are managed by Home Manager.
+# Repo-local hooks chain after global hooks via core.hooksPath.
 install-hooks:
     @cp scripts/build/pre-commit-hook.sh .git/hooks/pre-commit
     @chmod +x .git/hooks/pre-commit
     @cp scripts/build/pre-push-hook.sh .git/hooks/pre-push
     @chmod +x .git/hooks/pre-push
-    @echo "✔ Pre-commit and pre-push hooks installed!"
+    @echo "✔ Repo-local pre-commit and pre-push hooks installed!"
 
 # Audit systemd unit security exposure
 security-audit:
