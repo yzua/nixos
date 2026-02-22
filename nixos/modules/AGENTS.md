@@ -1,6 +1,6 @@
 # NixOS System Modules
 
-~61 shared modules (48 top-level imports + sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
+~56 shared modules (46 top-level module files + sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
 Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
 
 Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values and security module guidance.

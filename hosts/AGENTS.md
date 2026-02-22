@@ -79,7 +79,7 @@ Every host `configuration.nix` follows the same structure:
   imports = [
     ./hardware-configuration.nix  # Auto-generated
     ./local-packages.nix          # Host packages
-    ../../nixos/modules           # Shared modules (~52)
+    ../../nixos/modules           # Shared modules (~56)
     ./modules                     # Host-specific modules
   ];
 

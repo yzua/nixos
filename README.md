@@ -228,7 +228,7 @@ hosts/<hostname>/
   hardware-configuration.nix  # Auto-generated (never edit)
   local-packages.nix          # Host-specific packages
   modules/                    # Host-specific hardware modules
-nixos/modules/                # ~52 shared system modules
+nixos/modules/                # ~56 shared system modules (46 top-level + sub-modules)
   cleanup/                    # Automated cleanup timers (downloads, caches)
   security/                   # Kernel hardening, firewall, AppArmor, opsec
   prometheus-grafana/         # Prometheus + Alertmanager + Grafana stack

@@ -66,7 +66,7 @@ just secrets-add KEY    # Add single secret (reads value from stdin)
 ```text
 flake.nix
   ├─ hosts/<hostname>/configuration.nix     # Per-host: hardware, mySystem.* options
-  │    ├─ nixos/modules/default.nix          # ~52 shared NixOS modules
+  │    ├─ nixos/modules/default.nix          # ~56 shared NixOS modules (46 top-level + sub-modules)
   │    └─ hosts/<hostname>/modules/          # Host-specific hardware modules
   ├─ home-manager/home.nix                   # HM entry point (standalone)
   │    ├─ home-manager/modules/default.nix   # User-level modules

@@ -149,7 +149,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ```text
 flake.nix                             # Entry point, makeSystem factory
   hosts/<hostname>/configuration.nix  # Per-host NixOS config
-    nixos/modules/default.nix         # ~56 shared system modules (48 top-level + sub-modules)
+    nixos/modules/default.nix         # ~56 shared system modules (46 top-level + sub-modules)
     hosts/<hostname>/modules/         # Host-specific modules
   home-manager/home.nix               # HM entry point (standalone, NOT NixOS module)
     home-manager/modules/default.nix  # User-level modules
