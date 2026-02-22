@@ -14,6 +14,7 @@
     hostInfo.enable = true;
     hostProfile = "desktop";
     netdata.enable = true;
+    vnc.enable = true;
   };
 
   # LUKS unlock for swap partition (from installer's configuration.nix)
