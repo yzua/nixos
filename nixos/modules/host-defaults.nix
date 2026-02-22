@@ -46,6 +46,7 @@
       loki.enable = lib.mkDefault true;
       systemReport.enable = lib.mkDefault true;
       auditLogging.enable = lib.mkDefault true; # fail2ban does NOT conflict with AppArmor (only auditd does)
+      vnc.enable = lib.mkDefault false; # On-demand remote access
 
       # Profile-dependent defaults
       gaming = {

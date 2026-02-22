@@ -47,6 +47,7 @@
     ./printing.nix # CUPS printing services
     ./android.nix # ADB and Fastboot support
     ./kdeconnect.nix # KDE Connect phone-desktop integration
+    ./vnc.nix # VNC remote access (x11vnc, noVNC, websockify)
 
     # Virtualisation
     ./virtualisation.nix # Docker and libvirt/QEMU
