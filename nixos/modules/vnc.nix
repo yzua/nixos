@@ -16,6 +16,7 @@
       x11vnc
       novnc
       python3Packages.websockify
+      xclip # X11 clipboard access (useful for VNC sessions)
     ];
   };
 }
