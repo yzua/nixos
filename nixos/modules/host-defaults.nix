@@ -51,6 +51,7 @@
       # Profile-dependent defaults
       gaming = {
         enable = lib.mkDefault (config.mySystem.hostProfile == "desktop");
+        enableGamemode = lib.mkDefault (config.mySystem.hostProfile == "desktop");
         enableGamescope = lib.mkDefault (config.mySystem.hostProfile == "desktop");
       };
       bluetooth = {
@@ -58,8 +59,6 @@
         powerOnBoot = lib.mkDefault false;
       };
     };
-
-    programs.gamemode.enable = lib.mkDefault false;
     environment.systemPackages = lib.mkDefault [ ];
   };
 }
