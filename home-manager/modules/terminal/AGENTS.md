@@ -58,7 +58,7 @@ terminal/
 - **Plugins**: sudo, extract, copypath, copyfile, bgnotify, fzf-tab
 - **Completions**: Carapace (not OMZ completions)
 - **Privacy history**: 20+ patterns filtered (tokens, passwords, API keys, SSH, sops commands)
-- **Custom functions** (40+): `nix-diff-gen`, `fix`, `nix-fix`, `qq`, `deep`, `oc-tmux`, `proj`, `mkcd`, agent wrappers (`claude_glm`, `oc-sops`, `opencode_gemini`)
+- **Custom functions**: `aip` (multi-agent Zellij panes), agent wrappers (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`)
 - **Agent wrappers**: Load secrets from sops at runtime, launch agents with correct env vars
 
 ### Zellij (`zellij/`, 4 files)
