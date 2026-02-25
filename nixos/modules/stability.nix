@@ -18,9 +18,24 @@
     # Resolve conflict: earlyoom sets systembus-notify=true, smartd (via Scrutiny) sets false.
     # We want notifications enabled for earlyoom OOM-kill alerts.
     systembus-notify.enable = lib.mkForce true;
+
+    # Journald limits -- Loki/Promtail retains 30 days, so keep journal lean
+    journald.extraConfig = ''
+      SystemMaxUse=500M
+      SystemMaxFileSize=50M
+      MaxRetentionSec=7day
+      ForwardToSyslog=no
+      Compress=yes
+    '';
   };
 
+  boot.kernelModules = [ "tcp_bbr" ]; # BBR congestion control module
+
   boot.kernel.sysctl = {
+    # Inotify limits for development (VS Code, webpack, rust-analyzer file watchers)
+    "fs.inotify.max_user_watches" = 524288;
+    "fs.inotify.max_user_instances" = 1024;
+
     "fs.file-max" = 1000000;
     "net.core.somaxconn" = 65536;
     "net.core.netdev_max_backlog" = 250000;
@@ -44,6 +59,10 @@
     # TCP optimizations
     "net.ipv4.tcp_fastopen" = 3; # Client+server TFO (saves 1 RTT on HTTPS connections)
     "net.ipv4.tcp_mtu_probing" = 1; # Discover path MTU (helps on VPN tunnels like Mullvad)
+
+    # TCP BBR congestion control -- 10-30% throughput improvement on VPN connections
+    "net.core.default_qdisc" = "fq";
+    "net.ipv4.tcp_congestion_control" = "bbr";
   };
 
   systemd.settings.Manager = {
