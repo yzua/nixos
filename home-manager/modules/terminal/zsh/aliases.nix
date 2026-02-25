@@ -57,43 +57,21 @@
       of = "onefetch";
 
       # AI tools
-      cl = "claude"; # Launch Claude interactive session.
-      clg = "claude_glm"; # Claude via GLM-backed ZAI endpoint wrapper.
-      clc = "claude --continue"; # Continue most recent Claude session.
-      clr = "claude --resume"; # Open Claude resume picker/session restore.
-      clplan = "claude --permission-mode plan"; # Claude read-only planning mode.
-      clauto = "claude --permission-mode acceptEdits"; # Claude auto-approve edits.
-      clyolo = "claude --dangerously-skip-permissions"; # Claude no-permission prompts (risky).
+      cl = "claude --dangerously-skip-permissions"; # Claude Code YOLO (default).
+      clglm = "claude_glm"; # Claude via GLM-backed ZAI endpoint wrapper (includes YOLO).
 
-      g = "gemini"; # Launch Gemini interactive session.
-      gplan = "gemini --approval-mode plan"; # Gemini planning/read-only mode.
-      gauto = "gemini --approval-mode auto_edit"; # Gemini auto-approve edit tools.
-      gyolo = "gemini --yolo"; # Gemini auto-approve all tools (risky).
+      gem = "gemini --yolo"; # Gemini CLI YOLO (default).
 
       oc = "opencode"; # Launch OpenCode interactive session.
-      ocg = "opencode_glm"; # OpenCode using GLM profile config.
+      ocglm = "opencode_glm"; # OpenCode using GLM profile config.
       ocgem = "opencode_gemini"; # OpenCode using Gemini profile config.
       ocgpt = "opencode_gpt"; # OpenCode using GPT profile config.
       ocs = "opencode_sonnet"; # OpenCode using Sonnet-only profile config.
-      bs = "btca-svelte-ask"; # Ask better-context against Svelte docs/source.
-      occ = "opencode --continue"; # Continue last OpenCode session.
-      ocl = "opencode session list"; # List OpenCode sessions.
-      ocr = "opencode run --continue"; # Non-interactive OpenCode run on last session.
       ocf = "opencode --continue --fork"; # Continue OpenCode session in a forked branch.
       ocrun = "opencode run"; # Non-interactive OpenCode run.
       occm = "opencode_sonnet --prompt '${commitSplitPrompt}'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
 
-      cx = "command codex --no-alt-screen"; # Launch Codex with zellij-friendly scrollback.
-      cxyolo = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"; # Codex fully unrestricted mode (risky).
-      cxl = "command codex resume --last --no-alt-screen"; # Resume latest Codex session.
-      cxr = "command codex review --uncommitted"; # Review current working tree with Codex.
-      cxb = "command codex review --base main"; # Review changes against main branch.
-      cxquick = "command codex --no-alt-screen -p quick"; # Start Codex quick profile.
-      cxdeep = "command codex --no-alt-screen -p deep"; # Start Codex deep profile.
-      cxsafe = "command codex --no-alt-screen -p safe"; # Start Codex safe profile (read-only/untrusted).
-      cxauto = "command codex --no-alt-screen --full-auto"; # Codex low-friction automation mode.
-      cxexec = "command codex exec"; # Codex one-shot non-interactive execution.
-      cxcm = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow in YOLO mode.
+      cx = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"; # Codex YOLO (default).
 
       # Gastown (multi-agent orchestrator)
       gti = "gt install ~/gt --git"; # Initialize town workspace (one-time).
