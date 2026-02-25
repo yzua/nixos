@@ -213,7 +213,6 @@
             "zai-mcp-server"
             "filesystem"
             "memory"
-            "sequential-thinking"
             "playwright"
             "cloudflare-docs"
             "github"

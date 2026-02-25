@@ -11,8 +11,7 @@
 
       zai-mcp-server = {
         enable = true;
-        command = "${pkgs.bun}/bin/bunx";
-        args = [ "@z_ai/mcp-server" ];
+        command = "${config.home.homeDirectory}/.bun/bin/zai-mcp-server";
         env = {
           Z_AI_MODE = "ZAI";
         };
@@ -28,11 +27,6 @@
         enable = true;
         command = "${config.home.homeDirectory}/.bun/bin/mcp-server-filesystem";
         args = [ config.home.homeDirectory ];
-      };
-
-      sequential-thinking = {
-        enable = true;
-        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-sequential-thinking";
       };
 
       cloudflare-docs = {
