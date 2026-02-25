@@ -50,7 +50,6 @@
     fg0 = "#ebdbb2"; # base06 (primary light foreground)
     fg_dark = "#665c54"; # bg3
     fg = "#7c6f64"; # bg4
-    fg_light = "#928374"; # gray
 
     # Accent colors
     red = "#fb4934"; # base08 (bright)
@@ -83,8 +82,6 @@
     layout = "us,ara";
     variant = ",qwerty";
     options = "grp:caps_toggle,grp_led:caps";
+    niriExtra = "terminate:ctrl_alt_bksp";
   };
-
-  # Niri compositor extends keyboard options
-  keyboardNiriExtra = "terminate:ctrl_alt_bksp";
 }

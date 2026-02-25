@@ -4,7 +4,7 @@
     keyboard = {
       xkb = {
         inherit (constants.keyboard) layout variant;
-        options = "${constants.keyboard.options},${constants.keyboardNiriExtra}";
+        options = "${constants.keyboard.options},${constants.keyboard.niriExtra}";
       };
       repeat-rate = 25;
       repeat-delay = 600;
