@@ -130,6 +130,15 @@
         }
       ) { } hosts;
 
+      devShells.${system}.default = pkgs.mkShell {
+        packages = with pkgs; [
+          statix
+          deadnix
+          shellcheck
+          nixfmt-tree
+        ];
+      };
+
       formatter.${system} = pkgs.nixfmt-tree;
     };
 }
