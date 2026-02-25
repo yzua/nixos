@@ -20,5 +20,6 @@
 
     # Security
     ./gpg.nix # GnuPG agent and key configuration
+    ./ssh.nix # SSH client hardening (algorithms, forwarding, host keys)
   ];
 }

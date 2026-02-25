@@ -1,10 +1,10 @@
 # Custom utility scripts added to user PATH.
-{ pkgs, user, ... }:
+{ config, pkgs, ... }:
 
 {
   home.packages = with pkgs; [
     (writeShellScriptBin "nvidia-fans" ''
-      exec /home/${user}/System/scripts/nvidia-fans.sh "$@"
+      exec ${config.home.homeDirectory}/System/scripts/nvidia-fans.sh "$@"
     '')
   ];
 }

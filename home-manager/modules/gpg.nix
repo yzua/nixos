@@ -27,6 +27,11 @@
       no-symkey-cache = true;
       use-agent = true;
       throw-keyids = true;
+
+      # Key server and discovery
+      keyserver = "hkps://keys.openpgp.org";
+      auto-key-locate = "wkd,dane,local";
+      auto-key-retrieve = true;
     };
   };
 
