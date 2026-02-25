@@ -11,7 +11,6 @@ let
   cfg = config.programs.aiAgents;
 
   logAnalyzer = pkgs.writeShellScriptBin "ai-agent-analyze" ''
-    #!/usr/bin/env bash
     set -euo pipefail
 
     LOG_DIR="${cfg.logging.directory}"
@@ -128,7 +127,6 @@ let
   '';
 
   errorPatternDetector = pkgs.writeShellScriptBin "ai-agent-patterns" ''
-    #!/usr/bin/env bash
 
     LOG_DIR="${cfg.logging.directory}"
     PATTERNS_FILE="$LOG_DIR/.error-patterns.txt"
@@ -148,7 +146,6 @@ let
   '';
 
   logDashboard = pkgs.writeShellScriptBin "ai-agent-dashboard" ''
-    #!/usr/bin/env bash
 
     LOG_DIR="${cfg.logging.directory}"
 

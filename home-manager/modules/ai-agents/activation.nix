@@ -25,6 +25,7 @@ in
 {
   config = lib.mkIf cfg.enable {
     home.activation = {
+      # === Secret Patching ===
       # Runs after all config writers so keys can be injected last.
       patchAiAgentSecrets = lib.mkIf (cfg.secrets.zaiApiKeyFile != null) (
         lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "setupClaudeConfig" ] ''
@@ -154,6 +155,7 @@ in
         ''
       );
 
+      # === Skill Installation ===
       installAgentSkills =
         let
           # Pre-generate install commands at Nix eval time
@@ -189,10 +191,10 @@ in
           ''
         );
 
+      # === Codex Configuration ===
       setupCodexConfig = lib.mkIf cfg.codex.enable (
         let
           codexNotifyScript = pkgs.writeShellScript "codex-notify" ''
-            #!/usr/bin/env bash
             set -euo pipefail
 
             payload=""
@@ -320,6 +322,7 @@ in
         ''
       );
 
+      # === Claude Configuration ===
       # Real files (not symlinks) so plugins can modify them.
       setupClaudeConfig = lib.mkIf cfg.claude.enable (
         let
@@ -366,6 +369,7 @@ in
         ''
       );
 
+      # === Claude Plugin Installation ===
       installOhMyClaudeCode = lib.mkIf cfg.claude.enable (
         lib.hm.dag.entryAfter [ "setupClaudeConfig" ] ''
           if command -v claude &> /dev/null; then
@@ -383,6 +387,7 @@ in
         ''
       );
 
+      # === Everything Claude Code Plugin ===
       installEverythingClaudeCode = lib.mkIf cfg.claude.enable (
         lib.hm.dag.entryAfter [ "setupClaudeConfig" ] ''
           ECC_DIR="$HOME/.local/share/everything-claude-code"

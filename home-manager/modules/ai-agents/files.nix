@@ -65,6 +65,7 @@ in
 {
   config = lib.mkIf cfg.enable {
     home.file = lib.mkMerge [
+      # === Claude Agent Definitions ===
       (lib.mkIf cfg.claude.enable {
         ".claude/agents/nix-evaluator.md".text = ''
           ---
@@ -113,6 +114,7 @@ in
         '';
       })
 
+      # === Gastown Configuration ===
       (lib.mkIf cfg.gastown.enable {
         "gt/settings/config.json" = {
           text = toJSON {
@@ -144,6 +146,7 @@ in
         };
       })
 
+      # === Gemini Files (Settings, Commands, Skills) ===
       (lib.mkIf cfg.gemini.enable {
         ".gemini/settings.json" = {
           text = toJSON geminiSettings;

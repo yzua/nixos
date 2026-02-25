@@ -52,7 +52,7 @@
 
     logging = {
       enable = true;
-      directory = "${config.home.homeDirectory}/.local/share/ai-agents/logs";
+      directory = "${config.xdg.dataHome}/ai-agents/logs";
       notifyOnError = true;
       retentionDays = 30;
 

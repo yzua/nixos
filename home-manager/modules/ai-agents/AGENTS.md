@@ -1,6 +1,6 @@
 # AI Agents Configuration
 
-Multi-agent orchestration for Claude Code, OpenCode, Codex CLI, and Gemini CLI. Largest HM module (20 files, 2800+ lines). Uses a layered architecture: options → config values → settings builders → file generation → activation-time secret injection.
+Multi-agent orchestration for Claude Code, OpenCode, Codex CLI, Gemini CLI, and Gastown. Largest HM module (20 files, 2800+ lines). Uses a layered architecture: options → config values → settings builders → file generation → activation-time secret injection.
 
 **Option namespace**: `programs.aiAgents.*` (exception — only HM module with custom options).
 
@@ -65,6 +65,7 @@ services.nix (zsh aliases, systemd timers, packages)
 | Codex CLI | `gpt-5.3-codex` | `~/.codex/config.toml` | TOML |
 | Gemini CLI | Gemini 3 Pro | `~/.gemini/settings.json` | JSON |
 
+| Gastown | Z.AI GLM-5 | `~/.config/gastown/` | TOML + JSON |
 ### Profile Variants (OpenCode)
 
 5 profiles swap the entire agent fleet between providers:

@@ -7,6 +7,7 @@
 
 {
   options.programs.aiAgents = {
+    # === Core Options ===
     enable = lib.mkEnableOption "AI coding agents configuration";
 
     globalInstructions = lib.mkOption {
@@ -110,7 +111,7 @@
 
       directory = lib.mkOption {
         type = lib.types.str;
-        default = "${config.home.homeDirectory}/.local/share/ai-agents/logs";
+        default = "${config.xdg.dataHome}/ai-agents/logs";
         description = "Directory for AI agent logs";
       };
 
@@ -145,6 +146,7 @@
       };
     };
 
+    # === Claude Options ===
     claude = {
       enable = lib.mkEnableOption "Claude Code configuration";
 
@@ -182,6 +184,7 @@
       };
     };
 
+    # === OpenCode Options ===
     opencode = {
       enable = lib.mkEnableOption "OpenCode configuration";
 
@@ -382,6 +385,7 @@
       };
     };
 
+    # === Codex Options ===
     codex = {
       enable = lib.mkEnableOption "Codex CLI configuration";
 
@@ -444,10 +448,12 @@
       };
     };
 
+    # === Gastown Options ===
     gastown = {
       enable = lib.mkEnableOption "Gastown multi-agent orchestrator (gt CLI) configuration";
     };
 
+    # === Gemini Options ===
     gemini = {
       enable = lib.mkEnableOption "Gemini CLI configuration";
 

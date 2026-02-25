@@ -57,7 +57,6 @@ let
   }) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
 
   agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
-    #!/usr/bin/env bash
 
     AGENT_NAME="$1"
     shift

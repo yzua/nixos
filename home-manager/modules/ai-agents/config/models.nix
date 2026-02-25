@@ -3,6 +3,7 @@
 
 {
   programs.aiAgents = {
+    # === OpenCode Configuration ===
     opencode = {
       enable = true;
       model = "anthropic/claude-opus-4-6";
@@ -143,10 +144,12 @@
       };
     };
 
+    # === Gastown Configuration ===
     gastown = {
       enable = true;
     };
 
+    # === Codex Configuration ===
     codex = {
       enable = true;
       useWrapper = true;
@@ -183,14 +186,17 @@
       '';
     };
 
+    # === Gemini Configuration ===
     gemini = {
       enable = true;
       theme = "Gruvbox";
       sandboxMode = "cautious";
 
       extraSettings = {
+        # --- Core Features ---
         codeExecution = true;
         searchGrounding = true;
+        # --- Security ---
         security = {
           auth = {
             selectedType = "gemini-api-key";
@@ -199,6 +205,7 @@
             enabled = true;
           };
         };
+        # --- MCP Server Access ---
         mcp = {
           allowed = [
             "context7"
@@ -219,6 +226,7 @@
             "cloudflare-observability"
           ];
         };
+        # --- Context Settings ---
         context = {
           fileName = [
             "GEMINI.md"
@@ -231,6 +239,7 @@
             enableRecursiveFileSearch = true;
           };
         };
+        # --- General Settings ---
         general = {
           vimMode = true;
           enableAutoUpdate = true;
@@ -241,9 +250,11 @@
             maxAge = "30d";
           };
         };
+        # --- Privacy ---
         privacy = {
           usageStatisticsEnabled = false;
         };
+        # --- UI and Theming ---
         ui = {
           hideTips = true;
           hideBanner = true;
@@ -269,9 +280,11 @@
           };
           theme = "Gruvbox";
         };
+        # --- Experimental Features ---
         experimental = {
           enableAgents = true;
         };
+        # --- Model Aliases ---
         modelConfigs = {
           customAliases = {
             fast = {
@@ -306,12 +319,15 @@
             };
           };
         };
+        # --- Tool Settings ---
         tools = {
           approvalMode = "auto_edit";
         };
+        # --- Model Compression ---
         model = {
           compressionThreshold = 0.75; # Wait until 75% full before compressing (was 0.5)
         };
+        # --- Hooks ---
         hooks = {
           AfterTool = [
             {

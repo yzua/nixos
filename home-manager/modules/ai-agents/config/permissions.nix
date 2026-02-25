@@ -1,5 +1,5 @@
 # Claude Code permissions, lifecycle hooks, and extra settings.
-{ config, constants, ... }:
+_:
 
 {
   programs.aiAgents = {
@@ -15,6 +15,7 @@
         ENABLE_TOOL_SEARCH = "auto:5"; # Auto-search when >5 tools match; faster with 12+ MCPs
       };
 
+      # === Permissions ===
       permissions = {
         allow = [
           "Bash(git *)"
@@ -63,7 +64,9 @@
         ];
       };
 
+      # === Lifecycle Hooks ===
       hooks = {
+        # --- PreToolUse Hooks ---
         PreToolUse = [
           {
             matcher = ''tool == "Bash" && tool_input.command matches "(rm -rf|DROP|DELETE FROM|truncate)"'';
@@ -143,6 +146,7 @@
             ];
           }
         ];
+        # --- Notification Hooks ---
         Notification = [
           {
             hooks = [
@@ -156,6 +160,7 @@
             ];
           }
         ];
+        # --- Stop Hooks ---
         Stop = [
           {
             hooks = [
@@ -169,6 +174,7 @@
             ];
           }
         ];
+        # --- PostToolUseFailure Hooks ---
         PostToolUseFailure = [
           {
             hooks = [
@@ -185,6 +191,7 @@
             ];
           }
         ];
+        # --- PostToolUse Hooks (Auto-Format + Analysis) ---
         PostToolUse = [
           {
             matcher = ''tool == "Edit" && tool_input.file_path matches "\\.(ts|tsx|js|jsx|json|jsonc)$"'';
@@ -361,6 +368,7 @@
             ];
           }
         ];
+        # --- Session Lifecycle Hooks ---
         SessionStart = [
           {
             hooks = [
@@ -400,6 +408,7 @@
             ];
           }
         ];
+        # --- PreCompact Hook ---
         PreCompact = [
           {
             hooks = [
@@ -418,6 +427,7 @@
         ];
       };
 
+      # === Extra Settings ===
       extraSettings = {
         cleanupPeriodDays = 14;
         respectGitignore = true;

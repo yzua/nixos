@@ -1,5 +1,5 @@
 # Oh-My-OpenCode agent definitions and orchestration settings.
-{ config, constants, ... }:
+_:
 
 {
   programs.aiAgents = {

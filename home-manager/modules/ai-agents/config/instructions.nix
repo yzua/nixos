@@ -1,5 +1,5 @@
 # Global instructions and skill installations for all AI agents.
-{ config, constants, ... }:
+_:
 
 {
   programs.aiAgents = {
