@@ -109,6 +109,14 @@ in
               ' "$GEMINI_CFG" > "$GEMINI_CFG.tmp" && mv "$GEMINI_CFG.tmp" "$GEMINI_CFG"
               echo "✓ Patched gemini settings.json with Z.AI API key + remote MCPs"
             fi
+
+            GASTOWN_CFG="$HOME/gt/settings/config.json"
+            if [[ -f "$GASTOWN_CFG" ]]; then
+              ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
+                .agents["zai-claude"].env.ANTHROPIC_AUTH_TOKEN = $key
+              ' "$GASTOWN_CFG" > "$GASTOWN_CFG.tmp" && mv "$GASTOWN_CFG.tmp" "$GASTOWN_CFG"
+              echo "✓ Patched gastown config.json with Z.AI API key"
+            fi
           else
             echo "⚠ ${cfg.secrets.zaiApiKeyFile} not found - run 'just nixos' first"
           fi

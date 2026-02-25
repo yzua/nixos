@@ -143,6 +143,10 @@
       };
     };
 
+    gastown = {
+      enable = true;
+    };
+
     codex = {
       enable = true;
       useWrapper = true;

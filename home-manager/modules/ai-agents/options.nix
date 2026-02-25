@@ -444,6 +444,10 @@
       };
     };
 
+    gastown = {
+      enable = lib.mkEnableOption "Gastown multi-agent orchestrator (gt CLI) configuration";
+    };
+
     gemini = {
       enable = lib.mkEnableOption "Gemini CLI configuration";
 
