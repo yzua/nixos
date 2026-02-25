@@ -79,6 +79,12 @@
     # PRIVACY: Prevent remote uptime fingerprinting
     "net.ipv4.tcp_timestamps" = 0;
     "kernel.perf_event_paranoid" = 3; # Prevent side-channel attacks
+    "kernel.perf_cpu_time_max_percent" = 1; # Limit perf overhead
+    "kernel.perf_event_max_sample_rate" = 1; # Restrict sampling rate
+
+    # Exploit surface reduction
+    "kernel.io_uring_disabled" = 2; # Disable io_uring (frequent exploit target, rarely needed on desktop)
+    "vm.unprivileged_userfaultfd" = 0; # Restrict userfaultfd (used in exploit chains)
   };
 
   # lynis is in security/audit.nix (where the security-audit timer uses it)
