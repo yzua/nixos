@@ -1,0 +1,42 @@
+# Zellij WASM plugin definitions and xdg.configFile entries.
+
+{ pkgs, lib, ... }:
+
+let
+  plugins = lib.mapAttrs (_: pkgs.fetchurl) {
+    zjstatus = {
+      url = "https://github.com/dj95/zjstatus/releases/download/v0.21.1/zjstatus.wasm";
+      hash = "sha256-3BmCogjCf2aHHmmBFFj7savbFeKGYv3bE2tXXWVkrho=";
+    };
+    zellij-autolock = {
+      url = "https://github.com/fresh2dev/zellij-autolock/releases/download/0.2.2/zellij-autolock.wasm";
+      hash = "sha256-aclWB7/ZfgddZ2KkT9vHA6gqPEkJ27vkOVLwIEh7jqQ=";
+    };
+    monocle = {
+      url = "https://github.com/imsnif/monocle/releases/download/v0.100.2/monocle.wasm";
+      hash = "sha256-TLfizJEtl1tOdVyT5E5/DeYu+SQKCaibc1SQz0cTeSw=";
+    };
+    room = {
+      url = "https://github.com/rvcas/room/releases/download/v1.2.1/room.wasm";
+      hash = "sha256-kLSDpAt2JGj7dYYhYFh6BfvtzVwTrcs+0jHwG/nActE=";
+    };
+    harpoon = {
+      url = "https://github.com/Nacho114/harpoon/releases/download/v0.1.0/harpoon.wasm";
+      hash = "sha256-ytn4faMd26q7mzbE1oINM/u62SXojxawa924K98AlgI=";
+    };
+    zellij-forgot = {
+      url = "https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm";
+      hash = "sha256-MRlBRVGdvcEoaFtFb5cDdDePoZ/J2nQvvkoyG6zkSds=";
+    };
+    multitask = {
+      url = "https://github.com/leakec/multitask/releases/download/0.43.1/multitask.wasm";
+      hash = "sha256-8IRkFe+JsBaAwGnFl0zOLJ5xsu1YGPhJY9LVPYg8VWA=";
+    };
+  };
+in
+{
+  xdg.configFile = lib.mapAttrs' (name: src: {
+    name = "zellij/plugins/${name}.wasm";
+    value.source = src;
+  }) plugins;
+}

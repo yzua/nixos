@@ -4,7 +4,7 @@
     ./tools # CLI tools (bat, eza, git, atuin, btop, yazi, starship, etc.)
     ./zsh # Zsh shell configuration
     ./ghostty.nix # Ghostty terminal emulator (GPU-accelerated, native Wayland)
-    ./zellij.nix # Zellij terminal multiplexer
+    ./zellij # Zellij terminal multiplexer (plugins, layouts, keybinds)
     ./direnv.nix # Per-directory environment loading
     ./scripts.nix # Custom utility scripts
     ./shell.nix # Nix shell integration and dev tools
