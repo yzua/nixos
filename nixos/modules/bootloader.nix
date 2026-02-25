@@ -5,7 +5,7 @@
     kernelPackages = pkgs.linuxPackages_6_18;
 
     loader = {
-      timeout = 5; # Show generation menu for 5 seconds (hold Space to pause)
+      timeout = 2; # Show generation menu briefly (hold Space to pause and select)
       efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;

@@ -12,6 +12,9 @@
     nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
     channel.enable = false;
 
+    # Pin flake registry to our nixpkgs -- avoids network lookups for `nix run nixpkgs#<pkg>`
+    registry.nixpkgs.flake = inputs.nixpkgs;
+
     extraOptions = ''
       warn-dirty = false
     '';
@@ -31,6 +34,8 @@
       sandbox = true;
       sandbox-fallback = false;
 
+      max-jobs = 4; # Build up to 4 derivations in parallel
+      cores = 0; # Each job uses all available cores (0 = auto-detect)
       max-substitution-jobs = 8;
       http-connections = 25;
 
