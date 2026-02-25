@@ -34,8 +34,8 @@
       sandbox = true;
       sandbox-fallback = false;
 
-      max-jobs = 4; # Build up to 4 derivations in parallel
-      cores = 0; # Each job uses all available cores (0 = auto-detect)
+      max-jobs = "auto";
+      cores = 0;
       max-substitution-jobs = 8;
       http-connections = 25;
 

@@ -63,7 +63,6 @@ let
 
     # Profiling
     heaptrack # Heap memory profiler (allocation tracking + GUI)
-    python3Packages.py-spy # Zero-overhead Python profiler (attaches to running processes)
     tokio-console # Real-time async Rust (tokio) diagnostics
 
     # Reverse engineering (android-tools provided by nixos/modules/android.nix)
