@@ -54,7 +54,7 @@
           {
             run = ''${constants.editor} "$@"'';
             block = false;
-            desc = "Open in Zed";
+            desc = "Open in editor";
           }
         ];
         open = [
