@@ -50,11 +50,23 @@ let
     base // localAttrs // remoteAttrs // envAttrs
   ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
 
-  geminiMcpServers = lib.mapAttrs (_: server: {
-    inherit (server) command;
-    args = server.args or [ ];
-    env = server.env or { };
-  }) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+  geminiMcpServers = lib.mapAttrs (
+    _: server:
+    let
+      isLocal = (server.type or "local") == "local";
+    in
+    if isLocal then
+      {
+        inherit (server) command;
+        args = server.args or [ ];
+        env = server.env or { };
+      }
+    else
+      {
+        httpUrl = server.url;
+      }
+      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; })
+  ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
 
   agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
 
