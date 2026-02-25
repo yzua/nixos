@@ -66,17 +66,12 @@
           USB_BLACKLIST_PHONE = 1;
           USB_EXCLUDE_BTUSB = 1;
 
-          # AMD Radeon graphics power management (if applicable)
-          RADEON_DPM_PERF_LEVEL_ON_AC = "auto";
-          RADEON_DPM_PERF_LEVEL_ON_BAT = "low";
-
           # Disk I/O scheduler settings for SSDs
           DISK_IOSCHED = [ "none" ];
 
           # Additional power saving features
           RESTORE_DEVICE_STATE_ON_STARTUP = 1;
-          DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth wifi wwan";
-          DEVICES_TO_ENABLE_ON_STARTUP = "wifi";
+          DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth wwan";
 
           # PCIe Active State Power Management on battery
           PCIE_ASPM_ON_BAT = "powersupersave";

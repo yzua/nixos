@@ -1,13 +1,9 @@
 # Local system packages for the 'laptop' host.
-{ pkgs, pkgsStable, ... }:
+{ pkgsStable, ... }:
 {
-  environment.systemPackages =
-    (with pkgs; [
-      # tlp provided by services.tlp
-    ])
-    ++ (with pkgsStable; [
-      acpi
-      powertop
-      tpacpi-bat
-    ]);
+  environment.systemPackages = with pkgsStable; [
+    acpi
+    powertop
+    tpacpi-bat
+  ];
 }
