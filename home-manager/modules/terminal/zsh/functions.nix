@@ -15,22 +15,6 @@
       export LS_COLORS="$(cat "$ls_colors_cache")"
     fi
 
-    # === Nix helpers ===
-    # Compare NixOS generations with nvd (defaults to last two)
-    nix-diff-gen() {
-      local gen1=''${1:-$(nixos-rebuild list-generations | tail -2 | head -1 | awk '{print $1}')}
-      local gen2=''${2:-$(nixos-rebuild list-generations | tail -1 | awk '{print $1}')}
-      nvd diff /nix/var/nix/profiles/system-$gen1-link /nix/var/nix/profiles/system-$gen2-link
-    }
-
-    nix-search() {
-      nix search nixpkgs "$@" --no-update-lock-file
-    }
-
-    nix-repl-flake() {
-      nix repl --expr "builtins.getFlake \"$PWD\""
-    }
-
     # === Sops secret loading ===
     # Load Gemini API key from sops (needed by gemini CLI)
     if [[ -f /run/secrets/gemini_api_key ]]; then
@@ -59,11 +43,6 @@
       claude --dangerously-skip-permissions "$@"
     }
 
-    oc-sops() {
-      local key; key="$(_load_zai_key)" || return 1
-      Z_AI_API_KEY="$key" opencode "$@"
-    }
-
     opencode_glm() {
       OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" opencode "$@"
     }
@@ -80,105 +59,89 @@
       OPENCODE_CONFIG_DIR="$HOME/.config/opencode-sonnet" opencode "$@"
     }
 
-    btca-svelte-ask() {
+    # === AI multi-pane launcher ===
+    # Launch multiple AI agents side-by-side in Zellij panes
+    # Prompt injection: claude/codex/gemini use positional, opencode uses --prompt
+    aip() {
       if [[ $# -eq 0 ]]; then
-        echo "Usage: btca-svelte-ask <question>" >&2
+        echo "Usage: aip <agent> [agent...] [\"prompt\"]" >&2
+        echo "  Any alias or function: cl, clglm, oc, ocglm, gem, cx..." >&2
+        echo "  Last arg becomes the initial prompt if not a known command." >&2
+        echo "Examples:" >&2
+        echo "  aip oc cl                  # Two agents side-by-side" >&2
+        echo "  aip oc clglm gem           # Three agents" >&2
+        echo '  aip oc ocglm "who are you" # With prompt injection' >&2
         return 1
       fi
-      btca ask --resource svelte --question "$*"
-    }
 
-    cl-sops() {
-      local key; key="$(_load_zai_key)" || return 1
-      Z_AI_API_KEY="$key" claude "$@"
-    }
+      # Collect args into array for safe manipulation
+      local -a agents=("$@")
+      local prompt=""
 
-    # === OpenCode tmux integration ===
-    # OpenCode with tmux visual multi-agent panes
-    oc-tmux() {
-      local base_name
-      base_name=$(basename "$(pwd)")
-      local path_hash
-      path_hash=$(echo "$(pwd)" | md5sum | cut -c1-4)
-      local session_name="''${base_name}-''${path_hash}"
-      local oc_port
-
-      for port in $(seq 4096 5096); do
-        if ! lsof -i ":$port" >/dev/null 2>&1; then
-          oc_port=$port
-          break
-        fi
-      done
-      oc_port=''${oc_port:-4096}
-
-      export OPENCODE_PORT=$oc_port
-
-      if [[ -n "$TMUX" ]]; then
-        opencode --port "$oc_port" "$@"
-      else
-        local oc_cmd="OPENCODE_PORT=$oc_port opencode --port $oc_port $*; exec zsh"
-        if tmux has-session -t "$session_name" 2>/dev/null; then
-          tmux new-window -t "$session_name" -c "$(pwd)" "$oc_cmd"
-          tmux attach-session -t "$session_name"
-        else
-          tmux new-session -s "$session_name" -c "$(pwd)" "$oc_cmd"
-        fi
+      # Detect prompt: if last arg is not a recognized command, treat as prompt
+      if ! type "''${agents[-1]}" &>/dev/null; then
+        prompt="''${agents[-1]}"
+        agents[-1]=()
       fi
-    }
 
-    # === Utility functions ===
-    mkcd() {
-      mkdir -p "$1" && cd "$1"
-    }
-
-    proj() {
-      local project_dir="$HOME/Projects"
-      if [ -z "$1" ]; then
-        cd "$project_dir"
-      else
-        cd "$project_dir/$1"
+      if [[ ''${#agents[@]} -eq 0 ]]; then
+        echo "Error: no agents specified (only a prompt was given)" >&2
+        return 1
       fi
-    }
 
-    git-worktree-helper() {
-      if [ -z "$1" ]; then
-        git worktree list
+      local layout_file zsh_bin
+      layout_file=$(mktemp /tmp/aip-XXXXXX.kdl)
+      zsh_bin="$SHELL"
+
+      # Escape double quotes for KDL string safety
+      local kdl_prompt="''${prompt//\"/\\\"}"
+
+      # Inherit zjstatus bar from default layout
+      local default_layout="$HOME/.config/zellij/layouts/default.kdl"
+      if [[ -f "$default_layout" ]]; then
+        head -n -1 "$default_layout" > "$layout_file"
       else
-        git worktree add "../$(basename $(pwd))-$1" "$1"
+        echo 'layout {' > "$layout_file"
       fi
-    }
 
-    # === Claude AI helpers ===
-    # Pipe last command's error output to Claude for fixing
-    # Uses script(1) to capture output safely instead of re-executing via eval
-    fix() {
-      local last_cmd
-      last_cmd=$(fc -ln -1 | sed 's/^[[:space:]]*//')
-      echo "Re-running: $last_cmd"
-      local last_output
-      last_output=$(script -qc "$last_cmd" /dev/null 2>&1) || true
-      echo "$last_output" | claude "Fix this error. Be concise. The command was: $last_cmd"
-    }
+      {
+        echo '  tab name="aip" focus=true {'
+        echo '    pane split_direction="vertical" {'
+        local i=0 cmd
+        for agent in "''${agents[@]}"; do
+          # Build command with prompt injection per agent family
+          if [[ -n "$prompt" ]]; then
+            case "$agent" in
+              oc|ocglm|ocgem|ocgpt|ocs|ocf|ocrun|occm|opencode*)
+                cmd="$agent --prompt '$kdl_prompt'" ;;
+              *)
+                cmd="$agent '$kdl_prompt'" ;;
+            esac
+          else
+            cmd="$agent"
+          fi
 
-    # Quick nix build error fix
-    nix-fix() {
-      just check 2>&1 | claude "Fix this Nix evaluation error. Show only the fix."
-    }
+          if [[ $i -eq 0 ]]; then
+            echo "      pane name=\"$agent\" command=\"$zsh_bin\" focus=true {"
+          else
+            echo "      pane name=\"$agent\" command=\"$zsh_bin\" {"
+          fi
+          echo "        args \"-ic\" \"$cmd\""
+          echo "      }"
+          ((i++))
+        done
+        echo '    }'
+        echo '  }'
+        echo '}'
+      } >> "$layout_file"
 
-    # Search NixOS packages with details
-    nix-pkg() {
-      nix search nixpkgs "$1" --json 2>/dev/null | jq -r \
-        'to_entries[] | "\(.key): \(.value.description // "no description")"' | head -20
-    }
+      if [[ -n "''${ZELLIJ:-}" ]]; then
+        zellij action new-tab --layout "$layout_file"
+      else
+        zellij --layout "$layout_file"
+      fi
 
-    # Quick question — use cheapest model
-    qq() {
-      ANTHROPIC_MODEL=claude-haiku-4-5 claude "$@"
-    }
-
-    # Deep thinking — use opus
-    deep() {
-      ANTHROPIC_MODEL=claude-opus-4-6 claude "$@"
+      rm -f "$layout_file"
     }
 
     # === Environment setup ===
