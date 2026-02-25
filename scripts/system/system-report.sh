@@ -26,10 +26,12 @@ CMD_TIMEOUT=5
 _CPU=0 _MEM=0 _DISK_ROOT=0 _DISK_HOME=0
 _SMART_FAILING=0 _FAIL2BAN_BANNED=0 _NETDATA_ALARMS=0 _BUILD_RATE=0
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # shellcheck source=/dev/null
-source "$(dirname "$0")/report-helpers.sh"
+source "${SCRIPT_DIR}/report-helpers.sh"
 # shellcheck source=/dev/null
-source "$(dirname "$0")/report-collectors.sh"
+source "${SCRIPT_DIR}/report-collectors.sh"
 
 generate_errors_report() {
 	{

@@ -143,12 +143,14 @@ main() {
 
 		local -a manual_helpers=()
 		mapfile -t manual_helpers < <(parse_manual_helpers "$default")
+		unset manual_helper_set
 		declare -A manual_helper_set=()
 		local helper_name
 		for helper_name in "${manual_helpers[@]}"; do
 			manual_helper_set["$helper_name"]=1
 		done
 
+		unset imported_set
 		declare -A imported_set=()
 		local -a unique_imports=()
 		local import_path

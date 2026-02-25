@@ -66,7 +66,11 @@ safe_cmd() {
 status_label() {
 	local value="$1" warn="${2:-80}" crit="${3:-90}"
 	local int_val="${value%%.*}"
-	if [[ -z "$int_val" || "$int_val" -lt 0 ]]; then
+	if [[ -z "$int_val" || ! "$int_val" =~ ^-?[0-9]+$ ]]; then
+		echo "unknown"
+		return
+	fi
+	if [[ "$int_val" -lt 0 ]]; then
 		echo "unknown"
 	elif [[ "$int_val" -ge "$crit" ]]; then
 		echo "critical"

@@ -5,9 +5,13 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/lib/logging.sh"
+
 # Check if fan speed argument is provided
 if [[ -z "${1:-}" ]]; then
-  echo "Error: Fan speed argument required" >&2
+  print_error "Fan speed argument required"
   echo "Usage: nvidia-fans <speed>" >&2
   echo "Example: nvidia-fans 40" >&2
   exit 1
@@ -15,9 +19,9 @@ fi
 
 FAN_SPEED="$1"
 
-# Validate fan speed is a number between 0 and 100
+# Validate fan speed is a number between 0 and 100 (dual-fan GPU assumed)
 if ! [[ "$FAN_SPEED" =~ ^[0-9]+$ ]] || (( FAN_SPEED < 0 || FAN_SPEED > 100 )); then
-  echo "Error: Fan speed must be a number between 0 and 100" >&2
+  print_error "Fan speed must be a number between 0 and 100"
   exit 1
 fi
 

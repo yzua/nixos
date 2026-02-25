@@ -189,26 +189,14 @@ wait $CURL_PID
 # Read response from temp file
 RESPONSE=$(cat "$TEMP_RESPONSE")
 
-# Clean up temp file
-rm -f "$TEMP_RESPONSE"
-
-# Parse response
-CLEAN_RESPONSE=""
-if command -v jq >/dev/null 2>&1; then
-    # Parse with jq if available
-    CLEAN_RESPONSE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null) || {
-        print_error "Failed to parse API response"
-        echo "Raw response:"
-        echo "$RESPONSE" | head -5
-        exit 1
-    }
-    echo "$CLEAN_RESPONSE"
-else
-    # Fallback without jq
-    print_warning "jq not found, showing raw response"
-    CLEAN_RESPONSE="$RESPONSE"
-    echo "$CLEAN_RESPONSE"
-fi
+# Parse response (jq is required — already used to build $PAYLOAD above)
+CLEAN_RESPONSE=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null) || {
+    print_error "Failed to parse API response"
+    echo "Raw response:"
+    echo "$RESPONSE" | head -5
+    exit 1
+}
+echo "$CLEAN_RESPONSE"
 
 # Copy to clipboard if requested
 if [[ "$COPY_TO_CLIPBOARD" == "true" ]]; then

@@ -4,25 +4,33 @@
 
 set -euo pipefail
 
-echo "🔍 Pre-commit: validating NixOS config..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
+
+DEADNIX_EXCLUDES=(
+	./home-manager/modules/terminal/zellij/layouts.nix
+)
+
+print_info "Pre-commit: validating NixOS config..."
 
 # Fast checks only — full build is too slow for a hook.
 # Escalation: modules (fastest) → lint → format check → flake check.
 
-echo "  ➤ Checking module imports..."
+print_info "Checking module imports..."
 bash ./scripts/build/modules-check.sh
 
-echo "  ➤ Linting..."
-nix run nixpkgs#statix -- check --ignore '.git/**'
-nix run nixpkgs#deadnix -- --fail --exclude ./home-manager/modules/terminal/zellij.nix .
+print_info "Linting..."
+statix check --ignore '.git/**'
+deadnix --fail --exclude "${DEADNIX_EXCLUDES[@]}" .
 
-echo "  ➤ Checking formatting..."
+print_info "Checking formatting..."
 nix fmt -- --fail-on-change --no-cache . 2>/dev/null || {
-	echo "✗ Formatting check failed. Run 'just format' first."
+	print_error "Formatting check failed. Run 'just format' first."
 	exit 1
 }
 
-echo "  ➤ Evaluating flake..."
+print_info "Evaluating flake..."
 nix flake check --no-build
 
-echo "✔ Pre-commit checks passed!"
+print_success "Pre-commit checks passed!"
