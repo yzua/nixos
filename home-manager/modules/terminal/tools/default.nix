@@ -10,9 +10,10 @@
     ./eza.nix # Modern ls replacement
     ./fzf.nix # Fuzzy finder with Zsh integration
     ./gh.nix # GitHub CLI with declarative settings
-    ./git.nix # Git configuration with difftastic
+    ./git # Git configuration with difftastic, GPG signing, global hooks
     ./htop.nix # Process viewer (legacy — btop preferred)
     ./lazygit.nix # Git TUI
+    ./mpv.nix # Media player with Vim keybindings
     ./starship.nix # Cross-shell prompt
     ./yazi.nix # Terminal file manager
     ./zathura.nix # PDF viewer
