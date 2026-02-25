@@ -33,8 +33,9 @@ just update          # Update all flake inputs
 just diff            # Diff current vs previous NixOS generation (nvd)
 just clean           # GC old generations + optimize store
 just security-audit  # systemd unit hardening + vulnix CVE scan
-just install-hooks   # Install pre-commit/pre-push git hooks
+just install-hooks   # Install repo-local hooks (chain after HM-managed global hooks)
 just report [mode]   # Generate system health report
+just report-view [type]  # View latest saved report ("errors" or full)
 ```
 
 ### No unit tests
@@ -57,7 +58,8 @@ just secrets-add KEY    # Add single secret (reads value from stdin)
 - `homeConfigurations` are **standalone** (separate `just home` command, NOT a NixOS module) — HM modules cannot reference NixOS `config.*` and receive `specialArgs` independently
 - `pkgs` = nixpkgs unstable (default), `pkgsStable` = nixos-25.11 (critical tools only — language runtimes, LSP servers, stable CLI tools)
 - `constants` from `shared/constants.nix` — single source of truth for terminal, editor, fonts, theme, keyboard, user identity
-- Both NixOS and HM receive `specialArgs`: `inputs`, `user`, `pkgsStable`, `constants`, `hostname`
+- NixOS `specialArgs`: `inputs`, `user`, `pkgsStable`, `pkgConfig`, `constants`, `hostname`, `stateVersion`
+- HM `specialArgs`: `inputs`, `user`, `pkgsStable`, `constants`, `hostname`, `homeStateVersion`
 - `nh` (Nix Helper) wraps all builds; `FLAKE` env var points to `~/System` automatically
 - **Critical**: niri flake input does NOT follow nixpkgs (`# Do NOT follow nixpkgs — mesa compatibility`) — do not add `inputs.nixpkgs.follows`
 
@@ -66,7 +68,7 @@ just secrets-add KEY    # Add single secret (reads value from stdin)
 ```text
 flake.nix
   ├─ hosts/<hostname>/configuration.nix     # Per-host: hardware, mySystem.* options
-  │    ├─ nixos/modules/default.nix          # ~56 shared NixOS modules (46 top-level + sub-modules)
+  │    ├─ nixos/modules/default.nix          # ~58 shared NixOS modules (48 top-level + sub-modules)
   │    └─ hosts/<hostname>/modules/          # Host-specific hardware modules
   ├─ home-manager/home.nix                   # HM entry point (standalone)
   │    ├─ home-manager/modules/default.nix   # User-level modules
@@ -85,6 +87,7 @@ flake.nix
 ### Home Manager modules (`home-manager/modules/`)
 
 - No custom option namespace — directly configure `programs.*`, `services.*`, `home.*`
+- **Exception**: `home-manager/modules/ai-agents/` uses `programs.aiAgents.*` (the only HM module with a custom options namespace)
 - Receives `constants` for shared values
 - Packages split into 12 domain chunks in `home-manager/packages/`, each with signature `{ pkgs, pkgsStable }: [ ... ]`
 
@@ -93,9 +96,16 @@ flake.nix
 More detailed module-level guidance exists at:
 
 - `nixos/modules/AGENTS.md` — NixOS module categories, option patterns, validation deps
+- `nixos/modules/security/AGENTS.md` — Hardening values, sysctl, blacklisted kernel modules, disabled features with rationale
 - `home-manager/modules/AGENTS.md` — HM module hierarchy, theming, config patterns
 - `home-manager/modules/niri/AGENTS.md` — Niri compositor binds, scripts, Noctalia coupling
+- `home-manager/modules/noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
+- `home-manager/modules/apps/AGENTS.md` — Application configs (VS Code, Brave, OBS, Discord, etc.)
+- `home-manager/modules/terminal/AGENTS.md` — Terminal module structure, zsh functions, zellij layouts
+- `home-manager/modules/ai-agents/AGENTS.md` — AI agent architecture, OpenCode profiles, Claude hooks, Gastown
 - `hosts/AGENTS.md` — Host comparison, adding new hosts
+- `scripts/AGENTS.md` — Script inventory, test conventions, Nix-referenced scripts
+- `dev-shells/AGENTS.md` — Standalone flake templates (not part of main flake), usage
 
 Read these when working in those areas.
 
@@ -131,7 +141,8 @@ Specialized reference docs in `guides/`: AI agents, Ghostty, Neovim, Niri, Yazi,
 - **Imports**: every directory with `.nix` files must have `default.nix` listing all imports with inline comments
 - **`_` prefix files**: Files like `_lib.nix`, `_helpers.nix`, `_mcp-transforms.nix` are helper files imported manually by other modules — NOT listed in `default.nix`. The modules-check script skips them.
 - **inherit**: `{ inherit user; }` not `user = user;`
-- **Conditionals**: `lib.mkIf` for conditional attr sets
+- **Conditionals**: `lib.mkIf` for conditional attr sets; bind local config with `cfg = config.mySystem.<feature>;`
+- **mkOption**: always include `default`, `example`, and `description`
 - **with pkgs**: only inside package lists (`environment.systemPackages = with pkgs; [...]`)
 - **mkDefault**: only in `host-defaults.nix` for profile-based defaults
 - **allowBroken**: always `false` (enforced in flake.nix)
@@ -142,6 +153,25 @@ Specialized reference docs in `guides/`: AI agents, Ghostty, Neovim, Niri, Yazi,
 ### After adding/removing a `.nix` file
 
 Update the parent `default.nix` imports list, then run `just modules`.
+
+## Common Fixes
+
+| Symptom | Fix |
+| ------- | --- |
+| Missing import error | Add file to parent `default.nix` imports list |
+| deadnix warning | Remove unused binding or prefix with `_` |
+| statix suggestion | Apply the suggested fix directly |
+| Module not found | Check path in `default.nix`, ensure file exists on disk |
+
+## Host Defaults (`host-defaults.nix`)
+
+| Option | Desktop | Laptop |
+| ------ | ------- | ------ |
+| `gaming.enable` | `true` | `false` |
+| `gaming.enableGamescope` | `true` | `false` |
+| `bluetooth.enable` | `false` | `true` |
+| `backup.enable` / `auditLogging.enable` | `false` | `false` |
+| All others | `true` | `true` |
 
 ## Forbidden Patterns
 
@@ -154,6 +184,9 @@ Update the parent `default.nix` imports list, then run `just modules`.
 | `allowBroken = true` | Unstable packages; find alternative |
 | Avahi without explicit `allowInterfaces` | Security risk (validated) |
 | Gaming without `hardware.graphics.enable` | Graphics drivers required (validated) |
+| `graphene-hardened` kernel | Crashes glycin/bwrap image loaders (Loupe, Nautilus) |
+| `auditd` with AppArmor | Kernel panic via `audit_log_subj_ctx` |
+| `mkForce` outside security hardening | Use `mkDefault`/`mkOverride` instead; `mkForce` reserved for security overrides only |
 
 "Validated" = enforced by assertions in `nixos/modules/validation.nix`.
 

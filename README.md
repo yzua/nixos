@@ -181,6 +181,8 @@ All features toggle via `mySystem.*` options. Set `hostProfile` and most default
 | `greetd.enable` | Display manager |
 | `waydroid.enable` | Android emulation |
 | `auditLogging.enable` | fail2ban logging |
+| `kdeconnect.enable` | KDE Connect phone integration |
+| `vnc.enable` | VNC remote access (x11vnc, noVNC, websockify) |
 
 Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Both default everything else to `true` (except `backup` which requires a sops secret).
 
@@ -188,7 +190,7 @@ Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Both defau
 
 ## Security
 
-Always-on (no toggle): kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2.
+Always-on (no toggle): kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, AIDE file integrity monitoring.
 
 Toggleable: Firejail sandboxing, Mullvad VPN, Tor, DNSCrypt, OpenSnitch firewall, fail2ban audit logging.
 
@@ -228,7 +230,7 @@ hosts/<hostname>/
   hardware-configuration.nix  # Auto-generated (never edit)
   local-packages.nix          # Host-specific packages
   modules/                    # Host-specific hardware modules
-nixos/modules/                # ~56 shared system modules (46 top-level + sub-modules)
+nixos/modules/                # ~58 shared system modules (48 top-level + sub-modules)
   cleanup/                    # Automated cleanup timers (downloads, caches)
   security/                   # Kernel hardening, firewall, AppArmor, opsec
   prometheus-grafana/         # Prometheus + Alertmanager + Grafana stack
@@ -239,15 +241,15 @@ nixos/modules/                # ~56 shared system modules (46 top-level + sub-mo
 home-manager/
   home.nix                    # HM entry point (standalone, not NixOS module)
   modules/
-    ai-agents/                # AI coding agents (Claude Code, OpenCode, Codex, Gemini)
+    ai-agents/                # AI coding agents (Claude Code, OpenCode, Codex, Gemini, Gastown)
     apps/                     # App configs (OBS, KeePassXC, Discord, ActivityWatch, etc.)
     niri/                     # Niri compositor (input, layout, rules, binds, scripts)
     noctalia/                 # Noctalia Shell (bar, settings)
     neovim/                   # Neovim with LSP and plugins
     languages/                # Go, JS/TS, Python, LSP servers, Mise
-    terminal/                 # Ghostty, Zellij, Zsh, CLI tools, scripts
+    terminal/                 # Ghostty, Zellij, Zsh, CLI tools (17), scripts
     stylix.nix                # Gruvbox theming
-  packages/                   # 12 domain chunks (cli, dev, multimedia, privacy, etc.)
+  packages/                   # 12 domain chunks + custom (cli, dev, multimedia, privacy, beads, gastown, prayer, etc.)
 scripts/                      # Utility scripts (ai, browser, build, lib, sops, system)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix, age)
 dev-shells/                   # Per-language dev environments (Node, Python, Rust, Go, etc.)

@@ -9,7 +9,9 @@ Sub-directory `AGENTS.md` files exist at these locations with deeper module-leve
 - `nixos/modules/security/` — Hardening values, always-on security modules
 - `home-manager/modules/` — HM module hierarchy, theming, config patterns
 - `home-manager/modules/niri/` — Niri compositor keybindings, workspaces, window rules
-- `home-manager/modules/ai-agents/` — Multi-agent orchestration (Claude, OpenCode, Codex, Gemini)
+- `home-manager/modules/noctalia/` — Noctalia Shell bar, settings, Stylix-exempt theming
+- `home-manager/modules/apps/` — Application configs (VS Code, Brave, OBS, Discord, etc.)
+- `home-manager/modules/ai-agents/` — Multi-agent orchestration (Claude Code, OpenCode, Codex, Gemini, Gastown)
 - `home-manager/modules/terminal/` — Shell, terminal, CLI tools, one-per-tool pattern
 - `hosts/` — Host comparison, adding new hosts
 - `scripts/` — Shell script conventions, shared logging, script inventory
@@ -149,7 +151,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ```text
 flake.nix                             # Entry point, makeSystem factory
   hosts/<hostname>/configuration.nix  # Per-host NixOS config
-    nixos/modules/default.nix         # ~56 shared system modules (46 top-level + sub-modules)
+    nixos/modules/default.nix         # ~58 shared system modules (48 top-level + sub-modules)
     hosts/<hostname>/modules/         # Host-specific modules
   home-manager/home.nix               # HM entry point (standalone, NOT NixOS module)
     home-manager/modules/default.nix  # User-level modules
@@ -188,6 +190,8 @@ flake.nix                             # Entry point, makeSystem factory
 | Firmware updates | `nixos/modules/fwupd.nix` |
 | Boot optimization | `nixos/modules/boot-optimization.nix` (defer monitoring from boot) |
 | System health reports | `nixos/modules/system-report.nix` |
+| VNC remote access | `nixos/modules/vnc.nix` (x11vnc, noVNC, websockify) |
+| KDE Connect / phone integration | `nixos/modules/kdeconnect.nix` |
 
 ---
 

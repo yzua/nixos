@@ -1,6 +1,6 @@
 # NixOS System Modules
 
-~56 shared modules (46 top-level module files + sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
+~58 shared modules (48 top-level module files + sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
 Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
 
 Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values and security module guidance.
@@ -75,6 +75,8 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 | `nautilus.nix` | GNOME Files manager | `mySystem.nautilus.enable` |
 | `android.nix` | Android tools and platform support | None |
 | `browser-deps.nix` | Chrome/Chromium dependencies (Wayland + X11) | None |
+| `kdeconnect.nix` | KDE Connect phone-desktop integration | `mySystem.kdeconnect.enable` |
+| `vnc.nix` | VNC remote access (x11vnc, noVNC, websockify) | `mySystem.vnc.enable` |
 | `waydroid.nix` | Waydroid Android emulation (LXC container) | `mySystem.waydroid.enable` |
 
 ### Cross-Cutting
@@ -123,7 +125,7 @@ Sets `lib.mkDefault` for all shared `mySystem.*` options so hosts only need to s
 | `bluetooth.powerOnBoot` | `false` | `false` |
 | `backup.enable` | `false` | `false` |
 | `auditLogging.enable` | `false` | `false` |
-| All others (sandboxing, flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki) | `true` | `true` |
+| All others (sandboxing, flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect, vnc) | `true` | `true` |
 
 Host configs only need:
 ```nix

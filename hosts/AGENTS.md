@@ -18,6 +18,8 @@ Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defa
 | Avahi interface | `eno1` (ethernet) | `wlp0s20f3` (WiFi) |
 | Sandboxing | enabled | enabled |
 | Privacy stack | full (VPN, Tor, DNS, MAC) | full (VPN, Tor, DNS, MAC) |
+| VNC remote access | enabled | — |
+| KDE Connect | enabled | enabled |
 
 ---
 

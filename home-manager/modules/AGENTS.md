@@ -40,6 +40,7 @@ modules/
 │   ├── vscode/         # VS Code editor
 │   │   ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)
 │   │   ├── extensions.nix   # Extensions (nixpkgs + marketplace)
+│   │   ├── _settings.nix    # Settings builder (not a module, imported by activation)
 │   │   └── activation.nix   # Writes mutable settings.json
 │   └── brave/          # Brave browser
 │       ├── default.nix      # Import hub
@@ -73,15 +74,27 @@ modules/
 │   └── mise.nix        # Mise polyglot runtime manager
 ├── terminal/           # Shell, terminal, and CLI tools
 │   ├── ghostty.nix     # Ghostty terminal emulator
-│   ├── zellij.nix      # Terminal multiplexer
+│   ├── zellij/         # Terminal multiplexer (8 WASM plugins, 3 layouts)
+│   │   ├── default.nix # Import hub
+│   │   ├── config.nix  # Keybinds, UI, behavior
+│   │   ├── layouts.nix # Layouts (default, dev, ai, monitoring)
+│   │   └── plugins.nix # WASM plugins (zjstatus, autolock, monocle, room, harpoon)
 │   ├── direnv.nix      # Per-directory environments
 │   ├── scripts.nix     # Custom utility scripts (ai-ask, ai-help, ai-commit, nvidia-fans)
 │   ├── shell.nix       # Nix shell integration and dev tools
 │   ├── zsh/            # Zsh + Oh My Zsh (oxide theme)
-│   │   ├── default.nix # Main zsh config with setOptions, OMZ, initContent
-│   │   └── aliases.nix # Shell aliases
-│   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, git, htop, lazygit, starship, yazi, zathura, zoxide)
+│   │   ├── default.nix # Main zsh config with setOptions, OMZ
+│   │   ├── aliases.nix # Shell aliases
+│   │   ├── config.nix  # Zsh settings and initialization
+│   │   ├── functions.nix # Custom zsh functions (40+)
+│   │   └── local-vars.nix # Local shell variables
+│   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, gh, git, htop, lazygit, mpv, starship, yazi, zathura, zoxide)
+│       └── git/        # Git (identity from constants, GPG signing, 30+ aliases, hooks)
+│           ├── default.nix # Import hub
+│           ├── config.nix  # Git settings, aliases, includes
+│           └── hooks.nix   # Global hooks (secret scanning, conventional commits, GPG)
 ├── gpg.nix             # GPG agent and keys
+├── ssh.nix             # SSH client hardening
 ├── mime.nix            # Default app associations
 ├── qt.nix              # Qt theming (Kvantum + Gruvbox)
 └── stylix.nix          # Theming engine (Gruvbox)
@@ -100,7 +113,7 @@ Packages live separately from modules. Each chunk returns a list:
 builtins.concatLists (map (f: import f { inherit pkgs pkgsStable; }) chunks)
 ```
 
-12 chunks: `applications`, `cli`, `custom/prayer` (Islamic prayer times), `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`.
+12 chunks + custom: `applications`, `cli`, `custom/beads` (git-backed issues), `custom/gastown` (multi-agent orchestrator), `custom/prayer` (Islamic prayer times), `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`.
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 
@@ -170,6 +183,8 @@ More detailed module-level guidance exists at:
 - `ai-agents/AGENTS.md` — Multi-agent architecture, profile variants, activation, hooks
 - `terminal/AGENTS.md` — Shell, multiplexer, CLI tools, one-per-tool pattern
 - `niri/AGENTS.md` — Compositor keybindings, workspaces, window rules
+- `noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
+- `apps/AGENTS.md` — Application configs, subdirectory modules (VS Code, Brave)
 
 Read these when working in those areas.
 
