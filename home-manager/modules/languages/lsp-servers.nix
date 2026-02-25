@@ -18,6 +18,8 @@
     markdownlint-cli # Markdown linting (used by nvim-lint)
 
     # Specialized
+    docker-compose-language-service # docker-compose.yml support
+    sqls # SQL language server (Postgres, MySQL, SQLite)
     taplo # TOML files (Cargo.toml, pyproject.toml, justfile)
   ];
 }

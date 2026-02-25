@@ -17,10 +17,13 @@ let
     # API development
     bruno
     burpsuite
+    hurl # HTTP request runner with assertions (CI-friendly API testing)
+    grpcurl # CLI for gRPC services (reflection + file descriptor support)
 
     # Build tools
     act # Run GitHub Actions locally in Docker
     docker-compose
+    earthly # Reproducible CI builds (Dockerfile + Makefile hybrid)
     git-lfs
     just
     pandoc
@@ -35,14 +38,33 @@ let
     strace
     valgrind
 
+    # Container tools
+    skopeo # Container image inspection and copy (no daemon needed)
+
     # Databases (postgresql provides psql client + libs for local dev)
     dbeaver-bin
+    pgcli # Auto-completing PostgreSQL CLI (drop-in psql replacement)
+    litecli # Auto-completing SQLite CLI
     postgresql
     redis
     sqlite
 
+    # Documentation
+    d2 # Declarative diagramming language (text -> SVG)
+    mdbook # Book generator from Markdown (Rust/Nix ecosystem standard)
+    typst # Modern typesetting system (fast LaTeX alternative)
+
     # Java
     openjdk21
+
+    # Linters
+    hadolint # Dockerfile best practices linter
+    shellcheck # Shell script static analysis (required by nvim-lint)
+
+    # Profiling
+    heaptrack # Heap memory profiler (allocation tracking + GUI)
+    python3Packages.py-spy # Zero-overhead Python profiler (attaches to running processes)
+    tokio-console # Real-time async Rust (tokio) diagnostics
 
     # Reverse engineering (android-tools provided by nixos/modules/android.nix)
     apktool
@@ -79,6 +101,7 @@ in
 
     sessionVariables = {
       RUSTC_WRAPPER = "sccache"; # Use sccache for faster Rust/C++ rebuilds
+      DOCKER_CONTENT_TRUST = "1"; # SECURITY: Enforce signed Docker images
     };
   };
 }

@@ -58,6 +58,7 @@
       govulncheck
       go-migrate
       sqlc
+      buf # Protobuf toolchain (lint, breaking change detection, registry)
       protobuf
       protoc-gen-go
       protoc-gen-go-grpc

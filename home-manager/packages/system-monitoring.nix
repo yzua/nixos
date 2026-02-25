@@ -12,6 +12,7 @@
 
     # GPU monitoring
     nvitop
+    nvtopPackages.nvidia # Lightweight C-based GPU monitor (complements nvitop)
 
     # Hardware information
     dmidecode

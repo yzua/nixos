@@ -26,9 +26,11 @@
     netcat
 
     # Network monitoring
+    bandwhich # Per-process/host bandwidth monitor
     iftop
     nethogs
     nload
+    termshark # TUI Wireshark (pcap analysis in terminal)
 
     # Network scanning
     masscan

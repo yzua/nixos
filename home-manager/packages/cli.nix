@@ -82,8 +82,12 @@
     sd
     yq
 
+    # Shell tools
+    navi # Interactive cheatsheet browser with fzf
+
     # Version control (gh managed by programs.gh in terminal/tools/gh.nix)
     git-absorb
+    git-branchless # Stacked diffs, smartlog, undo for git
     git-cliff # Auto-generate changelogs from conventional commits
     git-crypt # Transparent file encryption in repos
     git-extras # 60+ git utilities (git-summary, git-effort, git-standup, etc.)
