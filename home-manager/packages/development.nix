@@ -10,6 +10,7 @@ let
     rustfmt # Rust formatter (system-wide for conform.nvim)
     clippy # Rust linter (system-wide for outside dev-shells)
     uv # Python package manager; provides uvx for MCP servers
+    dolt # Version-controlled SQL database (Gastown/Beads backend)
   ];
 
   stable = with pkgsStable; [
