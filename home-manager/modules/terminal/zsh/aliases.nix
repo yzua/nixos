@@ -95,6 +95,20 @@
       cxexec = "command codex exec"; # Codex one-shot non-interactive execution.
       cxcm = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow in YOLO mode.
 
+      # Gastown (multi-agent orchestrator)
+      gti = "gt install ~/gt --git"; # Initialize town workspace (one-time).
+      gtra = "gt rig add"; # Add a rig (gt rig add <name> <url> or --adopt).
+      gtca = "gt crew add"; # Create crew workspace (gt crew add <name> --rig <rig>).
+      gts = "gt status"; # Town overview: rigs, agents, state.
+      gtf = "gt feed"; # TUI live feed of agent activity.
+      gtd = "gt dashboard"; # Web dashboard for monitoring.
+      gtma = "gt mayor attach"; # Attach to the Mayor coordinator.
+      gtrl = "gt rig list"; # List all registered rigs.
+      gtwl = "gt worker list"; # List active polecat workers.
+      gtcl = "gt convoy list"; # List active work convoys.
+      gtbl = "gt bead list"; # List all work items (beads).
+      gtl = "gt log"; # Agent activity log.
+
       # Nix
       ns = "nix-shell";
       nd = "nix develop --command zsh";

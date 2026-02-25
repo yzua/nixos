@@ -283,6 +283,7 @@
         "node_modules"
         "result"
         "result-*"
+        ".beads/"
       ];
     };
   };
