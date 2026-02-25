@@ -70,6 +70,29 @@ in
         };
         Install.WantedBy = [ "timers.target" ];
       };
+
+      services.opencode-db-vacuum = {
+        Unit.Description = "Vacuum OpenCode SQLite database";
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.writeShellScript "opencode-vacuum" ''
+            DB="${config.xdg.dataHome}/opencode/opencode.db"
+            if [[ -f "$DB" ]]; then
+              ${pkgs.sqlite}/bin/sqlite3 "$DB" "VACUUM;"
+              echo "Vacuumed OpenCode database"
+            fi
+          ''}";
+        };
+      };
+
+      timers.opencode-db-vacuum = {
+        Unit.Description = "Weekly OpenCode database vacuum";
+        Timer = {
+          OnCalendar = "weekly";
+          Persistent = true;
+        };
+        Install.WantedBy = [ "timers.target" ];
+      };
     };
   };
 }
