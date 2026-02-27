@@ -15,16 +15,8 @@ let
     "opencode-ai"
     "btca"
     "skills"
-    # MCP servers (globally installed for fast startup, avoids npx cold starts)
-    "@upstash/context7-mcp"
-    "@modelcontextprotocol/server-filesystem"
-    "@modelcontextprotocol/server-memory"
-    "@modelcontextprotocol/server-sequential-thinking"
-    "@playwright/cli"
-    "@magicuidesign/mcp"
-    "@modelcontextprotocol/server-github"
     "agent-browser"
-    "@z_ai/mcp-server"
+    "@playwright/cli"
   ];
 in
 {
