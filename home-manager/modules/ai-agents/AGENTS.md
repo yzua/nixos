@@ -1,6 +1,6 @@
 # AI Agents Configuration
 
-Multi-agent orchestration for Claude Code, OpenCode, Codex CLI, Gemini CLI, and Gastown. Largest HM module (20 files, 2800+ lines). Uses a layered architecture: options → config values → settings builders → file generation → activation-time secret injection.
+Multi-agent orchestration for Claude Code, OpenCode, Codex CLI, Gemini CLI, and Gastown. Uses a layered architecture: options → config values → settings builders → file generation → activation-time secret injection.
 
 **Option namespace**: `programs.aiAgents.*` (exception — only HM module with custom options).
 
@@ -12,9 +12,9 @@ Multi-agent orchestration for Claude Code, OpenCode, Codex CLI, Gemini CLI, and 
 options.nix (defines programs.aiAgents.*)
     ↓
 config/ (split configuration values)
-    ├── instructions.nix   # Global rules + 13 skills
-    ├── mcp-servers.nix    # 7 MCP servers (context7, zai, web-search, filesystem, sequential-thinking, cloudflare, github)
-    ├── permissions.nix    # Claude: 49 allow rules, 13 deny rules, 11 lifecycle hooks
+    ├── instructions.nix   # Global rules + skills
+    ├── mcp-servers.nix    # Shared MCP definitions (local + remote)
+    ├── permissions.nix    # Claude permissions and lifecycle hooks
     ├── models.nix         # Provider registries (OpenCode, Codex, Gemini)
     └── agents.nix         # 10 oh-my-opencode agents + categories + concurrency
     ↓
@@ -32,40 +32,40 @@ services.nix (zsh aliases, systemd timers, packages)
 
 ## File Map
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `options.nix` | 470 | All `programs.aiAgents.*` option definitions |
-| `activation.nix` | 426 | Secret patching (Z.AI key, GitHub token), plugin installs (oh-my-claudecode, everything-claude-code) |
-| `files.nix` | 298 | `home.file` + `xdg.configFile` declarations for all agents |
-| `services.nix` | 76 | Packages, zsh aliases, systemd log-cleanup timers |
-| `log-analyzer.nix` | 100+ | CLI: `ai-agent-analyze stats\|errors\|sessions\|search\|tail\|report` |
-| `config.nix` | 8 | Pass-through to `config/` subdirectory |
-| `config/instructions.nix` | 136 | Global instructions + skill installations |
-| `config/mcp-servers.nix` | 63 | MCP server definitions + logging config |
-| `config/permissions.nix` | 437 | Claude permissions, hooks, and settings |
-| `config/models.nix` | 344 | Model/provider registries |
-| `config/agents.nix` | 161 | Oh-My-OpenCode agent definitions (10 agents) |
+| File | Purpose |
+|------|---------|
+| `options.nix` | All `programs.aiAgents.*` option definitions |
+| `activation.nix` | Secret patching (Z.AI key, GitHub token), plugin installs |
+| `files.nix` | `home.file` + `xdg.configFile` declarations for all agents |
+| `services.nix` | Packages, zsh aliases, systemd log-cleanup timers |
+| `log-analyzer.nix` | CLI: `ai-agent-analyze stats\|errors\|sessions\|search\|tail\|report` |
+| `config.nix` | Pass-through to `config/` subdirectory |
+| `config/instructions.nix` | Global instructions + skill installations |
+| `config/mcp-servers.nix` | MCP server definitions + logging config |
+| `config/permissions.nix` | Claude permissions, hooks, and settings |
+| `config/models.nix` | Model/provider registries |
+| `config/agents.nix` | Oh-My-OpenCode agent definitions |
 
 ### Helper Files (prefixed `_`, NOT in `default.nix`)
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `_settings-builders.nix` | 305 | Per-agent settings with 5 profile variants |
-| `_mcp-transforms.nix` | 96 | Shared MCP → Claude/OpenCode/Gemini format transforms |
-| `_opencode-profiles.nix` | 17 | Profile names and config paths |
+| File | Purpose |
+|------|---------|
+| `_settings-builders.nix` | Per-agent settings with profile variants |
+| `_mcp-transforms.nix` | Shared MCP → Claude/OpenCode/Gemini format transforms |
+| `_opencode-profiles.nix` | Profile names and config paths |
 
 ---
 
 ## Supported Agents
 
-| Agent | Model (default) | Config Location | Format |
+| Agent | Model (configured) | Config Location | Format |
 |-------|----------------|-----------------|--------|
-| Claude Code | `claude-opus-4-6` | `~/.claude/settings.json`, `~/.mcp.json`, `~/.claude/CLAUDE.md` | JSON + Markdown |
+| Claude Code | `opus` alias (`programs.aiAgents.claude.model`) | `~/.claude/settings.json`, `~/.mcp.json`, `~/.claude/CLAUDE.md` | JSON + Markdown |
 | OpenCode | `anthropic/claude-opus-4-6` | `~/.config/opencode*/opencode.json` | JSON |
 | Codex CLI | `gpt-5.3-codex` | `~/.codex/config.toml` | TOML |
-| Gemini CLI | Gemini 3 Pro | `~/.gemini/settings.json` | JSON |
-
+| Gemini CLI | Gemini aliases configured in `config/models.nix` | `~/.gemini/settings.json` | JSON |
 | Gastown | Z.AI GLM-5 | `~/.config/gastown/` | TOML + JSON |
+
 ### Profile Variants (OpenCode)
 
 5 profiles swap the entire agent fleet between providers:
@@ -107,7 +107,7 @@ Secrets from sops-nix injected **after** config files are written via `jq` (JSON
 
 ### Lifecycle Hooks (Claude Code)
 
-11 hook types as Nix-generated shell scripts:
+Lifecycle hooks are generated in `config/permissions.nix` for multiple hook groups:
 - **PreToolUse**: Destructive command detection, pre-commit lint, dev server blocking
 - **PostToolUse**: Auto-format per language (biome, rustfmt, ruff, prettier, nixfmt), TypeScript checking
 - **SessionStart/End**: Session state persistence
@@ -118,7 +118,7 @@ Secrets from sops-nix injected **after** config files are written via `jq` (JSON
 ## Adding an MCP Server
 
 1. Define in `config/mcp-servers.nix` under `programs.aiAgents.mcpServers`
-2. Set `type = "stdio"` or `"sse"` with `command`/`args` or `url`
+2. Set `type = "local"` (with `command`/`args`) or `type = "remote"` (with `url`)
 3. MCP transforms in `_mcp-transforms.nix` auto-convert to each agent's format
 4. Run `just home`
 

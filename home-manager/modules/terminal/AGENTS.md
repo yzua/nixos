@@ -1,6 +1,6 @@
 # Terminal, Shell, and CLI Tools
 
-Shell environment: Ghostty terminal + Zellij multiplexer + Zsh (Oh My Zsh) + 17 CLI tools.
+Shell environment: Ghostty terminal + Zellij multiplexer + Zsh (Oh My Zsh) + declarative CLI tools (`tools/` + `tools/git/`).
 One-file-per-tool pattern in `tools/`. No custom options — uses `programs.*` directly.
 
 ---
@@ -11,13 +11,13 @@ One-file-per-tool pattern in `tools/`. No custom options — uses `programs.*` d
 terminal/
 ├── default.nix      # Import hub
 ├── ghostty.nix      # GPU-accelerated terminal (Wayland-native, shell integration)
-├── zellij/          # Multiplexer (8 WASM plugins, 3 layouts, 100+ keybinds)
+├── zellij/          # Multiplexer (WASM plugins, layouts, custom keybinds)
 │   ├── default.nix  # Import hub
 │   ├── config.nix   # Keybinds, UI, behavior
 │   ├── layouts.nix  # Layouts (default, dev, ai, monitoring)
 │   └── plugins.nix  # WASM plugins (zjstatus, autolock, monocle, room, harpoon)
 ├── direnv.nix       # Per-directory environments (nix-direnv)
-├── scripts.nix      # Custom scripts (ai-ask, ai-help, ai-commit, nvidia-fans)
+├── scripts.nix      # Custom script wrappers (currently `nvidia-fans`)
 ├── shell.nix        # Nix shell integration and dev tools
 ├── zsh/
 │   ├── default.nix  # Zsh + OMZ (oxide theme, 21 setOptions)
@@ -63,8 +63,8 @@ terminal/
 
 ### Zellij (`zellij/`, 4 files)
 
-- **Plugins** (8 WASM): zjstatus (bar), autolock, monocle, room, harpoon, zellij-forgot, multitask
-- **Layouts** (3): default (terminal), dev (nvim + lazygit), ai (Claude + logs), monitoring (btop + nvtop)
+- **Plugins** (7 WASM): zjstatus (bar), zellij-autolock, monocle, room, harpoon, zellij-forgot, multitask
+- **Layouts** (4): default (terminal), dev (nvim + lazygit), ai (Claude + logs), monitoring (btop + nvtop)
 - **Keybinds**: 100+ bindings, colored mode indicators (Gruvbox)
 - **Integration**: Auto-attach on terminal launch, `zjstatus` bar with git/mode/tabs
 
@@ -102,6 +102,6 @@ terminal/
 
 ## Adding a Zellij Layout
 
-1. Add to `zellij.nix` → `xdg.configFile."zellij/layouts/<name>.kdl"`
+1. Add to `zellij/layouts.nix` following the existing `xdg.configFile` pattern
 2. Follow existing pattern: pane splits + plugin references
 3. Run: `just home`

@@ -1,6 +1,6 @@
 # Niri Compositor Configuration
 
-Scrollable tiling Wayland compositor. 9 modules split by concern, plus 3 helper scripts.
+Scrollable tiling Wayland compositor. 8 local modules plus 3 helper scripts (and 2 imported flake modules).
 Configures `programs.niri.settings` — all settings live under that namespace.
 
 ---
@@ -10,8 +10,8 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | File | Configures | Key Details |
 |------|-----------|-------------|
 | `default.nix` | Import hub | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 7 local modules |
-| `main.nix` | Workspaces, autostart, environment | 5 named workspaces, 11 spawn-at-startup apps, `SSH_AUTH_SOCK` → KeePassXC |
-| `binds.nix` | Keybindings | 200+ bindings; `noctalia` IPC helper; imports scripts from `scripts/` |
+| `main.nix` | Workspaces, autostart, environment | 5 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC |
+| `binds.nix` | Keybindings | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/` |
 | `input.nix` | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp` |
 | `layout.nix` | Gaps, columns, borders | 8px gaps, 3 preset widths (1/3, 1/2, 2/3), focus-ring disabled (Stylix border instead) |
 | `rules.nix` | Window rules | Corner radius (10px), floating rules, opacity, workspace assignments by `app-id` |
@@ -44,17 +44,17 @@ Window rules in `rules.nix` assign apps to workspaces by `app-id` regex.
 ```nix
 noctalia = cmd: [ "noctalia-shell" "ipc" "call" ] ++ (lib.splitString " " cmd);
 ```
-Used for: launcher (`Mod+D`), clipboard (`Mod+V`), notifications (`Mod+N`), power menu, overview.
+Used for launcher, clipboard, notifications, lock/session controls, and other shell actions.
 **Tight coupling**: Changing Noctalia IPC protocol requires updating all `noctalia` calls in `binds.nix`.
 
 ### Key Categories
 - **App shortcuts**: `Mod+Return` (terminal+zellij), `Mod+Shift+Return` (bare terminal), `Mod+Q` (close)
-- **Noctalia**: `Mod+D` (launcher), `Mod+V` (clipboard), `Mod+N` (notifications), `Mod+Escape` (power)
+- **Noctalia**: launcher/clipboard/notifications/session controls (see exact combos in `binds.nix`)
 - **Layout**: `Mod+W` (tabbed), `Mod+Comma` (consume into column), `Mod+Slash` (expel)
 - **Focus**: `Mod+Arrow`, `Mod+Tab` (next window), `Mod+A` (MRU)
 - **Move/Resize**: `Mod+Shift+Arrow` (move), `Mod+Ctrl+Arrow` (resize)
 - **Workspaces**: `Mod+1-9`, `Mod+U` (previous), `Mod+Page_Up/Down`
-- **Screenshots**: `Print` (full), `Mod+Print` (annotated via `screenshot-annotate`)
+- **Screenshots**: full-screen, window, and annotated capture paths (via `screenshot-annotate`)
 
 ### Custom Scripts
 Scripts live in `scripts/`, imported in `binds.nix`, and added to `home.packages`:

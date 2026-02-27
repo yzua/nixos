@@ -1,6 +1,6 @@
 # NixOS System Modules
 
-~58 shared modules (48 top-level module files + sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`) imported by all hosts via `default.nix`. Each module handles one subsystem.
+Shared system modules imported by all hosts via `default.nix` (50+ imports including sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`). Each module handles one subsystem.
 Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
 
 Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values and security module guidance.
@@ -93,7 +93,7 @@ Split into sub-modules. Guarded by `mySystem.cleanup.enable`.
 | Sub-module | Purpose |
 |------------|---------|
 | `default.nix` | Import hub + `mySystem.cleanup.enable` option definition |
-| `lib.nix` | Reusable `mkCleanupTimer` helper (imported manually by sub-modules, not in `default.nix`) |
+| `_lib.nix` | Reusable `mkCleanupTimer` helper (imported manually by sub-modules, not in `default.nix`) |
 | `downloads.nix` | Download, screenshot, Telegram, and clipboard cleanup timers |
 | `cache.nix` | Cache cleanup timers (pip, npm, bun, go, Playwright), Docker prune |
 
@@ -124,8 +124,9 @@ Sets `lib.mkDefault` for all shared `mySystem.*` options so hosts only need to s
 | `bluetooth.enable` | `false` | `true` |
 | `bluetooth.powerOnBoot` | `false` | `false` |
 | `backup.enable` | `false` | `false` |
-| `auditLogging.enable` | `false` | `false` |
-| All others (sandboxing, flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect, vnc) | `true` | `true` |
+| `auditLogging.enable` | `true` | `true` |
+| `vnc.enable` | `false` | `false` |
+| Most others (sandboxing, flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect) | `true` | `true` |
 
 Host configs only need:
 ```nix

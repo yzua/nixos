@@ -25,7 +25,7 @@ noctalia = cmd: [ "noctalia-shell" "ipc" "call" ] ++ (lib.splitString " " cmd);
 
 **Tight coupling**: Changing Noctalia IPC commands requires updating all `noctalia` calls in `niri/binds.nix`.
 
-Used for: launcher (`Mod+D`), clipboard (`Mod+V`), notifications (`Mod+N`), power menu (`Mod+Escape`), overview.
+Used for launcher, clipboard, notifications, session menu, and related shell actions (exact key combos are defined in `home-manager/modules/niri/binds.nix`).
 
 ---
 

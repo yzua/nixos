@@ -1,7 +1,7 @@
 # Home Manager Modules
 
 User-level configuration: programs, dotfiles, theming, desktop environment.
-No custom options — modules directly configure `programs.*`, `services.*`, `home.*`.
+Most modules directly configure `programs.*`, `services.*`, `home.*`; `ai-agents/` is the exception and defines `programs.aiAgents.*` options.
 
 ---
 
@@ -74,13 +74,13 @@ modules/
 │   └── mise.nix        # Mise polyglot runtime manager
 ├── terminal/           # Shell, terminal, and CLI tools
 │   ├── ghostty.nix     # Ghostty terminal emulator
-│   ├── zellij/         # Terminal multiplexer (8 WASM plugins, 3 layouts)
+│   ├── zellij/         # Terminal multiplexer (WASM plugins, 4 layouts)
 │   │   ├── default.nix # Import hub
 │   │   ├── config.nix  # Keybinds, UI, behavior
 │   │   ├── layouts.nix # Layouts (default, dev, ai, monitoring)
 │   │   └── plugins.nix # WASM plugins (zjstatus, autolock, monocle, room, harpoon)
 │   ├── direnv.nix      # Per-directory environments
-│   ├── scripts.nix     # Custom utility scripts (ai-ask, ai-help, ai-commit, nvidia-fans)
+│   ├── scripts.nix     # Custom utility script wrappers (currently `nvidia-fans`)
 │   ├── shell.nix       # Nix shell integration and dev tools
 │   ├── zsh/            # Zsh + Oh My Zsh (oxide theme)
 │   │   ├── default.nix # Main zsh config with setOptions, OMZ
@@ -113,7 +113,7 @@ Packages live separately from modules. Each chunk returns a list:
 builtins.concatLists (map (f: import f { inherit pkgs pkgsStable; }) chunks)
 ```
 
-12 chunks + custom: `applications`, `cli`, `custom/beads` (git-backed issues), `custom/gastown` (multi-agent orchestrator), `custom/prayer` (Islamic prayer times), `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`.
+11 domain chunks + 3 custom chunks: `applications`, `cli`, `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/gastown`, `custom/prayer`.
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 
@@ -196,4 +196,4 @@ Read these when working in those areas.
 - `hostname` available for host-specific HM config
 - `constants` available from `shared/constants.nix` (terminal, editor, font, theme, keyboard, user identity)
 - Git identity (name, email, signingKey, githubEmail) lives in `constants.user.*` — used by `terminal/tools/git.nix`
-- No custom options namespace — HM modules are simpler than NixOS modules
+- HM modules are usually direct `programs.*`/`services.*` configs; only `programs.aiAgents.*` defines custom HM options

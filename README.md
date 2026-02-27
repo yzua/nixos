@@ -148,7 +148,7 @@ just nixos      # System-level (last)
 
 ## System Options (`mySystem.*`)
 
-All features toggle via `mySystem.*` options. Set `hostProfile` and most default to `true`:
+All features toggle via `mySystem.*` options. Set `hostProfile` first, then override specific options as needed:
 
 | Option | Description |
 |--------|-------------|
@@ -184,7 +184,7 @@ All features toggle via `mySystem.*` options. Set `hostProfile` and most default
 | `kdeconnect.enable` | KDE Connect phone integration |
 | `vnc.enable` | VNC remote access (x11vnc, noVNC, websockify) |
 
-Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Both default everything else to `true` (except `backup` which requires a sops secret).
+Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Shared defaults include `backup.enable = false` and `vnc.enable = false` unless overridden per host.
 
 ---
 
@@ -230,7 +230,7 @@ hosts/<hostname>/
   hardware-configuration.nix  # Auto-generated (never edit)
   local-packages.nix          # Host-specific packages
   modules/                    # Host-specific hardware modules
-nixos/modules/                # ~58 shared system modules (48 top-level + sub-modules)
+nixos/modules/                # Shared system modules (50+ imports including sub-modules)
   cleanup/                    # Automated cleanup timers (downloads, caches)
   security/                   # Kernel hardening, firewall, AppArmor, opsec
   prometheus-grafana/         # Prometheus + Alertmanager + Grafana stack
@@ -249,8 +249,8 @@ home-manager/
     languages/                # Go, JS/TS, Python, LSP servers, Mise
     terminal/                 # Ghostty, Zellij, Zsh, CLI tools (17), scripts
     stylix.nix                # Gruvbox theming
-  packages/                   # 12 domain chunks + custom (cli, dev, multimedia, privacy, beads, gastown, prayer, etc.)
-scripts/                      # Utility scripts (ai, browser, build, lib, sops, system)
+  packages/                   # Domain chunks + custom packages (beads, gastown, prayer)
+scripts/                      # Utility scripts (ai, build, lib, sops, system)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix, age)
 dev-shells/                   # Per-language dev environments (Node, Python, Rust, Go, etc.)
 guides/                       # Reference docs (AI agents, Ghostty, Neovim, Niri, Yazi, Zellij)

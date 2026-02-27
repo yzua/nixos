@@ -36,7 +36,7 @@ hosts/<hostname>/
 ```
 
 ### PC modules
-- No host-specific modules (empty `default.nix` — desktop needs no hardware overrides)
+- `default.nix` applies small desktop-specific tuning (kernel params and BFQ scheduler udev rule)
 
 ### Laptop modules
 - `boot.nix` — Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)
@@ -81,7 +81,7 @@ Every host `configuration.nix` follows the same structure:
   imports = [
     ./hardware-configuration.nix  # Auto-generated
     ./local-packages.nix          # Host packages
-    ../../nixos/modules           # Shared modules (~56)
+    ../../nixos/modules           # Shared modules
     ./modules                     # Host-specific modules
   ];
 
@@ -94,4 +94,4 @@ Every host `configuration.nix` follows the same structure:
 }
 ```
 
-**Key rule**: Set ALL `mySystem.*` options explicitly. No reliance on defaults for clarity.
+**Key rule**: Set `mySystem.hostProfile` and override only what differs from profile defaults.

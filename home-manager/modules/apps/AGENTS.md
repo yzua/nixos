@@ -1,6 +1,6 @@
 # Application Configurations
 
-10 app configs + 2 subdirectory modules (VS Code, Brave). Each app gets one `.nix` file or subdirectory.
+9 app config files + 2 subdirectory modules (VS Code, Brave). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---

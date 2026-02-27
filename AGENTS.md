@@ -34,8 +34,8 @@ just check     # nix flake check --no-build (evaluates flake without building)
 ### Apply changes
 
 ```bash
-just home      # Home Manager switch (safe, user-level) - always run FIRST
-just nixos     # NixOS switch (system-level) - run AFTER just home
+just home      # Home Manager switch (safe, user-level)
+just nixos     # NixOS switch (system-level)
 just all       # Full pipeline: modules -> lint -> format -> check -> nixos -> home
 ```
 
@@ -151,7 +151,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ```text
 flake.nix                             # Entry point, makeSystem factory
   hosts/<hostname>/configuration.nix  # Per-host NixOS config
-    nixos/modules/default.nix         # ~58 shared system modules (48 top-level + sub-modules)
+    nixos/modules/default.nix         # Shared system modules (50+ imports including sub-modules)
     hosts/<hostname>/modules/         # Host-specific modules
   home-manager/home.nix               # HM entry point (standalone, NOT NixOS module)
     home-manager/modules/default.nix  # User-level modules
@@ -184,7 +184,7 @@ flake.nix                             # Entry point, makeSystem factory
 | Theming/styling | `home-manager/modules/stylix.nix` |
 | AI agent configuration | `home-manager/modules/ai-agents/` |
 | Shared constants (terminal, editor, font, user identity) | `shared/constants.nix` |
-| Utility scripts | `scripts/` (ai, browser, build, lib, sops, system) |
+| Utility scripts | `scripts/` (ai, build, lib, sops, system) |
 | Secrets | `secrets/secrets.yaml` (edit with `just sops-edit`) |
 | Dev environments | `dev-shells/<lang>/flake.nix` (Node, Python, Rust, Go, etc.) |
 | Firmware updates | `nixos/modules/fwupd.nix` |
@@ -230,7 +230,7 @@ flake.nix                             # Entry point, makeSystem factory
 ## Notes
 
 - Home Manager is **standalone** (separate `homeConfigurations` output), not a NixOS module. Requires separate `just home` command.
-- **`nh`** (Nix Helper) handles all builds. `FLAKE` env var points to `~/System` automatically.
+- **`nh`** (Nix Helper) handles all builds. `NH_FLAKE` is set to `~/System` automatically.
 - Overlays go in **NixOS configuration** (not home.nix) because HM uses system pkgs.
 - Secrets: `secrets/secrets.yaml` (sops-nix, age-encrypted). Edit with `just sops-edit`. Never commit decrypted secrets, private keys, or `.envrc`.
 - Never edit `hardware-configuration.nix` (auto-generated) unless intentional.

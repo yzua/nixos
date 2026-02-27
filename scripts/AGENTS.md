@@ -1,6 +1,6 @@
 # Utility Scripts
 
-15 Bash scripts across 5 categories + 1 shared library. All must pass `shellcheck` (enforced by `just lint`).
+20 Bash scripts across 5 categories + 1 shared library. All must pass `shellcheck` (enforced by `just lint`).
 
 ---
 
@@ -10,7 +10,9 @@
 scripts/
 ├── ai/
 │   ├── ask.sh              # Z.ai API client (GLM-4.5-air/GLM-5, clipboard support)
-│   ├── api-quota.sh         # Noctalia bar widget: Z.ai + Claude Max + Codex usage JSON
+│   ├── api-quota.sh         # Noctalia bar widget entrypoint (orchestration + output)
+│   ├── api-quota-helpers.sh # Shared formatting/cache/time helper functions
+│   ├── api-quota-providers.sh # Provider collectors (Z.ai, Claude, Codex)
 │   └── api-quota-test.sh    # Unit tests for api-quota.sh
 ├── build/
 │   ├── modules-check.sh     # Validates default.nix imports match .nix files on disk
@@ -24,7 +26,10 @@ scripts/
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)
 ├── system/
 │   ├── system-report.sh     # Unified health report (full/errors mode)
-│   ├── report-collectors.sh # Collectors: systemd, Loki, Netdata, Scrutiny, security
+│   ├── report-collectors.sh # Compatibility shim loading collector modules
+│   ├── report-collectors-core.sh # Core collectors: systemd, timers, network, builds, AI logs
+│   ├── report-collectors-observability.sh # Observability collectors: Loki/Netdata/Scrutiny/resource metrics
+│   ├── report-collectors-security.sh # Security collectors: fail2ban, Lynis, OpenSnitch, hardening
 │   ├── report-helpers.sh    # Report generation helper functions
 │   └── report-collectors-test.sh # Unit tests for report collectors
 └── nvidia-fans.sh           # GPU fan control
@@ -71,7 +76,10 @@ source "$(dirname "$0")/../lib/logging.sh"
 | `build/modules-check.sh` | `justfile` (`just modules`) |
 | `build/shellcheck-nix-inline.sh` | `justfile` (`just lint`) |
 | `system/system-report.sh` | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`) |
-| `system/report-collectors.sh` | Sourced by `system-report.sh` |
+| `system/report-collectors.sh` | Sourced by `system-report.sh` (loads module files) |
+| `system/report-collectors-core.sh` | Sourced by `system/report-collectors.sh` |
+| `system/report-collectors-observability.sh` | Sourced by `system/report-collectors.sh` |
+| `system/report-collectors-security.sh` | Sourced by `system/report-collectors.sh` |
 | `system/report-helpers.sh` | Sourced by `system-report.sh` |
 | `ai/api-quota.sh` | `home-manager/modules/noctalia/default.nix` (bar widget) |
 | `sops/sops-edit.sh` | `justfile` (`just sops-edit`) |
