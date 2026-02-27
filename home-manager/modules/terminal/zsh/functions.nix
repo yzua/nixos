@@ -112,7 +112,7 @@
           # Build command with prompt injection per agent family
           if [[ -n "$prompt" ]]; then
             case "$agent" in
-              oc|ocglm|ocgem|ocgpt|ocs|ocf|ocrun|occm|opencode*)
+              oc|ocglm|ocgem|ocgpt|ocs|ocf|ocrun|occm|ocrf|ocsa|ocmd|opencode*)
                 cmd="$agent --prompt '$kdl_prompt'" ;;
               *)
                 cmd="$agent '$kdl_prompt'" ;;
