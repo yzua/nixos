@@ -57,6 +57,10 @@
       of = "onefetch";
 
       # AI tools
+      occm = "opencode_sonnet --prompt '${commitSplitPrompt}'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
+      clcm = "claude --dangerously-skip-permissions '${commitSplitPrompt}'"; # Claude commit-splitting + signed-commit workflow.
+      cxcm = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow.
+
       cl = "claude --dangerously-skip-permissions"; # Claude Code YOLO (default).
       clglm = "claude_glm"; # Claude via GLM-backed ZAI endpoint wrapper (includes YOLO).
 
@@ -69,7 +73,6 @@
       ocs = "opencode_sonnet"; # OpenCode using Sonnet-only profile config.
       ocf = "opencode --continue --fork"; # Continue OpenCode session in a forked branch.
       ocrun = "opencode run"; # Non-interactive OpenCode run.
-      occm = "opencode_sonnet --prompt '${commitSplitPrompt}'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
 
       cx = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"; # Codex YOLO (default).
 
