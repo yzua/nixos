@@ -72,6 +72,13 @@ assert_regex "$epoch_24h" '^[0-9]+$' "epoch_hours_ago returns numeric epoch"
 iso_7d="$(iso_days_ago 7)"
 assert_contains "$iso_7d" "T" "iso_days_ago returns ISO timestamp"
 
+table_header_output="$(print_table_header "| A | B |" "|---|---|")"
+assert_contains "$table_header_output" "| A | B |" "print_table_header emits columns line"
+assert_contains "$table_header_output" "|---|---|" "print_table_header emits separator line"
+
+feature_gate_msg="$(require_enabled_feature "false" "Netdata" || true)"
+assert_contains "$feature_gate_msg" "[unavailable] Netdata not enabled." "require_enabled_feature emits unavailable message"
+
 safe_cmd() {
 	if [[ "$1" == "systemctl" && "$2" == "list-timers" ]]; then
 		cat <<'EOF'
@@ -87,5 +94,18 @@ timers_output="$(collect_systemd_timers)"
 assert_contains "$timers_output" "| apt-daily.timer | Mon 2026-02-16 09:00:00 |" "timers table uses timer unit name"
 assert_contains "$timers_output" "| fstrim.timer | Tue 2026-02-17 01:00:00 |" "timers table includes second timer"
 assert_not_contains "$timers_output" "| apt-daily.service |" "timers table does not use activates service as timer name"
+
+# shellcheck disable=SC2034 # Used by sourced collector functions.
+HAS_FAIL2BAN="false"
+# shellcheck disable=SC2034
+HAS_OPENSNITCH="false"
+security_output="$(collect_security)"
+assert_contains "$security_output" "- fail2ban: [unavailable]" "security collector reports fail2ban unavailable"
+assert_contains "$security_output" "- OpenSnitch: [unavailable]" "security collector reports OpenSnitch unavailable"
+
+# shellcheck disable=SC2034
+HAS_LOKI="false"
+loki_output="$(collect_loki_errors)"
+assert_contains "$loki_output" "[unavailable] Loki not enabled." "loki collector reports disabled service"
 
 echo "All system report helper/collector tests passed."

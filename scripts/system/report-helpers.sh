@@ -3,6 +3,23 @@
 
 section() { printf '\n## %s\n\n' "$1"; }
 
+print_table_header() {
+	local columns="$1"
+	local separator="$2"
+	echo "$columns"
+	echo "$separator"
+}
+
+require_enabled_feature() {
+	local feature_flag="$1"
+	local feature_name="$2"
+	if [[ "$feature_flag" != "true" ]]; then
+		echo "[unavailable] ${feature_name} not enabled."
+		return 1
+	fi
+	return 0
+}
+
 debug_log() {
 	if [[ "${SYSTEM_REPORT_DEBUG:-false}" == "true" ]]; then
 		printf '[system-report] %s\n' "$*" >&2
