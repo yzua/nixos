@@ -60,16 +60,16 @@
       of = "onefetch";
 
       # AI tools
-      occm = "opencode_sonnet --prompt '${commitSplitPrompt}'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
+      occm = "opencode_glm --prompt '${commitSplitPrompt}'"; # OpenCode Sonnet commit-splitting + signed-commit workflow.
       clcm = "claude --dangerously-skip-permissions '${commitSplitPrompt}'"; # Claude commit-splitting + signed-commit workflow.
       cxcm = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${commitSplitPrompt}'"; # Codex commit-splitting + signed-commit workflow.
-      ocrf = "opencode_sonnet --prompt '${refactorMaintainabilityPrompt}'"; # OpenCode Sonnet maintainability refactor workflow.
+      ocrf = "opencode_glm --prompt '${refactorMaintainabilityPrompt}'"; # OpenCode Sonnet maintainability refactor workflow.
       clrf = "claude --dangerously-skip-permissions '${refactorMaintainabilityPrompt}'"; # Claude maintainability refactor workflow.
       cxrf = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${refactorMaintainabilityPrompt}'"; # Codex maintainability refactor workflow.
-      ocsa = "opencode_sonnet --prompt '${securityAuditPrompt}'"; # OpenCode Sonnet security audit workflow.
+      ocsa = "opencode_glm --prompt '${securityAuditPrompt}'"; # OpenCode Sonnet security audit workflow.
       clsa = "claude --dangerously-skip-permissions '${securityAuditPrompt}'"; # Claude security audit workflow.
       cxsa = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${securityAuditPrompt}'"; # Codex security audit workflow.
-      ocmd = "opencode_sonnet --prompt '${markdownSyncPrompt}'"; # OpenCode Sonnet markdown documentation audit workflow.
+      ocmd = "opencode_glm --prompt '${markdownSyncPrompt}'"; # OpenCode Sonnet markdown documentation audit workflow.
       clmd = "claude --dangerously-skip-permissions '${markdownSyncPrompt}'"; # Claude markdown documentation audit workflow.
       cxmd = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox '${markdownSyncPrompt}'"; # Codex markdown documentation audit workflow.
 
