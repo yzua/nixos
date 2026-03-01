@@ -19,13 +19,16 @@ let
     HAS_FAIL2BAN = lib.boolToString config.mySystem.auditLogging.enable;
     SYSTEM_REPORT_DIR = cfg.outputDir;
     REPORT_USER = user;
+    SYSTEM_REPORT_HELPERS = ../../scripts/system/report-helpers.sh;
+    SYSTEM_REPORT_COLLECTORS = ../../scripts/system/report-collectors.sh;
+    AI_AGENT_LOG_DIR = "/home/${user}/.local/share/ai-agents/logs";
   };
 
   featureFlagExports = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (k: v: "export ${k}=\"\${${k}:-${v}}\"") featureFlags
   );
 
-  reportScript = pkgs.writeShellApplication {
+  reportScriptBase = pkgs.writeShellApplication {
     name = "system-report";
     runtimeInputs =
       with pkgs;
@@ -45,6 +48,7 @@ let
       ++ lib.optionals config.mySystem.auditLogging.enable [ pkgs.fail2ban ];
     text = featureFlagExports + "\n" + builtins.readFile ../../scripts/system/system-report.sh;
   };
+
 in
 {
   options.mySystem.systemReport = {
@@ -62,7 +66,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ reportScript ];
+    environment.systemPackages = [ reportScriptBase ];
 
     systemd = {
       services = {
@@ -70,11 +74,11 @@ in
           description = "Quick system error scan";
           serviceConfig = {
             Type = "oneshot";
-            ExecStart = "${reportScript}/bin/system-report errors";
+            ExecStart = "${reportScriptBase}/bin/system-report errors";
             # SECURITY: Systemd hardening directives
             PrivateTmp = true;
             ProtectSystem = "strict";
-            ProtectHome = true;
+            ProtectHome = "read-only";
             NoNewPrivileges = true;
             ProtectKernelTunables = true;
             ProtectControlGroups = true;
@@ -87,11 +91,11 @@ in
           description = "Full system health report";
           serviceConfig = {
             Type = "oneshot";
-            ExecStart = "${reportScript}/bin/system-report full";
+            ExecStart = "${reportScriptBase}/bin/system-report full";
             # SECURITY: Systemd hardening directives
             PrivateTmp = true;
             ProtectSystem = "strict";
-            ProtectHome = true;
+            ProtectHome = "read-only";
             NoNewPrivileges = true;
             ProtectKernelTunables = true;
             ProtectControlGroups = true;
@@ -108,7 +112,7 @@ in
             # SECURITY: Systemd hardening directives
             PrivateTmp = true;
             ProtectSystem = "strict";
-            ProtectHome = true;
+            ProtectHome = "read-only";
             NoNewPrivileges = true;
             ProtectKernelTunables = true;
             ProtectControlGroups = true;

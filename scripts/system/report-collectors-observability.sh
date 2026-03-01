@@ -79,7 +79,7 @@ collect_loki_errors() {
 		return
 	fi
 
-	errors=$(query_loki 'sum by (unit) (count_over_time({job="systemd-journal"} |~ "(?i)error|fail|panic" [24h]))' "$start")
+	errors=$(query_loki 'sum by (unit) (count_over_time({job="systemd-journal",level=~"err|error|crit|alert|emerg"} |~ "(?i)(error|fail|panic)" [24h]))' "$start")
 
 	if json_is_empty "$errors"; then
 		echo "No error logs found in Loki (24h)."

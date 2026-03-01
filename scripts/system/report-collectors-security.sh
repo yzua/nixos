@@ -7,12 +7,36 @@ collect_security() {
 	local items=()
 
 	if [[ "$HAS_FAIL2BAN" == "true" ]] && command -v fail2ban-client &>/dev/null; then
-		local fail2ban_status banned total_bans
-		fail2ban_status=$(safe_cmd sudo fail2ban-client status sshd 2>/dev/null)
-		banned=$(echo "$fail2ban_status" | grep "Currently banned" | awk '{print $NF}') || banned="?"
-		total_bans=$(echo "$fail2ban_status" | grep "Total banned" | awk '{print $NF}') || total_bans="?"
-		items+=("- fail2ban: ${banned:-0} currently banned, ${total_bans:-0} total bans (sshd)")
-		_FAIL2BAN_BANNED="${banned:-0}"
+		local fail2ban_status
+		fail2ban_status=$(safe_cmd fail2ban-client status 2>/dev/null)
+		if [[ -z "$fail2ban_status" ]]; then
+			items+=("- fail2ban: [unavailable]")
+			_FAIL2BAN_BANNED="0"
+		else
+			local jail_list jail banned total_bans total_banned_now total_banned_ever
+			jail_list=$(echo "$fail2ban_status" | awk -F: '/Jail list:/ {gsub(/^[[:space:]]+/, "", $2); print $2}' | tr ',' ' ')
+			if [[ -z "$jail_list" ]]; then
+				items+=("- fail2ban: 0 currently banned, 0 total bans (no active jails)")
+				_FAIL2BAN_BANNED="0"
+			else
+				total_banned_now=0
+				total_banned_ever=0
+				for jail in $jail_list; do
+					local jail_status
+					jail_status=$(safe_cmd fail2ban-client status "$jail" 2>/dev/null || true)
+					banned=$(echo "$jail_status" | awk -F: '/Currently banned:/ {gsub(/^[[:space:]]+/, "", $2); print $2}')
+					total_bans=$(echo "$jail_status" | awk -F: '/Total banned:/ {gsub(/^[[:space:]]+/, "", $2); print $2}')
+					banned="${banned:-0}"
+					total_bans="${total_bans:-0}"
+					[[ "$banned" =~ ^[0-9]+$ ]] || banned=0
+					[[ "$total_bans" =~ ^[0-9]+$ ]] || total_bans=0
+					total_banned_now=$((total_banned_now + banned))
+					total_banned_ever=$((total_banned_ever + total_bans))
+				done
+				items+=("- fail2ban: ${total_banned_now} currently banned, ${total_banned_ever} total bans (${jail_list})")
+				_FAIL2BAN_BANNED="${total_banned_now}"
+			fi
+		fi
 	else
 		items+=("- fail2ban: [unavailable]")
 		_FAIL2BAN_BANNED="0"

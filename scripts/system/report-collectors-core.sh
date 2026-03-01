@@ -136,18 +136,40 @@ collect_nix_builds() {
 collect_ai_agents() {
 	section "AI Agent Errors"
 
-	local log_dir="${HOME:-/home/${REPORT_USER}}/.local/share/opencode/log"
+	local user_home="${HOME:-/home/${REPORT_USER}}"
+	local primary_dir="${AI_AGENT_LOG_DIR:-${user_home}/.local/share/ai-agents/logs}"
+	local -a candidate_dirs=(
+		"$primary_dir"
+		"${user_home}/.local/share/opencode/log"
+		"${user_home}/.codex/log"
+	)
+	local -a log_dirs=()
 
-	if [[ ! -d "$log_dir" ]]; then
+	for dir in "${candidate_dirs[@]}"; do
+		[[ -d "$dir" ]] && log_dirs+=("$dir")
+	done
+
+	if [[ "${#log_dirs[@]}" -eq 0 ]]; then
 		echo "No agent logs found."
 		return
 	fi
 
 	local errors
-	errors=$(safe_cmd grep -rihl "error\|panic\|fatal" "$log_dir"/*.log 2>/dev/null | wc -l || echo "0")
+	local -a matched_files=()
+	mapfile -t matched_files < <(
+		find "${log_dirs[@]}" -type f -name "*.log" -print0 2>/dev/null |
+			xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
+	)
+	errors="${#matched_files[@]}"
 	local recent_errors
-	recent_errors=$(safe_cmd find "$log_dir" -name "*.log" -mtime -1 -exec grep -il "error\|panic\|fatal" {} \; 2>/dev/null | wc -l || echo "0")
+	local -a recent_matched_files=()
+	mapfile -t recent_matched_files < <(
+		find "${log_dirs[@]}" -type f -name "*.log" -mtime -1 -print0 2>/dev/null |
+			xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
+	)
+	recent_errors="${#recent_matched_files[@]}"
 
+	echo "- Log directories scanned: ${#log_dirs[@]}"
 	echo "- Log files with errors: ${errors}"
 	echo "- Files with errors (last 24h): ${recent_errors}"
 }
