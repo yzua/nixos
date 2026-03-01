@@ -24,7 +24,7 @@ Package declarations for `home.packages`. This directory is chunked by domain an
 - `productivity.nix` — Focus/time utilities
 - `system-monitoring.nix` — Observability user tools
 - `utilities.nix` — General utility packages
-- `custom/beads.nix`, `custom/gastown.nix`, `custom/prayer.nix` — Local/custom package definitions
+- `custom/beads.nix`, `custom/prayer.nix` — Local/custom package definitions
 - `_egl-wrap.nix` — Helper imported manually by chunks; not imported by `default.nix`
 
 ---

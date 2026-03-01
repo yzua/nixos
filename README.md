@@ -243,7 +243,7 @@ nixos/modules/                # Shared system modules (50+ imports including sub
 home-manager/
   home.nix                    # HM entry point (standalone, not NixOS module)
   modules/
-    ai-agents/                # AI coding agents (Claude Code, OpenCode, Codex, Gemini, Gastown)
+    ai-agents/                # AI coding agents (Claude Code, OpenCode, Codex, Gemini)
     apps/                     # App configs (OBS, KeePassXC, Discord, ActivityWatch, etc.)
     niri/                     # Niri compositor (input, layout, rules, binds, scripts)
     noctalia/                 # Noctalia Shell (bar, settings)
@@ -251,7 +251,7 @@ home-manager/
     languages/                # Go, JS/TS, Python, LSP servers, Mise
     terminal/                 # Ghostty, Zellij, Zsh, CLI tools (16), scripts
     stylix.nix                # Gruvbox theming
-  packages/                   # Domain chunks + custom packages (beads, gastown, prayer)
+  packages/                   # Domain chunks + custom packages (beads, prayer)
 scripts/                      # Utility scripts (ai, build, lib, sops, system)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix, age)
 dev-shells/                   # Per-language dev environments (Node, Python, Rust, Go, etc.)

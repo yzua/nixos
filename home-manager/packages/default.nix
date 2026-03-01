@@ -4,7 +4,6 @@
     ./applications.nix # Desktop apps and GTK theming
     ./cli.nix # CLI tools: file mgmt, text processing, search
     ./custom/beads.nix # Beads git-backed issue tracker (bd CLI)
-    ./custom/gastown.nix # Gastown multi-agent orchestrator (gt CLI)
     ./custom/prayer.nix # Custom prayer times indicator
     ./development.nix # Dev tools, databases, reverse engineering
     ./gnome.nix # Minimal GNOME utilities for Niri

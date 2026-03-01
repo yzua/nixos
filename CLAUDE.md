@@ -102,7 +102,7 @@ More detailed module-level guidance exists at:
 - `home-manager/modules/noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
 - `home-manager/modules/apps/AGENTS.md` — Application configs (VS Code, Brave, OBS, Discord, etc.)
 - `home-manager/modules/terminal/AGENTS.md` — Terminal module structure, zsh functions, zellij layouts
-- `home-manager/modules/ai-agents/AGENTS.md` — AI agent architecture, OpenCode profiles, Claude hooks, Gastown
+- `home-manager/modules/ai-agents/AGENTS.md` — AI agent architecture, OpenCode profiles, Claude hooks
 - `hosts/AGENTS.md` — Host comparison, adding new hosts
 - `scripts/AGENTS.md` — Script inventory, test conventions, Nix-referenced scripts
 - `dev-shells/AGENTS.md` — Standalone flake templates (not part of main flake), usage

@@ -112,7 +112,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-11 domain chunks + 3 custom chunks: `applications`, `cli`, `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/gastown`, `custom/prayer`.
+11 domain chunks + 2 custom chunks: `applications`, `cli`, `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/prayer`.
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 

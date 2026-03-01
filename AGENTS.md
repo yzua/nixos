@@ -12,7 +12,7 @@ Sub-directory `AGENTS.md` files exist at these locations with deeper module-leve
 - `home-manager/modules/niri/` — Niri compositor keybindings, workspaces, window rules
 - `home-manager/modules/noctalia/` — Noctalia Shell bar, settings, Stylix-exempt theming
 - `home-manager/modules/apps/` — Application configs (VS Code, Brave, OBS, Discord, etc.)
-- `home-manager/modules/ai-agents/` — Multi-agent orchestration (Claude Code, OpenCode, Codex, Gemini, Gastown)
+- `home-manager/modules/ai-agents/` — Multi-agent orchestration (Claude Code, OpenCode, Codex, Gemini)
 - `home-manager/modules/terminal/` — Shell, terminal, CLI tools, one-per-tool pattern
 - `hosts/` — Host comparison, adding new hosts
 - `scripts/` — Shell script conventions, shared logging, script inventory
