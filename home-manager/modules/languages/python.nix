@@ -8,112 +8,117 @@
 }:
 
 {
-  programs = {
-    zsh.shellAliases = {
-      py = "python3";
-      py2 = "python2";
-      pyi = "python3 -i";
-      pym = "python3 -m";
-      pipi = "pip install";
-      pipu = "pip install --upgrade";
-      pipr = "pip uninstall";
-      pipl = "pip list";
-      pipf = "pip freeze";
-      pipreq = "pip install -r requirements.txt";
-      pipfreeze = "pip freeze > requirements.txt";
-      uvi = "uv pip install";
-      uvu = "uv pip install --upgrade";
-      uvr = "uv pip uninstall";
-      uvl = "uv pip list";
-      uvf = "uv pip freeze";
-      uvreq = "uv pip install -r requirements.txt";
-      uvfreeze = "uv pip freeze > requirements.txt";
-      uvinit = "uv init";
-      uvadd = "uv add";
-      uvdev = "uv add --dev";
-      uvrun = "uv run";
-      uvsync = "uv sync";
-      venvc = "python3 -m venv venv";
-      venva = "source venv/bin/activate";
-      venvd = "deactivate";
-      venvi = "venv/bin/pip install";
-      rufff = "ruff format";
-      ruffl = "ruff check";
-      rufffi = "ruff format --check";
-      blackf = "black --line-length 88";
-      isortf = "isort --profile black";
-      flake8l = "flake8 --max-line-length 88";
-      mypyl = "mypy --ignore-missing-imports";
-      pytestr = "pytest -v";
-      pytestrw = "pytest -v --tb=short";
-      coverage = "coverage run -m pytest && coverage report";
-      jupyterl = "jupyter lab";
-      jupytern = "jupyter notebook";
-    };
+  programs =
+    let
+      shellAliases = {
+        py = "python3";
+        py2 = "python2";
+        pyi = "python3 -i";
+        pym = "python3 -m";
+        pipi = "pip install";
+        pipu = "pip install --upgrade";
+        pipr = "pip uninstall";
+        pipl = "pip list";
+        pipf = "pip freeze";
+        pipreq = "pip install -r requirements.txt";
+        pipfreeze = "pip freeze > requirements.txt";
+        uvi = "uv pip install";
+        uvu = "uv pip install --upgrade";
+        uvr = "uv pip uninstall";
+        uvl = "uv pip list";
+        uvf = "uv pip freeze";
+        uvreq = "uv pip install -r requirements.txt";
+        uvfreeze = "uv pip freeze > requirements.txt";
+        uvinit = "uv init";
+        uvadd = "uv add";
+        uvdev = "uv add --dev";
+        uvrun = "uv run";
+        uvsync = "uv sync";
+        venvc = "python3 -m venv venv";
+        venva = "source venv/bin/activate";
+        venvd = "deactivate";
+        venvi = "venv/bin/pip install";
+        rufff = "ruff format";
+        ruffl = "ruff check";
+        rufffi = "ruff format --check";
+        blackf = "black --line-length 88";
+        isortf = "isort --profile black";
+        flake8l = "flake8 --max-line-length 88";
+        mypyl = "mypy --ignore-missing-imports";
+        pytestr = "pytest -v";
+        pytestrw = "pytest -v --tb=short";
+        coverage = "coverage run -m pytest && coverage report";
+        jupyterl = "jupyter lab";
+        jupytern = "jupyter notebook";
+      };
+    in
+    {
+      zsh.shellAliases = shellAliases;
+      bash.shellAliases = shellAliases;
 
-    git.ignores = [
-      "__pycache__/"
-      "*.py[cod]"
-      "*$py.class"
-      "*.so"
-      ".Python"
-      "develop-eggs/"
-      "downloads/"
-      "eggs/"
-      ".eggs/"
-      "parts/"
-      "sdist/"
-      ".installed.cfg"
-      "*.egg-info/"
-      "*.egg"
-      "MANIFEST"
-      "*.manifest"
-      "*.spec"
-      "pip-log.txt"
-      "pip-delete-this-directory.txt"
-      "htmlcov/"
-      ".tox/"
-      ".coverage"
-      ".coverage.*"
-      "nosetests.xml"
-      "coverage.xml"
-      "*.cover"
-      ".hypothesis/"
-      "*.mo"
-      "*.pot"
-      "local_settings.py"
-      "db.sqlite3"
-      "db.sqlite3-journal"
-      "instance/"
-      ".webassets-cache"
-      ".scrapy"
-      "docs/_build/"
-      "target/"
-      ".ipynb_checkpoints"
-      "profile_default/"
-      "ipython_config.py"
-      ".python-version"
-      "Pipfile.lock"
-      "__pypackages__/"
-      "celerybeat-schedule"
-      "celerybeat.pid"
-      "*.sage.py"
-      ".env"
-      ".venv"
-      "env/"
-      "venv/"
-      "ENV/"
-      "env.bak/"
-      "venv.bak/"
-      ".spyderproject"
-      ".spyproject"
-      ".ropeproject"
-      ".mypy_cache/"
-      ".dmypy.json"
-      "dmypy.json"
-      ".pyre/"
-    ];
-  };
+      git.ignores = [
+        "__pycache__/"
+        "*.py[cod]"
+        "*$py.class"
+        "*.so"
+        ".Python"
+        "develop-eggs/"
+        "downloads/"
+        "eggs/"
+        ".eggs/"
+        "parts/"
+        "sdist/"
+        ".installed.cfg"
+        "*.egg-info/"
+        "*.egg"
+        "MANIFEST"
+        "*.manifest"
+        "*.spec"
+        "pip-log.txt"
+        "pip-delete-this-directory.txt"
+        "htmlcov/"
+        ".tox/"
+        ".coverage"
+        ".coverage.*"
+        "nosetests.xml"
+        "coverage.xml"
+        "*.cover"
+        ".hypothesis/"
+        "*.mo"
+        "*.pot"
+        "local_settings.py"
+        "db.sqlite3"
+        "db.sqlite3-journal"
+        "instance/"
+        ".webassets-cache"
+        ".scrapy"
+        "docs/_build/"
+        "target/"
+        ".ipynb_checkpoints"
+        "profile_default/"
+        "ipython_config.py"
+        ".python-version"
+        "Pipfile.lock"
+        "__pypackages__/"
+        "celerybeat-schedule"
+        "celerybeat.pid"
+        "*.sage.py"
+        ".env"
+        ".venv"
+        "env/"
+        "venv/"
+        "ENV/"
+        "env.bak/"
+        "venv.bak/"
+        ".spyderproject"
+        ".spyproject"
+        ".ropeproject"
+        ".mypy_cache/"
+        ".dmypy.json"
+        "dmypy.json"
+        ".pyre/"
+      ];
+    };
 
   home = {
     # Project-specific deps should use dev-shells or uv

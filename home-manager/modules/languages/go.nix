@@ -7,41 +7,46 @@
 }:
 
 {
-  programs = {
-    go = {
-      enable = true;
-      package = pkgs.go;
-
-      env = {
-        GOPATH = "go";
-        GOBIN = "go/bin";
-        GOPRIVATE = [ ];
+  programs =
+    let
+      shellAliases = {
+        gorun = "go run";
+        gobuild = "go build";
+        gotest = "go test -v";
+        gomod = "go mod";
+        gofmt = "gofumpt -w";
+        golint = "golangci-lint run";
+        goair = "air";
+        godebug = "dlv debug";
+        gotrace = "dlv trace";
       };
-    };
+    in
+    {
+      go = {
+        enable = true;
+        package = pkgs.go;
 
-    zsh.shellAliases = {
-      gorun = "go run";
-      gobuild = "go build";
-      gotest = "go test -v";
-      gomod = "go mod";
-      gofmt = "gofumpt -w";
-      golint = "golangci-lint run";
-      goair = "air";
-      godebug = "dlv debug";
-      gotrace = "dlv trace";
-    };
+        env = {
+          GOPATH = "go";
+          GOBIN = "go/bin";
+          GOPRIVATE = [ ];
+        };
+      };
 
-    git.ignores = [
-      "*.exe"
-      "*.exe~"
-      "*.dll"
-      "*.so"
-      "*.dylib"
-      "*.test"
-      "go.work"
-      "go.work.sum"
-    ];
-  };
+      zsh.shellAliases = shellAliases;
+      bash.shellAliases = shellAliases;
+
+      git.ignores = [
+        "*.exe"
+        "*.exe~"
+        "*.dll"
+        "*.so"
+        "*.dylib"
+        "*.test"
+        "go.work"
+        "go.work.sum"
+      ];
+    };
 
   home = {
     packages = with pkgs; [

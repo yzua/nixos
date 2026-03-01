@@ -8,7 +8,17 @@ let
     cargo-nextest
     rustc
     rustfmt # Rust formatter (system-wide for conform.nvim)
+    zig # Zig compiler + formatter (used by AI agent hooks and editors)
     clippy # Rust linter (system-wide for outside dev-shells)
+    nixfmt # Nix formatter
+    statix # Nix linter
+    deadnix # Nix dead code detector
+    nixd # Nix language server
+    nix-tree # Nix dependency explorer
+    nix-output-monitor # Better Nix build output
+    cachix # Binary cache client
+    nix-init # Generate Nix packages from URLs
+    nurl # Nix URL fetcher hash helper
     uv # Python package manager; provides uvx for MCP servers
     dolt # Version-controlled SQL database (Gastown/Beads backend)
   ];

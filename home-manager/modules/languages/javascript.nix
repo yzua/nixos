@@ -20,69 +20,74 @@ let
   ];
 in
 {
-  programs = {
-    zsh.shellAliases = {
-      tscl = "tsc --noEmit";
-      tscw = "tsc --watch";
-      tscb = "tsc --build";
-      el = "eslint --fix";
-      pf = "prettier --write";
-      jt = "jest --watch";
-      vt = "npx vitest";
-      pt = "npx playwright";
-      bc = "biome check";
-      bf = "biome format";
-      bcf = "biome check --apply";
-      blint = "biome lint";
-      bfmt = "biome format --write";
-    };
+  programs =
+    let
+      shellAliases = {
+        tscl = "tsc --noEmit";
+        tscw = "tsc --watch";
+        tscb = "tsc --build";
+        el = "eslint --fix";
+        pf = "prettier --write";
+        jt = "jest --watch";
+        vt = "npx vitest";
+        pt = "npx playwright";
+        bc = "biome check";
+        bf = "biome format";
+        bcf = "biome check --apply";
+        blint = "biome lint";
+        bfmt = "biome format --write";
+      };
+    in
+    {
+      zsh.shellAliases = shellAliases;
+      bash.shellAliases = shellAliases;
 
-    git.ignores = [
-      "node_modules/"
-      "bun.lockb"
-      ".pnpm-debug.log*"
-      ".yarn/install-state.gz"
-      ".yarn/cache"
-      ".yarn/build-state.yml"
-      ".next/"
-      ".nuxt/"
-      ".output/"
-      ".vercel/"
-      ".netlify/"
-      ".env"
-      ".env.local"
-      ".env.development.local"
-      ".env.test.local"
-      ".env.production.local"
-      "logs"
-      "npm-debug.log*"
-      "yarn-debug.log*"
-      "yarn-error.log*"
-      "pids"
-      "*.pid"
-      "*.seed"
-      "*.pid.lock"
-      "coverage/"
-      "*.lcov"
-      ".nyc_output"
-      "jspm_packages/"
-      ".npm"
-      ".eslintcache"
-      ".rpt2_cache/"
-      ".rts2_cache_cjs/"
-      ".rts2_cache_es/"
-      ".rts2_cache_umd/"
-      ".node_repl_history"
-      "*.tgz"
-      ".yarn-integrity"
-      ".parcel-cache"
-      ".storybook-out"
-      "tmp/"
-      "temp/"
-      "*.swo"
-      "*~"
-    ];
-  };
+      git.ignores = [
+        "node_modules/"
+        "bun.lockb"
+        ".pnpm-debug.log*"
+        ".yarn/install-state.gz"
+        ".yarn/cache"
+        ".yarn/build-state.yml"
+        ".next/"
+        ".nuxt/"
+        ".output/"
+        ".vercel/"
+        ".netlify/"
+        ".env"
+        ".env.local"
+        ".env.development.local"
+        ".env.test.local"
+        ".env.production.local"
+        "logs"
+        "npm-debug.log*"
+        "yarn-debug.log*"
+        "yarn-error.log*"
+        "pids"
+        "*.pid"
+        "*.seed"
+        "*.pid.lock"
+        "coverage/"
+        "*.lcov"
+        ".nyc_output"
+        "jspm_packages/"
+        ".npm"
+        ".eslintcache"
+        ".rpt2_cache/"
+        ".rts2_cache_cjs/"
+        ".rts2_cache_es/"
+        ".rts2_cache_umd/"
+        ".node_repl_history"
+        "*.tgz"
+        ".yarn-integrity"
+        ".parcel-cache"
+        ".storybook-out"
+        "tmp/"
+        "temp/"
+        "*.swo"
+        "*~"
+      ];
+    };
 
   home = {
     # Wrapper sets system Chromium path before every playwright-cli invocation.
