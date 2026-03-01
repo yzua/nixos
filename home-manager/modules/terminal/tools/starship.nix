@@ -6,6 +6,7 @@
     enableZshIntegration = true;
 
     settings = {
+      scan_timeout = 200;
       format = "$directory$git_branch$git_status$nix_shell$python$nodejs$golang$rust$docker_context$cmd_duration$line_break$character";
       add_newline = false;
 
@@ -91,6 +92,8 @@
       gcloud.disabled = true;
       azure.disabled = true;
       package.disabled = true;
+      username.disabled = true;
+      hostname.disabled = true;
     };
   };
 }

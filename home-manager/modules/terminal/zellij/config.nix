@@ -28,7 +28,7 @@
       session_serialization = true;
       pane_viewport_serialization = true;
 
-      on_force_close = "detach";
+      on_force_close = "quit";
       show_startup_tips = false;
       show_release_notes = false;
     };
