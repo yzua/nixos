@@ -21,6 +21,9 @@
       };
     };
 
+    # Avoid noisy gkr-pam warnings on greetd auth attempts; keyring is started in user session.
+    security.pam.services.greetd.enableGnomeKeyring = lib.mkForce false;
+
     # Suppress duplicate login messages on tty1
     systemd.services.greetd.serviceConfig = {
       Type = "idle";
