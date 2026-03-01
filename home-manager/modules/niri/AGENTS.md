@@ -41,9 +41,7 @@ Window rules in `rules.nix` assign apps to workspaces by `app-id` regex.
 ## Keybinding Patterns
 
 ### Noctalia IPC Helper
-```nix
-noctalia = cmd: [ "noctalia-shell" "ipc" "call" ] ++ (lib.splitString " " cmd);
-```
+`binds.nix` defines a `noctalia` helper that shells out to `noctalia-shell ipc call`, auto-starts Noctalia if IPC is unavailable, then retries the command.
 Used for launcher, clipboard, notifications, lock/session controls, and other shell actions.
 **Tight coupling**: Changing Noctalia IPC protocol requires updating all `noctalia` calls in `binds.nix`.
 

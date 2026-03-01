@@ -18,10 +18,7 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 ## Noctalia IPC Protocol
 
 Niri binds communicate with Noctalia via IPC:
-```nix
-# In niri/binds.nix:
-noctalia = cmd: [ "noctalia-shell" "ipc" "call" ] ++ (lib.splitString " " cmd);
-```
+`home-manager/modules/niri/binds.nix` uses a `noctalia` helper that calls `noctalia-shell ipc call`, starts Noctalia if needed, and retries once.
 
 **Tight coupling**: Changing Noctalia IPC commands requires updating all `noctalia` calls in `niri/binds.nix`.
 
@@ -51,5 +48,5 @@ Displays Z.AI + Claude Max + Codex usage in the bar's right panel.
 ## Adding a Bar Widget
 
 1. Edit `bar.nix` — add to the appropriate panel (left, center, or right)
-2. If widget needs external data: create script, wrap with `pkgs.writeShellApplication`, reference in `default.nix`
+2. If widget needs external data: create script, wrap with `pkgs.writeShellScript`, reference in `default.nix`
 3. Run: `just home`

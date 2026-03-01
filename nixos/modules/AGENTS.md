@@ -12,7 +12,7 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 ### Core System
 | Module | Purpose | Custom Options |
 |--------|---------|----------------|
-| `bootloader.nix` | GRUB/systemd-boot configuration | None |
+| `bootloader.nix` | systemd-boot configuration | None |
 | `nix.nix` | Nix package manager settings (flakes, gc) | None |
 | `nh.nix` | Nix Helper — build tool wrapper | None |
 | `users.nix` | User accounts and permissions | None |
@@ -29,7 +29,7 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 ### Security & Privacy
 | Module | Purpose | Custom Options |
 |--------|---------|----------------|
-| `security/` | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | None (always-on, except `mySystem.auditLogging.enable` for fail2ban) |
+| `security/` | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | `mySystem.auditLogging.enable` (for fail2ban only; other security sub-modules are always-on) |
 | `sandboxing.nix` | Firejail, bubblewrap | `mySystem.sandboxing.*` |
 | `tor.nix` | Tor SOCKS proxy (9050/9150) | `mySystem.tor.enable` |
 | `mullvad-vpn.nix` | Mullvad VPN client | `mySystem.mullvadVpn.enable` |
@@ -48,7 +48,7 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 | `xdg-desktop-portal.nix` | XDG portals for Wayland | None |
 | `libinput.nix` | Touchpad/mouse input | None |
 | `upower.nix` | Power/battery monitoring | None |
-| `fwupd.nix` | Firmware updates (fwupd/LVFS) | None |
+| `fwupd.nix` | Firmware updates (fwupd/LVFS) | `mySystem.fwupd.enable` |
 | `printing.nix` | CUPS print services | `mySystem.printing.enable` |
 | `monitoring.nix` | Hardware sensors, vnStat, bandwhich | None |
 

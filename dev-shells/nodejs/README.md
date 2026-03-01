@@ -1,11 +1,11 @@
 # NodeJS
 
-This is a minimal template for JavasScript development with NodeJS.
+This is a minimal template for JavaScript/TypeScript development with Node.js.
 
 ## Initialization
 
 ```bash
-nix flake init -t "github:yzua/nixos/master?dir=dev-shells#nodejs"
+nix flake init -t "/home/yz/System/dev-shells#nodejs"
 ```
 
 ## Usage

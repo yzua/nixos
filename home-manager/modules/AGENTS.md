@@ -104,13 +104,12 @@ modules/
 
 ## Package Chunks (`../packages/`)
 
-Packages live separately from modules. Each chunk returns a list:
+Packages live separately from modules. Each chunk is a Home Manager module:
 ```nix
-# Each chunk signature:
-{ pkgs, pkgsStable }: [ ... ]
-
-# Aggregated in packages/default.nix:
-builtins.concatLists (map (f: import f { inherit pkgs pkgsStable; }) chunks)
+{ pkgs, ... }:
+{
+  home.packages = [ ... ];
+}
 ```
 
 11 domain chunks + 3 custom chunks: `applications`, `cli`, `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/gastown`, `custom/prayer`.
@@ -195,5 +194,5 @@ Read these when working in those areas.
 - `home.nix` receives `{ inputs, homeStateVersion, user, pkgsStable, constants, hostname }` via `extraSpecialArgs` from flake
 - `hostname` available for host-specific HM config
 - `constants` available from `shared/constants.nix` (terminal, editor, font, theme, keyboard, user identity)
-- Git identity (name, email, signingKey, githubEmail) lives in `constants.user.*` — used by `terminal/tools/git.nix`
+- Git identity (name, email, signingKey, githubEmail) lives in `constants.user.*` — used by `terminal/tools/git/config.nix`
 - HM modules are usually direct `programs.*`/`services.*` configs; only `programs.aiAgents.*` defines custom HM options

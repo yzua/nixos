@@ -7,12 +7,12 @@ This is a minimal template for Rust development on the stable channel.
 ## Initialization
 
 ```bash
-nix flake init -t "github:yzua/nixos/master?dir=dev-shells#rust-stable"
+nix flake init -t "/home/yz/System/dev-shells#rust-stable"
 ```
 
 ## Usage
 
-- `nix develop`: opens up a `bash` shell with the bare minimum Rust toolset (`cargo` & `rustc`) by default
+- `nix develop`: opens a shell with the stable Rust toolchain and related development tools
 - `nix build` : builds the Rust project. Outputs the binary to `./result/bin/<name>`
 - `nix run`: runs the Rust program.
 

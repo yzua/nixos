@@ -9,7 +9,8 @@ Flake-based NixOS + Home Manager config with Niri compositor (scrollable tiling 
 ### Prerequisites
 
 - NixOS installed with flakes enabled
-- Git, age key for secrets
+- `git`, `just`, and `nh` available in `PATH`
+- Age key for secrets (`~/.config/sops/age/keys.txt`)
 
 ### Step 1: Clone
 
@@ -51,7 +52,7 @@ Edit `shared/constants.nix` — this is the single source of truth for your pers
 ### Step 3: Set your username in `flake.nix`
 
 ```nix
-# flake.nix (line 52)
+# flake.nix
 user = "yourname";  # Must match constants.user.handle
 ```
 
@@ -157,6 +158,7 @@ All features toggle via `mySystem.*` options. Set `hostProfile` first, then over
 | `nvidia.enable` | NVIDIA GPU drivers, CUDA, Wayland |
 | `fwupd.enable` | Firmware updates (fwupd/LVFS) |
 | `gaming.enable` | Steam, Lutris, Wine, MangoHud |
+| `gaming.enableGamemode` | Feral GameMode performance daemon |
 | `gaming.enableGamescope` | Gamescope compositor for Steam |
 | `bluetooth.enable` | Bluetooth services |
 | `sandboxing.enable` | Firejail, bubblewrap |
@@ -247,7 +249,7 @@ home-manager/
     noctalia/                 # Noctalia Shell (bar, settings)
     neovim/                   # Neovim with LSP and plugins
     languages/                # Go, JS/TS, Python, LSP servers, Mise
-    terminal/                 # Ghostty, Zellij, Zsh, CLI tools (17), scripts
+    terminal/                 # Ghostty, Zellij, Zsh, CLI tools (16), scripts
     stylix.nix                # Gruvbox theming
   packages/                   # Domain chunks + custom packages (beads, gastown, prayer)
 scripts/                      # Utility scripts (ai, build, lib, sops, system)

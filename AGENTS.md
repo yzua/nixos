@@ -1,13 +1,14 @@
 # NixOS Configuration - Agent Guidelines
 
 Repository: Flake-based NixOS + Home Manager (active host: pc; dormant: laptop)
-Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck
+Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck + markdownlint
 Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox theming (stylix)
 
 Sub-directory `AGENTS.md` files exist at these locations with deeper module-level guidance. Read them when working in those areas:
 - `nixos/modules/` — NixOS module categories, option patterns, validation deps
 - `nixos/modules/security/` — Hardening values, always-on security modules
 - `home-manager/modules/` — HM module hierarchy, theming, config patterns
+- `home-manager/packages/` — HM package chunk taxonomy and helper patterns
 - `home-manager/modules/niri/` — Niri compositor keybindings, workspaces, window rules
 - `home-manager/modules/noctalia/` — Noctalia Shell bar, settings, Stylix-exempt theming
 - `home-manager/modules/apps/` — Application configs (VS Code, Brave, OBS, Discord, etc.)
@@ -51,7 +52,7 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 
 ### Secrets (sops-nix with age encryption)
 
-`just sops-view` (read-only) | `just sops-edit` (edit + auto encrypt/decrypt) | `just secrets-add key value`
+`just sops-view` (read-only) | `just sops-edit` (edit + auto encrypt/decrypt) | `just secrets-add <KEY>` (value is prompted securely)
 
 ---
 
@@ -163,7 +164,7 @@ flake.nix                             # Entry point, makeSystem factory
 
 - `pkgs` (nixpkgs unstable) — default for all apps
 - `pkgsStable` (nixos-25.11) — critical/stable tools only
-- Package chunks receive `{ pkgs, pkgsStable }` and return a list, aggregated via `builtins.concatLists`
+- Home Manager package chunks are modules imported via `home-manager/packages/default.nix`; each chunk sets `home.packages`
 - System packages: `environment.systemPackages` in NixOS modules
 - User packages: `home.packages` via `home-manager/packages/` chunks
 

@@ -86,7 +86,7 @@ services.nix (zsh aliases, systemd timers, packages)
 | `oracle` | Opus | Read-only consultant — architecture, debugging |
 | `librarian` | Sonnet | External reference search — docs, OSS |
 | `explore` | Haiku | Fast contextual grep — codebase patterns |
-| `multimodal-looker` | Gemini Flash | Visual content analysis — PDFs, images |
+| `multimodal-looker` | Sonnet | Visual content analysis — PDFs, images |
 | `prometheus` | Opus (max thinking) | Strategic planner with interview mode |
 | `metis` | Opus | Pre-planning analysis — hidden requirements |
 | `momus` | Opus | Plan reviewer — validates clarity |

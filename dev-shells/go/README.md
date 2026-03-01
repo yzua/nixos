@@ -5,7 +5,7 @@ Minimal Go development template with linting, debugging, and protobuf tooling.
 ## Initialization
 
 ```bash
-nix flake init -t "github:yzua/nixos/master?dir=dev-shells#go"
+nix flake init -t "/home/yz/System/dev-shells#go"
 ```
 
 ## Usage

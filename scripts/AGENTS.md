@@ -1,6 +1,6 @@
 # Utility Scripts
 
-20 Bash scripts across 5 categories + 1 shared library. All must pass `shellcheck` (enforced by `just lint`).
+20 Bash scripts across `ai/`, `build/`, `sops/`, `system/`, and root-level `scripts/`, plus one shared library in `lib/`. All must pass `shellcheck` (enforced by `just lint`).
 
 ---
 

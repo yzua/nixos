@@ -1,6 +1,6 @@
 # Application Configurations
 
-9 app config files + 2 subdirectory modules (VS Code, Brave). Each app gets one `.nix` file or subdirectory.
+10 app config files + 2 subdirectory modules (VS Code, Brave). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
@@ -10,6 +10,7 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 | File | App | Config Pattern |
 |------|-----|----------------|
 | `activitywatch.nix` | ActivityWatch | `services.activitywatch` + systemd service (Wayland) |
+| `desktop-entries.nix` | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries` |
 | `keepassxc.nix` | KeePassXC | Desktop entry + SSH agent socket |
 | `nautilus.nix` | GNOME Files | `dconf.settings` (preferences) |
 | `nixcord.nix` | Discord (Vesktop) | `programs.nixcord` (Vencord declarative plugins) |

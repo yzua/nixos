@@ -1,11 +1,11 @@
 # Deno
 
-This is a minimal template for JavasScript development with Deno.
+This is a minimal template for JavaScript/TypeScript development with Deno.
 
 ## Initialization
 
 ```bash
-nix flake init -t "github:yzua/nixos/master?dir=dev-shells#deno"
+nix flake init -t "/home/yz/System/dev-shells#deno"
 ```
 
 ## Usage

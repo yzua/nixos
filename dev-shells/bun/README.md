@@ -1,11 +1,11 @@
 # Bun
 
-This is a minimal template for JavasScript development with Bun.
+This is a minimal template for JavaScript/TypeScript development with Bun.
 
 ## Initialization
 
 ```bash
-nix flake init -t "github:yzua/nixos/master?dir=dev-shells#bun"
+nix flake init -t "/home/yz/System/dev-shells#bun"
 ```
 
 ## Usage
