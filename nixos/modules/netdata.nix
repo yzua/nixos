@@ -29,7 +29,7 @@
 
         web."enable gzip compression" = "yes";
         cloud."enabled" = "no";
-        logs."level" = "warning";
+        logs."level" = "error";
 
         # Disable plugins that fail or are unneeded on hardened NixOS desktop
         "plugin:ioping"."enabled" = "no";
@@ -42,6 +42,25 @@
       };
 
       enableAnalyticsReporting = false;
+
+      configDir = {
+        "health.d/timex.conf" = pkgs.writeText "netdata-timex.conf" ''
+                alarm: system_clock_sync_state
+                   on: system.clock_sync_state
+                class: Errors
+                 type: System
+            component: Clock
+          host labels: _os=linux
+                 calc: $state
+                units: synchronization state
+                every: 10s
+                 warn: $this != $this
+                delay: down 5m
+              summary: System clock sync state
+                 info: When set to 0, the system kernel believes the system clock is not properly synchronized to a reliable server
+                   to: silent
+        '';
+      };
     };
 
     users.users.netdata.extraGroups = [

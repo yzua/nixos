@@ -67,6 +67,9 @@ in
           enable = true;
           listenAddress = "127.0.0.1";
           port = 9093;
+          extraFlags = [
+            "--cluster.listen-address="
+          ];
 
           # Route all alerts via alertmanager-ntfy bridge → ntfy.sh
           configuration = {
