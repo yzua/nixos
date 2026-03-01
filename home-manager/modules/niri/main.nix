@@ -40,6 +40,7 @@
 
     spawn-at-startup = [
       { argv = [ "${pkgs.xwayland-satellite}/bin/xwayland-satellite" ]; }
+      { argv = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
       { argv = [ "${pkgs.noctalia-shell}/bin/noctalia-shell" ]; }
       { argv = [ "${pkgs.keepassxc}/bin/keepassxc" ]; }
       { argv = [ "${pkgs.mullvad-vpn}/bin/mullvad-vpn" ]; }
