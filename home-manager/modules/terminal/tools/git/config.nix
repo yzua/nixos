@@ -1,16 +1,11 @@
 # Git settings, aliases, conditional includes, and global ignores.
 
 {
-  pkgsStable,
   constants,
   ...
 }:
 
 {
-  home.packages = [
-    pkgsStable.git-interactive-rebase-tool # Better interactive rebase UI
-  ];
-
   programs = {
     difftastic = {
       enable = true;
