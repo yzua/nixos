@@ -1,10 +1,9 @@
 # Loki log aggregation with Promtail (localhost:3100).
-{
-  config,
-  lib,
-  ...
-}:
+{ config, lib, ... }:
 
+let
+  inherit (import ./_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
+in
 {
   options.mySystem.loki = {
     enable = lib.mkEnableOption "Loki log aggregation";
@@ -125,27 +124,21 @@
         loki.serviceConfig = {
           MemoryMax = "256M";
           MemoryHigh = "192M";
-          PrivateTmp = lib.mkForce true;
-          ProtectSystem = lib.mkForce "strict"; # Upstream sets "full"; we want stricter
-          ProtectHome = lib.mkForce true;
-          NoNewPrivileges = lib.mkForce true;
-          ProtectKernelTunables = lib.mkForce true;
-          ProtectControlGroups = lib.mkForce true;
-          RestrictSUIDSGID = lib.mkForce true;
-          ReadWritePaths = [ "/var/lib/loki" ];
+        }
+        // mkOneshotHardening {
+          readWritePaths = [ "/var/lib/loki" ];
+          protectHome = true;
+          useMkForce = true;
         };
 
         promtail.serviceConfig = {
           MemoryMax = "128M";
           MemoryHigh = "64M";
-          PrivateTmp = lib.mkForce true;
-          ProtectSystem = lib.mkForce "strict";
-          ProtectHome = lib.mkForce true;
-          NoNewPrivileges = lib.mkForce true;
-          ProtectKernelTunables = lib.mkForce true;
-          ProtectControlGroups = lib.mkForce true;
-          RestrictSUIDSGID = lib.mkForce true;
-          ReadWritePaths = [ "/var/lib/promtail" ];
+        }
+        // mkOneshotHardening {
+          readWritePaths = [ "/var/lib/promtail" ];
+          protectHome = true;
+          useMkForce = true;
         };
       };
 

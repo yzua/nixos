@@ -8,7 +8,12 @@
 }:
 
 let
+  inherit (import ./_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
+
   cfg = config.mySystem.systemReport;
+
+  # Standard hardening for system-report services
+  reportHardening = mkOneshotHardening { readWritePaths = [ cfg.outputDir ]; };
 
   featureFlags = {
     HAS_PROMETHEUS = lib.boolToString config.mySystem.observability.enable;
@@ -75,16 +80,8 @@ in
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${reportScriptBase}/bin/system-report errors";
-            # SECURITY: Systemd hardening directives
-            PrivateTmp = true;
-            ProtectSystem = "strict";
-            ProtectHome = "read-only";
-            NoNewPrivileges = true;
-            ProtectKernelTunables = true;
-            ProtectControlGroups = true;
-            RestrictSUIDSGID = true;
-            ReadWritePaths = [ cfg.outputDir ];
-          };
+          }
+          // reportHardening;
         };
 
         system-report-full = {
@@ -92,16 +89,8 @@ in
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${reportScriptBase}/bin/system-report full";
-            # SECURITY: Systemd hardening directives
-            PrivateTmp = true;
-            ProtectSystem = "strict";
-            ProtectHome = "read-only";
-            NoNewPrivileges = true;
-            ProtectKernelTunables = true;
-            ProtectControlGroups = true;
-            RestrictSUIDSGID = true;
-            ReadWritePaths = [ cfg.outputDir ];
-          };
+          }
+          // reportHardening;
         };
 
         system-report-cleanup = {
@@ -109,16 +98,8 @@ in
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${pkgs.findutils}/bin/find ${cfg.outputDir}/history -type f -mtime +${toString cfg.retentionDays} -delete";
-            # SECURITY: Systemd hardening directives
-            PrivateTmp = true;
-            ProtectSystem = "strict";
-            ProtectHome = "read-only";
-            NoNewPrivileges = true;
-            ProtectKernelTunables = true;
-            ProtectControlGroups = true;
-            RestrictSUIDSGID = true;
-            ReadWritePaths = [ cfg.outputDir ];
-          };
+          }
+          // reportHardening;
         };
       };
 
