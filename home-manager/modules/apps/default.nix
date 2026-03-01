@@ -1,6 +1,7 @@
 # Application configuration modules.
 {
   imports = [
+    ./desktop-entries.nix # Desktop entries and Element keyring wrapper script
     ./keepassxc.nix # KeePassXC desktop entry (binary is firejail-wrapped)
     ./obs.nix # OBS Studio with CUDA and plugins
     ./syncthing.nix # Syncthing local file sync

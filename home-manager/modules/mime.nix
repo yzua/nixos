@@ -20,6 +20,7 @@ let
     pdf = [ "org.pwmt.zathura.desktop" ]; # PDF viewer
     terminal = [ "${constants.terminalAppId}.desktop" ]; # Terminal emulator
     archive = [ "org.gnome.Nautilus.desktop" ]; # Nautilus handles archives via file-roller
+    matrix = [ "element-desktop.desktop" ]; # Matrix/Element protocol links
   };
 
   # MIME type mappings - maps file categories to specific MIME types
@@ -73,6 +74,13 @@ let
       "x-scheme-handler/http" # HTTP URLs
       "x-scheme-handler/https" # HTTPS URLs
       "x-scheme-handler/unknown" # Unknown schemes
+    ];
+
+    # Matrix/Element URL schemes
+    matrix = [
+      "x-scheme-handler/element" # Element deep links
+      "x-scheme-handler/io.element.desktop" # Element SSO callback links
+      "x-scheme-handler/matrix" # Matrix protocol links
     ];
 
     # Office document formats

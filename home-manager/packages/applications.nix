@@ -12,6 +12,7 @@ in
 {
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
+    pkgs.element-desktop
     pkgs.localsend
     pkgs.pear-desktop
     pkgsStable.keepassxc
