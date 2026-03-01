@@ -29,7 +29,7 @@
       enable = true;
       max-scroll-amount = "0%";
     };
-    warp-mouse-to-focus.enable = true;
+    warp-mouse-to-focus.enable = false;
     workspace-auto-back-and-forth = true;
   };
 }
