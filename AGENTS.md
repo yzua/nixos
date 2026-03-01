@@ -7,7 +7,10 @@ Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox
 Sub-directory `AGENTS.md` files exist at these locations with deeper module-level guidance. Read them when working in those areas:
 - `nixos/modules/` — NixOS module categories, option patterns, validation deps
 - `nixos/modules/security/` — Hardening values, always-on security modules
+- `nixos/modules/cleanup/` — Cleanup timer helper pattern and retention policy modules
+- `nixos/modules/prometheus-grafana/` — Observability stack wiring, alert rules, dashboards
 - `home-manager/modules/` — HM module hierarchy, theming, config patterns
+- `home-manager/modules/languages/` — Language toolchains, aliases, env/session wiring
 - `home-manager/packages/` — HM package chunk taxonomy and helper patterns
 - `home-manager/modules/niri/` — Niri compositor keybindings, workspaces, window rules
 - `home-manager/modules/noctalia/` — Noctalia Shell bar, settings, Stylix-exempt theming
@@ -15,7 +18,9 @@ Sub-directory `AGENTS.md` files exist at these locations with deeper module-leve
 - `home-manager/modules/ai-agents/` — Multi-agent orchestration (Claude Code, OpenCode, Codex, Gemini)
 - `home-manager/modules/terminal/` — Shell, terminal, CLI tools, one-per-tool pattern
 - `hosts/` — Host comparison, adding new hosts
+- `hosts/laptop/modules/` — ThinkPad-specific power, thermal, and Optimus modules
 - `scripts/` — Shell script conventions, shared logging, script inventory
+- `scripts/system/` — System report collectors, helpers, and test conventions
 - `dev-shells/` — Per-language dev environment templates
 
 ---
