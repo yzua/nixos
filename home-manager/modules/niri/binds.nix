@@ -85,7 +85,7 @@ in
     "Mod+Ctrl+End".action.move-column-to-last = [ ];
 
     "Mod+Ctrl+L".action.spawn = noctalia "lockScreen lock";
-    "Mod+Shift+R".action.spawn = [ "${pkgs.nautilus}/bin/nautilus" ];
+    "Mod+Shift+R".action.spawn = [ "/run/current-system/sw/bin/nautilus" ];
     "Mod+B".action.spawn = [ "/run/current-system/sw/bin/brave" ];
     "Mod+E".action.spawn = [
       "${pkgsStable.bemoji}/bin/bemoji"

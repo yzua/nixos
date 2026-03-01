@@ -48,7 +48,9 @@
         enable = true;
         package = pkgsStable.gvfs;
       };
-      tumbler.enable = true;
+      # Disabled due persistent DBus service-name mismatch warnings from tumbler
+      # (org.xfce.Tumbler.* vs org.freedesktop.thumbnails.*) in user journals.
+      tumbler.enable = false;
       udisks2.enable = true;
     };
 

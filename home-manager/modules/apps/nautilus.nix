@@ -8,6 +8,7 @@
     text = ''
       file:///home/${config.home.username}/Documents
       file:///home/${config.home.username}/Pictures
+      file:///home/${config.home.username}/Screens
       file:///home/${config.home.username}/Videos
       file:///home/${config.home.username}/Music
       file:///home/${config.home.username}/Downloads
