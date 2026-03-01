@@ -114,38 +114,6 @@ in
         '';
       })
 
-      # === Gastown Configuration ===
-      (lib.mkIf cfg.gastown.enable {
-        "gt/settings/config.json" = {
-          text = toJSON {
-            type = "town-settings";
-            version = 1;
-            default_agent = "zai-claude";
-            agents = {
-              zai-claude = {
-                command = "claude";
-                args = [ "--dangerously-skip-permissions" ];
-                env = {
-                  ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic";
-                  ANTHROPIC_AUTH_TOKEN = "__ZAI_KEY_PLACEHOLDER__";
-                  ANTHROPIC_DEFAULT_HAIKU_MODEL = "glm-5";
-                  ANTHROPIC_DEFAULT_SONNET_MODEL = "glm-5";
-                  ANTHROPIC_DEFAULT_OPUS_MODEL = "glm-5";
-                };
-                prompt_mode = "arg";
-              };
-            };
-            role_agents = {
-              polecat = "zai-claude";
-              witness = "zai-claude";
-              refinery = "zai-claude";
-              crew = "zai-claude";
-            };
-          };
-          force = true;
-        };
-      })
-
       # === Gemini Files (Settings, Commands, Skills) ===
       (lib.mkIf cfg.gemini.enable {
         ".gemini/settings.json" = {

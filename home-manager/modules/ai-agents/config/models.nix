@@ -144,11 +144,6 @@
       };
     };
 
-    # === Gastown Configuration ===
-    gastown = {
-      enable = true;
-    };
-
     # === Codex Configuration ===
     codex = {
       enable = true;
