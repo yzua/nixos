@@ -11,7 +11,6 @@
     ];
 
     sessionVariables = {
-      GDK_DEBUG = "none";
       NO_AT_BRIDGE = "1";
     };
   };

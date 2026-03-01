@@ -13,6 +13,7 @@
   mySystem = {
     hostInfo.enable = true;
     hostProfile = "desktop";
+    kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.
     netdata.enable = true;
     vnc.enable = true;
   };
