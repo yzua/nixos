@@ -21,10 +21,25 @@
     '';
   };
 
+  home.file.".local/bin/telegram-desktop-quiet" = {
+    executable = true;
+    text = ''
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      log_file="''${XDG_STATE_HOME:-$HOME/.local/state}/telegram-desktop.log"
+      mkdir -p "$(dirname "$log_file")"
+
+      # Telegram currently emits frequent Qt paint warnings on Wayland.
+      # Keep a local log file while avoiding user-journal spam.
+      exec /run/current-system/sw/bin/telegram-desktop "$@" >> "$log_file" 2>&1
+    '';
+  };
+
   xdg.desktopEntries = {
     "org.telegram.desktop" = {
       name = "Telegram Desktop";
-      exec = "/run/current-system/sw/bin/telegram-desktop -- %U";
+      exec = "/home/${user}/.local/bin/telegram-desktop-quiet -- %U";
       icon = "telegram";
       comment = "Official Telegram Desktop client (firejail-wrapped)";
       categories = [
