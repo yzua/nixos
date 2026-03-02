@@ -164,6 +164,8 @@ All features toggle via `mySystem.*` options. Set `hostProfile` first, then over
 | `sandboxing.enable` | Firejail, bubblewrap |
 | `mullvadVpn.enable` | Mullvad VPN |
 | `tor.enable` | Tor SOCKS proxy |
+| `yggdrasil.enable` | Yggdrasil encrypted mesh overlay network |
+| `i2pd.enable` | I2PD anonymous network router |
 | `dnscryptProxy.enable` | Encrypted DNS with DNSSEC |
 | `virtualisation.enable` | Docker, libvirt/QEMU |
 | `flatpak.enable` | Flatpak + Flathub |
@@ -186,7 +188,28 @@ All features toggle via `mySystem.*` options. Set `hostProfile` first, then over
 | `kdeconnect.enable` | KDE Connect phone integration |
 | `vnc.enable` | VNC remote access (x11vnc, noVNC, websockify) |
 
-Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Shared defaults include `backup.enable = false` and `vnc.enable = false` unless overridden per host.
+Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Shared defaults include `backup.enable = false`, `i2pd.enable = false`, `yggdrasil.enable = false`, and `vnc.enable = false` unless overridden per host.
+
+### I2PD quick setup
+
+```nix
+mySystem.i2pd = {
+  enable = true;
+  notransit = true;
+  port = 12345;      # required when openFirewall = true
+  openFirewall = true;
+  # bandwidth = 128; # optional KB/s cap
+};
+```
+
+I2PD local endpoints after enable:
+
+| Service | URL/Port | Notes |
+|---------|----------|-------|
+| Web console | `<http://127.0.0.1:7070>` | Local dashboard/UI |
+| HTTP proxy | `<http://127.0.0.1:4444>` | Browser/CLI proxy for `.i2p` |
+| SOCKS proxy | 127.0.0.1:4447 | SOCKS5 proxy endpoint |
+| I2P transport | `mySystem.i2pd.port` | External router port; only opened when `openFirewall = true` |
 
 ---
 
@@ -194,7 +217,7 @@ Desktop profile enables gaming + Gamescope. Laptop enables bluetooth. Shared def
 
 Always-on (no toggle): kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, AIDE file integrity monitoring.
 
-Toggleable: Firejail sandboxing, Mullvad VPN, Tor, DNSCrypt, OpenSnitch firewall, fail2ban audit logging.
+Toggleable: Firejail sandboxing, Mullvad VPN, Tor, Yggdrasil mesh overlay, DNSCrypt, OpenSnitch firewall, fail2ban audit logging.
 
 ---
 
@@ -207,6 +230,9 @@ All local, no cloud. Toggle each via `mySystem.*`:
 | Netdata | localhost:19999 | Real-time system metrics |
 | Scrutiny | localhost:8080 | SMART disk health |
 | Glance | localhost:8082 | Dashboard (services, RSS, crypto) |
+| I2PD Webconsole | localhost:7070 | I2P router web UI |
+| I2PD HTTP Proxy | localhost:4444 | Proxy endpoint for `.i2p` browsing |
+| Tor SOCKS | localhost:9050 | SOCKS proxy (no HTTP UI) |
 | Grafana | localhost:3001 | Custom dashboards |
 | Prometheus | localhost:9090 | Metrics/alerting |
 | Loki | — | Log aggregation with Promtail |
@@ -238,6 +264,7 @@ nixos/modules/                # Shared system modules (50+ imports including sub
   prometheus-grafana/         # Prometheus + Alertmanager + Grafana stack
   host-defaults.nix           # Profile defaults (desktop/laptop)
   host-info.nix               # Hostname + stateVersion management
+  yggdrasil.nix               # Encrypted IPv6 mesh overlay networking
   validation.nix              # Cross-module conflict assertions
   ...                         # One module per subsystem
 home-manager/
