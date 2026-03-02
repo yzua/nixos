@@ -180,6 +180,7 @@ For subdirectory modules (e.g., new tool in `terminal/tools/`):
 
 More detailed module-level guidance exists at:
 - `ai-agents/AGENTS.md` — Multi-agent architecture, profile variants, activation, hooks
+- `neovim/AGENTS.md` — Neovim module boundaries, Lua/plugin wiring patterns
 - `terminal/AGENTS.md` — Shell, multiplexer, CLI tools, one-per-tool pattern
 - `niri/AGENTS.md` — Compositor keybindings, workspaces, window rules
 - `noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
