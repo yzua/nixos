@@ -1,6 +1,6 @@
 # Host Configurations
 
-Active host: `pc`. Dormant host: `laptop` (commented out in `flake.nix`, kept for future use).
+Active host: `desktop`. Dormant host: `laptop` (commented out in `flake.nix`, kept for future use).
 
 Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defaults.nix`) and overrides specific options as needed.
 
@@ -8,7 +8,7 @@ Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defa
 
 ## Host Comparison
 
-| Setting | pc (desktop) | laptop (dormant) |
+| Setting | desktop | laptop (dormant) |
 |---------|-------------|-------------------|
 | Gaming | enabled + Gamescope | disabled |
 | Bluetooth | disabled | enabled (manual start) |
@@ -19,7 +19,7 @@ Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defa
 | Sandboxing | enabled | enabled |
 | Privacy stack | full (VPN, Tor, DNS, MAC) | full (VPN, Tor, DNS, MAC) |
 | VNC remote access | enabled | — |
-| KDE Connect | enabled | enabled |
+| KDE Connect | disabled (overridden in host config) | enabled |
 
 ---
 
@@ -40,7 +40,7 @@ hosts/<hostname>/
 
 ### Laptop modules
 - `boot.nix` — Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)
-- `nvidia.nix` — Optimus offload mode (bus IDs from flake, fine-grained power mgmt)
+- `nvidia.nix` — Optimus offload mode (`mySystem.nvidia.*` bus IDs from laptop module options), fine-grained power mgmt
 - `power.nix` — Disables power-profiles-daemon, loads laptop kernel modules (thinkpad_acpi, tp_smapi)
 - `tlp.nix` — Battery thresholds (75-80%), CPU governor, WiFi power saving
 - `thermal.nix` — thermald for Intel DPTF thermal zone management
@@ -49,20 +49,20 @@ hosts/<hostname>/
 
 ## Host-Specific Options
 
-Laptop defines extra options not used by pc:
+Laptop defines extra options not used by desktop:
 ```nix
 mySystem.nvidia.intelBusId    # PCI bus ID for Intel GPU
 mySystem.nvidia.nvidiaBusId   # PCI bus ID for NVIDIA GPU
 mySystem.laptop.battery.startChargeThreshold  # Default: 75
 mySystem.laptop.battery.stopChargeThreshold   # Default: 80
 ```
-Bus IDs are defined as `mySystem.nvidia.*` mkOption in `hosts/laptop/modules/nvidia.nix` and set in the laptop's `configuration.nix`.
+Bus IDs are defined as `mySystem.nvidia.*` options in `hosts/laptop/modules/nvidia.nix` and can be overridden in the laptop's `configuration.nix`.
 
 ---
 
 ## Adding a New Host
 
-1. Copy existing host: `cp -r hosts/pc hosts/<new-hostname>`
+1. Copy existing host: `cp -r hosts/desktop hosts/<new-hostname>`
 2. Replace `hardware-configuration.nix` from target machine (`/etc/nixos/`)
 3. Add to `hosts` list in `flake.nix` with `hostname` and `stateVersion`
 4. Adjust `mySystem.*` options in `configuration.nix` for hardware

@@ -53,7 +53,7 @@
 
       hosts = [
         {
-          hostname = "pc";
+          hostname = "desktop";
           stateVersion = "25.11";
         }
         # {
