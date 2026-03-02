@@ -30,17 +30,6 @@
         url = "https://api.z.ai/api/mcp/zread/mcp";
       };
 
-      playwright = {
-        enable = true;
-        command = "bunx";
-        args = [
-          "@playwright/mcp@0.0.68"
-          "--headless"
-          "--browser"
-          "chromium"
-        ];
-      };
-
       cloudflare-docs = {
         enable = true;
         type = "remote";

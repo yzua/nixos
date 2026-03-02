@@ -103,7 +103,6 @@
         mcp = {
           allowed = [
             "context7"
-            "playwright"
             "cloudflare-docs"
             "github"
             "web-search-prime"
