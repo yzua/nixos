@@ -12,7 +12,7 @@ let
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   sonnetModel = "anthropic/claude-sonnet-4-6";
   gptMainModel = "openai/gpt-5.3-codex";
-  gptStandardModel = "openai/gpt-5.3";
+  gptStandardModel = "openai/gpt-5.3-codex";
   gptFastModel = "opencode/gpt-5-nano";
 
   replaceOpusWithSonnet =
@@ -98,18 +98,18 @@ let
     atlas = "zai-coding-plan/glm-4.7";
   };
 
-  # Gemini profile: Google Antigravity models for Gemini-native coding sessions.
+  # Gemini profile: Google Gemini models for Gemini-native coding sessions.
   geminiAgentModels = {
-    sisyphus = "google/antigravity-gemini-3-pro";
-    oracle = "google/antigravity-gemini-3-pro";
-    librarian = "google/antigravity-gemini-3-flash";
-    explore = "google/antigravity-gemini-3-flash";
+    sisyphus = "google/gemini-2.5-pro";
+    oracle = "google/gemini-2.5-pro";
+    librarian = "google/gemini-2.5-flash";
+    explore = "google/gemini-2.5-flash";
     # multimodal-looker keeps its original vision-capable model
-    prometheus = "google/antigravity-gemini-3-pro";
-    metis = "google/antigravity-gemini-3-pro";
-    momus = "google/antigravity-gemini-3-pro";
-    atlas = "google/antigravity-gemini-3-flash";
-    hephaestus = "google/antigravity-gemini-3-pro";
+    prometheus = "google/gemini-2.5-pro";
+    metis = "google/gemini-2.5-pro";
+    momus = "google/gemini-2.5-pro";
+    atlas = "google/gemini-2.5-flash";
+    hephaestus = "google/gemini-2.5-pro";
   };
 
   # Variant overrides for Gemini agents (thinking levels per role).
@@ -184,9 +184,9 @@ let
     };
   };
 
-  # Gemini profile: Google Antigravity models for Gemini-native coding sessions.
+  # Gemini profile: Google Gemini models for Gemini-native coding sessions.
   geminiOpencodeSettings = opencodeSettings // {
-    model = "google/antigravity-gemini-3-pro";
+    model = "google/gemini-2.5-pro";
   };
 
   geminiOhMyOpencodeSettings = ohMyOpencodeSettings // {
@@ -201,36 +201,36 @@ let
       })
     ) ohMyOpencodeSettings.agents;
 
-    # Override category models to use Gemini Antigravity instead of default providers
+    # Override category models to use Gemini instead of default providers
     categories = {
       "visual-engineering" = {
-        model = "google/antigravity-gemini-3-pro";
+        model = "google/gemini-2.5-pro";
       };
       ultrabrain = {
-        model = "google/antigravity-gemini-3-pro";
+        model = "google/gemini-2.5-pro";
         variant = "high";
       };
       deep = {
-        model = "google/antigravity-gemini-3-pro";
+        model = "google/gemini-2.5-pro";
         variant = "high";
       };
       artistry = {
-        model = "google/antigravity-gemini-3-pro";
+        model = "google/gemini-2.5-pro";
       };
       quick = {
-        model = "google/antigravity-gemini-3-flash";
+        model = "google/gemini-2.5-flash";
         variant = "minimal";
       };
       "unspecified-low" = {
-        model = "google/antigravity-gemini-3-flash";
+        model = "google/gemini-2.5-flash";
         variant = "medium";
       };
       "unspecified-high" = {
-        model = "google/antigravity-gemini-3-pro";
+        model = "google/gemini-2.5-pro";
         variant = "high";
       };
       writing = {
-        model = "google/antigravity-gemini-3-flash";
+        model = "google/gemini-2.5-flash";
         variant = "medium";
       };
     };

@@ -93,14 +93,14 @@ _:
             modelConcurrency = {
               "anthropic/claude-opus-4-6" = 2; # Expensive — limit hard
               "anthropic/claude-haiku-4-5" = 8; # Cheap — allow many
-              "google/antigravity-gemini-3-flash" = 10; # Cheap — allow many
+              "google/gemini-2.5-flash" = 10; # Cheap — allow many
             };
           };
 
           # === Category Model Assignments ===
           categories = {
             "visual-engineering" = {
-              model = "google/antigravity-gemini-3-pro";
+              model = "google/gemini-2.5-pro";
             };
             ultrabrain = {
               model = "anthropic/claude-opus-4-6";
@@ -110,7 +110,7 @@ _:
               variant = "max";
             };
             artistry = {
-              model = "google/antigravity-gemini-3-pro";
+              model = "google/gemini-2.5-pro";
             };
             quick = {
               model = "anthropic/claude-haiku-4-5";
@@ -123,7 +123,7 @@ _:
               variant = "max";
             };
             writing = {
-              model = "google/antigravity-gemini-3-flash";
+              model = "google/gemini-2.5-flash";
             };
           };
 
