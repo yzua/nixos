@@ -31,6 +31,6 @@ nix fmt -- --fail-on-change --no-cache . 2>/dev/null || {
 }
 
 print_info "Evaluating flake..."
-nix flake check --no-build
+nix flake check --no-build path:.
 
 print_success "Pre-commit checks passed!"

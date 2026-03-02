@@ -38,7 +38,7 @@ dead:
 # Run nix flake check
 check:
     @echo -e "\n➤ Running nix flake check…"
-    @\time -f "⏱ Completed in %E" nix flake check --no-build
+    @\time -f "⏱ Completed in %E" nix flake check --no-build path:.
     @echo "✔ Flake check passed!"
 
 # Check all missing imports
@@ -49,12 +49,12 @@ modules:
 # Switch Home-Manager generation
 home:
     @echo -e "\n➤ Switching Home-Manager…"
-    nh home switch '.?submodules=1'
+    nh home switch 'path:.' --configuration yz@desktop
 
 # Switch NixOS generation
 nixos:
     @echo -e "\n➤ Rebuilding NixOS…"
-    nh os switch .
+    nh os switch 'path:.' --hostname desktop
 
 # All of the above, in order
 all:
@@ -126,7 +126,7 @@ sops-view:
 	@echo -e "\n➤ Viewing decrypted secrets…"
 	@nix run nixpkgs#sops -- --decrypt secrets/secrets.yaml
 
-# Add a single secret (reads value from stdin to avoid process list exposure)
+# Add a single secret (prompts securely to avoid process list exposure)
 secrets-add key:
 	@echo "{{key}}" | grep -qE '^[a-zA-Z_][a-zA-Z0-9_]*$$' || (echo "✗ Invalid key name. Use alphanumeric characters and underscores only." && exit 1)
 	@read -s -p "Enter secret value for '{{key}}': " VALUE && echo "" && \
