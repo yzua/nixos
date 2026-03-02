@@ -35,7 +35,7 @@ in
             for OPENCODE_CFG in ${opencodeConfigPathList}; do
               if [[ -f "$OPENCODE_CFG" ]]; then
                 ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                  .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key |
+                  (if .mcp["zai-mcp-server"] != null then .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key else . end) |
                   .mcp["web-search-prime"] = {
                     type: "remote",
                     url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
@@ -59,7 +59,7 @@ in
             CLAUDE_MCP="$HOME/.mcp.json"
             if [[ -f "$CLAUDE_MCP" ]]; then
               ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key |
+                (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
                 .mcpServers["web-search-prime"] = {
                   type: "http",
                   url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
@@ -92,7 +92,7 @@ in
             GEMINI_CFG="$HOME/.gemini/settings.json"
             if [[ -f "$GEMINI_CFG" ]]; then
               ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key |
+                (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
                 .mcpServers["web-search-prime"] = {
                   command: "echo",
                   args: [],
@@ -104,6 +104,13 @@ in
                   command: "echo",
                   args: [],
                   url: "https://api.z.ai/api/mcp/web_reader/mcp",
+                  headers: { Authorization: ("Bearer " + $key) },
+                  type: "http"
+                } |
+                .mcpServers["zread"] = {
+                  command: "echo",
+                  args: [],
+                  url: "https://api.z.ai/api/mcp/zread/mcp",
                   headers: { Authorization: ("Bearer " + $key) },
                   type: "http"
                 }
@@ -145,6 +152,7 @@ in
           else
             echo "⚠ gh CLI not authenticated - GitHub MCP will not work (run 'gh auth login')"
           fi
+
         ''
       );
 

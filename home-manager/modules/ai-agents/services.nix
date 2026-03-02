@@ -32,6 +32,11 @@ let
       workflowPromptMode = "positional";
     }
     {
+      alias = "clu";
+      command = "claude --dangerously-skip-permissions";
+      workflowPromptMode = "positional";
+    }
+    {
       alias = "clglm";
       command = "claude_glm";
       workflowPromptMode = "positional";
@@ -42,6 +47,11 @@ let
     }
     {
       alias = "cx";
+      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
+      workflowPromptMode = "positional";
+    }
+    {
+      alias = "cxu";
       command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
       workflowPromptMode = "positional";
     }
@@ -123,8 +133,12 @@ in
               "gemini-log" = "ai-agent-log-wrapper gemini gemini";
 
               "ai-logs" = "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null";
+              "ai-errors-all" =
+                "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -100";
               "ai-errors" =
-                "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -50";
+                "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | grep -vi 'Method not found: prompts/list\\|Method not found: resources/list\\|Method not found failed to get prompts' | tail -50";
+              "ai-errors-runtime" =
+                "grep -rn --color=always -i 'not connected failed to get prompts\\|EIO: i/o error\\|setRawMode failed\\|tui bootstrap failed\\|bun info failed' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -50";
 
               "ai-stats" = "ai-agent-analyze stats";
               "ai-report" = "ai-agent-analyze report";
@@ -135,7 +149,10 @@ in
         )
         // aiAliases
         // {
-          "ai-mcp-scan" = "uvx mcp-scan@latest --skills";
+          "ai-mcp-scan" =
+            "echo 'mcp-scan package is unavailable; running health checks instead' && ai-mcp-health";
+          "ai-mcp-health" =
+            "(command -v node >/dev/null && command -v bun >/dev/null && command -v bunx >/dev/null && command -v uvx >/dev/null && gh auth status >/dev/null 2>&1 && [ -f ~/.mcp.json ] && jq -e . ~/.mcp.json >/dev/null && ! grep -q '__GITHUB_TOKEN_PLACEHOLDER__' ~/.mcp.json && echo 'MCP health: ok') || (echo 'MCP health: check failed' && false)";
         };
     in
     {

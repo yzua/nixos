@@ -1,20 +1,15 @@
 # MCP server definitions and logging configuration.
-{ config, pkgs, ... }:
+{ config, ... }:
 
 {
   programs.aiAgents = {
     mcpServers = {
       context7 = {
         enable = true;
-        command = "${config.home.homeDirectory}/.bun/bin/context7-mcp";
-      };
-
-      zai-mcp-server = {
-        enable = true;
-        command = "${config.home.homeDirectory}/.bun/bin/zai-mcp-server";
-        env = {
-          Z_AI_MODE = "ZAI";
-        };
+        command = "bunx";
+        args = [
+          "@upstash/context7-mcp@2.1.2"
+        ];
       };
 
       web-search-prime = {
@@ -23,10 +18,27 @@
         url = "https://api.z.ai/api/mcp/web_search_prime/mcp";
       };
 
-      filesystem = {
+      web-reader = {
         enable = true;
-        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-filesystem";
-        args = [ config.home.homeDirectory ];
+        type = "remote";
+        url = "https://api.z.ai/api/mcp/web_reader/mcp";
+      };
+
+      zread = {
+        enable = true;
+        type = "remote";
+        url = "https://api.z.ai/api/mcp/zread/mcp";
+      };
+
+      playwright = {
+        enable = true;
+        command = "bunx";
+        args = [
+          "@playwright/mcp@0.0.68"
+          "--headless"
+          "--browser"
+          "chromium"
+        ];
       };
 
       cloudflare-docs = {
@@ -37,11 +49,15 @@
 
       github = {
         enable = true;
-        command = "${config.home.homeDirectory}/.bun/bin/mcp-server-github";
+        command = "bunx";
+        args = [
+          "@modelcontextprotocol/server-github@2025.4.8"
+        ];
         env = {
           GITHUB_PERSONAL_ACCESS_TOKEN = "__GITHUB_TOKEN_PLACEHOLDER__"; # patched at activation via gh auth token
         };
       };
+
     };
 
     logging = {

@@ -79,6 +79,19 @@
         }
       ];
     }
+    {
+      matcher = ''tool == "Bash" && tool_input.command matches "(git push --force|git push -f|git reset --hard|git clean -fd)"'';
+      hooks = [
+        {
+          type = "command";
+          command = ''
+            echo "[Hook] BLOCKED: destructive git command requires explicit manual execution" >&2
+            echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
+            exit 1
+          '';
+        }
+      ];
+    }
   ];
 
   # --- Notification Hooks ---
