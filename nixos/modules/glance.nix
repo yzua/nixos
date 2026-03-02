@@ -202,6 +202,14 @@
                       "UC7YOGHUfC1Tb6E4pudI9STA"
                       # Vimjoyer
                       "UC_zBdZ0_H_jn41FDRG7q4Tw"
+                      # dacctal
+                      "UCTMiGZ6t4wry5sk7Cso2plQ"
+                      # Theo - t3.gg
+                      "UCbRP3c757lWg9M-U7TyEkXA"
+                      # Dylan Page
+                      "UCzPpbeK8ANcNKg5aoMB0miw"
+                      # Awesome
+                      "UCXzw-OdotBUcNA9yhuYQBwA"
                     ];
                   }
                 ];
