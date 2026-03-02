@@ -96,6 +96,10 @@ _:
       }
       {
         repo = "vercel-labs/agent-skills";
+        skill = "vercel-composition-patterns";
+      }
+      {
+        repo = "vercel-labs/agent-skills";
         skill = "security-review";
       }
       {
