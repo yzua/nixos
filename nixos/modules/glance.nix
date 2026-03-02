@@ -119,6 +119,11 @@
                     cache = "1m";
                     sites = [
                       {
+                        title = "Glance";
+                        url = "http://localhost:8082";
+                        icon = "mdi:view-dashboard-outline";
+                      }
+                      {
                         title = "Netdata";
                         url = "http://localhost:19999";
                         icon = "si:netdata";
@@ -134,9 +139,24 @@
                         icon = "si:prometheus";
                       }
                       {
+                        title = "Alertmanager";
+                        url = "http://localhost:9093";
+                        icon = "mdi:alert-outline";
+                      }
+                      {
                         title = "Scrutiny";
                         url = "http://localhost:8080";
                         icon = "mdi:harddisk";
+                      }
+                      {
+                        title = "I2PD Webconsole";
+                        url = "http://localhost:7070";
+                        icon = "mdi:router-network";
+                      }
+                      {
+                        title = "Syncthing";
+                        url = "http://localhost:8384";
+                        icon = "si:syncthing";
                       }
                       {
                         title = "ActivityWatch";
@@ -145,6 +165,9 @@
                       }
                     ];
                   }
+
+                  # NOTE: Tor exposes SOCKS/DNS ports (9050/9053), not an HTTP UI endpoint,
+                  # so it cannot be health-checked by Glance's HTTP monitor widget.
 
                   # Docker containers
                   {
