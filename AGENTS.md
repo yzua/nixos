@@ -1,6 +1,6 @@
 # NixOS Configuration - Agent Guidelines
 
-Repository: Flake-based NixOS + Home Manager (active host: pc; dormant: laptop)
+Repository: Flake-based NixOS + Home Manager (active host: desktop; dormant: laptop)
 Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck + markdownlint
 Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox theming (stylix)
 
@@ -31,8 +31,8 @@ Sub-directory `AGENTS.md` files exist at these locations with deeper module-leve
 
 ```bash
 just modules   # Validate default.nix imports match .nix files on disk (fastest)
-just lint      # statix + deadnix + shellcheck
-just dead      # deadnix only (subset of lint)
+just lint      # statix + deadnix + shellcheck + markdownlint + inline Nix-shell script checks
+just dead      # Optional targeted deadnix run (already included in just lint)
 just format    # nixfmt-tree via nix fmt
 just check     # nix flake check --no-build (evaluates flake without building)
 ```

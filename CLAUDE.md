@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-Flake-based NixOS + Home Manager personal system configuration. Hosts: `pc` (desktop). Niri compositor (scrollable tiling Wayland), Gruvbox theming via Stylix, extensive security hardening. Dormant `laptop` host available for future use.
+Flake-based NixOS + Home Manager personal system configuration. Hosts: `desktop`. Niri compositor (scrollable tiling Wayland), Gruvbox theming via Stylix, extensive security hardening. Dormant `laptop` host available for future use.
 
 ## Commands
 
@@ -47,7 +47,7 @@ Escalate: `just modules` (fastest) → `just check` (eval) → `just home` (user
 ```bash
 just sops-view          # View decrypted secrets (read-only)
 just sops-edit          # Edit secrets (auto encrypt/decrypt via RAM tmpfs)
-just secrets-add KEY    # Add single secret (reads value from stdin)
+just secrets-add KEY    # Add single secret (prompts securely for value)
 ```
 
 ## Architecture

@@ -59,9 +59,11 @@ user = "yourname";  # Must match constants.user.handle
 ### Step 4: Create your host
 
 ```bash
-cp -r hosts/pc hosts/<your-hostname>
+cp -r hosts/desktop hosts/<your-hostname>
 cp /etc/nixos/hardware-configuration.nix hosts/<your-hostname>/
 ```
+
+After copying, remove or replace machine-specific values inherited from `hosts/desktop/configuration.nix` (for example custom LUKS UUID entries) before first switch.
 
 ### Step 5: Configure your host
 
@@ -129,7 +131,7 @@ just all                 # Full pipeline: modules -> lint -> format -> check -> 
 | `just install-hooks` | Install pre-commit/pre-push git hooks |
 | `just sops-edit` | Edit encrypted secrets |
 | `just sops-view` | View decrypted secrets |
-| `just secrets-add KEY` | Add single secret (reads value from stdin) |
+| `just secrets-add KEY` | Add single secret (prompts securely for value) |
 | `just security-audit` | Systemd unit hardening + vulnix CVE scan |
 
 ### Development workflow
@@ -294,5 +296,5 @@ Uses `sops-nix` with age encryption. Private key at `~/.config/sops/age/keys.txt
 ```bash
 just sops-edit              # Edit secrets (auto encrypt/decrypt via RAM-backed tmpfs)
 just sops-view              # View decrypted (read-only)
-just secrets-add KEY        # Add single secret (reads value from stdin)
+just secrets-add KEY        # Add single secret (prompts securely for value)
 ```
