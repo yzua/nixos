@@ -26,6 +26,8 @@
       flatpak.enable = lib.mkDefault true;
       mullvadVpn.enable = lib.mkDefault true;
       tor.enable = lib.mkDefault true;
+      i2pd.enable = lib.mkDefault false;
+      yggdrasil.enable = lib.mkDefault false;
       dnscryptProxy.enable = lib.mkDefault true;
       printing.enable = lib.mkDefault true;
       virtualisation.enable = lib.mkDefault true;

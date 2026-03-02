@@ -33,6 +33,8 @@
     ./dnscrypt-proxy.nix # Encrypted DNS (DoH/DoT, DNSSEC)
     ./mullvad-vpn.nix # Mullvad VPN with hardened tunnel
     ./tor.nix # Tor SOCKS proxy and onion routing
+    ./yggdrasil.nix # Yggdrasil encrypted mesh overlay network
+    ./i2pd.nix # I2PD anonymous network router
 
     # Security
     ./security # Kernel hardening, firewall, AppArmor, opsec

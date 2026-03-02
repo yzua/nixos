@@ -67,7 +67,7 @@
         # Mullvad auto-disables it after repeated failures anyway. Re-enable on
         # unrestricted networks where direct WireGuard works.
         $mullvad tunnel set daita off
-        # Disable IPv6 in tunnel (matches networking.enableIPv6 = false)
+        # Disable IPv6 inside Mullvad tunnel (Yggdrasil can still use kernel IPv6 stack)
         $mullvad tunnel set ipv6 off
         # Rotate WireGuard keys every 24 hours for forward secrecy
         $mullvad tunnel set rotation-interval 24

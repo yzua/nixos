@@ -14,6 +14,8 @@
     hostInfo.enable = true;
     hostProfile = "desktop";
     kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.
+    i2pd.enable = true;
+    yggdrasil.enable = true;
     netdata.enable = true;
     vnc.enable = true;
   };
