@@ -1,11 +1,11 @@
 # Qt theming (Kvantum + Gruvbox).
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   qt = {
     enable = true;
     platformTheme.name = "qtct";
-    style.name = "kvantum";
+    style.name = lib.mkForce "fusion";
   };
 
   home.packages = with pkgs; [
@@ -16,8 +16,5 @@
     gruvbox-kvantum
   ];
 
-  xdg.configFile."Kvantum/kvantum.kvconfig".text = ''
-    [General]
-    theme=gruvbox-kvantum
-  '';
+  # Keep Kvantum packages installed, but use Fusion for squarer widgets.
 }
