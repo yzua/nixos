@@ -1,21 +1,17 @@
 # Noctalia Shell desktop environment.
 
 {
-  constants,
   inputs,
-  pkgs,
   ...
 }:
 
 let
-  apiQuotaScript = pkgs.writeShellScript "api-quota-widget" (
-    builtins.readFile ../../../scripts/ai/api-quota.sh
-  );
+  apiQuotaScript = "bash ${../../../scripts/ai}/api-quota.sh";
 in
 {
   imports = [
     inputs.noctalia.homeModules.default
-    (import ./bar.nix { inherit pkgs apiQuotaScript; })
+    (import ./bar.nix { inherit apiQuotaScript; })
     ./settings.nix
   ];
 

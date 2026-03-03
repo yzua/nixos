@@ -1,4 +1,4 @@
-{ pkgs, apiQuotaScript, ... }:
+{ apiQuotaScript, ... }:
 {
   programs.noctalia-shell.settings.bar = {
     position = "top";
@@ -55,24 +55,9 @@
         }
         {
           id = "Tray";
-          colorizeIcons = true;
+          colorizeIcons = false;
           drawerEnabled = false;
-          hidePassive = false;
-        }
-        {
-          id = "CustomButton";
-          icon = "shield-lock";
-          showIcon = true;
-          hideMode = "alwaysExpanded";
-          textCommand = "mullvad status | grep -oP '(Connected|Disconnected|Connecting)'";
-          textIntervalMs = 5000;
-          textCollapse = "Disconnected";
-          leftClickExec = "mullvad connect";
-          rightClickExec = "mullvad disconnect";
-          maxTextLength = {
-            horizontal = 12;
-            vertical = 6;
-          };
+          hidePassive = true;
         }
         {
           id = "CustomButton";
