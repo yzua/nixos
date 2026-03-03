@@ -21,7 +21,7 @@
       font-family-bold-italic = "JetBrainsMono Nerd Font";
       font-size = lib.mkForce constants.font.size;
       font-thicken = true;
-      adjust-cell-height = "10%";
+      adjust-cell-height = "0%";
 
       theme = "Gruvbox Dark"; # Fallback; Stylix handles theming
 

@@ -7,12 +7,12 @@
 
     settings = {
       scan_timeout = 200;
-      format = "$directory$git_branch$git_status$nix_shell$python$nodejs$golang$rust$docker_context$cmd_duration$line_break$character";
+      format = "$directory$git_branch$git_status$nix_shell$cmd_duration$line_break$character";
       add_newline = false;
 
       character = {
-        success_symbol = "[λ](bold green)";
-        error_symbol = "[λ](bold red)";
+        success_symbol = "[❯](bold green) ";
+        error_symbol = "[❯](bold red) ";
         vimcmd_symbol = "[](bold green)";
       };
 
@@ -21,33 +21,34 @@
         truncation_length = 3;
         truncate_to_repo = true;
         fish_style_pwd_dir_length = 1;
+        format = "[󰉋 $path]($style) ";
       };
 
       git_branch = {
-        symbol = " ";
+        symbol = " ";
         style = "bold cyan";
-        format = "[$symbol$branch]($style) ";
+        format = "[$symbol$branch]($style)";
       };
 
       git_status = {
         style = "bold yellow";
-        format = "[$all_status$ahead_behind]($style) ";
+        format = " [($all_status$ahead_behind)]($style)";
         conflicted = "=";
         ahead = "⇡\${count}";
         behind = "⇣\${count}";
         diverged = "⇕⇡\${ahead_count}⇣\${behind_count}";
         untracked = "?";
-        stashed = "\\$";
-        modified = "!";
+        stashed = "*";
+        modified = "~";
         staged = "+";
         renamed = "»";
         deleted = "✘";
       };
 
       nix_shell = {
-        symbol = " ";
+        symbol = " ";
         style = "bold blue";
-        format = "[$symbol$state]($style) ";
+        format = " [($symbol$state)]($style)";
         heuristic = true;
       };
 
@@ -85,7 +86,7 @@
       cmd_duration = {
         min_time = 2000;
         style = "bold yellow";
-        format = "[$duration]($style) ";
+        format = " [󱎫 $duration]($style)";
       };
 
       aws.disabled = true;
