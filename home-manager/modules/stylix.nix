@@ -34,6 +34,13 @@
     targets = {
       ghostty.enable = true;
       gtk.enable = true;
+      gtk.extraCss = ''
+        * {
+          border-radius: 0;
+          -gtk-outline-radius: 0;
+          box-shadow: none;
+        }
+      '';
       qt.enable = true;
       neovim.enable = true;
       zellij.enable = true;

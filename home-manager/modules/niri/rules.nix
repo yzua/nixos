@@ -3,7 +3,7 @@
 {
   programs.niri.settings.window-rules =
     let
-      r = 10.0; # Corner radius
+      r = 0.0; # Square corners
     in
     [
       {

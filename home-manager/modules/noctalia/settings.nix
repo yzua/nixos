@@ -19,16 +19,38 @@
 
     notifications = {
       location = "top_right";
+      backgroundOpacity = 0.96;
+      respectExpireTimeout = true;
+      lowUrgencyDuration = 3;
+      normalUrgencyDuration = 6;
+      criticalUrgencyDuration = 10;
     };
 
     general = {
       compactLockScreen = false;
       showChangelogOnStartup = false;
       dimmerOpacity = 0.57;
+      enableShadows = false;
+      radiusRatio = 0;
+      iRadiusRatio = 0.35;
+      boxRadiusRatio = 0;
+      screenRadiusRatio = 0;
     };
 
     ui = {
       panelBackgroundOpacity = 1;
+    };
+
+    bar = {
+      density = "compact";
+      showOutline = false;
+      showCapsule = false;
+      backgroundOpacity = 1;
+      marginVertical = 0;
+      marginHorizontal = 0;
+      frameThickness = 0;
+      frameRadius = 0;
+      outerCorners = false;
     };
 
     appLauncher = {
