@@ -8,7 +8,7 @@
 }:
 
 let
-  optionHelpers = import ./_option-helpers.nix { inherit lib; };
+  optionHelpers = import ./helpers/_option-helpers.nix { inherit lib; };
   inherit (optionHelpers) mkBoolOption;
 in
 

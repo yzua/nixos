@@ -8,7 +8,7 @@
 }:
 
 let
-  inherit (import ./_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
 
   cfg = config.mySystem.systemReport;
 
