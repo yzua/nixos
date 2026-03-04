@@ -57,7 +57,7 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 |--------|---------|----------------|
 | `netdata.nix` | Real-time system monitoring dashboard | `mySystem.netdata.enable` |
 | `scrutiny.nix` | SMART disk health monitoring | `mySystem.scrutiny.enable` |
-| `glance.nix` | Minimal dashboard with Gruvbox theme (localhost:8082) | `mySystem.glance.enable` |
+| `glance/` | Minimal dashboard with Gruvbox theme (localhost:8082) | `mySystem.glance.enable` |
 | `opensnitch.nix` | Application firewall with network logging | `mySystem.opensnitch.enable` |
 | `loki.nix` | Loki log aggregation with Promtail | `mySystem.loki.enable` |
 | `prometheus-grafana/` | Prometheus + Alertmanager + Grafana stack (includes JSON dashboards) | `mySystem.observability.enable` |

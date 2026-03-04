@@ -63,7 +63,7 @@
     ./monitoring.nix # Sensors, vnStat, bandwhich
     ./netdata.nix # Real-time system monitoring dashboard
     ./scrutiny.nix # SMART disk health monitoring
-    ./glance.nix # Self-hosted dashboard
+    ./glance # Self-hosted dashboard
     ./loki.nix # Loki log aggregation with Promtail
     ./prometheus-grafana # Prometheus + Alertmanager + Grafana observability
     ./system-report.nix # Unified system health reporting

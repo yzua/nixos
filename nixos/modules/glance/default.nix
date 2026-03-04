@@ -117,7 +117,7 @@
                     type = "monitor";
                     title = "Services";
                     cache = "1m";
-                    sites = import ./_glance-service-sites.nix;
+                    sites = import ./_service-sites.nix;
                   }
 
                   # NOTE: Tor exposes SOCKS/DNS ports (9050/9053), not an HTTP UI endpoint,
@@ -148,7 +148,7 @@
                     type = "videos";
                     title = "YouTube";
                     style = "grid-cards";
-                    channels = import ./_glance-youtube-channels.nix;
+                    channels = import ./_youtube-channels.nix;
                   }
                 ];
               }
