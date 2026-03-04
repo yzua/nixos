@@ -107,8 +107,9 @@ parse_manual_helpers() {
 		{
 			line = $0
 			lower_line = tolower(line)
+			is_manual = (line ~ /#/ && (lower_line ~ /modules-check:[[:space:]]*manual-helper/ || lower_line ~ /imported manually/))
 
-			if (line ~ /#/ && lower_line ~ /imported manually/) {
+			if (is_manual) {
 				while (match(line, /\.\/[[:alnum:]_./-]+\.nix/)) {
 					path = substr(line, RSTART + 2, RLENGTH - 2)
 					sub(/^.*\//, "", path)
@@ -127,7 +128,7 @@ main() {
 	local -a defaults=()
 	mapfile -t defaults < <(find . -type f -name default.nix | sort)
 
-	if (( ${#defaults[@]} == 0 )); then
+	if ((${#defaults[@]} == 0)); then
 		print_warning "No default.nix files found." >&2
 		return 0
 	fi

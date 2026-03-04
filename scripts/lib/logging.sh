@@ -8,56 +8,70 @@ readonly YELLOW='\033[1;33m'
 readonly BLUE='\033[0;34m'
 readonly NC='\033[0m'
 
+print_colored() {
+	local color="$1"
+	local icon="$2"
+	local message="$3"
+	printf '%b\n' "${color}${icon}${NC} ${message}"
+}
+
+log_with_level() {
+	local color="$1"
+	local level="$2"
+	local stream="$3"
+	shift 3
+
+	local msg="$*"
+	local timestamp
+	timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+	local formatted="${color}[${level}]${NC} ${timestamp} - ${msg}"
+
+	if [[ -n "${LOG_FILE:-}" ]]; then
+		if [[ "$stream" == "stderr" ]]; then
+			printf '%b\n' "$formatted" | tee -a "$LOG_FILE" >&2
+		else
+			printf '%b\n' "$formatted" | tee -a "$LOG_FILE"
+		fi
+		return
+	fi
+
+	if [[ "$stream" == "stderr" ]]; then
+		printf '%b\n' "$formatted" >&2
+	else
+		printf '%b\n' "$formatted"
+	fi
+}
+
 # Simple colored output functions (emoji style)
 print_info() {
-	echo -e "${BLUE}ℹ${NC} $1"
+	print_colored "$BLUE" "ℹ" "$1"
 }
 
 print_success() {
-	echo -e "${GREEN}✓${NC} $1"
+	print_colored "$GREEN" "✓" "$1"
 }
 
 print_warning() {
-	echo -e "${YELLOW}⚠${NC} $1"
+	print_colored "$YELLOW" "⚠" "$1"
 }
 
 print_error() {
-	echo -e "${RED}✗${NC} $1"
+	print_colored "$RED" "✗" "$1"
 }
 
 # Timestamped logging functions (with optional file logging)
 log_info() {
-	local msg="$*"
-	if [[ -n "${LOG_FILE:-}" ]]; then
-		echo -e "${BLUE}[INFO]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg" | tee -a "$LOG_FILE"
-	else
-		echo -e "${BLUE}[INFO]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg"
-	fi
+	log_with_level "$BLUE" "INFO" "stdout" "$@"
 }
 
 log_warning() {
-	local msg="$*"
-	if [[ -n "${LOG_FILE:-}" ]]; then
-		echo -e "${YELLOW}[WARNING]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg" | tee -a "$LOG_FILE" >&2
-	else
-		echo -e "${YELLOW}[WARNING]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg" >&2
-	fi
+	log_with_level "$YELLOW" "WARNING" "stderr" "$@"
 }
 
 log_error() {
-	local msg="$*"
-	if [[ -n "${LOG_FILE:-}" ]]; then
-		echo -e "${RED}[ERROR]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg" | tee -a "$LOG_FILE" >&2
-	else
-		echo -e "${RED}[ERROR]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg" >&2
-	fi
+	log_with_level "$RED" "ERROR" "stderr" "$@"
 }
 
 log_success() {
-	local msg="$*"
-	if [[ -n "${LOG_FILE:-}" ]]; then
-		echo -e "${GREEN}[SUCCESS]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg" | tee -a "$LOG_FILE"
-	else
-		echo -e "${GREEN}[SUCCESS]${NC} $(date '+%Y-%m-%d %H:%M:%S') - $msg"
-	fi
+	log_with_level "$GREEN" "SUCCESS" "stdout" "$@"
 }

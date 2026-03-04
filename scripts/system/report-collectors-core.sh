@@ -1,6 +1,27 @@
 #!/usr/bin/env bash
 # Core collectors for system report generation.
 
+scan_error_log_count() {
+	local mtime_filter="$1"
+	shift
+	local -a dirs=("$@")
+	local -a matched_files=()
+
+	if [[ -n "$mtime_filter" ]]; then
+		mapfile -t matched_files < <(
+			find "${dirs[@]}" -type f -name "*.log" -mtime "$mtime_filter" -print0 2>/dev/null |
+				xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
+		)
+	else
+		mapfile -t matched_files < <(
+			find "${dirs[@]}" -type f -name "*.log" -print0 2>/dev/null |
+				xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
+		)
+	fi
+
+	echo "${#matched_files[@]}"
+}
+
 collect_systemd_errors() {
 	section "Failed Services"
 
@@ -154,20 +175,9 @@ collect_ai_agents() {
 		return
 	fi
 
-	local errors
-	local -a matched_files=()
-	mapfile -t matched_files < <(
-		find "${log_dirs[@]}" -type f -name "*.log" -print0 2>/dev/null |
-			xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
-	)
-	errors="${#matched_files[@]}"
-	local recent_errors
-	local -a recent_matched_files=()
-	mapfile -t recent_matched_files < <(
-		find "${log_dirs[@]}" -type f -name "*.log" -mtime -1 -print0 2>/dev/null |
-			xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
-	)
-	recent_errors="${#recent_matched_files[@]}"
+	local errors recent_errors
+	errors=$(scan_error_log_count "" "${log_dirs[@]}")
+	recent_errors=$(scan_error_log_count "-1" "${log_dirs[@]}")
 
 	echo "- Log directories scanned: ${#log_dirs[@]}"
 	echo "- Log files with errors: ${errors}"

@@ -73,24 +73,22 @@ generate_full_report() {
 }
 
 view_report() {
-	local file="${OUTPUT_DIR}/latest-full.md"
-	if [[ ! -f "$file" ]]; then
-		echo "No full report found. Run: sudo system-report full"
-		exit 1
-	fi
-	if command -v bat &>/dev/null; then
-		bat --style=auto --language=markdown "$file"
-	else
-		cat "$file"
-	fi
+	render_report_file "${OUTPUT_DIR}/latest-full.md" "No full report found. Run: sudo system-report full"
 }
 
 view_errors_report() {
-	local file="${OUTPUT_DIR}/latest-errors.md"
+	render_report_file "${OUTPUT_DIR}/latest-errors.md" "No error report found. Run: sudo system-report errors"
+}
+
+render_report_file() {
+	local file="$1"
+	local missing_message="$2"
+
 	if [[ ! -f "$file" ]]; then
-		echo "No error report found. Run: sudo system-report errors"
+		echo "$missing_message"
 		exit 1
 	fi
+
 	if command -v bat &>/dev/null; then
 		bat --style=auto --language=markdown "$file"
 	else
