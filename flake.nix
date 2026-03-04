@@ -51,16 +51,12 @@
       homeStateVersion = "25.11";
       user = "yz";
 
-      hosts = [
-        {
-          hostname = "desktop";
-          stateVersion = "25.11";
-        }
-        # {
-        #   hostname = "laptop";
-        #   stateVersion = "25.11";
-        # }
-      ];
+      hosts = import ./hosts/_inventory.nix;
+
+      activeHosts = builtins.filter (host: host.enabled) hosts;
+
+      forEachHost =
+        buildEntry: nixpkgs.lib.foldl' (configs: host: configs // buildEntry host) { } activeHosts;
 
       # Single source of truth for all nixpkgs instances
       pkgConfig = {
@@ -101,34 +97,29 @@
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.foldl' (
-        configs: host:
-        configs // { "${host.hostname}" = makeSystem { inherit (host) hostname stateVersion; }; }
-      ) { } hosts;
+      nixosConfigurations = forEachHost (host: {
+        "${host.hostname}" = makeSystem { inherit (host) hostname stateVersion; };
+      });
 
-      homeConfigurations = nixpkgs.lib.foldl' (
-        configs: host:
-        configs
-        // {
-          "${user}@${host.hostname}" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit
-                inputs
-                homeStateVersion
-                user
-                pkgsStable
-                constants
-                ;
-              inherit (host) hostname;
-            };
-            modules = [
-              ./home-manager/home.nix
-              inputs.nix-index-database.homeModules.nix-index
-            ];
+      homeConfigurations = forEachHost (host: {
+        "${user}@${host.hostname}" = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit
+              inputs
+              homeStateVersion
+              user
+              pkgsStable
+              constants
+              ;
+            inherit (host) hostname;
           };
-        }
-      ) { } hosts;
+          modules = [
+            ./home-manager/home.nix
+            inputs.nix-index-database.homeModules.nix-index
+          ];
+        };
+      });
 
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [

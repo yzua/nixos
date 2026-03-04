@@ -14,7 +14,6 @@ Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defa
 | Bluetooth | disabled | enabled (manual start) |
 | NVIDIA Optimus | — | Intel + NVIDIA hybrid |
 | Power mgmt | minimal | TLP (charge limits 75-80%) |
-| Monitor | `1920x1080@144` | `preferred,auto,1` |
 | Avahi interface | `eno1` (ethernet) | `wlp0s20f3` (WiFi) |
 | Sandboxing | enabled | enabled |
 | Privacy stack | full (VPN, Tor, DNS, MAC) | full (VPN, Tor, DNS, MAC) |

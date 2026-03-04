@@ -5,13 +5,12 @@
   imports = [
     ./hardware-configuration.nix
     ./local-packages.nix
+    ../common-host-info.nix
     ../../nixos/modules
     ./modules
   ];
 
-  # Host identity managed by nixos/modules/host-info.nix
   mySystem = {
-    hostInfo.enable = true;
     hostProfile = "laptop";
     observability.enable = false; # Save ~150MB RAM — no dashboards/alerts justify it on laptop
   };

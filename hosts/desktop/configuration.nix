@@ -5,13 +5,12 @@
   imports = [
     ./hardware-configuration.nix
     ./local-packages.nix
+    ../common-host-info.nix
     ../../nixos/modules
     ./modules
   ];
 
-  # Host identity managed by nixos/modules/host-info.nix
   mySystem = {
-    hostInfo.enable = true;
     hostProfile = "desktop";
     kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.
     i2pd.enable = true;
