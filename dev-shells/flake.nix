@@ -3,6 +3,8 @@
 {
   description = "A collection of flake templates";
 
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
   outputs =
     { nixpkgs, ... }:
 
