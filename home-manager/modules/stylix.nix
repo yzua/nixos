@@ -41,7 +41,9 @@
           box-shadow: none;
         }
       '';
-      qt.enable = true;
+      # Qt theming is managed in home-manager/modules/qt.nix.
+      # Keeping Stylix Qt target off avoids unsupported qt.style override warnings.
+      qt.enable = false;
       neovim.enable = true;
       zellij.enable = true;
       noctalia-shell.enable = false;
