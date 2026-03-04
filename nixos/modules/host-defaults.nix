@@ -5,6 +5,13 @@
   ...
 }:
 
+let
+  profile = config.mySystem.hostProfile;
+  isDesktop = profile == "desktop";
+  isLaptop = profile == "laptop";
+  mkDefaultTrue = lib.mkDefault true;
+  mkDefaultFalse = lib.mkDefault false;
+in
 {
   options.mySystem.hostProfile = lib.mkOption {
     type = lib.types.enum [
@@ -18,47 +25,47 @@
   config = {
     mySystem = {
       sandboxing = {
-        enable = lib.mkDefault true;
-        enableUserNamespaces = lib.mkDefault true;
-        enableWrappedBinaries = lib.mkDefault true;
+        enable = mkDefaultTrue;
+        enableUserNamespaces = mkDefaultTrue;
+        enableWrappedBinaries = mkDefaultTrue;
       };
-      cleanup.enable = lib.mkDefault true;
-      flatpak.enable = lib.mkDefault true;
-      mullvadVpn.enable = lib.mkDefault true;
-      tor.enable = lib.mkDefault true;
-      i2pd.enable = lib.mkDefault false;
-      yggdrasil.enable = lib.mkDefault false;
-      dnscryptProxy.enable = lib.mkDefault true;
-      printing.enable = lib.mkDefault true;
-      virtualisation.enable = lib.mkDefault true;
-      nautilus.enable = lib.mkDefault true;
-      glance.enable = lib.mkDefault true;
-      netdata.enable = lib.mkDefault true;
-      nixLd.enable = lib.mkDefault true;
-      opensnitch.enable = lib.mkDefault true;
-      scrutiny.enable = lib.mkDefault true;
-      waydroid.enable = lib.mkDefault true;
-      kdeconnect.enable = lib.mkDefault true;
-      greetd.enable = lib.mkDefault true;
-      nvidia.enable = lib.mkDefault true;
-      fwupd.enable = lib.mkDefault true;
-      backup.enable = lib.mkDefault false; # Requires restic-password sops secret
-      ntfy.enable = lib.mkDefault true;
-      observability.enable = lib.mkDefault true;
-      loki.enable = lib.mkDefault true;
-      systemReport.enable = lib.mkDefault true;
-      auditLogging.enable = lib.mkDefault true; # fail2ban does NOT conflict with AppArmor (only auditd does)
-      vnc.enable = lib.mkDefault false; # On-demand remote access
+      cleanup.enable = mkDefaultTrue;
+      flatpak.enable = mkDefaultTrue;
+      mullvadVpn.enable = mkDefaultTrue;
+      tor.enable = mkDefaultTrue;
+      i2pd.enable = mkDefaultFalse;
+      yggdrasil.enable = mkDefaultFalse;
+      dnscryptProxy.enable = mkDefaultTrue;
+      printing.enable = mkDefaultTrue;
+      virtualisation.enable = mkDefaultTrue;
+      nautilus.enable = mkDefaultTrue;
+      glance.enable = mkDefaultTrue;
+      netdata.enable = mkDefaultTrue;
+      nixLd.enable = mkDefaultTrue;
+      opensnitch.enable = mkDefaultTrue;
+      scrutiny.enable = mkDefaultTrue;
+      waydroid.enable = mkDefaultTrue;
+      kdeconnect.enable = mkDefaultTrue;
+      greetd.enable = mkDefaultTrue;
+      nvidia.enable = mkDefaultTrue;
+      fwupd.enable = mkDefaultTrue;
+      backup.enable = mkDefaultFalse; # Requires restic-password sops secret
+      ntfy.enable = mkDefaultTrue;
+      observability.enable = mkDefaultTrue;
+      loki.enable = mkDefaultTrue;
+      systemReport.enable = mkDefaultTrue;
+      auditLogging.enable = mkDefaultTrue; # fail2ban does NOT conflict with AppArmor (only auditd does)
+      vnc.enable = mkDefaultFalse; # On-demand remote access
 
       # Profile-dependent defaults
       gaming = {
-        enable = lib.mkDefault (config.mySystem.hostProfile == "desktop");
-        enableGamemode = lib.mkDefault (config.mySystem.hostProfile == "desktop");
-        enableGamescope = lib.mkDefault (config.mySystem.hostProfile == "desktop");
+        enable = lib.mkDefault isDesktop;
+        enableGamemode = lib.mkDefault isDesktop;
+        enableGamescope = lib.mkDefault isDesktop;
       };
       bluetooth = {
-        enable = lib.mkDefault (config.mySystem.hostProfile == "laptop");
-        powerOnBoot = lib.mkDefault false;
+        enable = lib.mkDefault isLaptop;
+        powerOnBoot = mkDefaultFalse;
       };
     };
     environment.systemPackages = lib.mkDefault [ ];

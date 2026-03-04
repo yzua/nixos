@@ -7,38 +7,24 @@
 
 let
   cfg = config.mySystem.i2pd;
+  optionHelpers = import ./_option-helpers.nix { inherit lib; };
+  inherit (optionHelpers) mkBoolOption mkNullableOption;
 in
 {
   options.mySystem.i2pd = {
     enable = lib.mkEnableOption "I2PD (I2P router) service";
 
-    notransit = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      example = false;
-      description = "Disable transit tunnel participation to reduce relay traffic.";
-    };
+    notransit = mkBoolOption true false "Disable transit tunnel participation to reduce relay traffic.";
 
-    bandwidth = lib.mkOption {
-      type = with lib.types; nullOr int;
-      default = null;
-      example = 128;
-      description = "Router bandwidth cap in KB/s. Null keeps the upstream i2pd default.";
-    };
+    bandwidth =
+      mkNullableOption lib.types.int null 128
+        "Router bandwidth cap in KB/s. Null keeps the upstream i2pd default.";
 
-    port = lib.mkOption {
-      type = with lib.types; nullOr port;
-      default = null;
-      example = 12345;
-      description = "Fixed external I2P transport port. Null lets i2pd choose automatically.";
-    };
+    port =
+      mkNullableOption lib.types.port null 12345
+        "Fixed external I2P transport port. Null lets i2pd choose automatically.";
 
-    openFirewall = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      example = true;
-      description = "Open TCP/UDP firewall rules for the configured i2pd port.";
-    };
+    openFirewall = mkBoolOption false true "Open TCP/UDP firewall rules for the configured i2pd port.";
   };
 
   config = lib.mkIf cfg.enable {

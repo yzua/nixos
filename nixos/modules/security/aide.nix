@@ -1,11 +1,15 @@
 # Weekly AIDE file integrity monitoring.
 {
+  lib,
   pkgs,
   user,
   ...
 }:
 
 let
+  helpers = import ./_systemd-timer-helpers.nix { inherit lib; };
+  inherit (helpers) mkOneshotService mkPersistentTimer;
+
   aideConf = pkgs.writeText "aide.conf" ''
     database_in=file:/var/lib/aide/aide.db
     database_out=file:/var/lib/aide/aide.db.new
@@ -37,43 +41,38 @@ let
     !/run
     !/tmp
   '';
+
+  aideCheckScript = pkgs.writeShellScript "aide-check.sh" ''
+    set -euo pipefail
+    AIDE_DB="/var/lib/aide"
+    mkdir -p "$AIDE_DB"
+
+    if [[ ! -f "$AIDE_DB/aide.db" ]]; then
+      echo "Initializing AIDE database..."
+      ${pkgs.aide}/bin/aide --config=${aideConf} --init
+      mv "$AIDE_DB/aide.db.new" "$AIDE_DB/aide.db"
+      echo "AIDE database initialized"
+    else
+      echo "Running AIDE integrity check..."
+      ${pkgs.aide}/bin/aide --config=${aideConf} --check || true
+      echo "AIDE check completed"
+    fi
+  '';
 in
 {
   environment.systemPackages = [ pkgs.aide ];
 
   systemd = {
-    timers.aide-check = {
+    timers.aide-check = mkPersistentTimer {
       description = "Weekly AIDE file integrity check";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnCalendar = "weekly";
-        Persistent = true;
-        RandomizedDelaySec = "2h";
-        Unit = "aide-check.service";
-      };
+      onCalendar = "weekly";
+      randomizedDelaySec = "2h";
+      unit = "aide-check.service";
     };
 
-    services.aide-check = {
+    services.aide-check = mkOneshotService {
       description = "Run AIDE file integrity check";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = pkgs.writeShellScript "aide-check.sh" ''
-          set -euo pipefail
-          AIDE_DB="/var/lib/aide"
-          mkdir -p "$AIDE_DB"
-
-          if [[ ! -f "$AIDE_DB/aide.db" ]]; then
-            echo "Initializing AIDE database..."
-            ${pkgs.aide}/bin/aide --config=${aideConf} --init
-            mv "$AIDE_DB/aide.db.new" "$AIDE_DB/aide.db"
-            echo "AIDE database initialized"
-          else
-            echo "Running AIDE integrity check..."
-            ${pkgs.aide}/bin/aide --config=${aideConf} --check || true
-            echo "AIDE check completed"
-          fi
-        '';
-      };
+      execStart = aideCheckScript;
     };
   };
 }

@@ -54,6 +54,25 @@ let
     text = featureFlagExports + "\n" + builtins.readFile ../../scripts/system/system-report.sh;
   };
 
+  mkReportService = description: execStart: {
+    inherit description;
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = execStart;
+    }
+    // reportHardening;
+  };
+
+  mkReportTimer = description: onCalendar: randomizedDelaySec: {
+    inherit description;
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = onCalendar;
+      Persistent = true;
+      inherit randomizedDelaySec;
+    };
+  };
+
 in
 {
   options.mySystem.systemReport = {
@@ -75,64 +94,19 @@ in
 
     systemd = {
       services = {
-        system-report-errors = {
-          description = "Quick system error scan";
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "${reportScriptBase}/bin/system-report errors";
-          }
-          // reportHardening;
-        };
+        system-report-errors = mkReportService "Quick system error scan" "${reportScriptBase}/bin/system-report errors";
 
-        system-report-full = {
-          description = "Full system health report";
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "${reportScriptBase}/bin/system-report full";
-          }
-          // reportHardening;
-        };
+        system-report-full = mkReportService "Full system health report" "${reportScriptBase}/bin/system-report full";
 
-        system-report-cleanup = {
-          description = "Clean up old system reports";
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.findutils}/bin/find ${cfg.outputDir}/history -type f -mtime +${toString cfg.retentionDays} -delete";
-          }
-          // reportHardening;
-        };
+        system-report-cleanup = mkReportService "Clean up old system reports" "${pkgs.findutils}/bin/find ${cfg.outputDir}/history -type f -mtime +${toString cfg.retentionDays} -delete";
       };
 
       timers = {
-        system-report-errors = {
-          description = "Hourly system error scan";
-          wantedBy = [ "timers.target" ];
-          timerConfig = {
-            OnCalendar = "hourly";
-            Persistent = true;
-            RandomizedDelaySec = "5m";
-          };
-        };
+        system-report-errors = mkReportTimer "Hourly system error scan" "hourly" "5m";
 
-        system-report-full = {
-          description = "Daily full system health report";
-          wantedBy = [ "timers.target" ];
-          timerConfig = {
-            OnCalendar = "06:00";
-            Persistent = true;
-            RandomizedDelaySec = "15m";
-          };
-        };
+        system-report-full = mkReportTimer "Daily full system health report" "06:00" "15m";
 
-        system-report-cleanup = {
-          description = "Weekly cleanup of old system reports";
-          wantedBy = [ "timers.target" ];
-          timerConfig = {
-            OnCalendar = "weekly";
-            Persistent = true;
-            RandomizedDelaySec = "1h";
-          };
-        };
+        system-report-cleanup = mkReportTimer "Weekly cleanup of old system reports" "weekly" "1h";
       };
 
       tmpfiles.rules = [

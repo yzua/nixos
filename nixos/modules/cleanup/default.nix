@@ -6,6 +6,6 @@
   imports = [
     ./downloads.nix
     ./cache.nix
-    # ./_lib.nix (imported manually by submodules)
+    # ./_lib.nix (modules-check: manual-helper; imported manually by submodules)
   ];
 }

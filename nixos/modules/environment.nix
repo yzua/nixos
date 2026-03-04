@@ -8,6 +8,11 @@
 
 let
   xdgBinHome = "$HOME/.local/bin";
+  xdgDataDirs = [
+    "/var/lib/flatpak/exports/share"
+    "/home/${user}/.local/share/flatpak/exports/share"
+    "/run/current-system/sw/share"
+  ];
   inherit (constants) terminal editor;
 in
 {
@@ -31,11 +36,7 @@ in
 
     # XDG data directories - include Flatpak exports for app launchers
     # This ensures wofi and other launchers can find Flatpak applications
-    XDG_DATA_DIRS = [
-      "/var/lib/flatpak/exports/share"
-      "/home/${user}/.local/share/flatpak/exports/share"
-      "/run/current-system/sw/share"
-    ];
+    XDG_DATA_DIRS = xdgDataDirs;
 
     # System PATH with additional directories
     PATH = [ xdgBinHome ];

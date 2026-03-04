@@ -7,17 +7,19 @@
   ...
 }:
 
+let
+  optionHelpers = import ./_option-helpers.nix { inherit lib; };
+  inherit (optionHelpers) mkBoolOption;
+in
+
 {
   # Custom module options for Bluetooth configuration
   options.mySystem.bluetooth = {
     enable = lib.mkEnableOption "Bluetooth support with Blueman manager";
 
-    powerOnBoot = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      example = true;
-      description = "Power on Bluetooth adapter automatically at boot. Disable on public networks for privacy.";
-    };
+    powerOnBoot =
+      mkBoolOption false true
+        "Power on Bluetooth adapter automatically at boot. Disable on public networks for privacy.";
   };
 
   # Configuration applied when Bluetooth is enabled

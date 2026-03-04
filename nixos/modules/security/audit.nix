@@ -1,35 +1,41 @@
 # Weekly Lynis security audit timer and service.
-{ pkgs, ... }:
+{
+  lib,
+  pkgs,
+  ...
+}:
+
+let
+  helpers = import ./_systemd-timer-helpers.nix { inherit lib; };
+  inherit (helpers) mkOneshotService mkPersistentTimer;
+
+  auditScript = pkgs.writeShellScript "security-audit.sh" ''
+    #!${pkgs.bash}/bin/bash
+    echo 'Running Lynis audit...'
+    ${pkgs.lynis}/bin/lynis audit system --quiet
+    echo 'Security audit completed!'
+  '';
+in
 
 {
   environment.systemPackages = with pkgs; [ lynis ];
 
   systemd = {
-    timers.security-audit = {
+    timers.security-audit = mkPersistentTimer {
       description = "Weekly security audit";
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnCalendar = "weekly";
-        Persistent = true;
-        Unit = "security-audit.service";
-      };
+      onCalendar = "weekly";
+      unit = "security-audit.service";
     };
 
-    services.security-audit = {
+    services.security-audit = mkOneshotService {
       description = "Run Lynis security audit";
-      serviceConfig = {
-        Type = "oneshot";
+      execStart = auditScript;
+      extraServiceConfig = {
         # NOTE: PrivateNetwork omitted so Lynis can audit network config
         PrivateTmp = true;
         ProtectHome = true;
         ProtectSystem = "strict";
         ReadWritePaths = [ "/tmp" ];
-        ExecStart = pkgs.writeShellScript "security-audit.sh" ''
-          #!${pkgs.bash}/bin/bash
-          echo 'Running Lynis audit...'
-          ${pkgs.lynis}/bin/lynis audit system --quiet
-          echo 'Security audit completed!'
-        '';
       };
     };
   };

@@ -5,22 +5,31 @@
   ...
 }:
 
+let
+  locale = "en_US.UTF-8";
+  localeCategories = [
+    "LC_ADDRESS"
+    "LC_IDENTIFICATION"
+    "LC_MEASUREMENT"
+    "LC_MONETARY"
+    "LC_NAME"
+    "LC_NUMERIC"
+    "LC_PAPER"
+    "LC_TELEPHONE"
+    "LC_TIME"
+  ];
+in
 {
   i18n = {
-    defaultLocale = "en_US.UTF-8";
+    defaultLocale = locale;
 
     # PRIVACY: en_US for all categories to blend with largest English-speaking locale pool
-    extraLocaleSettings = {
-      LC_ADDRESS = "en_US.UTF-8";
-      LC_IDENTIFICATION = "en_US.UTF-8";
-      LC_MEASUREMENT = "en_US.UTF-8";
-      LC_MONETARY = "en_US.UTF-8";
-      LC_NAME = "en_US.UTF-8";
-      LC_NUMERIC = "en_US.UTF-8";
-      LC_PAPER = "en_US.UTF-8";
-      LC_TELEPHONE = "en_US.UTF-8";
-      LC_TIME = "en_US.UTF-8";
-    };
+    extraLocaleSettings = builtins.listToAttrs (
+      map (name: {
+        inherit name;
+        value = locale;
+      }) localeCategories
+    );
 
     inputMethod = {
       enable = true;

@@ -1,14 +1,18 @@
 # Chromium browser, Puppeteer dependencies, and privacy flags.
 { pkgs, ... }:
 
+let
+  browserDeps = with pkgs; [
+    ungoogled-chromium
+    # Xvfb still needed on Wayland for headless browser testing
+    xvfb
+    xauth
+  ];
+in
+
 {
   environment = {
-    systemPackages = with pkgs; [
-      ungoogled-chromium
-      # Xvfb still needed on Wayland for headless browser testing
-      xvfb
-      xauth
-    ];
+    systemPackages = browserDeps;
 
     variables = {
       CHROME_DEVEL_SANDBOX = "${pkgs.ungoogled-chromium}/bin/chrome-devel-sandbox";
