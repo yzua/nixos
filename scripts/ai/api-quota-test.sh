@@ -4,57 +4,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../lib/test-helpers.sh"
+# shellcheck source=/dev/null
 source "${SCRIPT_DIR}/api-quota.sh"
-
-assert_eq() {
-	local got="$1"
-	local want="$2"
-	local msg="$3"
-	if [[ "$got" != "$want" ]]; then
-		echo "FAIL: ${msg} (got='${got}', want='${want}')"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_contains() {
-	local haystack="$1"
-	local needle="$2"
-	local msg="$3"
-	if [[ "$haystack" != *"$needle"* ]]; then
-		echo "FAIL: ${msg} (missing '${needle}')"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_not_contains() {
-	local haystack="$1"
-	local needle="$2"
-	local msg="$3"
-	if [[ "$haystack" == *"$needle"* ]]; then
-		echo "FAIL: ${msg} (unexpected '${needle}')"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_cmd_fail() {
-	local msg="$1"
-	shift
-	if "$@" >/dev/null 2>&1; then
-		echo "FAIL: ${msg} (expected failure)"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
 
 assert_eq "$(numeric_pct_to_remaining 34.6)" "65" "remaining percent rounds used value"
 assert_eq "$(numeric_pct_to_remaining 120)" "0" "remaining percent clamps values above 100"
 assert_eq "$(numeric_pct_to_remaining -5)" "100" "remaining percent clamps values below 0"
 assert_cmd_fail "remaining percent rejects non-numeric values" numeric_pct_to_remaining "nope"
 
-future_epoch=$(( $(date +%s) + 3600 ))
+future_epoch=$(($(date +%s) + 3600))
 tip_epoch="$(build_window_tip "OpenAI Codex" "23.4" "${future_epoch}" "45.0" "epoch")"
 assert_contains "$tip_epoch" "OpenAI Codex" "tooltip contains provider title"
 assert_contains "$tip_epoch" "5h used: 23.4%" "tooltip contains 5h usage line"

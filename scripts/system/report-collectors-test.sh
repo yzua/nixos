@@ -4,62 +4,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../../scripts/lib/test-helpers.sh"
+# shellcheck source=/dev/null
 source "${SCRIPT_DIR}/report-helpers.sh"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/report-collectors.sh"
-
-assert_true() {
-	local msg="$1"
-	shift
-	if ! "$@" >/dev/null 2>&1; then
-		echo "FAIL: ${msg}"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_false() {
-	local msg="$1"
-	shift
-	if "$@" >/dev/null 2>&1; then
-		echo "FAIL: ${msg}"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_contains() {
-	local haystack="$1"
-	local needle="$2"
-	local msg="$3"
-	if [[ "$haystack" != *"$needle"* ]]; then
-		echo "FAIL: ${msg} (missing '${needle}')"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_not_contains() {
-	local haystack="$1"
-	local needle="$2"
-	local msg="$3"
-	if [[ "$haystack" == *"$needle"* ]]; then
-		echo "FAIL: ${msg} (unexpected '${needle}')"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
-assert_regex() {
-	local value="$1"
-	local pattern="$2"
-	local msg="$3"
-	if [[ ! "$value" =~ $pattern ]]; then
-		echo "FAIL: ${msg} (value='${value}')"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
 
 assert_true "json_is_empty handles empty string" json_is_empty ""
 assert_true "json_is_empty handles null" json_is_empty "null"
