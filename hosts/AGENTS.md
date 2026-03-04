@@ -1,6 +1,6 @@
 # Host Configurations
 
-Active host: `desktop`. Dormant host: `laptop` (commented out in `flake.nix`, kept for future use).
+Active host: `desktop`. Dormant host: `laptop` (`enabled = false` in `hosts/_inventory.nix`, kept for future use).
 
 Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defaults.nix`) and overrides specific options as needed.
 
@@ -75,22 +75,23 @@ Bus IDs are defined as `mySystem.nvidia.*` options in `hosts/laptop/modules/nvid
 
 Every host `configuration.nix` follows the same structure:
 ```nix
-{ stateVersion, hostname, ... }:
+{ ... }:
 {
   imports = [
     ./hardware-configuration.nix  # Auto-generated
     ./local-packages.nix          # Host packages
+    ../common-host-info.nix       # Enables hostInfo
     ../../nixos/modules           # Shared modules
     ./modules                     # Host-specific modules
   ];
 
-  # Host identity managed by nixos/modules/host-info.nix
   mySystem = {
-    hostInfo.enable = true;       # Sets networking.hostName and system.stateVersion from flake args
     hostProfile = "desktop";      # or "laptop" — sets defaults via host-defaults.nix
     # Override specific defaults as needed
   };
 }
 ```
+
+**Note**: `common-host-info.nix` sets `mySystem.hostInfo.enable = true` for all hosts, which configures hostname and stateVersion from flake arguments.
 
 **Key rule**: Set `mySystem.hostProfile` and override only what differs from profile defaults.

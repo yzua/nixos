@@ -175,7 +175,6 @@ in
       programs.bash.shellAliases = shellAliases;
 
       systemd.user = lib.mkIf cfg.logging.enable {
-        # Create log directory declaratively (replaces createAiAgentLogDir activation script)
         tmpfiles.rules = [
           "d ${cfg.logging.directory} 0755 - - -"
         ];

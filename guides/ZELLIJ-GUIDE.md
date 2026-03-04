@@ -160,7 +160,7 @@ From Scroll mode, press `/` or `s` to enter search:
 
 ## Layouts
 
-Layouts define the initial pane arrangement when starting Zellij. Three layouts are configured:
+Layouts define the initial pane arrangement when starting Zellij. Four layouts are configured:
 
 ### Default Layout
 
@@ -180,6 +180,16 @@ Two tabs pre-configured for development:
 
 - **code** (focused): 75% Neovim | 25% split between a shell and lazygit
 - **servers**: Empty pane for running dev servers
+
+### AI Layout
+
+```bash
+zellij -l ai
+```
+
+Single tab for AI-assisted development:
+
+- **agent** (focused): 60% Claude Code | 50% logs (OpenCode/Codex) + 50% lazygit
 
 ### Monitoring Layout
 

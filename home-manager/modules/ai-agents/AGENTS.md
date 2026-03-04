@@ -53,6 +53,10 @@ services.nix (zsh aliases, systemd timers, packages)
 | `_settings-builders.nix` | Per-agent settings with profile variants |
 | `_mcp-transforms.nix` | Shared MCP → Claude/OpenCode/Gemini format transforms |
 | `_opencode-profiles.nix` | Profile names and config paths |
+| `_oh-my-opencode-agent-type.nix` | Agent type NixOS module option definition |
+| `_workflow-prompts.nix` | Workflow prompt templates |
+| `config/_claude-hooks.nix` | Claude Code lifecycle hook definitions |
+| `config/_claude-permission-rules.nix` | Claude Code permission rule definitions |
 
 ---
 

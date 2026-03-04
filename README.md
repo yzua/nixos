@@ -70,17 +70,17 @@ After copying, remove or replace machine-specific values inherited from `hosts/d
 Edit `hosts/<your-hostname>/configuration.nix`:
 
 ```nix
-{ stateVersion, hostname, ... }:
+{ ... }:
 {
   imports = [
     ./hardware-configuration.nix
     ./local-packages.nix
+    ../common-host-info.nix           # Enables hostInfo for hostname + stateVersion
     ../../nixos/modules
     ./modules
   ];
 
   mySystem = {
-    hostInfo.enable = true;           # Sets hostname + stateVersion from flake
     hostProfile = "desktop";          # "desktop" or "laptop"
     # Override defaults as needed:
     # nvidia.enable = false;          # No NVIDIA GPU
@@ -91,14 +91,15 @@ Edit `hosts/<your-hostname>/configuration.nix`:
 }
 ```
 
-### Step 6: Register the host in `flake.nix`
+### Step 6: Register the host in `hosts/_inventory.nix`
 
-Add to the `hosts` list:
+Add a new entry with `enabled = true`:
 
 ```nix
-hosts = [
-  { hostname = "your-hostname"; stateVersion = "25.11"; }
-];
+[
+  { hostname = "desktop"; stateVersion = "25.11"; enabled = true; }
+  { hostname = "your-hostname"; stateVersion = "25.11"; enabled = true; }
+]
 ```
 
 ### Step 7: Setup secrets and deploy
