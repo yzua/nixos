@@ -49,7 +49,7 @@ modules:
 # Switch Home-Manager generation
 home:
     @echo -e "\n➤ Switching Home-Manager…"
-    nh home switch 'path:.' --configuration yz@desktop
+    nh home switch 'path:.' --configuration yz@desktop --backup-extension backup
 
 # Switch NixOS generation
 nixos:
