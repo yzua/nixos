@@ -14,6 +14,7 @@ let
   commitSplitPrompt = workflowPrompts.commitSplit;
   refactorMaintainabilityPrompt = workflowPrompts.refactorMaintainability;
   securityAuditPrompt = workflowPrompts.securityAudit;
+  buildPerformancePrompt = workflowPrompts.buildPerformance;
   markdownSyncPrompt = workflowPrompts.markdownSync;
 
   mkAliasAttrs =
@@ -94,6 +95,10 @@ let
     {
       suffix = "sa";
       prompt = securityAuditPrompt;
+    }
+    {
+      suffix = "bp";
+      prompt = buildPerformancePrompt;
     }
     {
       suffix = "md";
