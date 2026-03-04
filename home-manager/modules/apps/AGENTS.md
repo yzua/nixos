@@ -1,6 +1,6 @@
 # Application Configurations
 
-10 app config files + 2 subdirectory modules (VS Code, Brave). Each app gets one `.nix` file or subdirectory.
+9 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
@@ -39,6 +39,12 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 |------|---------|
 | `default.nix` | Import hub: `programs.chromium` with Brave package |
 | `extensions.nix` | 30+ declarative extensions (privacy, dev tools, YouTube) |
+
+### `librewolf/` (1 file)
+
+| File | Purpose |
+|------|---------|
+| `default.nix` | `programs.librewolf` with declarative policies + profile settings (SOCKS5) |
 
 ---
 

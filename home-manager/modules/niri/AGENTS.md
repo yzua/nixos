@@ -1,6 +1,6 @@
 # Niri Compositor Configuration
 
-Scrollable tiling Wayland compositor. 8 local modules plus 3 helper scripts (and 2 imported flake modules).
+Scrollable tiling Wayland compositor. 7 local modules plus 3 helper scripts (and 2 imported flake modules).
 Configures `programs.niri.settings` — all settings live under that namespace.
 
 ---
@@ -13,8 +13,8 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | `main.nix` | Workspaces, autostart, environment | 5 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC |
 | `binds.nix` | Keybindings | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/` |
 | `input.nix` | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp` |
-| `layout.nix` | Gaps, columns, borders | 8px gaps, 3 preset widths (1/3, 1/2, 2/3), focus-ring disabled (Stylix border instead) |
-| `rules.nix` | Window rules | Corner radius (10px), floating rules, opacity, workspace assignments by `app-id` |
+| `layout.nix` | Gaps, columns, borders | 3px gaps, 3 preset widths (1/3, 1/2, 2/3), focus-ring disabled (Stylix border instead) |
+| `rules.nix` | Window rules | Square corners (`0px`), floating rules, opacity, workspace assignments by `app-id` |
 | `idle.nix` | Idle/DPMS | swayidle integration, screen lock timeout |
 | `lock.nix` | Screen locker | swaylock fallback configuration |
 | `scripts/` | Helper scripts | `color-picker.nix`, `screenshot.nix`, `open-books.nix` — each returns a derivation |
@@ -28,9 +28,9 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | Key | Name | Typical Apps |
 |-----|------|-------------|
 | `01-browser` | browser | Brave |
-| `02-code` | editor | Zed, terminals |
+| `02-code` | editor | configured editor, terminals |
 | `03-social` | social | Telegram, Vesktop |
-| `04-media` | media | YouTube Music, Celluloid |
+| `04-media` | media | YouTube Music, FreeTube |
 | `05-vpn` | vpn | Mullvad VPN |
 
 Dynamic workspaces 6-9 available via `Mod+6` through `Mod+9`.
