@@ -1,6 +1,16 @@
 # Beads (bd) — git-backed issue tracking for AI coding agents.
 { pkgs, ... }:
 
+let
+  beadsMeta = with pkgs.lib; {
+    description = "Git-backed graph issue tracker for AI coding agents";
+    homepage = "https://github.com/steveyegge/beads";
+    license = licenses.asl20;
+    platforms = [ "x86_64-linux" ];
+    mainProgram = "bd";
+  };
+in
+
 {
   home.packages = [
     (pkgs.stdenv.mkDerivation rec {
@@ -18,13 +28,7 @@
         install -Dm755 bd $out/bin/bd
       '';
 
-      meta = with pkgs.lib; {
-        description = "Git-backed graph issue tracker for AI coding agents";
-        homepage = "https://github.com/steveyegge/beads";
-        license = licenses.asl20;
-        platforms = [ "x86_64-linux" ];
-        mainProgram = "bd";
-      };
+      meta = beadsMeta;
     })
   ];
 }
