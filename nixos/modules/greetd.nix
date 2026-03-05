@@ -3,7 +3,7 @@
 {
   config,
   lib,
-  pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -15,12 +15,12 @@
   config = lib.mkIf config.mySystem.greetd.enable {
     services.greetd = {
       enable = true;
+      package = pkgsStable.greetd;
       settings.default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-session --cmd niri-session";
+        command = "${pkgsStable.tuigreet}/bin/tuigreet --time --remember --remember-session --cmd niri-session";
         user = "greeter";
       };
     };
-
     # Avoid noisy gkr-pam warnings on greetd auth attempts; keyring is started in user session.
     security.pam.services.greetd.enableGnomeKeyring = lib.mkForce false;
 
