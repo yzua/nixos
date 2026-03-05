@@ -11,6 +11,18 @@
 let
   mesaEglVendorFile = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
   mesaEglFirejailArg = "--env=__EGL_VENDOR_LIBRARY_FILENAMES=${mesaEglVendorFile}";
+  braveLauncherWrapped = pkgs.writeShellScript "brave-with-basic-password-store" ''
+    # Keep Brave launch stable under current NVIDIA + Firejail setup.
+    recovery_profile_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/BraveSoftware/Brave-Browser-Recovery"
+    ${pkgs.coreutils}/bin/mkdir -p "$recovery_profile_dir"
+
+    exec ${pkgs.lib.getBin pkgs.brave}/bin/brave \
+      --password-store=basic \
+      --disable-gpu \
+      --proxy-server="socks5://se-mma-wg-socks5-004.relays.mullvad.net:1080" \
+      --user-data-dir="$recovery_profile_dir" \
+      "$@"
+  '';
 in
 {
   options.mySystem.sandboxing = {
@@ -61,7 +73,7 @@ in
 
         # Messaging — use upstream profiles
         signal-desktop = {
-          executable = "${pkgs.lib.getBin pkgs.signal-desktop-bin}/bin/signal-desktop";
+          executable = "${pkgs.lib.getBin pkgs.signal-desktop}/bin/signal-desktop";
           profile = "${pkgs.firejail}/etc/firejail/signal-desktop.profile";
         };
 
