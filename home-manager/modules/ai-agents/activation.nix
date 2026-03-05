@@ -182,6 +182,11 @@ in
             if [[ ! -x "$SKILLS_BIN" ]]; then
               SKILLS_BIN="$(command -v skills 2>/dev/null || true)"
             fi
+
+            # Ensure runtime dependencies for the skills CLI are available in
+            # Home Manager activation environment.
+            export PATH="${pkgs.nodejs}/bin:${pkgs.bun}/bin:$PATH"
+
             if [[ -n "$SKILLS_BIN" ]]; then
               echo "📦 Installing agent skills from skills.sh..."
               ${lib.concatStringsSep "" skillCommands}
