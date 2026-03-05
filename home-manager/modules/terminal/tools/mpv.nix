@@ -1,4 +1,4 @@
-# mpv media player with Vim keybindings and hardware acceleration.
+# mpv media player with Vim keybindings and stable rendering defaults.
 { constants, ... }:
 
 {
@@ -6,9 +6,9 @@
     enable = true;
     config = {
       profile = "gpu-hq";
-      gpu-api = "vulkan";
-      hwdec = "auto-safe";
-      vo = "gpu-next";
+      gpu-api = "opengl";
+      hwdec = "auto-copy-safe";
+      vo = "gpu";
       keep-open = true;
       osd-font = constants.font.mono;
       osd-font-size = 24;

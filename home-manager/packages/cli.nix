@@ -42,6 +42,7 @@
 
     # Media processing
     imagemagick
+    yt-dlp
 
     # Network analysis
     mitmproxy

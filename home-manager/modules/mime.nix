@@ -21,6 +21,7 @@ let
     terminal = [ "${constants.terminalAppId}.desktop" ]; # Terminal emulator
     archive = [ "org.gnome.Nautilus.desktop" ]; # Nautilus handles archives via file-roller
     matrix = [ "element-desktop.desktop" ]; # Matrix/Element protocol links
+    ytmpv = [ "youtube-mpv.desktop" ]; # Custom YouTube-to-mpv protocol links
   };
 
   # MIME type mappings - maps file categories to specific MIME types
@@ -82,6 +83,9 @@ let
       "x-scheme-handler/io.element.desktop" # Element SSO callback links
       "x-scheme-handler/matrix" # Matrix protocol links
     ];
+
+    # Custom protocol for redirecting YouTube URLs to local mpv script
+    ytmpv = [ "x-scheme-handler/ytmpv" ];
 
     # Office document formats
     office = [

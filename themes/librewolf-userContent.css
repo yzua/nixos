@@ -1,0 +1,67 @@
+:root {
+  --dt-black: #0f0f0f;
+  --dt-gray-1: #1e1f1e;
+  --dt-gray-2: #272a28;
+  --dt-gray-3: #3b403c;
+  --dt-gray-6: #888e7b;
+  --dt-gray-10: #e3d6c9;
+  --dt-blue-6: #71b4d6;
+  --dt-orange-6: #ef934d;
+}
+
+@-moz-document regexp("https?://.*") {
+  * {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html,
+  body,
+  input,
+  textarea,
+  select,
+  button,
+  code,
+  pre,
+  dialog,
+  iframe {
+    border-radius: 0 !important;
+  }
+}
+
+@-moz-document domain("youtube.com"), domain("www.youtube.com"), domain("m.youtube.com") {
+  html::before {
+    content: "Opening in mpv... Keep this tab open or close it.";
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 2147483647;
+    padding: 12px 16px;
+    background: rgba(20, 21, 20, 0.94);
+    color: #e3d6c9;
+    border: 1px solid #3b403c;
+    font-size: 14px;
+    font-family: "Noto Sans", sans-serif;
+    pointer-events: none;
+  }
+
+  body > * {
+    visibility: hidden !important;
+  }
+}
+
+/* Fallback for redirected/blank interim documents (e.g., external player handoff). */
+body:empty::before {
+  content: "Opening in mpv... Loading external player.";
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 2147483647;
+  padding: 12px 16px;
+  background: rgba(20, 21, 20, 0.94);
+  color: #e3d6c9;
+  border: 1px solid #3b403c;
+  font-size: 14px;
+  font-family: "Noto Sans", sans-serif;
+  pointer-events: none;
+}

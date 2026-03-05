@@ -31,6 +31,14 @@
       '';
     };
 
+    ".librewolf/acffhfnf.default/chrome/userChrome.css".source =
+      ../../../../themes/librewolf-userChrome.css;
+    ".librewolf/acffhfnf.default/chrome/userContent.css".source =
+      ../../../../themes/librewolf-userContent.css;
+    ".librewolf/i2pd.default/chrome/userChrome.css".source =
+      ../../../../themes/librewolf-userChrome.css;
+    ".librewolf/i2pd.default/chrome/userContent.css".source =
+      ../../../../themes/librewolf-userContent.css;
   };
 
   programs.librewolf = {
@@ -71,11 +79,6 @@
         "{b43b974b-1d3a-4232-b226-eaa2ac6ebb69}" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/random_user_agent/latest.xpi";
-        };
-        # Canvas Blocker - Fingerprint Protect
-        "CanvasBlocker@kkapsner.de" = {
-          installation_mode = "force_installed";
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/canvasblocker/latest.xpi";
         };
         # Privacy Badger
         "jid1-MnnxcxisBPnSXQ@jetpack" = {
@@ -137,6 +140,26 @@
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/new-tab-shows-your-homepage/latest.xpi";
         };
+        # Redirector (URL-based redirects, e.g. YouTube -> custom target)
+        "redirector@einaregilsson.com" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/redirector/latest.xpi";
+        };
+        # Violentmonkey (userscript manager)
+        "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/violentmonkey/latest.xpi";
+        };
+        # Stylus
+        "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/styl-us/latest.xpi";
+        };
+        # Sidebery
+        "{3c078156-979c-498b-8990-85f7987dd929}" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/sidebery/latest.xpi";
+        };
       };
       UserMessaging = {
         ExtensionRecommendations = false;
@@ -167,13 +190,13 @@
         "extensions.activeThemeID" = "{1e01c787-99d2-4826-86df-0003da8e88cd}";
         "layout.css.prefers-color-scheme.content-override" = 0; # Prefer dark
         "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        "layout.css.moz-document.content.enabled" = true;
 
         # === Sidebar ===
-        "sidebar.revamp" = true;
-        "sidebar.verticalTabs" = true;
-        "sidebar.visibility" = "always-show";
-        "sidebar.backupState" =
-          "{\"command\":\"\",\"panelOpen\":false,\"launcherWidth\":240,\"launcherExpanded\":true,\"launcherVisible\":true}";
+        # Keep Firefox native sidebar disabled when using Sidebery.
+        "sidebar.revamp" = false;
+        "sidebar.verticalTabs" = false;
+        "sidebar.visibility" = "hide-sidebar";
 
         "media.peerconnection.enabled" = false;
 
@@ -189,6 +212,9 @@
         "network.proxy.socks_port" = 1080;
         "network.proxy.socks_version" = 5;
         "network.proxy.socks_remote_dns" = true;
+        "network.protocol-handler.external.ytmpv" = true;
+        "network.protocol-handler.expose.ytmpv" = false;
+        "network.protocol-handler.warn-external.ytmpv" = true;
       };
     };
 
@@ -211,13 +237,15 @@
         "network.proxy.socks_port" = 4447;
         "network.proxy.socks_version" = 5;
         "network.proxy.socks_remote_dns" = true;
+        "network.protocol-handler.external.ytmpv" = true;
+        "network.protocol-handler.expose.ytmpv" = false;
+        "network.protocol-handler.warn-external.ytmpv" = true;
 
-        "sidebar.revamp" = true;
-        "sidebar.verticalTabs" = true;
-        "sidebar.visibility" = "always-show";
-        "sidebar.backupState" =
-          "{\"command\":\"\",\"panelOpen\":false,\"launcherWidth\":240,\"launcherExpanded\":true,\"launcherVisible\":true}";
+        "sidebar.revamp" = false;
+        "sidebar.verticalTabs" = false;
+        "sidebar.visibility" = "hide-sidebar";
         "extensions.activeThemeID" = "{1e01c787-99d2-4826-86df-0003da8e88cd}";
+        "layout.css.moz-document.content.enabled" = true;
       };
     };
   };

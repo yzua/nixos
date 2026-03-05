@@ -1,39 +1,117 @@
 # Desktop entries and launcher wrapper scripts for desktop applications.
-{ user, ... }:
+{
+  pkgs,
+  user,
+  ...
+}:
 
 {
-  home.file.".local/bin/element-desktop-keyring" = {
-    executable = true;
-    text = ''
-      #!/usr/bin/env bash
-      set -euo pipefail
+  home.file = {
+    ".local/bin/element-desktop-keyring" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
 
-      log_file="''${XDG_CACHE_HOME:-$HOME/.cache}/element-desktop-url-handler.log"
-      main_log_file="''${XDG_CACHE_HOME:-$HOME/.cache}/element-desktop-main.log"
-      {
-        printf '%s ' "$(date --iso-8601=seconds)"
-        printf '%q ' "$@"
-        printf '\n'
-      } >> "$log_file"
+        log_file="''${XDG_CACHE_HOME:-$HOME/.cache}/element-desktop-url-handler.log"
+        main_log_file="''${XDG_CACHE_HOME:-$HOME/.cache}/element-desktop-main.log"
+        {
+          printf '%s ' "$(date --iso-8601=seconds)"
+          printf '%q ' "$@"
+          printf '\n'
+        } >> "$log_file"
 
-      export ELECTRON_ENABLE_LOGGING=1
-      exec element-desktop --password-store=gnome-libsecret "$@" >> "$main_log_file" 2>&1
-    '';
-  };
+        export ELECTRON_ENABLE_LOGGING=1
+        exec element-desktop --password-store=gnome-libsecret "$@" >> "$main_log_file" 2>&1
+      '';
+    };
 
-  home.file.".local/bin/telegram-desktop-quiet" = {
-    executable = true;
-    text = ''
-      #!/usr/bin/env bash
-      set -euo pipefail
+    ".local/bin/telegram-desktop-quiet" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
 
-      log_file="''${XDG_STATE_HOME:-$HOME/.local/state}/telegram-desktop.log"
-      mkdir -p "$(dirname "$log_file")"
+        log_file="''${XDG_STATE_HOME:-$HOME/.local/state}/telegram-desktop.log"
+        mkdir -p "$(dirname "$log_file")"
 
-      # Telegram currently emits frequent Qt paint warnings on Wayland.
-      # Keep a local log file while avoiding user-journal spam.
-      exec /run/current-system/sw/bin/telegram-desktop "$@" >> "$log_file" 2>&1
-    '';
+        # Telegram currently emits frequent Qt paint warnings on Wayland.
+        # Keep a local log file while avoiding user-journal spam.
+        exec /run/current-system/sw/bin/telegram-desktop "$@" >> "$log_file" 2>&1
+      '';
+    };
+
+    ".local/bin/youtube-mpv" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        if [[ $# -lt 1 ]]; then
+          exit 1
+        fi
+
+        url="$1"
+
+        # Convert custom ytmpv:// scheme redirects back to normal YouTube URLs.
+        case "$url" in
+          ytmpv://watch\?v=*)
+            url="https://www.youtube.com/watch?v=''${url#ytmpv://watch?v=}"
+            ;;
+          ytmpv://youtu.be/*)
+            url="https://youtu.be/''${url#ytmpv://youtu.be/}"
+            ;;
+          ytmpv://https://*)
+            url="''${url#ytmpv://}"
+            ;;
+        esac
+
+        # Channel "videos" pages are not directly playable; open newest upload.
+        case "$url" in
+          */channel/*/videos|*/@*/videos|*/c/*/videos|*/user/*/videos)
+            first_video="$(
+              yt-dlp --flat-playlist --playlist-end 1 --print webpage_url -- "$url" 2>/dev/null | head -n 1
+            )"
+            if [[ -n "$first_video" ]]; then
+              url="$first_video"
+            fi
+            ;;
+        esac
+
+        export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/bus}"
+        ${pkgs.libnotify}/bin/notify-send \
+          --app-name="youtube-mpv" \
+          --urgency=low \
+          --expire-time=3500 \
+          "YouTube -> mpv" \
+          "Loading in external player..." || true
+
+        # Prefer non-AV1 formats to avoid unsupported hardware decode paths.
+        exec mpv \
+          --wayland-app-id=youtube-mpv \
+          --hwdec=no \
+          --ytdl-format="bestvideo[vcodec!^=av01][height<=1440]+bestaudio/best[vcodec!^=av01][height<=1440]/best" \
+          "$url"
+      '';
+    };
+
+    ".local/bin/xdg-open" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        if [[ $# -gt 0 ]]; then
+          case "$1" in
+            https://youtube.com/*|http://youtube.com/*|https://www.youtube.com/*|http://www.youtube.com/*|https://m.youtube.com/*|http://m.youtube.com/*|https://music.youtube.com/*|http://music.youtube.com/*|https://youtu.be/*|http://youtu.be/*)
+              exec /home/${user}/.local/bin/youtube-mpv "$1"
+              ;;
+          esac
+        fi
+
+        exec /run/current-system/sw/bin/xdg-open "$@"
+      '';
+    };
   };
 
   xdg.desktopEntries = {
@@ -48,6 +126,17 @@
         "InstantMessaging"
       ];
       mimeType = [ "x-scheme-handler/tg" ];
+    };
+    "youtube-mpv" = {
+      name = "YouTube MPV";
+      exec = "/home/${user}/.local/bin/youtube-mpv %U";
+      icon = "mpv";
+      comment = "Open YouTube links in mpv";
+      categories = [
+        "AudioVideo"
+        "Player"
+      ];
+      mimeType = [ "x-scheme-handler/ytmpv" ];
     };
     "brave-browser" = {
       name = "Brave Web Browser";

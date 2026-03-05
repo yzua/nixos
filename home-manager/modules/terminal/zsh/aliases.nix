@@ -46,6 +46,7 @@
         v = "${editor}";
         se = "sudoedit";
         open = "xdg-open";
+        yt = "youtube-mpv";
         ezshr = "${editor} ~/System/home-manager/modules/terminal/zsh";
         enix = "${editor} ~/System";
 
