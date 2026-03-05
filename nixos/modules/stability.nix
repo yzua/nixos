@@ -67,7 +67,8 @@
 
   systemd.settings.Manager = {
     DefaultTimeoutStopSec = "30s";
-    DefaultTimeoutStartSec = "30s";
+    # Avoid greetd/user@ login loops when user manager startup is heavy on cold boot.
+    DefaultTimeoutStartSec = "180s";
     DefaultDeviceTimeoutSec = "30s";
     DefaultLimitNOFILE = 200000;
     DefaultLimitNPROC = 65536;
