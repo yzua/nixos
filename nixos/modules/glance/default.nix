@@ -389,6 +389,23 @@
               }
             ];
           }
+          {
+            name = "YouTube";
+
+            columns = [
+              {
+                size = "full";
+                widgets = [
+                  {
+                    type = "videos";
+                    title = "YouTube";
+                    style = "grid-cards";
+                    channels = import ./_youtube-channels.nix;
+                  }
+                ];
+              }
+            ];
+          }
         ];
       };
     };
