@@ -181,32 +181,47 @@
                     type = "bookmarks";
                     groups = [
                       {
-                        title = "Quick";
+                        title = "AI";
                         links = [
                           {
-                            title = "Proton Mail";
-                            url = "https://mail.proton.me/u/1/inbox";
-                            icon = "si:protonmail";
+                            title = "Claude";
+                            url = "https://claude.ai/";
+                            icon = "si:anthropic";
                           }
+                          {
+                            title = "ChatGPT";
+                            url = "https://chatgpt.com/";
+                            icon = "si:openai";
+                          }
+                        ];
+                      }
+                      {
+                        title = "Dev";
+                        links = [
                           {
                             title = "GitHub";
                             url = "https://github.com";
                             icon = "si:github";
                           }
                           {
-                            title = "X";
-                            url = "https://x.com/home";
-                            icon = "si:x";
-                          }
-                          {
-                            title = "SimpleLogin";
-                            url = "https://app.simplelogin.io/dashboard/";
-                            icon = "mdi:shield-lock-outline";
+                            title = "Excalidraw";
+                            url = "https://excalidraw.com/";
+                            icon = "si:excalidraw";
                           }
                           {
                             title = "Codeberg";
                             url = "https://codeberg.org/";
                             icon = "si:codeberg";
+                          }
+                        ];
+                      }
+                      {
+                        title = "Social";
+                        links = [
+                          {
+                            title = "Reddit";
+                            url = "https://www.reddit.com/";
+                            icon = "si:reddit";
                           }
                           {
                             title = "YouTube";
@@ -214,27 +229,24 @@
                             icon = "si:youtube";
                           }
                           {
-                            title = "Reddit";
-                            url = "https://www.reddit.com/";
-                            icon = "si:reddit";
+                            title = "X";
+                            url = "https://x.com/home";
+                            icon = "si:x";
                           }
                         ];
                       }
                       {
-                        title = "Dev";
-                        color = "43 59 81"; # Gruvbox yellow
+                        title = "Accounts";
                         links = [
                           {
-                            title = "DevDocs";
-                            url = "https://devdocs.io/";
+                            title = "Proton Mail";
+                            url = "https://mail.proton.me/u/1/inbox";
+                            icon = "si:protonmail";
                           }
                           {
-                            title = "Excalidraw";
-                            url = "https://excalidraw.com/";
-                          }
-                          {
-                            title = "DEV Community";
-                            url = "https://dev.to/";
+                            title = "SimpleLogin";
+                            url = "https://app.simplelogin.io/dashboard/";
+                            icon = "mdi:shield-lock-outline";
                           }
                         ];
                       }
@@ -253,6 +265,124 @@
                       "YaLTeR/niri"
                       "neovim/neovim"
                       "glanceapp/glance"
+                    ];
+                  }
+                ];
+              }
+            ];
+          }
+          {
+            name = "Search";
+
+            columns = [
+              {
+                size = "full";
+                widgets = [
+                  {
+                    type = "search";
+                    search-engine = "duckduckgo";
+                    new-tab = true;
+                    bangs = [
+                      {
+                        title = "GitHub";
+                        shortcut = "!gh";
+                        url = "https://github.com/search?q={QUERY}";
+                      }
+                      {
+                        title = "NixOS";
+                        shortcut = "!nix";
+                        url = "https://search.nixos.org/packages?query={QUERY}";
+                      }
+                      {
+                        title = "YouTube";
+                        shortcut = "!yt";
+                        url = "https://www.youtube.com/results?search_query={QUERY}";
+                      }
+                      {
+                        title = "Crates";
+                        shortcut = "!crate";
+                        url = "https://crates.io/search?q={QUERY}";
+                      }
+                      {
+                        title = "NPM";
+                        shortcut = "!npm";
+                        url = "https://www.npmjs.com/search?q={QUERY}";
+                      }
+                    ];
+                  }
+                  {
+                    type = "bookmarks";
+                    groups = [
+                      {
+                        title = "AI";
+                        links = [
+                          {
+                            title = "Claude";
+                            url = "https://claude.ai/";
+                            icon = "si:anthropic";
+                          }
+                          {
+                            title = "ChatGPT";
+                            url = "https://chatgpt.com/";
+                            icon = "si:openai";
+                          }
+                        ];
+                      }
+                      {
+                        title = "Dev";
+                        links = [
+                          {
+                            title = "GitHub";
+                            url = "https://github.com";
+                            icon = "si:github";
+                          }
+                          {
+                            title = "Excalidraw";
+                            url = "https://excalidraw.com/";
+                            icon = "si:excalidraw";
+                          }
+                          {
+                            title = "Codeberg";
+                            url = "https://codeberg.org/";
+                            icon = "si:codeberg";
+                          }
+                        ];
+                      }
+                      {
+                        title = "Social";
+                        links = [
+                          {
+                            title = "Reddit";
+                            url = "https://www.reddit.com/";
+                            icon = "si:reddit";
+                          }
+                          {
+                            title = "YouTube";
+                            url = "https://www.youtube.com/";
+                            icon = "si:youtube";
+                          }
+                          {
+                            title = "X";
+                            url = "https://x.com/home";
+                            icon = "si:x";
+                          }
+                        ];
+                      }
+                      {
+                        title = "Accounts";
+                        links = [
+                          {
+                            title = "Proton Mail";
+                            url = "https://mail.proton.me/u/1/inbox";
+                            icon = "si:protonmail";
+                          }
+                          {
+                            title = "SimpleLogin";
+                            url = "https://app.simplelogin.io/dashboard/";
+                            icon = "mdi:shield-lock-outline";
+                          }
+                        ];
+                      }
                     ];
                   }
                 ];
