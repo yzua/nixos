@@ -79,17 +79,20 @@
         esac
 
         export DBUS_SESSION_BUS_ADDRESS="''${DBUS_SESSION_BUS_ADDRESS:-unix:path=''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/bus}"
-        ${pkgs.libnotify}/bin/notify-send \
-          --app-name="youtube-mpv" \
-          --urgency=low \
-          --expire-time=3500 \
-          "YouTube -> mpv" \
-          "Loading in external player..." || true
+        (
+          ${pkgs.libnotify}/bin/notify-send \
+            --app-name="youtube-mpv" \
+            --urgency=low \
+            --expire-time=3500 \
+            "YouTube -> mpv" \
+            "Loading in external player..." || true
+        ) &
 
         # Prefer non-AV1 formats to avoid unsupported hardware decode paths.
         exec mpv \
           --wayland-app-id=youtube-mpv \
           --hwdec=no \
+          --ytdl-raw-options="player_client=android" \
           --ytdl-format="bestvideo[vcodec!^=av01][height<=1440]+bestaudio/best[vcodec!^=av01][height<=1440]/best" \
           "$url"
       '';

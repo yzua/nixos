@@ -214,7 +214,7 @@
         "network.proxy.socks_remote_dns" = true;
         "network.protocol-handler.external.ytmpv" = true;
         "network.protocol-handler.expose.ytmpv" = false;
-        "network.protocol-handler.warn-external.ytmpv" = true;
+        "network.protocol-handler.warn-external.ytmpv" = false;
       };
     };
 
@@ -239,7 +239,7 @@
         "network.proxy.socks_remote_dns" = true;
         "network.protocol-handler.external.ytmpv" = true;
         "network.protocol-handler.expose.ytmpv" = false;
-        "network.protocol-handler.warn-external.ytmpv" = true;
+        "network.protocol-handler.warn-external.ytmpv" = false;
 
         "sidebar.revamp" = false;
         "sidebar.verticalTabs" = false;
