@@ -18,6 +18,7 @@
 
       services.add-flathub = {
         description = "Add Flathub remote";
+        restartIfChanged = false; # Do not block nixos-rebuild on transient network/DNS failures
         wantedBy = [ ]; # Deferred — started by timer after boot to avoid network wait
         wants = [ "network-online.target" ];
         after = [
@@ -27,6 +28,13 @@
         ];
         path = [ config.services.flatpak.package ];
         script = ''
+          if ! flatpak --system remotes --columns=name | grep -qx flathub; then
+            if ! getent hosts flathub.org >/dev/null; then
+              echo "add-flathub: DNS not ready, will retry via timer/restart"
+              exit 0
+            fi
+          fi
+
           flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         '';
         serviceConfig = {
