@@ -31,35 +31,11 @@
       '';
     };
 
-    ".mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json".text = ''
-      {
-          "allowed_extensions": [
-              "keepassxc-browser@keepassxc.org"
-          ],
-          "description": "KeePassXC integration with native messaging support",
-          "name": "org.keepassxc.keepassxc_browser",
-          "path": "${pkgsStable.keepassxc}/bin/keepassxc-proxy",
-          "type": "stdio"
-      }
-    '';
-
-    ".librewolf/native-messaging-hosts/org.keepassxc.keepassxc_browser.json".text = ''
-      {
-          "allowed_extensions": [
-              "keepassxc-browser@keepassxc.org"
-          ],
-          "description": "KeePassXC integration with native messaging support",
-          "name": "org.keepassxc.keepassxc_browser",
-          "path": "${pkgsStable.keepassxc}/bin/keepassxc-proxy",
-          "type": "stdio"
-      }
-    '';
   };
 
   programs.librewolf = {
     enable = true;
     package = pkgsStable.librewolf;
-    nativeMessagingHosts = [ pkgsStable.keepassxc ];
 
     policies = {
       DisableTelemetry = true;
