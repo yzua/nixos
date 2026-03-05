@@ -85,7 +85,7 @@
         opacity = 0.92;
       }
       {
-        matches = [ { app-id = "^brave"; } ];
+        matches = [ { app-id = "^(librewolf|librewolf-main|librewolf-i2pd)$"; } ];
       }
 
       {
@@ -134,14 +134,19 @@
       }
 
       {
-        matches = [ { app-id = "^(brave|firefox|chromium)"; } ];
+        matches = [ { app-id = "^(brave|firefox|chromium|librewolf|librewolf-main|librewolf-i2pd)"; } ];
         scroll-factor = 0.75;
       }
 
       # Workspace assignments
       {
-        matches = [ { app-id = "^brave-browser$"; } ];
+        matches = [ { app-id = "^(librewolf|librewolf-main)$"; } ];
         open-on-workspace = "󰖟 browser";
+        default-column-width.proportion = 1.0;
+      }
+      {
+        matches = [ { app-id = "^librewolf-i2pd$"; } ];
+        open-on-workspace = "󰦝 vpn";
         default-column-width.proportion = 1.0;
       }
 

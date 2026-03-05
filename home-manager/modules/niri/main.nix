@@ -72,7 +72,7 @@
         ];
       }
 
-      { argv = [ "/run/current-system/sw/bin/brave" ]; }
+      { argv = [ "/home/${constants.user.handle}/.local/bin/librewolf-main" ]; }
       { argv = [ "${constants.editor}" ]; }
       {
         argv = [

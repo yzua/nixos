@@ -10,7 +10,7 @@ let
   inherit (lib) listToAttrs flatten mapAttrsToList;
   inherit (lib.attrsets) nameValuePair;
   defaultApps = {
-    browser = [ "brave-browser.desktop" ];
+    browser = [ "librewolf.desktop" ];
     text = [ "org.gnome.TextEditor.desktop" ]; # Plain text editor
     image = [ "org.gnome.Loupe.desktop" ]; # GNOME Image Viewer (GTK4, Wayland-native)
     audio = [ "io.bassi.Amberol.desktop" ]; # Audio player (GNOME Amberol)

@@ -86,7 +86,8 @@ in
 
     "Mod+Ctrl+L".action.spawn = noctalia "lockScreen lock";
     "Mod+Shift+R".action.spawn = [ "/run/current-system/sw/bin/nautilus" ];
-    "Mod+B".action.spawn = [ "/run/current-system/sw/bin/brave" ];
+    "Mod+B".action.spawn = [ "/home/${constants.user.handle}/.local/bin/librewolf-main" ];
+    "Mod+Shift+B".action.spawn = [ "/home/${constants.user.handle}/.local/bin/librewolf-i2pd" ];
     "Mod+E".action.spawn = [
       "${pkgsStable.bemoji}/bin/bemoji"
       "-cn"
