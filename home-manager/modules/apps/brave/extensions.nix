@@ -6,9 +6,6 @@
     "bkhaagjahfmjljalopjnoealnfndnagc" # Octotree - GitHub code tree
     "hlepfoohegkhhmjieoechaddaejaokhf" # Refined GitHub
 
-    # Translation and language
-    "bpoadfkcbjbfhfodiogcnhhhpibjhbnh" # Immersive Translate - Translate Web & PDF
-
     # Privacy and security
     "dphilobhebphkdjbpfohgikllaljmgbn" # SimpleLogin by Proton: Secure Email Aliases
     "einpaelgookohagofgnnkcfjbkkgepnp" # Random User-Agent (Switcher)
