@@ -92,7 +92,6 @@
         exec mpv \
           --wayland-app-id=youtube-mpv \
           --hwdec=no \
-          --ytdl-raw-options="player_client=android" \
           --ytdl-format="bestvideo[vcodec!^=av01][height<=1440]+bestaudio/best[vcodec!^=av01][height<=1440]/best" \
           "$url"
       '';
