@@ -27,15 +27,6 @@
           enableScrollWheel = true;
           colorizeIcons = false;
         }
-        {
-          id = "Taskbar";
-          onlySameOutput = true;
-          showTitle = false;
-          colorizeIcons = false;
-          iconScale = 0.8;
-          smartWidth = true;
-          maxTaskbarWidth = 40;
-        }
       ];
       right = [
         {
