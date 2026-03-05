@@ -111,6 +111,7 @@ in
           security = {
             admin_user = "admin";
             admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
+            secret_key = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
           };
 
           "auth.anonymous".enabled = false;
