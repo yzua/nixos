@@ -35,8 +35,5 @@
     file # MIME type detection (used by yazi file manager)
     libsecret
     lsof
-
-    # Terminal image display
-    ueberzugpp
   ];
 }

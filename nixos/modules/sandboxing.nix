@@ -13,14 +13,11 @@ let
   mesaEglFirejailArg = "--env=__EGL_VENDOR_LIBRARY_FILENAMES=${mesaEglVendorFile}";
   braveLauncherWrapped = pkgs.writeShellScript "brave-with-basic-password-store" ''
     # Keep Brave launch stable under current NVIDIA + Firejail setup.
-    recovery_profile_dir="''${XDG_CONFIG_HOME:-$HOME/.config}/BraveSoftware/Brave-Browser-Recovery"
-    ${pkgs.coreutils}/bin/mkdir -p "$recovery_profile_dir"
 
     exec ${pkgs.lib.getBin pkgs.brave}/bin/brave \
       --password-store=basic \
       --disable-gpu \
       --proxy-server="socks5://se-mma-wg-socks5-004.relays.mullvad.net:1080" \
-      --user-data-dir="$recovery_profile_dir" \
       "$@"
   '';
 in
@@ -57,7 +54,7 @@ in
         # Force Mesa EGL inside sandbox — firejail strips session env vars,
         # so the system-wide override in nvidia.nix doesn't reach sandboxed apps.
         brave = {
-          executable = "${pkgs.lib.getBin pkgs.brave}/bin/brave";
+          executable = "${braveLauncherWrapped}";
           profile = "${pkgs.firejail}/etc/firejail/brave.profile";
           extraArgs = [ mesaEglFirejailArg ];
         };
@@ -82,22 +79,6 @@ in
           profile = "${pkgs.firejail}/etc/firejail/telegram-desktop.profile";
         };
 
-        wire-desktop = {
-          executable = "${pkgs.lib.getBin pkgsStable.wire-desktop}/bin/wire-desktop";
-          profile = "${pkgs.firejail}/etc/firejail/wire-desktop.profile";
-        };
-
-        # Media streaming
-        freetube = {
-          executable = "${pkgs.lib.getBin pkgs.freetube}/bin/freetube";
-          profile = "${pkgs.firejail}/etc/firejail/freetube.profile";
-        };
-
-        celluloid = {
-          executable = "${pkgs.lib.getBin pkgsStable.celluloid}/bin/celluloid";
-          profile = "${pkgs.firejail}/etc/firejail/celluloid.profile";
-        };
-
         # Discord client (Vencord plugins execute arbitrary JS)
         vesktop = {
           executable = "${pkgs.lib.getBin pkgs.vesktop}/bin/vesktop";
@@ -117,42 +98,6 @@ in
         # KeePassXC excluded from firejail — needs SSH agent socket at
         # $XDG_RUNTIME_DIR, D-Bus for Secret Service, and native messaging
         # for browser integration. It encrypts its own database already.
-
-        # Image viewer
-        imv = {
-          executable = "${pkgs.lib.getBin pkgsStable.imv}/bin/imv";
-          profile = "${pkgs.firejail}/etc/firejail/imv.profile";
-        };
-
-        # Office suite
-        libreoffice = {
-          executable = "${pkgs.lib.getBin pkgsStable.libreoffice-qt6-fresh}/bin/libreoffice";
-          profile = "${pkgs.firejail}/etc/firejail/libreoffice.profile";
-        };
-
-        # File sharing over Tor
-        onionshare-cli = {
-          executable = "${pkgs.lib.getBin pkgsStable.onionshare}/bin/onionshare-cli";
-          profile = "${pkgs.firejail}/etc/firejail/onionshare-cli.profile";
-        };
-
-        # Metadata removal
-        metadata-cleaner = {
-          executable = "${pkgs.lib.getBin pkgsStable.metadata-cleaner}/bin/metadata-cleaner";
-          profile = "${pkgs.firejail}/etc/firejail/metadata-cleaner.profile";
-        };
-
-        # System cleaner
-        bleachbit = {
-          executable = "${pkgs.lib.getBin pkgsStable.bleachbit}/bin/bleachbit";
-          profile = "${pkgs.firejail}/etc/firejail/bleachbit.profile";
-        };
-
-        # Database browser
-        sqlitebrowser = {
-          executable = "${pkgs.lib.getBin pkgsStable.sqlitebrowser}/bin/sqlitebrowser";
-          profile = "${pkgs.firejail}/etc/firejail/sqlitebrowser.profile";
-        };
 
       };
     };
@@ -194,6 +139,11 @@ in
           whitelist ''${HOME}/Videos
           whitelist ''${HOME}/Music
           whitelist ''${HOME}/Desktop
+        '';
+
+        # FreeTube (Electron 38+) needs system D-Bus access in sandbox.
+        "firejail/freetube.local".text = ''
+          ignore dbus-system none
         '';
       };
 

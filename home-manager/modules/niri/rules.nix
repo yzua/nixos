@@ -178,13 +178,17 @@
       }
 
       {
-        matches = [ { app-id = "^com\\.github\\.th_ch\\.youtube_music$"; } ];
+        matches = [ { app-id = "^FreeTube$"; } ];
         open-on-workspace = "󰎆 media";
-        default-column-width.proportion = 1.0;
       }
 
       {
-        matches = [ { app-id = "^FreeTube$"; } ];
+        matches = [ { app-id = "^muffon$"; } ];
+        open-on-workspace = "󰎆 media";
+      }
+
+      {
+        matches = [ { app-id = "^nuclear$"; } ];
         open-on-workspace = "󰎆 media";
       }
 

@@ -8,8 +8,10 @@
   home.packages = [
     (pkgs.bottles.override { removeWarningPopup = true; })
     pkgs.element-desktop
+    pkgsStable.imv
     pkgs.localsend
-    pkgs.pear-desktop
+    pkgsStable.libreoffice-qt6-fresh
+    pkgsStable.sqlitebrowser
     pkgsStable.keepassxc
     # GTK theming
     pkgsStable.gnome-themes-extra

@@ -30,6 +30,7 @@ in
     tpm2-tools
 
     # Security tools
+    metadata-cleaner
     socat # Network relay
     srm # Secure file removal
     veracrypt # Disk encryption

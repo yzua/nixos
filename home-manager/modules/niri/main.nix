@@ -86,7 +86,6 @@
       }
       { argv = [ "/run/current-system/sw/bin/vesktop" ]; }
       { argv = [ "/home/${constants.user.handle}/.local/bin/telegram-desktop-quiet" ]; }
-      { argv = [ "${pkgs.pear-desktop}/bin/pear-desktop" ]; }
     ];
 
     animations = {
