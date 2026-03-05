@@ -123,6 +123,18 @@ let
   );
 
   aiAliases = mkAliasAttrs (aiAgentAliasSpecs ++ aiWorkflowAliasSpecs);
+  logCleanupCommand = ''
+    find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
+  '';
+
+  mkWeeklyTimer = description: {
+    Unit.Description = description;
+    Timer = {
+      OnCalendar = "weekly";
+      Persistent = true;
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
 in
 {
   config = lib.mkIf cfg.enable (
@@ -166,7 +178,7 @@ in
       ]
       ++ (lib.optional cfg.logging.enable (
         pkgs.writeShellScriptBin "ai-agent-log-cleanup" ''
-          find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
+          ${logCleanupCommand}
           echo "Cleaned up logs older than ${toString cfg.logging.retentionDays} days"
         ''
       ));
@@ -183,20 +195,11 @@ in
           Unit.Description = "Clean up old AI agent logs";
           Service = {
             Type = "oneshot";
-            ExecStart = "${pkgs.writeShellScript "cleanup" ''
-              find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
-            ''}";
+            ExecStart = "${pkgs.writeShellScript "cleanup" logCleanupCommand}";
           };
         };
 
-        timers.ai-agent-log-cleanup = {
-          Unit.Description = "Weekly AI agent log cleanup";
-          Timer = {
-            OnCalendar = "weekly";
-            Persistent = true;
-          };
-          Install.WantedBy = [ "timers.target" ];
-        };
+        timers.ai-agent-log-cleanup = mkWeeklyTimer "Weekly AI agent log cleanup";
 
         services.opencode-db-vacuum = {
           Unit.Description = "Vacuum OpenCode SQLite database";
@@ -212,14 +215,7 @@ in
           };
         };
 
-        timers.opencode-db-vacuum = {
-          Unit.Description = "Weekly OpenCode database vacuum";
-          Timer = {
-            OnCalendar = "weekly";
-            Persistent = true;
-          };
-          Install.WantedBy = [ "timers.target" ];
-        };
+        timers.opencode-db-vacuum = mkWeeklyTimer "Weekly OpenCode database vacuum";
       };
     }
   );

@@ -21,6 +21,69 @@ let
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
   opencodeConfigPaths = builtins.map opencodeProfiles.configPath opencodeProfiles.names;
   opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
+  opencodeZaiFilter = ''
+    (if .mcp["zai-mcp-server"] != null then .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key else . end) |
+    .mcp["web-search-prime"] = {
+      type: "remote",
+      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      headers: { Authorization: ("Bearer " + $key) }
+    } |
+    .mcp["web-reader"] = {
+      type: "remote",
+      url: "https://api.z.ai/api/mcp/web_reader/mcp",
+      headers: { Authorization: ("Bearer " + $key) }
+    } |
+    .mcp["zread"] = {
+      type: "remote",
+      url: "https://api.z.ai/api/mcp/zread/mcp",
+      headers: { Authorization: ("Bearer " + $key) }
+    }
+  '';
+  claudeZaiFilter = ''
+    (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
+    .mcpServers["web-search-prime"] = {
+      type: "http",
+      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      headers: { Authorization: ("Bearer " + $key) }
+    } |
+    .mcpServers["web-reader"] = {
+      type: "http",
+      url: "https://api.z.ai/api/mcp/web_reader/mcp",
+      headers: { Authorization: ("Bearer " + $key) }
+    } |
+    .mcpServers["zread"] = {
+      type: "http",
+      url: "https://api.z.ai/api/mcp/zread/mcp",
+      headers: { Authorization: ("Bearer " + $key) }
+    }
+  '';
+  geminiZaiFilter = ''
+    (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
+    .mcpServers["web-search-prime"] = {
+      command: "echo",
+      args: [],
+      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      headers: { Authorization: ("Bearer " + $key) },
+      type: "http"
+    } |
+    .mcpServers["web-reader"] = {
+      command: "echo",
+      args: [],
+      url: "https://api.z.ai/api/mcp/web_reader/mcp",
+      headers: { Authorization: ("Bearer " + $key) },
+      type: "http"
+    } |
+    .mcpServers["zread"] = {
+      command: "echo",
+      args: [],
+      url: "https://api.z.ai/api/mcp/zread/mcp",
+      headers: { Authorization: ("Bearer " + $key) },
+      type: "http"
+    }
+  '';
+  githubPlaceholderFilter = ''
+    walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
+  '';
 in
 {
   config = lib.mkIf cfg.enable {
@@ -29,60 +92,39 @@ in
       # Runs after all config writers so keys can be injected last.
       patchAiAgentSecrets = lib.mkIf (cfg.secrets.zaiApiKeyFile != null) (
         lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "setupClaudeConfig" ] ''
+          patch_json_file() {
+            local file="$1"
+            local arg_name="$2"
+            local arg_value="$3"
+            local filter="$4"
+
+            ${pkgs.jq}/bin/jq --arg "$arg_name" "$arg_value" "$filter" "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+          }
+
+          escape_sed_replacement() {
+            printf '%s\n' "$1" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g'
+          }
+
           if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
             ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
 
             for OPENCODE_CFG in ${opencodeConfigPathList}; do
               if [[ -f "$OPENCODE_CFG" ]]; then
-                ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                  (if .mcp["zai-mcp-server"] != null then .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key else . end) |
-                  .mcp["web-search-prime"] = {
-                    type: "remote",
-                    url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-                    headers: { Authorization: ("Bearer " + $key) }
-                  } |
-                  .mcp["web-reader"] = {
-                    type: "remote",
-                    url: "https://api.z.ai/api/mcp/web_reader/mcp",
-                    headers: { Authorization: ("Bearer " + $key) }
-                  } |
-                  .mcp["zread"] = {
-                    type: "remote",
-                    url: "https://api.z.ai/api/mcp/zread/mcp",
-                    headers: { Authorization: ("Bearer " + $key) }
-                  }
-                ' "$OPENCODE_CFG" > "$OPENCODE_CFG.tmp" && mv "$OPENCODE_CFG.tmp" "$OPENCODE_CFG"
+                patch_json_file "$OPENCODE_CFG" key "$ZAI_KEY" ${lib.escapeShellArg opencodeZaiFilter}
                 echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Z.AI API key"
               fi
             done
 
             CLAUDE_MCP="$HOME/.mcp.json"
             if [[ -f "$CLAUDE_MCP" ]]; then
-              ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
-                .mcpServers["web-search-prime"] = {
-                  type: "http",
-                  url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-                  headers: { Authorization: ("Bearer " + $key) }
-                } |
-                .mcpServers["web-reader"] = {
-                  type: "http",
-                  url: "https://api.z.ai/api/mcp/web_reader/mcp",
-                  headers: { Authorization: ("Bearer " + $key) }
-                } |
-                .mcpServers["zread"] = {
-                  type: "http",
-                  url: "https://api.z.ai/api/mcp/zread/mcp",
-                  headers: { Authorization: ("Bearer " + $key) }
-                }
-              ' "$CLAUDE_MCP" > "$CLAUDE_MCP.tmp" && mv "$CLAUDE_MCP.tmp" "$CLAUDE_MCP"
+              patch_json_file "$CLAUDE_MCP" key "$ZAI_KEY" ${lib.escapeShellArg claudeZaiFilter}
               echo "✓ Patched .mcp.json with Z.AI API key + remote MCPs"
             fi
 
             CODEX_CFG="$HOME/.codex/config.toml"
             if [[ -f "$CODEX_CFG" ]]; then
               if grep -q '\[mcp_servers.zai-mcp-server.env\]' "$CODEX_CFG"; then
-                ESCAPED_ZAI=$(printf '%s\n' "$ZAI_KEY" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g')
+                ESCAPED_ZAI="$(escape_sed_replacement "$ZAI_KEY")"
                 ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ESCAPED_ZAI\"" "$CODEX_CFG"
                 unset ESCAPED_ZAI
               fi
@@ -91,30 +133,7 @@ in
 
             GEMINI_CFG="$HOME/.gemini/settings.json"
             if [[ -f "$GEMINI_CFG" ]]; then
-              ${pkgs.jq}/bin/jq --arg key "$ZAI_KEY" '
-                (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
-                .mcpServers["web-search-prime"] = {
-                  command: "echo",
-                  args: [],
-                  url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-                  headers: { Authorization: ("Bearer " + $key) },
-                  type: "http"
-                } |
-                .mcpServers["web-reader"] = {
-                  command: "echo",
-                  args: [],
-                  url: "https://api.z.ai/api/mcp/web_reader/mcp",
-                  headers: { Authorization: ("Bearer " + $key) },
-                  type: "http"
-                } |
-                .mcpServers["zread"] = {
-                  command: "echo",
-                  args: [],
-                  url: "https://api.z.ai/api/mcp/zread/mcp",
-                  headers: { Authorization: ("Bearer " + $key) },
-                  type: "http"
-                }
-              ' "$GEMINI_CFG" > "$GEMINI_CFG.tmp" && mv "$GEMINI_CFG.tmp" "$GEMINI_CFG"
+              patch_json_file "$GEMINI_CFG" key "$ZAI_KEY" ${lib.escapeShellArg geminiZaiFilter}
               echo "✓ Patched gemini settings.json with Z.AI API key + remote MCPs"
             fi
 
@@ -128,24 +147,18 @@ in
             # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
             for OPENCODE_CFG in ${opencodeConfigPathList}; do
               if [[ -f "$OPENCODE_CFG" ]]; then
-                ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
-                  walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
-                ' "$OPENCODE_CFG" > "$OPENCODE_CFG.tmp" && mv "$OPENCODE_CFG.tmp" "$OPENCODE_CFG"
+                patch_json_file "$OPENCODE_CFG" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
               fi
             done
             if [[ -f "$HOME/.mcp.json" ]]; then
-              ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
-                walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
-              ' "$HOME/.mcp.json" > "$HOME/.mcp.json.tmp" && mv "$HOME/.mcp.json.tmp" "$HOME/.mcp.json"
+              patch_json_file "$HOME/.mcp.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
             fi
             if [[ -f "$HOME/.codex/config.toml" ]]; then
-              ESCAPED_TOKEN=$(printf '%s\n' "$GH_TOKEN" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g')
+              ESCAPED_TOKEN="$(escape_sed_replacement "$GH_TOKEN")"
               ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$ESCAPED_TOKEN/g" "$HOME/.codex/config.toml"
             fi
             if [[ -f "$HOME/.gemini/settings.json" ]]; then
-              ${pkgs.jq}/bin/jq --arg token "$GH_TOKEN" '
-                walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
-              ' "$HOME/.gemini/settings.json" > "$HOME/.gemini/settings.json.tmp" && mv "$HOME/.gemini/settings.json.tmp" "$HOME/.gemini/settings.json"
+              patch_json_file "$HOME/.gemini/settings.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
             fi
             unset GH_TOKEN
             echo "✓ Patched GitHub token from gh CLI into all agent configs"
