@@ -1,6 +1,6 @@
 # Utility Scripts
 
-21 executable Bash scripts across `ai/`, `build/`, `sops/`, `system/`, and root-level `scripts/`, plus one shared library in `lib/` (`logging.sh`). All must pass `shellcheck` (enforced by `just lint`).
+23 executable Bash scripts across `ai/`, `build/`, `sops/`, `system/`, `lib/`, and root-level `scripts/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
 
 ---
 
@@ -17,11 +17,13 @@ scripts/
 ├── build/
 │   ├── modules-check.sh     # Validates default.nix imports match .nix files on disk
 │   ├── modules-check-test.sh # Unit tests for modules-check.sh
+│   ├── packages-check.sh    # Checks for duplicate packages and program/module conflicts
 │   ├── pre-commit-hook.sh   # Git hook: modules → lint → format → check
 │   ├── pre-push-hook.sh     # Git hook: enforces GPG-signed commits
 │   └── shellcheck-nix-inline.sh # Lints inline Bash in writeShellScript blocks
 ├── lib/
-│   └── logging.sh           # Shared logging library (colored output, timestamps)
+│   ├── logging.sh           # Shared logging library (colored output, timestamps)
+│   └── test-helpers.sh      # Shared test utilities (assertions, mocking)
 ├── sops/
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)
 ├── system/
@@ -32,6 +34,7 @@ scripts/
 │   ├── report-collectors-security.sh # Security collectors: fail2ban, Lynis, OpenSnitch, hardening
 │   ├── report-helpers.sh    # Report generation helper functions
 │   └── report-collectors-test.sh # Unit tests for report collectors
+├── browser-select.sh        # Browser profile selector (wofi menu)
 └── nvidia-fans.sh           # GPU fan control
 ```
 
@@ -74,6 +77,7 @@ source "$(dirname "$0")/../lib/logging.sh"
 | Script | Referenced By |
 |--------|-------------|
 | `build/modules-check.sh` | `justfile` (`just modules`) |
+| `build/packages-check.sh` | `justfile` (`just pkgs`) |
 | `build/shellcheck-nix-inline.sh` | `justfile` (`just lint`) |
 | `system/system-report.sh` | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`) |
 | `system/report-collectors.sh` | Sourced by `system-report.sh` (loads module files) |
@@ -83,3 +87,4 @@ source "$(dirname "$0")/../lib/logging.sh"
 | `system/report-helpers.sh` | Sourced by `system-report.sh` |
 | `ai/api-quota.sh` | `home-manager/modules/noctalia/default.nix` (bar widget) |
 | `sops/sops-edit.sh` | `justfile` (`just sops-edit`) |
+| `browser-select.sh` | Niri keybinding (browser profile picker) |

@@ -46,6 +46,11 @@ modules:
     @echo -e "\n➤ Checking modules"
     @\time -f "⏱ Completed in %E" bash ./scripts/build/modules-check.sh
 
+# Check for duplicate packages and program/module conflicts
+pkgs:
+    @echo -e "\n➤ Checking packages"
+    @\time -f "⏱ Completed in %E" bash ./scripts/build/packages-check.sh
+
 # Switch Home-Manager generation
 home:
     @echo -e "\n➤ Switching Home-Manager…"
@@ -60,6 +65,7 @@ nixos:
 all:
     @echo -e "\n➤ Running full pipeline…"
     {{JUST}} modules
+    {{JUST}} pkgs
     {{JUST}} lint
     {{JUST}} format
     {{JUST}} check
