@@ -84,4 +84,22 @@
     options = "grp:caps_toggle,grp_led:caps";
     niriExtra = "terminate:ctrl_alt_bksp";
   };
+
+  # Mullvad SOCKS5 proxy endpoints for browser profiles.
+  # Never mix proxies - each profile gets a dedicated exit.
+  proxies = {
+    # LibreWolf profiles
+    librewolf = {
+      personal = "se-sto-wg-socks5-002.relays.mullvad.net"; # Sweden
+      work = "de-fra-wg-socks5-003.relays.mullvad.net"; # Germany
+      banking = "nl-ams-wg-socks5-005.relays.mullvad.net"; # Netherlands
+      shopping = "ro-buh-wg-socks5-001.relays.mullvad.net"; # Romania
+      illegal = "ch-zrh-wg-socks5-002.relays.mullvad.net"; # Switzerland
+    };
+    brave = {
+      personal = "fi-hel-wg-socks5-001.relays.mullvad.net"; # Finland
+    };
+    # I2P local daemon
+    i2pd = "127.0.0.1"; # Local I2P daemon (port 4447)
+  };
 }
