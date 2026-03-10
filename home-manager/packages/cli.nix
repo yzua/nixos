@@ -1,13 +1,12 @@
 # CLI tools for file management, text processing, and development.
 # NOTE: fzf and carapace are managed by programs.* modules.
-#       yt-dlp is firejail-wrapped at system level.
+# NOTE: restic managed by services.restic
 { pkgsStable, ... }:
 
 {
   home.packages = with pkgsStable; [
-    # Backup
+    # Backup (restic managed by services.restic)
     borgbackup
-    restic
 
     # Container analysis
     dive

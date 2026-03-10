@@ -20,7 +20,6 @@ let
     nix-init # Generate Nix packages from URLs
     nurl # Nix URL fetcher hash helper
     uv # Python package manager; provides uvx for MCP servers
-    dolt # Version-controlled SQL database (Beads backend)
   ];
 
   stable = with pkgsStable; [
@@ -53,6 +52,7 @@ let
 
     # Databases (postgresql provides psql client + libs for local dev)
     dbeaver-bin
+    dolt # Version-controlled SQL database (Beads backend)
     pgcli # Auto-completing PostgreSQL CLI (drop-in psql replacement)
     litecli # Auto-completing SQLite CLI
     postgresql

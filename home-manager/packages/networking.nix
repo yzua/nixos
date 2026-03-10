@@ -1,10 +1,10 @@
 # Networking tools for analysis, monitoring, and security testing.
+# NOTE: openssh managed by services.openssh, bandwhich by programs.bandwhich
 { pkgsStable, ... }:
 
 {
   home.packages = with pkgsStable; [
     # Core networking (networkmanagerapplet managed by services.network-manager-applet)
-    openssh
     openssl
     openssl.dev
 
@@ -25,8 +25,7 @@
     # Network debugging
     netcat
 
-    # Network monitoring
-    bandwhich # Per-process/host bandwidth monitor
+    # Network monitoring (bandwhich managed by programs.bandwhich)
     iftop
     nethogs
     nload

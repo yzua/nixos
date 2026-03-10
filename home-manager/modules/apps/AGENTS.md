@@ -1,6 +1,6 @@
 # Application Configurations
 
-10 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
+9 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
@@ -17,7 +17,6 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 | `obs.nix` | OBS Studio | `programs.obs-studio` + CUDA + plugins |
 | `obsidian.nix` | Obsidian | Desktop entry with Wayland flags |
 | `opensnitch-ui.nix` | OpenSnitch | `home.file` for config + autostart |
-| `pear-desktop.nix` | Pear Desktop | Theme/plugin baseline files |
 | `syncthing.nix` | Syncthing | `services.syncthing` (local file sync) |
 
 ## Subdirectory Modules

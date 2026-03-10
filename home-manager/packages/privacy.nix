@@ -1,6 +1,5 @@
 # Privacy and security tools for anonymous browsing and network analysis.
-# NOTE: librewolf, signal-desktop, wire-desktop, keepassxc, onionshare,
-#       metadata-cleaner, bleachbit are firejail-wrapped at system level.
+# NOTE: i2pd managed by services.i2pd
 {
   pkgs,
   pkgsStable,
@@ -17,8 +16,7 @@ in
     nmap
     tcpdump
 
-    # Network anonymity
-    i2pd
+    # Network anonymity (i2pd managed by services.i2pd)
     tribler
 
     # Privacy browsers — wrapped to force Mesa EGL (see wrapWithMesaEgl above)
