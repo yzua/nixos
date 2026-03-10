@@ -6,7 +6,6 @@ _:
     opencode = {
       ohMyOpencode = {
         enable = true;
-        googleAuth = false;
 
         agents = {
           sisyphus = {

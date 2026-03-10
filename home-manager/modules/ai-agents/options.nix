@@ -222,12 +222,6 @@ in
           description = "Enable oh-my-opencode configuration";
         };
 
-        googleAuth = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Use Google OAuth for authentication";
-        };
-
         agents = lib.mkOption {
           type = ohMyOpencodeAgentType;
           default = { };

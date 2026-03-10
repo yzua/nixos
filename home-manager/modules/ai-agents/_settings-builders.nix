@@ -59,8 +59,7 @@ let
 
   ohMyOpencodeSettings = {
     "$schema" =
-      "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json";
-    google_auth = cfg.opencode.ohMyOpencode.googleAuth;
+      "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json";
     agents = lib.mapAttrs (
       _: agent:
       {
