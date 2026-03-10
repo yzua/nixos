@@ -16,7 +16,7 @@ let
     audio = [ "io.bassi.Amberol.desktop" ]; # Audio player (GNOME Amberol)
     video = [ "io.github.celluloid_player.Celluloid.desktop" ]; # Video player (GTK Celluloid)
     directory = [ "org.gnome.Nautilus.desktop" ]; # File manager
-    office = [ "libreoffice-startcenter.desktop" ]; # Office suite (firejail-wrapped)
+    office = [ "libreoffice-startcenter.desktop" ]; # Office suite
     pdf = [ "org.pwmt.zathura.desktop" ]; # PDF viewer
     terminal = [ "${constants.terminalAppId}.desktop" ]; # Terminal emulator
     archive = [ "org.gnome.Nautilus.desktop" ]; # Nautilus handles archives via file-roller

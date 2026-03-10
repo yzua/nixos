@@ -72,7 +72,7 @@
         ];
       }
 
-      { argv = [ "/home/${constants.user.handle}/.local/bin/librewolf-main" ]; }
+      { argv = [ "/home/${constants.user.handle}/.local/bin/librewolf-personal" ]; }
       { argv = [ "${constants.editor}" ]; }
       {
         argv = [
@@ -84,8 +84,8 @@
           "main"
         ];
       }
-      { argv = [ "/run/current-system/sw/bin/vesktop" ]; }
-      { argv = [ "/home/${constants.user.handle}/.local/bin/telegram-desktop-quiet" ]; }
+      { argv = [ "${pkgs.vesktop}/bin/vesktop" ]; }
+      { argv = [ "${pkgs.telegram-desktop}/bin/Telegram" ]; }
     ];
 
     animations = {

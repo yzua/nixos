@@ -9,6 +9,10 @@
   min-width: 280px !important;
 }
 
+#sidebar-header {
+  display: none !important;
+}
+
 /* Hide native tab strip (Sidebery handles tabs). */
 #TabsToolbar {
   visibility: collapse !important;

@@ -1,44 +1,109 @@
 # LibreWolf browser with declarative baseline policies, multi-profile proxy setup, and extensions.
+# Each profile is fully isolated with its own proxy - never mix proxies.
 {
   pkgsStable,
+  constants,
   ...
 }:
+let
+  inherit (constants.proxies.librewolf)
+    personal
+    work
+    banking
+    shopping
+    illegal
+    ;
+  inherit (constants.proxies) i2pd;
+
+  # Shared profile settings for all profiles.
+  baseSettings = {
+    "app.update.auto" = false;
+    "browser.shell.checkDefaultBrowser" = false;
+    "browser.startup.page" = 1;
+    "browser.newtabpage.enabled" = true;
+    "browser.privatebrowsing.autostart" = false;
+    "browser.compactmode.show" = true;
+    "browser.uidensity" = 1;
+    "browser.toolbars.bookmarks.visibility" = "newtab";
+    "browser.tabs.loadInBackground" = true;
+    "browser.tabs.warnOnClose" = false;
+    "browser.tabs.closeWindowWithLastTab" = false;
+
+    # Theme
+    "extensions.activeThemeID" = "{1e01c787-99d2-4826-86df-0003da8e88cd}";
+    "layout.css.prefers-color-scheme.content-override" = 0;
+    "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+    "layout.css.moz-document.content.enabled" = true;
+
+    # Sidebar - disabled for Sidebery
+    "sidebar.revamp" = false;
+    "sidebar.verticalTabs" = false;
+    "sidebar.visibility" = "hide-sidebar";
+
+    # Privacy
+    "media.peerconnection.enabled" = false;
+    "network.cookie.lifetimePolicy" = 0;
+    "privacy.clearOnShutdown.cookies" = false;
+    "privacy.clearOnShutdown.offlineApps" = false;
+    "privacy.clearOnShutdown.history" = false;
+    "privacy.clearOnShutdown.cache" = false;
+    "privacy.sanitize.sanitizeOnShutdown" = false;
+
+    # Proxy base config (host set per-profile)
+    "network.proxy.type" = 1;
+    "network.proxy.socks_port" = 1080;
+    "network.proxy.socks_version" = 5;
+    "network.proxy.socks_remote_dns" = true;
+
+    # ytmpv protocol handler
+    "network.protocol-handler.external.ytmpv" = true;
+    "network.protocol-handler.expose.ytmpv" = false;
+    "network.protocol-handler.warn-external.ytmpv" = false;
+  };
+
+  # Generate launcher script for a profile.
+  mkLauncher = name: profilePath: {
+    ".local/bin/librewolf-${name}" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -euo pipefail
+        exec ${pkgsStable.librewolf}/bin/librewolf \
+          --new-instance \
+          --name librewolf-${name} \
+          --profile "$HOME/.librewolf/${profilePath}" \
+          "$@"
+      '';
+    };
+  };
+
+  # Generate chrome file symlinks for a profile.
+  mkChromeFiles = profilePath: {
+    ".librewolf/${profilePath}/chrome/userChrome.css".source =
+      ../../../../themes/librewolf-userChrome.css;
+    ".librewolf/${profilePath}/chrome/userContent.css".source =
+      ../../../../themes/librewolf-userContent.css;
+  };
+
+  librewolfProfileFiles =
+    # Launcher scripts for each profile.
+    (mkLauncher "personal" "personal.default")
+    // (mkLauncher "work" "work.default")
+    // (mkLauncher "banking" "banking.default")
+    // (mkLauncher "shopping" "shopping.default")
+    // (mkLauncher "illegal" "illegal.default")
+    // (mkLauncher "i2pd" "i2pd.default")
+    # Chrome theming for each profile.
+    // (mkChromeFiles "personal.default")
+    // (mkChromeFiles "work.default")
+    // (mkChromeFiles "banking.default")
+    // (mkChromeFiles "shopping.default")
+    // (mkChromeFiles "illegal.default")
+    // (mkChromeFiles "i2pd.default");
+in
 {
-  home.file = {
-    ".local/bin/librewolf-main" = {
-      executable = true;
-      text = ''
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec /run/current-system/sw/bin/librewolf \
-          --new-instance \
-          --name librewolf-main \
-          --profile "$HOME/.librewolf/acffhfnf.default" \
-          "$@"
-      '';
-    };
-
-    ".local/bin/librewolf-i2pd" = {
-      executable = true;
-      text = ''
-        #!/usr/bin/env bash
-        set -euo pipefail
-        exec /run/current-system/sw/bin/librewolf \
-          --new-instance \
-          --name librewolf-i2pd \
-          --profile "$HOME/.librewolf/i2pd.default" \
-          "$@"
-      '';
-    };
-
-    ".librewolf/acffhfnf.default/chrome/userChrome.css".source =
-      ../../../../themes/librewolf-userChrome.css;
-    ".librewolf/acffhfnf.default/chrome/userContent.css".source =
-      ../../../../themes/librewolf-userContent.css;
-    ".librewolf/i2pd.default/chrome/userChrome.css".source =
-      ../../../../themes/librewolf-userChrome.css;
-    ".librewolf/i2pd.default/chrome/userContent.css".source =
-      ../../../../themes/librewolf-userContent.css;
+  home.file = librewolfProfileFiles // {
+    ".librewolf/profiles.ini".force = true;
   };
 
   programs.librewolf = {
@@ -54,7 +119,6 @@
       OfferToSaveLogins = false;
       PasswordManagerEnabled = false;
       ExtensionSettings = {
-        # Declarative Firefox add-ons.
         # Enhanced GitHub
         "{72bd91c9-3dc5-40a8-9b10-dec633c0873f}" = {
           installation_mode = "force_installed";
@@ -70,12 +134,12 @@
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/refined-github-/latest.xpi";
         };
-        # SimpleLogin by Proton: Secure Email Aliases
+        # SimpleLogin by Proton
         "addon@simplelogin" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/simplelogin/latest.xpi";
         };
-        # Random User-Agent (Switcher)
+        # Random User-Agent
         "{b43b974b-1d3a-4232-b226-eaa2ac6ebb69}" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/random_user_agent/latest.xpi";
@@ -100,7 +164,7 @@
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/json-viewer-nick/latest.xpi";
         };
-        # Wappalyzer - Technology profiler
+        # Wappalyzer
         "wappalyzer@crunchlabz.com" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/wappalyzer/latest.xpi";
@@ -115,7 +179,7 @@
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/return-youtube-dislikes/latest.xpi";
         };
-        # Unhook - Remove YouTube Recommended & Shorts
+        # Unhook - Remove YouTube Recommended
         "myallychou@gmail.com" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/youtube-recommended-videos/latest.xpi";
@@ -125,7 +189,7 @@
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/control-panel-for-twitter/latest.xpi";
         };
-        # SponsorBlock for YouTube - Skip Sponsorships
+        # SponsorBlock
         "sponsorBlocker@ajay.app" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/sponsorblock/latest.xpi";
@@ -135,17 +199,17 @@
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/gruvbox-material-theme/latest.xpi";
         };
-        # New Tab (shows your homepage)
+        # New Tab
         "{ffd1b628-42fb-4779-a7ad-569b801b85bc}" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/new-tab-shows-your-homepage/latest.xpi";
         };
-        # Redirector (URL-based redirects, e.g. YouTube -> custom target)
+        # Redirector
         "redirector@einaregilsson.com" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/redirector/latest.xpi";
         };
-        # Violentmonkey (userscript manager)
+        # Violentmonkey
         "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}" = {
           installation_mode = "force_installed";
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/violentmonkey/latest.xpi";
@@ -167,88 +231,75 @@
       };
     };
 
-    profiles.default = {
-      id = 0;
-      isDefault = true;
-      path = "acffhfnf.default";
-      settings = {
-        # === Browser UX ===
-        "app.update.auto" = false;
-        "browser.shell.checkDefaultBrowser" = false;
-        "browser.startup.homepage" = "http://127.0.0.1:8082/search";
-        "browser.startup.page" = 1;
-        "browser.newtabpage.enabled" = true;
-        "browser.privatebrowsing.autostart" = false;
-        "browser.compactmode.show" = true;
-        "browser.uidensity" = 1; # Compact UI density
-        "browser.toolbars.bookmarks.visibility" = "newtab";
-        "browser.tabs.loadInBackground" = true;
-        "browser.tabs.warnOnClose" = false;
-        "browser.tabs.closeWindowWithLastTab" = false;
-
-        # === Theme ===
-        "extensions.activeThemeID" = "{1e01c787-99d2-4826-86df-0003da8e88cd}";
-        "layout.css.prefers-color-scheme.content-override" = 0; # Prefer dark
-        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-        "layout.css.moz-document.content.enabled" = true;
-
-        # === Sidebar ===
-        # Keep Firefox native sidebar disabled when using Sidebery.
-        "sidebar.revamp" = false;
-        "sidebar.verticalTabs" = false;
-        "sidebar.visibility" = "hide-sidebar";
-
-        "media.peerconnection.enabled" = false;
-
-        "network.cookie.lifetimePolicy" = 0;
-        "privacy.clearOnShutdown.cookies" = false;
-        "privacy.clearOnShutdown.offlineApps" = false;
-        "privacy.clearOnShutdown.history" = false;
-        "privacy.clearOnShutdown.cache" = false;
-        "privacy.sanitize.sanitizeOnShutdown" = false;
-
-        "network.proxy.type" = 1;
-        "network.proxy.socks" = "nl-ams-wg-socks5-001.relays.mullvad.net";
-        "network.proxy.socks_port" = 1080;
-        "network.proxy.socks_version" = 5;
-        "network.proxy.socks_remote_dns" = true;
-        "network.protocol-handler.external.ytmpv" = true;
-        "network.protocol-handler.expose.ytmpv" = false;
-        "network.protocol-handler.warn-external.ytmpv" = false;
+    profiles = {
+      # Personal profile - Sweden proxy (default)
+      personal = {
+        id = 0;
+        isDefault = true;
+        path = "personal.default";
+        settings = baseSettings // {
+          "browser.startup.homepage" = "http://127.0.0.1:8082/search";
+          "network.proxy.socks" = personal;
+        };
       };
-    };
 
-    profiles.i2pd = {
-      id = 1;
-      isDefault = false;
-      path = "i2pd.default";
-      settings = {
-        "app.update.auto" = false;
-        "browser.shell.checkDefaultBrowser" = false;
-        "browser.startup.homepage" = "about:blank";
-        "browser.startup.page" = 1;
-        "browser.newtabpage.enabled" = false;
-        "browser.privatebrowsing.autostart" = false;
+      # Work profile - Germany proxy
+      work = {
+        id = 1;
+        isDefault = false;
+        path = "work.default";
+        settings = baseSettings // {
+          "browser.startup.homepage" = "about:blank";
+          "network.proxy.socks" = work;
+        };
+      };
 
-        "media.peerconnection.enabled" = false;
+      # Banking profile - Netherlands proxy
+      banking = {
+        id = 2;
+        isDefault = false;
+        path = "banking.default";
+        settings = baseSettings // {
+          "browser.startup.homepage" = "about:blank";
+          "network.proxy.socks" = banking;
+        };
+      };
 
-        "network.proxy.type" = 1;
-        "network.proxy.socks" = "127.0.0.1";
-        "network.proxy.socks_port" = 4447;
-        "network.proxy.socks_version" = 5;
-        "network.proxy.socks_remote_dns" = true;
-        "network.protocol-handler.external.ytmpv" = true;
-        "network.protocol-handler.expose.ytmpv" = false;
-        "network.protocol-handler.warn-external.ytmpv" = false;
+      # Shopping profile - Switzerland proxy
+      shopping = {
+        id = 3;
+        isDefault = false;
+        path = "shopping.default";
+        settings = baseSettings // {
+          "browser.startup.homepage" = "about:blank";
+          "network.proxy.socks" = shopping;
+        };
+      };
 
-        "sidebar.revamp" = false;
-        "sidebar.verticalTabs" = false;
-        "sidebar.visibility" = "hide-sidebar";
-        "extensions.activeThemeID" = "{1e01c787-99d2-4826-86df-0003da8e88cd}";
-        "layout.css.moz-document.content.enabled" = true;
+      # Illegal profile - USA proxy
+      illegal = {
+        id = 4;
+        isDefault = false;
+        path = "illegal.default";
+        settings = baseSettings // {
+          "browser.startup.homepage" = "about:blank";
+          "network.proxy.socks" = illegal;
+        };
+      };
+
+      # I2P profile - local I2P daemon (port 4447)
+      i2pd = {
+        id = 5;
+        isDefault = false;
+        path = "i2pd.default";
+        settings = baseSettings // {
+          "browser.startup.homepage" = "about:blank";
+          "browser.newtabpage.enabled" = false;
+          "network.proxy.socks" = i2pd;
+          "network.proxy.socks_port" = 4447;
+        };
       };
     };
   };
 
-  home.file.".librewolf/profiles.ini".force = true;
 }

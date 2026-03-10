@@ -2,7 +2,7 @@
 {
   imports = [
     ./desktop-entries.nix # Desktop entries and Element keyring wrapper script
-    ./keepassxc.nix # KeePassXC desktop entry (binary is firejail-wrapped)
+    ./keepassxc.nix # KeePassXC desktop entry
     ./obs.nix # OBS Studio with CUDA and plugins
     ./syncthing.nix # Syncthing local file sync
     ./nixcord.nix # Discord (Vesktop + Vencord)
@@ -10,7 +10,7 @@
     ./opensnitch-ui.nix # OpenSnitch application firewall GUI
     ./nautilus.nix # Nautilus (GNOME Files) dconf preferences
     ./vscode # VS Code editor with extensions and settings
-    ./brave # Brave browser with declarative extensions and settings baseline
+    ./brave # Brave browser with declarative extensions
     ./librewolf # LibreWolf browser with declarative profile settings and policies
     ./obsidian.nix # Obsidian Markdown notes app defaults
   ];

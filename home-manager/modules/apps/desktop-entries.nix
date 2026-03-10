@@ -22,23 +22,13 @@
         } >> "$log_file"
 
         export ELECTRON_ENABLE_LOGGING=1
-        exec element-desktop --password-store=gnome-libsecret "$@" >> "$main_log_file" 2>&1
+        exec ${pkgs.element-desktop}/bin/element-desktop --password-store=gnome-libsecret "$@" >> "$main_log_file" 2>&1
       '';
     };
 
-    ".local/bin/telegram-desktop-quiet" = {
+    ".local/bin/browser-select" = {
       executable = true;
-      text = ''
-        #!/usr/bin/env bash
-        set -euo pipefail
-
-        log_file="''${XDG_STATE_HOME:-$HOME/.local/state}/telegram-desktop.log"
-        mkdir -p "$(dirname "$log_file")"
-
-        # Telegram currently emits frequent Qt paint warnings on Wayland.
-        # Keep a local log file while avoiding user-journal spam.
-        exec /run/current-system/sw/bin/telegram-desktop "$@" >> "$log_file" 2>&1
-      '';
+      text = builtins.readFile ../../../scripts/browser-select.sh;
     };
 
     ".local/bin/youtube-mpv" = {
@@ -104,9 +94,15 @@
         set -euo pipefail
 
         if [[ $# -gt 0 ]]; then
-          case "$1" in
-            https://youtube.com/*|http://youtube.com/*|https://www.youtube.com/*|http://www.youtube.com/*|https://m.youtube.com/*|http://m.youtube.com/*|https://music.youtube.com/*|http://music.youtube.com/*|https://youtu.be/*|http://youtu.be/*)
-              exec /home/${user}/.local/bin/youtube-mpv "$1"
+          url="$1"
+          case "$url" in
+            http://*|https://*)
+              # Interactive browser selection for HTTP/HTTPS URLs
+              exec /home/${user}/.local/bin/browser-select "$url"
+              ;;
+            ytmpv://*)
+              # Custom YouTube-to-mpv protocol
+              exec /home/${user}/.local/bin/youtube-mpv "$url"
               ;;
           esac
         fi
@@ -116,19 +112,11 @@
     };
   };
 
+  home.packages = [
+    pkgs.wofi
+  ];
+
   xdg.desktopEntries = {
-    "org.telegram.desktop" = {
-      name = "Telegram Desktop";
-      exec = "/home/${user}/.local/bin/telegram-desktop-quiet -- %U";
-      icon = "telegram";
-      comment = "Official Telegram Desktop client (firejail-wrapped)";
-      categories = [
-        "Chat"
-        "Network"
-        "InstantMessaging"
-      ];
-      mimeType = [ "x-scheme-handler/tg" ];
-    };
     "youtube-mpv" = {
       name = "YouTube MPV";
       exec = "/home/${user}/.local/bin/youtube-mpv %U";
@@ -139,48 +127,6 @@
         "Player"
       ];
       mimeType = [ "x-scheme-handler/ytmpv" ];
-    };
-    "brave-browser" = {
-      name = "Brave Web Browser";
-      exec = "/run/current-system/sw/bin/brave %U";
-      icon = "brave-browser";
-      comment = "Brave Web Browser (firejail-wrapped)";
-      categories = [
-        "Network"
-        "WebBrowser"
-      ];
-      mimeType = [
-        "text/html"
-        "text/xml"
-        "application/xhtml+xml"
-        "x-scheme-handler/http"
-        "x-scheme-handler/https"
-      ];
-    };
-    "io.github.celluloid_player.Celluloid" = {
-      name = "Celluloid";
-      exec = "/run/current-system/sw/bin/celluloid %U";
-      icon = "io.github.celluloid_player.Celluloid";
-      comment = "GTK video player powered by mpv (firejail-wrapped)";
-      categories = [
-        "AudioVideo"
-        "Video"
-        "Player"
-        "GTK"
-      ];
-      mimeType = [
-        "video/mp4"
-        "video/x-matroska"
-        "video/webm"
-        "video/mpeg"
-        "video/ogg"
-        "video/x-msvideo"
-        "video/mp2t"
-        "video/x-flv"
-        "audio/mpeg"
-        "audio/ogg"
-        "audio/flac"
-      ];
     };
     "element-desktop" = {
       name = "Element";
@@ -198,26 +144,63 @@
         "x-scheme-handler/matrix"
       ];
     };
-    "libreoffice-startcenter" = {
-      name = "LibreOffice";
-      exec = "/run/current-system/sw/bin/libreoffice %U";
-      icon = "libreoffice-startcenter";
-      comment = "Office suite (firejail-wrapped)";
-      categories = [
-        "Office"
-      ];
-      mimeType = [
-        "application/vnd.oasis.opendocument.text"
-        "application/vnd.oasis.opendocument.spreadsheet"
-        "application/vnd.oasis.opendocument.presentation"
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        "application/msword"
-        "application/vnd.ms-excel"
-        "application/vnd.ms-powerpoint"
-        "application/rtf"
-      ];
+
+    # === LibreWolf Profiles ===
+    "librewolf-personal" = {
+      name = "LibreWolf Personal";
+      exec = "/home/${user}/.local/bin/librewolf-personal %U";
+      icon = "librewolf";
+      comment = "LibreWolf with Sweden proxy";
+      categories = [ "Network" ];
+    };
+
+    "librewolf-work" = {
+      name = "LibreWolf Work";
+      exec = "/home/${user}/.local/bin/librewolf-work %U";
+      icon = "librewolf";
+      comment = "LibreWolf with Germany proxy";
+      categories = [ "Network" ];
+    };
+
+    "librewolf-banking" = {
+      name = "LibreWolf Banking";
+      exec = "/home/${user}/.local/bin/librewolf-banking %U";
+      icon = "librewolf";
+      comment = "LibreWolf with Netherlands proxy";
+      categories = [ "Network" ];
+    };
+
+    "librewolf-shopping" = {
+      name = "LibreWolf Shopping";
+      exec = "/home/${user}/.local/bin/librewolf-shopping %U";
+      icon = "librewolf";
+      comment = "LibreWolf with Romania proxy";
+      categories = [ "Network" ];
+    };
+
+    "librewolf-illegal" = {
+      name = "LibreWolf Illegal";
+      exec = "/home/${user}/.local/bin/librewolf-illegal %U";
+      icon = "librewolf";
+      comment = "LibreWolf with Switzerland proxy";
+      categories = [ "Network" ];
+    };
+
+    "librewolf-i2pd" = {
+      name = "LibreWolf I2P";
+      exec = "/home/${user}/.local/bin/librewolf-i2pd %U";
+      icon = "librewolf";
+      comment = "LibreWolf with I2P proxy";
+      categories = [ "Network" ];
+    };
+
+    # === Brave ===
+    "brave-proxy" = {
+      name = "Brave";
+      exec = "/home/${user}/.local/bin/brave-proxy %U";
+      icon = "brave";
+      comment = "Brave with Finland proxy";
+      categories = [ "Network" ];
     };
   };
 }
