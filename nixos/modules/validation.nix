@@ -49,13 +49,6 @@
       message = "Firewall must be enabled (networking.firewall.enable = true) for system security.";
     }
 
-    {
-      assertion =
-        !config.mySystem.sandboxing.enable
-        || config.boot.kernel.sysctl."kernel.unprivileged_userns_clone" == 1;
-      message = "Sandboxing requires unprivileged user namespaces (boot.kernel.sysctl.'kernel.unprivileged_userns_clone' = 1).";
-    }
-
     # === Network Service Security ===
     {
       assertion = !config.services.avahi.enable || config.services.avahi.allowInterfaces != [ ];

@@ -24,11 +24,6 @@ in
 
   config = {
     mySystem = {
-      sandboxing = {
-        enable = mkDefaultTrue;
-        enableUserNamespaces = mkDefaultTrue;
-        enableWrappedBinaries = mkDefaultTrue;
-      };
       cleanup.enable = mkDefaultTrue;
       flatpak.enable = mkDefaultTrue;
       mullvadVpn.enable = mkDefaultTrue;

@@ -2,7 +2,7 @@
 
 7 always-on sub-modules (no enable guard — security is unconditional). Split from monolithic `security.nix` for maintainability. Only exception: `audit-logging.nix` is guarded by `mySystem.auditLogging.enable`.
 
-Parent modules (`sandboxing.nix`, `opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable security features outside this directory.
+Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable security features outside this directory.
 
 ---
 

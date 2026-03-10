@@ -30,7 +30,6 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 | Module | Purpose | Custom Options |
 |--------|---------|----------------|
 | `security/` | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | `mySystem.auditLogging.enable` (for fail2ban only; other security sub-modules are always-on) |
-| `sandboxing.nix` | Firejail, bubblewrap | `mySystem.sandboxing.*` |
 | `tor.nix` | Tor SOCKS proxy (9050/9150) | `mySystem.tor.enable` |
 | `mullvad-vpn.nix` | Mullvad VPN client | `mySystem.mullvadVpn.enable` |
 | `dnscrypt-proxy.nix` | Encrypted DNS with DNSSEC | `mySystem.dnscryptProxy.enable` |
@@ -126,7 +125,7 @@ Sets `lib.mkDefault` for all shared `mySystem.*` options so hosts only need to s
 | `backup.enable` | `false` | `false` |
 | `auditLogging.enable` | `true` | `true` |
 | `vnc.enable` | `false` | `false` |
-| Most others (sandboxing, flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect) | `true` | `true` |
+| Most others (flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect) | `true` | `true` |
 
 Host configs only need:
 ```nix
@@ -163,7 +162,6 @@ hardware.bluetooth = {
 | `mySystem.gaming` | `hardware.graphics.enable` | Graphics drivers required |
 | `mySystem.gaming` | `services.pipewire.pulse.enable` | PipeWire with PulseAudio compat |
 | `mySystem.mullvadVpn` | `networking.networkmanager.enable` | NetworkManager required |
-| `mySystem.sandboxing` | `kernel.unprivileged_userns_clone = 1` | User namespaces required |
 | `mySystem.dnscryptProxy` | `!services.resolved.enable` | Conflicts with systemd-resolved |
 | Any config | `networking.firewall.enable` | Firewall mandatory |
 | `services.avahi` | `allowInterfaces != []` | Explicit interface list required |

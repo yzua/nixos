@@ -38,7 +38,6 @@
 
     # Security
     ./security # Kernel hardening, firewall, AppArmor, opsec
-    ./sandboxing.nix # Firejail and bubblewrap sandboxing
     ./opensnitch.nix # Application firewall with network logging
     ./sops.nix # SOPS-Nix encrypted secrets (age)
 

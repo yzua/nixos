@@ -107,7 +107,7 @@ Add a new entry with `enabled = true`:
 ```bash
 # Place your age key at ~/.config/sops/age/keys.txt
 just sops-edit           # Add your secrets (API keys, etc.)
-just all                 # Full pipeline: modules -> lint -> format -> check -> nixos -> home
+just all                 # Full pipeline: modules -> pkgs -> lint -> format -> check -> nixos -> home
 ```
 
 ---
@@ -116,10 +116,11 @@ just all                 # Full pipeline: modules -> lint -> format -> check -> 
 
 | Command | What it does |
 |---------|-------------|
-| `just all` | Full pipeline: modules -> lint -> format -> check -> nixos -> home |
+| `just all` | Full pipeline: modules -> pkgs -> lint -> format -> check -> nixos -> home |
 | `just home` | Apply Home Manager config (safe, user-level) |
 | `just nixos` | Apply NixOS config (system-level) |
 | `just modules` | Validate default.nix imports match files on disk |
+| `just pkgs` | Check for duplicate packages and program/module conflicts |
 | `just lint` | statix + deadnix + shellcheck + inline Nix scripts + markdownlint |
 | `just dead` | deadnix only (subset of lint) |
 | `just format` | nixfmt-tree |
@@ -141,6 +142,7 @@ just all                 # Full pipeline: modules -> lint -> format -> check -> 
 # Edit -> validate -> test -> apply
 vim nixos/modules/my-module.nix
 just modules    # Fast import check
+just pkgs       # Check for duplicate packages
 just lint       # Linting
 just format     # Auto-format
 just check      # Flake evaluation
@@ -164,7 +166,6 @@ All features toggle via `mySystem.*` options. Set `hostProfile` first, then over
 | `gaming.enableGamemode` | Feral GameMode performance daemon |
 | `gaming.enableGamescope` | Gamescope compositor for Steam |
 | `bluetooth.enable` | Bluetooth services |
-| `sandboxing.enable` | Firejail, bubblewrap |
 | `mullvadVpn.enable` | Mullvad VPN |
 | `tor.enable` | Tor SOCKS proxy |
 | `yggdrasil.enable` | Yggdrasil encrypted mesh overlay network |
@@ -220,7 +221,7 @@ I2PD local endpoints after enable:
 
 Always-on (no toggle): kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, AIDE file integrity monitoring.
 
-Toggleable: Firejail sandboxing, Mullvad VPN, Tor, Yggdrasil mesh overlay, DNSCrypt, OpenSnitch firewall, fail2ban audit logging.
+Toggleable: Mullvad VPN, Tor, Yggdrasil mesh overlay, DNSCrypt, OpenSnitch firewall, fail2ban audit logging.
 
 ---
 
