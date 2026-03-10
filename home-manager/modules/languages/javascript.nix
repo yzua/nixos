@@ -11,6 +11,7 @@ let
   globalNpmPackages = [
     "@anthropic-ai/claude-code"
     "@google/gemini-cli"
+    "@modelcontextprotocol/inspector"
     "@openai/codex"
     "opencode-ai"
     "btca"

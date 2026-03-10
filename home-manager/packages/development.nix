@@ -20,6 +20,7 @@ let
     nix-init # Generate Nix packages from URLs
     nurl # Nix URL fetcher hash helper
     uv # Python package manager; provides uvx for MCP servers
+    python313Packages.fastmcp # Pythonic MCP server/client framework
   ];
 
   stable = with pkgsStable; [
