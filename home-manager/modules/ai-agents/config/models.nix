@@ -13,6 +13,8 @@
       ];
 
       extraSettings = {
+        share = "disabled";
+        autoupdate = false;
         tui = {
           theme = "gruvbox";
           show_tokens = true;
@@ -28,14 +30,19 @@
           test = {
             template = "Run the project test suite. If a justfile exists, use 'just check'. Otherwise find and run the appropriate test command.";
             description = "Run project tests";
+            agent = "build";
+            subtask = true;
           };
           deploy = {
             template = "Run the NixOS deployment pipeline: just modules && just lint && just format && just check && just home. Only run 'just nixos' if I explicitly confirm.";
             description = "Deploy NixOS configuration";
+            agent = "build";
           };
           review = {
             template = "Review the staged git changes (git diff --staged). Check for: correctness, edge cases, security issues, performance problems, maintainability. Rate issues as CRITICAL/WARNING/SUGGESTION.";
             description = "Review staged changes";
+            agent = "plan";
+            subtask = true;
           };
         };
       };
@@ -47,7 +54,7 @@
     codex = {
       enable = true;
       useWrapper = true;
-      model = "gpt-5.3-codex";
+      model = "gpt-5.4";
       personality = "pragmatic";
       reasoningEffort = "medium";
       approvalPolicy = "on-request";
@@ -55,11 +62,20 @@
         "${config.home.homeDirectory}/System"
       ];
       extraToml = ''
+        [agents]
+        max_threads = 4
+
+        [agents.explorer]
+        description = "Read-only style codebase exploration, file tracing, and evidence gathering."
+
+        [agents.worker]
+        description = "Targeted implementation and fixes after the task is understood."
+
+        [agents.monitor]
+        description = "Long-running command, build, and polling monitor with concise status updates."
+
         [features]
-        request_rule = true
-        collaboration_modes = true
-        personality = true
-        model_reasoning_summary = true
+        multi_agent = true
         child_agents_md = true
 
         [profiles.nix]

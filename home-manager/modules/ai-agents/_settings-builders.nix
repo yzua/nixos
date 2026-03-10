@@ -11,8 +11,8 @@ let
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   sonnetModel = "anthropic/claude-sonnet-4-6";
-  gptMainModel = "openai/gpt-5.3-codex";
-  gptStandardModel = "openai/gpt-5.3-codex";
+  gptMainModel = "openai/gpt-5.4";
+  gptStandardModel = "openai/gpt-5.4";
   gptFastModel = "opencode/gpt-5-nano";
 
   replaceOpusWithSonnet =
@@ -149,7 +149,7 @@ let
         })
       ) ohMyOpencodeSettings.agents
       // {
-        # Autonomous deep worker agent (defaults to openai/gpt-5.3-codex)
+        # Autonomous deep worker agent (defaults to openai/gpt-5.4)
         hephaestus = {
           model = "zai-coding-plan/glm-5";
         };

@@ -8,7 +8,6 @@
 
 let
   cfg = config.programs.aiAgents;
-  homeDir = config.home.homeDirectory;
 
   inherit (builtins) toJSON;
 
@@ -19,7 +18,7 @@ let
   inherit (settingsBuilders) claudeSettings;
 
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
-  opencodeConfigPaths = builtins.map opencodeProfiles.configPath opencodeProfiles.names;
+  opencodeConfigPaths = map opencodeProfiles.configPath opencodeProfiles.names;
   opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
   opencodeZaiFilter = ''
     (if .mcp["zai-mcp-server"] != null then .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key else . end) |
@@ -286,11 +285,13 @@ in
           personality = "${cfg.codex.personality}"
           model = "${cfg.codex.model}"
           model_reasoning_effort = "${cfg.codex.reasoningEffort}"
+          model_reasoning_summary = "concise"
           approval_policy = "${cfg.codex.approvalPolicy}"
+          allow_login_shell = false
           check_for_update_on_startup = true
           suppress_unstable_features_warning = true
 
-          web_search = "live"
+          web_search = "cached"
 
           notify = ["${codexNotifyScript}"]
 
@@ -313,7 +314,6 @@ in
 
           [profiles.quick]
           model_reasoning_effort = "low"
-          approval_policy = "on-failure"
 
           [profiles.deep]
           model_reasoning_effort = "xhigh"
@@ -327,10 +327,6 @@ in
           inherit = "core"
           include_only = ["PATH", "HOME", "USER", "SHELL", "TERM", "EDITOR", "VISUAL", "LANG", "LC_ALL", "PWD"]
           exclude = ["AWS_*", "AZURE_*", "GCP_*", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
-
-          [sandbox_workspace_write]
-          network_access = true
-          writable_roots = ["${homeDir}/.config", "${homeDir}/.local"]
 
           ${mcpToml}
           ${projectsToml}
