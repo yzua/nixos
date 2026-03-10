@@ -172,15 +172,18 @@ ai-agents/
 
 ### Claude Code
 
-| Setting           | Value            | Why                                                     |
-| ----------------- | ---------------- | ------------------------------------------------------- |
-| Model             | `opus`           | Best quality for primary coding                         |
-| Extended thinking | Always on        | Better reasoning by default                             |
-| Tool search       | `auto:5`         | Auto-search when >5 tools match (faster with many MCPs) |
-| Auto-updates      | `latest` channel | Fastest release track                                   |
-| Cleanup           | 14 days          | Auto-delete old sessions                                |
-| Attribution       | Disabled         | No auto-attribution in commits/PRs                      |
-| Turn duration     | Shown            | "Cooked for Xm Ys" feedback                             |
+| Setting                  | Value            | Why                                                     |
+| ------------------------ | ---------------- | ------------------------------------------------------- |
+| Model                    | `opus`           | Best quality for primary coding                         |
+| Extended thinking        | Always on        | Better reasoning by default                             |
+| Auto memory              | Enabled          | Preserve useful project learnings across sessions       |
+| Tool search              | `auto:5`         | Auto-search when >5 tools match (faster with many MCPs) |
+| Git instructions         | Disabled         | Avoid duplicate git workflow guidance from Anthropic    |
+| Agent team display       | `in-process`     | Safer default than forcing tmux-specific pane behavior  |
+| Auto-updates             | `latest` channel | Fastest release track                                   |
+| Cleanup                  | 14 days          | Auto-delete old sessions                                |
+| Attribution              | Disabled         | No auto-attribution in commits/PRs                      |
+| Turn duration            | Shown            | "Cooked for Xm Ys" feedback                             |
 
 Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`, `docker`, etc. Deny: `rm -rf /`, `rm -rf ~`, disk operations (`dd`, `mkfs`), `.env` files, `./secrets/`, SSH keys.
 
@@ -211,19 +214,22 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`
 
 ### Codex
 
-| Setting                  | Value                          | Why                                                 |
-| ------------------------ | ------------------------------ | --------------------------------------------------- |
-| Model                    | `gpt-5.3-codex`                | Latest Codex model                                  |
-| Personality              | `pragmatic`                    | Direct, practical responses                         |
-| Reasoning effort         | `medium`                       | Balanced speed/quality                              |
-| Approval policy          | `on-request`                   | Model decides when to ask                           |
-| Web search               | `live`                         | Real-time web access                                |
-| Update check             | Enabled                        | Current generated config sets startup update checks |
-| History                  | `save-all`                     | Persistent session history                          |
-| Feature: request_rule    | Enabled                        | Smart approval suggestions                          |
-| Feature: child_agents_md | Enabled                        | Honors nested AGENTS instructions in subdirectories |
-| Profiles                 | nix, review, quick, deep, safe | Context-switching presets                           |
-| Shell env policy         | `core`                         | Exclude secrets/tokens from env                     |
+| Setting                  | Value                          | Why                                                           |
+| ------------------------ | ------------------------------ | ------------------------------------------------------------- |
+| Model                    | `gpt-5.4`                      | Current recommended Codex model                               |
+| Personality              | `pragmatic`                    | Direct, practical responses                                   |
+| Reasoning effort         | `medium`                       | Balanced speed/quality                                        |
+| Reasoning summary        | `concise`                      | Keeps reasoning visible without flooding the transcript        |
+| Approval policy          | `on-request`                   | Good autonomy/safety balance for local coding                 |
+| Web search               | `cached`                       | Safer default than live fetch while keeping research utility  |
+| Login shell              | Disabled                       | Reduces shell-profile side effects and accidental env leakage |
+| Update check             | Enabled                        | Current generated config sets startup update checks           |
+| History                  | `save-all`                     | Persistent session history                                    |
+| Feature: multi_agent     | Enabled                        | Turns on Codex sub-agent workflows                            |
+| Feature: child_agents_md | Enabled                        | Adds AGENTS scope guidance even when no local AGENTS file exists |
+| Agent thread cap         | `4`                            | Enables parallelism without overloading the main session      |
+| Profiles                 | nix, review, quick, deep, safe | Context-switching presets                                     |
+| Shell env policy         | `core`                         | Exclude secrets/tokens from env                               |
 
 Trusted projects: `~/System`.
 
