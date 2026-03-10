@@ -3,91 +3,115 @@
   # --- PreToolUse Hooks ---
   PreToolUse = [
     {
-      matcher = ''tool == "Bash" && tool_input.command matches "(rm -rf|DROP|DELETE FROM|truncate)"'';
+      matcher = "Bash";
       hooks = [
         {
           type = "command";
           command = ''
-            echo "⚠️  DESTRUCTIVE COMMAND DETECTED" >&2
-            cat
-          '';
-        }
-      ];
-    }
-    {
-      matcher = ''tool == "Bash" && tool_input.command matches "git commit"'';
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            if [ -f "justfile" ] && just --summary 2>/dev/null | grep -qw "lint"; then
-              echo "🔍 Pre-commit: running just lint..." >&2
-              just lint 2>&1 | tail -5 >&2
-            elif [ -f ".pre-commit-config.yaml" ] && command -v pre-commit >/dev/null 2>&1; then
-              echo "🔍 Pre-commit: running pre-commit..." >&2
-              pre-commit run --all-files 2>&1 | tail -5 >&2
-            elif [ -f "package.json" ] && grep -q '"lint"' package.json 2>/dev/null; then
-              echo "🔍 Pre-commit: running npm run lint..." >&2
-              npm run lint 2>&1 | tail -5 >&2
-            elif [ -f "Cargo.toml" ] && command -v cargo >/dev/null 2>&1; then
-              echo "🔍 Pre-commit: running cargo check..." >&2
-              cargo check 2>&1 | tail -5 >&2
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if echo "$COMMAND" | grep -Eq '(rm -rf|DROP|DELETE FROM|truncate)'; then
+              echo "⚠️  DESTRUCTIVE COMMAND DETECTED" >&2
             fi
-            cat
+            echo "$INPUT"
           '';
         }
       ];
     }
     {
-      matcher = ''tool == "Bash" && tool_input.command matches "(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)"'';
+      matcher = "Bash";
       hooks = [
         {
           type = "command";
           command = ''
-            echo "[Hook] BLOCKED: Dev server must run in tmux for log access" >&2
-            echo "[Hook] Use: tmux new-session -d -s dev \"npm run dev\"" >&2
-            echo "[Hook] Then: tmux attach -t dev" >&2
-            exit 1
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if echo "$COMMAND" | grep -Eq 'git commit'; then
+              if [ -f "justfile" ] && just --summary 2>/dev/null | grep -qw "lint"; then
+                echo "🔍 Pre-commit: running just lint..." >&2
+                just lint 2>&1 | tail -5 >&2
+              elif [ -f ".pre-commit-config.yaml" ] && command -v pre-commit >/dev/null 2>&1; then
+                echo "🔍 Pre-commit: running pre-commit..." >&2
+                pre-commit run --all-files 2>&1 | tail -5 >&2
+              elif [ -f "package.json" ] && grep -q '"lint"' package.json 2>/dev/null; then
+                echo "🔍 Pre-commit: running npm run lint..." >&2
+                npm run lint 2>&1 | tail -5 >&2
+              elif [ -f "Cargo.toml" ] && command -v cargo >/dev/null 2>&1; then
+                echo "🔍 Pre-commit: running cargo check..." >&2
+                cargo check 2>&1 | tail -5 >&2
+              fi
+            fi
+            echo "$INPUT"
           '';
         }
       ];
     }
     {
-      matcher = ''tool == "Bash" && tool_input.command matches "(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make|docker|pytest|vitest|playwright)"'';
+      matcher = "Bash";
       hooks = [
         {
           type = "command";
           command = ''
-            if [ -z "$TMUX" ]; then
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if echo "$COMMAND" | grep -Eq '(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)'; then
+              echo "[Hook] BLOCKED: Dev server must run in tmux for log access" >&2
+              echo "[Hook] Use: tmux new-session -d -s dev \"npm run dev\"" >&2
+              echo "[Hook] Then: tmux attach -t dev" >&2
+              exit 2
+            fi
+            echo "$INPUT"
+          '';
+        }
+      ];
+    }
+    {
+      matcher = "Bash";
+      hooks = [
+        {
+          type = "command";
+          command = ''
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if [ -z "$TMUX" ] && echo "$COMMAND" | grep -Eq '(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make|docker|pytest|vitest|playwright)'; then
               echo "[Hook] Consider running in tmux for session persistence" >&2
               echo "[Hook] tmux new -s dev  |  tmux attach -t dev" >&2
             fi
-            cat
+            echo "$INPUT"
           '';
         }
       ];
     }
     {
-      matcher = ''tool == "Bash" && tool_input.command matches "git push"'';
+      matcher = "Bash";
       hooks = [
         {
           type = "command";
           command = ''
-            echo "[Hook] Review changes before push..." >&2
-            cat
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if echo "$COMMAND" | grep -Eq 'git push'; then
+              echo "[Hook] Review changes before push..." >&2
+            fi
+            echo "$INPUT"
           '';
         }
       ];
     }
     {
-      matcher = ''tool == "Bash" && tool_input.command matches "(git push --force|git push -f|git reset --hard|git clean -fd)"'';
+      matcher = "Bash";
       hooks = [
         {
           type = "command";
           command = ''
-            echo "[Hook] BLOCKED: destructive git command requires explicit manual execution" >&2
-            echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
-            exit 1
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if echo "$COMMAND" | grep -Eq '(git push --force|git push -f|git reset --hard|git clean -fd)'; then
+              echo "[Hook] BLOCKED: destructive git command requires explicit manual execution" >&2
+              echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
+              exit 2
+            fi
+            echo "$INPUT"
           '';
         }
       ];
@@ -132,7 +156,7 @@
           type = "command";
           command = ''
             INPUT=$(cat)
-            TOOL=$(echo "$INPUT" | jq -r '.tool // "unknown"')
+            TOOL=$(echo "$INPUT" | jq -r '.tool_name // .tool // "unknown"')
             ERROR=$(echo "$INPUT" | jq -r '.error // "no error"' | head -5)
             echo "[Hook] Tool FAILED: $TOOL — $ERROR" >&2
             echo "$INPUT"
@@ -145,7 +169,7 @@
   # --- PostToolUse Hooks (Auto-Format + Analysis) ---
   PostToolUse = [
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.(ts|tsx|js|jsx|json|jsonc)$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -161,7 +185,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.rs$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -177,7 +201,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.zig$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -193,7 +217,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.go$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -209,7 +233,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.nix$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -225,7 +249,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.py$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -241,7 +265,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.(yaml|yml|toml)$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -257,15 +281,18 @@
       ];
     }
     {
-      matcher = ''tool == "Bash" && tool_input.command matches "gh pr create"'';
+      matcher = "Bash";
       hooks = [
         {
           type = "command";
           command = ''
             INPUT=$(cat)
-            PR_URL=$(echo "$INPUT" | jq -r '.tool_output.output // ""' | grep -oE 'https://github.com/[^/]+/[^/]+/pull/[0-9]+' || true)
-            if [ -n "$PR_URL" ]; then
-              echo "[Hook] PR created: $PR_URL" >&2
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+            if echo "$COMMAND" | grep -Eq 'gh pr create'; then
+              PR_URL=$(echo "$INPUT" | jq -r '.tool_output.output // ""' | grep -oE 'https://github.com/[^/]+/[^/]+/pull/[0-9]+' || true)
+              if [ -n "$PR_URL" ]; then
+                echo "[Hook] PR created: $PR_URL" >&2
+              fi
             fi
             echo "$INPUT"
           '';
@@ -273,7 +300,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.(ts|tsx|js|jsx)$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
@@ -293,7 +320,7 @@
       ];
     }
     {
-      matcher = ''tool == "Edit" && tool_input.file_path matches "\\.(ts|tsx)$"'';
+      matcher = "Edit|Write";
       hooks = [
         {
           type = "command";
