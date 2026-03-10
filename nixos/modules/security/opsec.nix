@@ -1,12 +1,12 @@
 # Operational security (kexec, metadata stripping, zram, NTS time).
-{ lib, pkgs, ... }:
+{ lib, pkgsStable, ... }:
 
 {
   boot.kernel.sysctl = {
     "kernel.kexec_load_disabled" = 1; # Prevent runtime kernel replacement
   };
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgsStable; [
     mat2 # Metadata removal (images, PDFs, office docs)
     exiftool
   ];

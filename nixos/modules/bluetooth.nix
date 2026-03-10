@@ -3,7 +3,7 @@
 {
   config,
   lib,
-  pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -65,7 +65,7 @@ in
       };
     };
 
-    environment.systemPackages = with pkgs; [
+    environment.systemPackages = with pkgsStable; [
       libfreeaptx # aptX and aptX-HD codec support
     ];
   };

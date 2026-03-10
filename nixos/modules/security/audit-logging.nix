@@ -2,7 +2,7 @@
 {
   config,
   lib,
-  pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -23,7 +23,7 @@
       };
     };
 
-    environment.systemPackages = with pkgs; [
+    environment.systemPackages = with pkgsStable; [
       audit # provides aureport, ausearch, auditctl, etc.
     ];
   };

@@ -1,7 +1,7 @@
 # Weekly Lynis security audit timer and service.
 {
   lib,
-  pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -9,16 +9,16 @@ let
   helpers = import ./_systemd-timer-helpers.nix { inherit lib; };
   inherit (helpers) mkOneshotService mkPersistentTimer;
 
-  auditScript = pkgs.writeShellScript "security-audit.sh" ''
-    #!${pkgs.bash}/bin/bash
+  auditScript = pkgsStable.writeShellScript "security-audit.sh" ''
+    #!${pkgsStable.bash}/bin/bash
     echo 'Running Lynis audit...'
-    ${pkgs.lynis}/bin/lynis audit system --quiet
+    ${pkgsStable.lynis}/bin/lynis audit system --quiet
     echo 'Security audit completed!'
   '';
 in
 
 {
-  environment.systemPackages = with pkgs; [ lynis ];
+  environment.systemPackages = with pkgsStable; [ lynis ];
 
   systemd = {
     timers.security-audit = mkPersistentTimer {

@@ -1,9 +1,9 @@
 # Nix Helper (nh) build tool wrapper.
-{ pkgs, user, ... }:
+{ pkgsStable, user, ... }:
 
 {
   environment = {
-    systemPackages = with pkgs; [ nh ];
+    systemPackages = with pkgsStable; [ nh ];
     sessionVariables.NH_FLAKE = "/home/${user}/System";
   };
 

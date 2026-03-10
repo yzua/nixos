@@ -2,7 +2,7 @@
 {
   config,
   lib,
-  pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -12,7 +12,7 @@
   };
 
   config = lib.mkIf config.mySystem.vnc.enable {
-    environment.systemPackages = with pkgs; [
+    environment.systemPackages = with pkgsStable; [
       x11vnc
       novnc
       python3Packages.websockify
