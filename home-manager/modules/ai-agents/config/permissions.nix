@@ -28,7 +28,10 @@ in
         cleanupPeriodDays = 14;
         respectGitignore = true;
         alwaysThinkingEnabled = true;
+        autoMemoryEnabled = true;
+        includeGitInstructions = false;
         showTurnDuration = true;
+        teammateMode = "in-process";
         spinnerTipsEnabled = true;
         autoUpdatesChannel = "latest";
         prefersReducedMotion = false;
