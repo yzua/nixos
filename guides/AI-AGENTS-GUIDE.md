@@ -111,6 +111,8 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | Alias/Function               | What It Runs                                                       | Notes                                                                |
 | ---------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | `cl`                         | `claude`                                                           | Claude Code safe default                                              |
+| `ocl`                        | `claude --dangerously-skip-permissions --model opus`              | Claude Code forced Opus model                                         |
+| `hcl`                        | `claude --dangerously-skip-permissions --model haiku`             | Claude Code forced Haiku model                                        |
 | `clu`                        | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                    |
 | `clglm`                      | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                          |
 | `oc`                         | `opencode`                                                         | Default OpenCode                                                     |
@@ -121,7 +123,16 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `oczen`                      | `opencode_zen`                                                     | OpenCode with Zen free profile                                       |
 | `gem`                        | `gemini --yolo`                                                    | Gemini CLI YOLO (default)                                            |
 | `cx`                         | `codex --no-alt-screen`                                            | Codex safe default                                                    |
+| `lcx`                        | `codex ... -c model_reasoning_effort=\"low\"`                  | Codex low reasoning effort profile                                    |
+| `mcx`                        | `codex ... -c model_reasoning_effort=\"medium\"`               | Codex medium reasoning effort profile                                 |
+| `hcx`                        | `codex ... -c model_reasoning_effort=\"high\"`                 | Codex high reasoning effort profile                                   |
+| `xcx`                        | `codex ... -c model_reasoning_effort=\"xhigh\"`                | Codex extra-high reasoning effort profile                             |
 | `cxu`                        | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex YOLO (unsafe explicit)                                          |
+| `locgpt`                     | `opencode_gpt --model openai/gpt-5.3-codex-spark`                 | OpenCode GPT low reasoning/speed variant                              |
+| `mocgpt`                     | `opencode_gpt --model openai/gpt-5.3-codex`                       | OpenCode GPT medium reasoning default                                 |
+| `hocgpt`                     | `opencode_gpt --model openai/gpt-5.4`                             | OpenCode GPT high reasoning variant                                   |
+| `xocgpt`                     | `opencode_gpt --model openai/gpt-5.1-codex-max`                   | OpenCode GPT extra-high reasoning variant                             |
+| `ais`                        | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix |
 | `aip`                        | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt         |
 | `claude_glm` (`clglm`)      | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars               |
 | `opencode_glm` (`ocglm`)    | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`         |
@@ -135,8 +146,20 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `ocs`, `oczen`, `gem`, `cx`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `ais`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
+
+### Interactive Selector (`ais`)
+
+`ais` launches a sectioned fzf flow (default mode) so selection is clearer:
+
+1. Pick provider (`OpenCode`, `Claude Code`, `Codex`, `Gemini`)
+2. Pick profile/mode for that provider
+3. Pick workflow suffix (`none`, `cm`, `rf`, `sa`, `bp`, `md`) when supported
+
+When `none` is selected, it runs normal mode (no workflow postfix prompt).
+
+Use `ais -s` (or `ais --simple`) for the previous flat prefix picker mode.
 
 ---
 
