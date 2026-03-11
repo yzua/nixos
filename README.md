@@ -140,7 +140,7 @@ just all                 # Full pipeline: modules -> pkgs -> lint -> format -> c
 
 ```bash
 # Edit -> validate -> test -> apply
-vim nixos/modules/my-module.nix
+vim nixos/modules/cleanup/cache.nix
 just modules    # Fast import check
 just pkgs       # Check for duplicate packages
 just lint       # Linting
@@ -263,6 +263,7 @@ hosts/<hostname>/
   local-packages.nix          # Host-specific packages
   modules/                    # Host-specific hardware modules
 nixos/modules/                # Shared system modules (50+ imports including sub-modules)
+  AGENTS.md                   # System-scope agent guidance
   cleanup/                    # Automated cleanup timers (downloads, caches)
   security/                   # Kernel hardening, firewall, AppArmor, opsec
   prometheus-grafana/         # Prometheus + Alertmanager + Grafana stack
@@ -272,6 +273,7 @@ nixos/modules/                # Shared system modules (50+ imports including sub
   validation.nix              # Cross-module conflict assertions
   ...                         # One module per subsystem
 home-manager/
+  AGENTS.md                   # Home Manager scope agent guidance
   home.nix                    # HM entry point (standalone, not NixOS module)
   modules/
     ai-agents/                # AI coding agents (Claude Code, OpenCode, Codex, Gemini)
@@ -288,6 +290,20 @@ secrets/secrets.yaml          # Encrypted secrets (sops-nix, age)
 dev-shells/                   # Per-language dev environments (Node, Python, Rust, Go, etc.)
 guides/                       # Reference docs (AI agents, Ghostty, Neovim, Niri, Yazi, Zellij)
 ```
+
+---
+
+## AGENTS Hierarchy
+
+This repo uses hierarchical `AGENTS.md` files for area-specific coding guidance:
+
+- `AGENTS.md` — root/global workflow, validation order, architecture boundaries
+- `nixos/AGENTS.md` — system-scope entrypoint and module boundary guidance
+- `home-manager/AGENTS.md` — user-scope HM entrypoint and module/package split guidance
+- `nixos/modules/**/AGENTS.md` and `home-manager/modules/**/AGENTS.md` — domain-specific rules
+- `hosts/AGENTS.md`, `scripts/AGENTS.md`, `dev-shells/AGENTS.md` — subtree conventions
+
+When editing a subtree, read the nearest `AGENTS.md` first.
 
 ---
 

@@ -5,10 +5,12 @@ Stack: nix fmt (nixfmt-tree) | statix + deadnix + shellcheck + markdownlint
 Architecture: x86_64-linux, Niri compositor (scrollable tiling Wayland), Gruvbox theming (stylix)
 
 Sub-directory `AGENTS.md` files exist at these locations with deeper module-level guidance. Read them when working in those areas:
+- `nixos/` — Top-level system scope, shared module entrypoint, host wiring boundaries
 - `nixos/modules/` — NixOS module categories, option patterns, validation deps
 - `nixos/modules/security/` — Hardening values, always-on security modules
 - `nixos/modules/cleanup/` — Cleanup timer helper pattern and retention policy modules
 - `nixos/modules/prometheus-grafana/` — Observability stack wiring, alert rules, dashboards
+- `home-manager/` — Top-level user scope, HM entrypoint, module/package split boundaries
 - `home-manager/modules/` — HM module hierarchy, theming, config patterns
 - `home-manager/modules/languages/` — Language toolchains, aliases, env/session wiring
 - `home-manager/packages/` — HM package chunk taxonomy and helper patterns
@@ -43,7 +45,7 @@ just check     # nix flake check --no-build (evaluates flake without building)
 ```bash
 just home      # Home Manager switch (safe, user-level)
 just nixos     # NixOS switch (system-level)
-just all       # Full pipeline: modules -> lint -> format -> check -> nixos -> home
+just all       # Full pipeline: modules -> pkgs -> lint -> format -> check -> nixos -> home
 ```
 
 ### Security auditing
@@ -110,8 +112,8 @@ No unit-test runner. Escalate: `just modules` (fastest) → `just check` (eval) 
 ### Imports
 
 - Every directory with `.nix` files must have a `default.nix` listing all imports
-- Both file (`./file.nix`) and directory (`./subdir`) imports are valid
-- Each import gets a short inline comment: `./audio.nix # Audio system (PipeWire)`
+- Both file (`./fwupd.nix`) and directory (`./security`) imports are valid
+- Each import gets a short inline comment: `./fwupd.nix # Firmware updates`
 - After adding/removing a `.nix` file, update `default.nix` and run `just modules`
 - Files prefixed with `_` (e.g., `_lib.nix`, `_helpers.nix`) are **helper files** imported manually by other modules, NOT listed in `default.nix`. The modules-check script skips them.
 

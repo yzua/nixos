@@ -63,7 +63,7 @@ Bus IDs are defined as `mySystem.nvidia.*` options in `hosts/laptop/modules/nvid
 
 1. Copy existing host: `cp -r hosts/desktop hosts/<new-hostname>`
 2. Replace `hardware-configuration.nix` from target machine (`/etc/nixos/`)
-3. Add to `hosts` list in `flake.nix` with `hostname` and `stateVersion`
+3. Add host entry to `hosts/_inventory.nix` with `hostname`, `stateVersion`, and `enabled = true`
 4. Adjust `mySystem.*` options in `configuration.nix` for hardware
 5. Set `services.avahi.allowInterfaces` to the correct network interface
 6. Create/modify `modules/` for hardware-specific needs

@@ -23,7 +23,7 @@ just check     # nix flake check --no-build (evaluates without building)
 ```bash
 just home      # Home Manager switch (safe, user-level) — run FIRST
 just nixos     # NixOS switch (system-level) — run AFTER just home
-just all       # Full pipeline: modules → lint → format → check → nixos → home
+just all       # Full pipeline: modules → pkgs → lint → format → check → nixos → home
 ```
 
 ### Other commands
@@ -60,7 +60,7 @@ just secrets-add KEY    # Add single secret (prompts securely for value)
 - `constants` from `shared/constants.nix` — single source of truth for terminal, editor, fonts, theme, keyboard, user identity
 - NixOS `specialArgs`: `inputs`, `user`, `pkgsStable`, `pkgConfig`, `constants`, `hostname`, `stateVersion`
 - HM `specialArgs`: `inputs`, `user`, `pkgsStable`, `constants`, `hostname`, `homeStateVersion`
-- `nh` (Nix Helper) wraps all builds; `FLAKE` env var points to `~/System` automatically
+- `nh` (Nix Helper) wraps all builds; `NH_FLAKE` points to `~/System` automatically
 - **Critical**: niri flake input does NOT follow nixpkgs (`# Do NOT follow nixpkgs — mesa compatibility`) — do not add `inputs.nixpkgs.follows`
 
 ### Module hierarchy
@@ -72,7 +72,7 @@ flake.nix
   │    └─ hosts/<hostname>/modules/          # Host-specific hardware modules
   ├─ home-manager/home.nix                   # HM entry point (standalone)
   │    ├─ home-manager/modules/default.nix   # User-level modules
-  │    └─ home-manager/packages/default.nix  # 12 domain chunks aggregated via builtins.concatLists
+  │    └─ home-manager/packages/default.nix  # 11 domain chunks + 2 custom package modules
   └─ dev-shells/                             # Per-language dev environments (standalone flakes)
 ```
 
@@ -89,7 +89,7 @@ flake.nix
 - No custom option namespace — directly configure `programs.*`, `services.*`, `home.*`
 - **Exception**: `home-manager/modules/ai-agents/` uses `programs.aiAgents.*` (the only HM module with a custom options namespace)
 - Receives `constants` for shared values
-- Packages split into 12 domain chunks in `home-manager/packages/`, each with signature `{ pkgs, pkgsStable }: [ ... ]`
+- Packages split across 11 domain chunks plus 2 custom package modules in `home-manager/packages/`; each imported module contributes to `home.packages`
 
 ### Sub-directory AGENTS.md files
 
