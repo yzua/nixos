@@ -28,6 +28,7 @@ assert_contains "$table_header_output" "|---|---|" "print_table_header emits sep
 feature_gate_msg="$(require_enabled_feature "false" "Netdata" || true)"
 assert_contains "$feature_gate_msg" "[unavailable] Netdata not enabled." "require_enabled_feature emits unavailable message"
 
+# shellcheck disable=SC2329 # Invoked indirectly by sourced collector functions.
 safe_cmd() {
 	if [[ "$1" == "systemctl" && "$2" == "list-timers" ]]; then
 		cat <<'EOF'
@@ -39,10 +40,35 @@ EOF
 	return 1
 }
 
+tmp_logs_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_logs_dir"' EXIT
+
+printf 'fatal: boom\n' >"${tmp_logs_dir}/error.log"
+printf 'all good\n' >"${tmp_logs_dir}/ok.log"
+
+assert_eq "$(scan_error_log_count "" "$tmp_logs_dir")" "1" "scan_error_log_count counts only matching log files"
+assert_eq "$(scan_error_log_count "0" "$tmp_logs_dir")" "1" "scan_error_log_count honors mtime filters"
+
 timers_output="$(collect_systemd_timers)"
 assert_contains "$timers_output" "| apt-daily.timer | Mon 2026-02-16 09:00:00 |" "timers table uses timer unit name"
 assert_contains "$timers_output" "| fstrim.timer | Tue 2026-02-17 01:00:00 |" "timers table includes second timer"
 assert_not_contains "$timers_output" "| apt-daily.service |" "timers table does not use activates service as timer name"
+
+# shellcheck disable=SC2329 # Invoked indirectly by sourced collector functions.
+safe_cmd() {
+	if [[ "$1" == "systemctl" && "$2" == "--no-legend" ]]; then
+		cat <<'EOF'
+alpha.service loaded failed failed Alpha service
+beta.socket loaded failed failed Beta socket
+EOF
+		return 0
+	fi
+	return 1
+}
+
+failed_services_output="$(collect_systemd_errors 24)"
+assert_contains "$failed_services_output" "- \`alpha.service\`" "systemd errors lists failed unit names"
+assert_contains "$failed_services_output" "- \`beta.socket\`" "systemd errors lists multiple failed units"
 
 # shellcheck disable=SC2034 # Used by sourced collector functions.
 HAS_FAIL2BAN="false"

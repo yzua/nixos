@@ -5,19 +5,18 @@ scan_error_log_count() {
 	local mtime_filter="$1"
 	shift
 	local -a dirs=("$@")
+	local -a find_args=()
 	local -a matched_files=()
 
+	find_args=("${dirs[@]}" -type f -name "*.log")
 	if [[ -n "$mtime_filter" ]]; then
-		mapfile -t matched_files < <(
-			find "${dirs[@]}" -type f -name "*.log" -mtime "$mtime_filter" -print0 2>/dev/null |
-				xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
-		)
-	else
-		mapfile -t matched_files < <(
-			find "${dirs[@]}" -type f -name "*.log" -print0 2>/dev/null |
-				xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
-		)
+		find_args+=(-mtime "$mtime_filter")
 	fi
+
+	mapfile -t matched_files < <(
+		find "${find_args[@]}" -print0 2>/dev/null |
+			xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
+	)
 
 	echo "${#matched_files[@]}"
 }
@@ -33,7 +32,7 @@ collect_systemd_errors() {
 	else
 		while IFS= read -r line; do
 			local unit
-			unit=$(echo "$line" | awk '{print $1}')
+			unit="${line%% *}"
 			echo "- \`${unit}\`"
 		done <<<"$failed"
 	fi

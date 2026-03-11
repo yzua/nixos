@@ -73,6 +73,22 @@ EOF
 EOF
 }
 
+setup_duplicate_import_entries() {
+	mkdir -p modules
+	cat >modules/default.nix <<'EOF'
+{ ... }:
+{
+  imports = [
+    ./audio.nix
+    ./audio.nix
+  ];
+}
+EOF
+	cat >modules/audio.nix <<'EOF'
+{ ... }: { }
+EOF
+}
+
 setup_manual_helper_comment() {
 	mkdir -p modules
 	cat >modules/default.nix <<'EOF'
@@ -135,6 +151,7 @@ run_case "valid file + directory imports" 0 "All imports OK" setup_valid_imports
 run_case "missing file import fails" 1 "Bad import \\(no such file or directory\\)" setup_missing_file_import || ((failed++))
 run_case "missing directory default fails" 1 "directory import missing default.nix" setup_missing_directory_default || ((failed++))
 run_case "unimported local module fails" 1 "Missing import: ./modules/network.nix" setup_unimported_local_module || ((failed++))
+run_case "duplicate import entries stay valid" 0 "All imports OK" setup_duplicate_import_entries || ((failed++))
 run_case "manual helper comment is skipped" 0 "All imports OK" setup_manual_helper_comment || ((failed++))
 
 if ((failed > 0)); then

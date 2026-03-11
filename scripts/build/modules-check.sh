@@ -121,6 +121,31 @@ parse_manual_helpers() {
 	' "$default_file"
 }
 
+collect_unique_nonempty_lines() {
+	awk 'NF && !seen[$0]++'
+}
+
+validate_import_path() {
+	local dir="$1"
+	local import_path="$2"
+	local resolved_path="${dir}/${import_path}"
+
+	if [[ -f "$resolved_path" ]]; then
+		return 0
+	fi
+
+	if [[ -d "$resolved_path" ]]; then
+		if [[ ! -f "${resolved_path}/default.nix" ]]; then
+			echo "✗  Bad import (directory import missing default.nix): $dir/$import_path" >&2
+			return 1
+		fi
+		return 0
+	fi
+
+	echo "✗  Bad import (no such file or directory): $dir/$import_path" >&2
+	return 1
+}
+
 main() {
 	local error_count=0
 	check_dependencies
@@ -154,12 +179,12 @@ main() {
 		unset imported_set
 		declare -A imported_set=()
 		local -a unique_imports=()
+		mapfile -t unique_imports < <(printf '%s\n' "${imported[@]}" | collect_unique_nonempty_lines)
+
 		local import_path
-		for import_path in "${imported[@]}"; do
-			[[ -n "$import_path" ]] || continue
+		for import_path in "${unique_imports[@]}"; do
 			if [[ -z "${imported_set[$import_path]:-}" ]]; then
 				imported_set["$import_path"]=1
-				unique_imports+=("$import_path")
 			fi
 		done
 
@@ -181,22 +206,9 @@ main() {
 		done
 
 		for import_path in "${unique_imports[@]}"; do
-			local resolved_path="${dir}/${import_path}"
-
-			if [[ -f "$resolved_path" ]]; then
-				continue
+			if ! validate_import_path "$dir" "$import_path"; then
+				((error_count++))
 			fi
-
-			if [[ -d "$resolved_path" ]]; then
-				if [[ ! -f "${resolved_path}/default.nix" ]]; then
-					echo "✗  Bad import (directory import missing default.nix): $dir/$import_path" >&2
-					((error_count++))
-				fi
-				continue
-			fi
-
-			echo "✗  Bad import (no such file or directory): $dir/$import_path" >&2
-			((error_count++))
 		done
 	done
 
