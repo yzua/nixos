@@ -19,6 +19,11 @@ let
     "agent-browser"
     "@playwright/cli"
   ];
+  homeDir = config.home.homeDirectory;
+  npmGlobalDir = "${homeDir}/.npm-global";
+  pnpmHomeDir = "${homeDir}/.local/share/pnpm";
+  bunInstallDir = "${homeDir}/.bun";
+  cacertBundle = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
 in
 {
   programs =
@@ -134,21 +139,21 @@ in
 
     sessionVariables = {
       NODE_ENV = "development";
-      NPM_CONFIG_PREFIX = "${config.home.homeDirectory}/.npm-global";
-      PNPM_HOME = "${config.home.homeDirectory}/.local/share/pnpm";
-      BUN_INSTALL = "${config.home.homeDirectory}/.bun";
-      SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-      NODE_EXTRA_CA_CERTS = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+      NPM_CONFIG_PREFIX = npmGlobalDir;
+      PNPM_HOME = pnpmHomeDir;
+      BUN_INSTALL = bunInstallDir;
+      SSL_CERT_FILE = cacertBundle;
+      NODE_EXTRA_CA_CERTS = cacertBundle;
       COREPACK_ENABLE_AUTO_PIN = "1";
       COREPACK_DEFAULT_TO_LATEST = "0";
     };
 
     sessionPath = [
-      "${config.home.homeDirectory}/.npm-global/bin"
-      "${config.home.homeDirectory}/.bun/bin"
-      "${config.home.homeDirectory}/.cache/.bun/bin"
-      "${config.home.homeDirectory}/.local/share/pnpm"
-      "${config.home.homeDirectory}/.deno/bin"
+      "${npmGlobalDir}/bin"
+      "${bunInstallDir}/bin"
+      "${homeDir}/.cache/.bun/bin"
+      pnpmHomeDir
+      "${homeDir}/.deno/bin"
     ];
 
     activation.createJSWorkspace = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

@@ -3,6 +3,28 @@
 
 let
   lua = path: builtins.readFile path;
+  luaModules = [
+    ./lua/options.lua
+    ./lua/keymaps.lua
+    ./lua/diagnostics.lua
+    ./lua/treesitter.lua
+    ./lua/lsp.lua
+    ./lua/plugins/cmp.lua
+    ./lua/plugins/telescope.lua
+    ./lua/plugins/neo-tree.lua
+    ./lua/plugins/gitsigns.lua
+    ./lua/plugins/lualine.lua
+    ./lua/plugins/which-key.lua
+    ./lua/plugins/indent-blankline.lua
+    ./lua/plugins/comment.lua
+    ./lua/plugins/autopairs.lua
+    ./lua/plugins/conform.lua
+    ./lua/plugins/lint.lua
+    ./lua/plugins/trouble.lua
+    ./lua/plugins/surround.lua
+    ./lua/plugins/dap.lua
+  ];
+  initLuaBundle = builtins.concatStringsSep "" (map lua luaModules);
 in
 {
   imports = [
@@ -87,25 +109,6 @@ in
       vim-sleuth
     ];
 
-    initLua =
-      lua ./lua/options.lua
-      + lua ./lua/keymaps.lua
-      + lua ./lua/diagnostics.lua
-      + lua ./lua/treesitter.lua
-      + lua ./lua/lsp.lua
-      + lua ./lua/plugins/cmp.lua
-      + lua ./lua/plugins/telescope.lua
-      + lua ./lua/plugins/neo-tree.lua
-      + lua ./lua/plugins/gitsigns.lua
-      + lua ./lua/plugins/lualine.lua
-      + lua ./lua/plugins/which-key.lua
-      + lua ./lua/plugins/indent-blankline.lua
-      + lua ./lua/plugins/comment.lua
-      + lua ./lua/plugins/autopairs.lua
-      + lua ./lua/plugins/conform.lua
-      + lua ./lua/plugins/lint.lua
-      + lua ./lua/plugins/trouble.lua
-      + lua ./lua/plugins/surround.lua
-      + lua ./lua/plugins/dap.lua;
+    initLua = initLuaBundle;
   };
 }

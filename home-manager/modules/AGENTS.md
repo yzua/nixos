@@ -29,13 +29,12 @@ modules/
 │   └── log-analyzer.nix # AI agent log analysis and dashboard
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, etc.)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
-│   ├── keepassxc.nix   # KeePassXC desktop entry and SSH agent
+│   ├── keepassxc.nix   # KeePassXC desktop entry
 │   ├── nautilus.nix    # Nautilus (GNOME Files) dconf preferences
 │   ├── nixcord.nix     # Discord (Vesktop + Vencord) declarative config
 │   ├── obs.nix         # OBS Studio with CUDA and plugins
 │   ├── obsidian.nix    # Obsidian Markdown notes app defaults
 │   ├── opensnitch-ui.nix # OpenSnitch application firewall GUI
-│   ├── pear-desktop.nix # Pear Desktop theme + plugin baseline
 │   ├── syncthing.nix   # Syncthing local file sync
 │   ├── vscode/         # VS Code editor
 │   │   ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)

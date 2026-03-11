@@ -4,6 +4,28 @@
   programs.niri.settings.window-rules =
     let
       r = 0.0; # Square corners
+      ws = {
+        browser = "󰖟 browser";
+        editor = "󰨞 editor";
+        social = "󰍡 social";
+        media = "󰎆 media";
+        vpn = "󰦝 vpn";
+      };
+      appIdMatch = pattern: { app-id = pattern; };
+      mkFloatingRule = matches: {
+        inherit matches;
+        open-floating = true;
+      };
+      mkWorkspaceRule =
+        matches: workspace: extra:
+        {
+          inherit matches;
+          open-on-workspace = workspace;
+        }
+        // extra;
+      mkWorkspaceAppIdRule =
+        pattern: workspace: extra:
+        mkWorkspaceRule [ (appIdMatch pattern) ] workspace extra;
     in
     [
       {
@@ -16,22 +38,10 @@
         clip-to-geometry = true;
       }
 
-      {
-        matches = [ { app-id = "^io\\.github\\.celluloid_player\\.Celluloid$"; } ];
-        open-floating = true;
-      }
-      {
-        matches = [ { app-id = "^io\\.bassi\\.Amberol$"; } ];
-        open-floating = true;
-      }
-      {
-        matches = [ { app-id = "^imv$"; } ];
-        open-floating = true;
-      }
-      {
-        matches = [ { app-id = "^showmethekey-gtk$"; } ];
-        open-floating = true;
-      }
+      (mkFloatingRule [ (appIdMatch "^io\\.github\\.celluloid_player\\.Celluloid$") ])
+      (mkFloatingRule [ (appIdMatch "^io\\.bassi\\.Amberol$") ])
+      (mkFloatingRule [ (appIdMatch "^imv$") ])
+      (mkFloatingRule [ (appIdMatch "^showmethekey-gtk$") ])
 
       {
         matches = [
@@ -43,14 +53,8 @@
         open-floating = true;
       }
 
-      {
-        matches = [ { app-id = "^org\\.gnome\\.NautilusPreviewer$"; } ];
-        open-floating = true;
-      }
-      {
-        matches = [ { app-id = "^(pwvucontrol|nm-connection-editor|blueman-manager)$"; } ];
-        open-floating = true;
-      }
+      (mkFloatingRule [ (appIdMatch "^org\\.gnome\\.NautilusPreviewer$") ])
+      (mkFloatingRule [ (appIdMatch "^(pwvucontrol|nm-connection-editor|blueman-manager)$") ])
       {
         matches = [
           { app-id = "^org\\.gnome\\.Calculator$"; }
@@ -59,11 +63,9 @@
         open-floating = true;
       }
 
-      {
-        matches = [ { app-id = "^org\\.keepassxc\\.KeePassXC$"; } ];
-        open-on-workspace = "󰦝 vpn";
+      (mkWorkspaceRule [ (appIdMatch "^org\\.keepassxc\\.KeePassXC$") ] ws.vpn {
         open-floating = true;
-      }
+      })
       {
         matches = [
           { app-id = "^xdg-desktop-portal-gtk$"; }
@@ -72,14 +74,8 @@
         open-floating = true;
       }
 
-      {
-        matches = [ { title = "^Picture-in-Picture$"; } ];
-        open-floating = true;
-      }
-      {
-        matches = [ { app-id = "^scratchpad$"; } ];
-        open-floating = true;
-      }
+      (mkFloatingRule [ { title = "^Picture-in-Picture$"; } ])
+      (mkFloatingRule [ (appIdMatch "^scratchpad$") ])
       {
         matches = [ { app-id = "^(${constants.terminalAppId}|kitty|foot)$"; } ];
         opacity = 0.92;
@@ -149,35 +145,33 @@
             app-id = "^(librewolf|librewolf-main|librewolf-personal|librewolf-work|librewolf-banking|librewolf-shopping|librewolf-illegal)$";
           }
         ];
-        open-on-workspace = "󰖟 browser";
+        open-on-workspace = ws.browser;
         default-column-width.proportion = 1.0;
       }
       {
-        matches = [ { app-id = "^librewolf-i2pd$"; } ];
-        open-on-workspace = "󰦝 vpn";
+        matches = [ (appIdMatch "^librewolf-i2pd$") ];
+        open-on-workspace = ws.vpn;
         default-column-width.proportion = 1.0;
       }
 
-      {
-        matches = [ { app-id = "^(brave|brave-browser)$"; } ];
-        open-on-workspace = "󰖟 browser";
+      (mkWorkspaceAppIdRule "^(brave|brave-browser)$" ws.browser {
         default-column-width.proportion = 1.0;
-      }
+      })
 
       {
         matches = [ { app-id = "^(${constants.editorAppId})$"; } ];
-        open-on-workspace = "󰨞 editor";
+        open-on-workspace = ws.editor;
       }
 
       {
         matches = [ { app-id = "^(${constants.terminalAppId})$"; } ];
         excludes = [ { app-id = "^scratchpad$"; } ];
-        open-on-workspace = "󰨞 editor";
+        open-on-workspace = ws.editor;
       }
 
       {
         matches = [ { app-id = "^vesktop$"; } ];
-        open-on-workspace = "󰍡 social";
+        open-on-workspace = ws.social;
       }
 
       {
@@ -188,28 +182,14 @@
             title = "^Media viewer$";
           }
         ];
-        open-on-workspace = "󰍡 social";
+        open-on-workspace = ws.social;
       }
 
-      {
-        matches = [ { app-id = "^FreeTube$"; } ];
-        open-on-workspace = "󰎆 media";
-      }
-
-      {
-        matches = [ { app-id = "^muffon$"; } ];
-        open-on-workspace = "󰎆 media";
-      }
-
-      {
-        matches = [ { app-id = "^nuclear$"; } ];
-        open-on-workspace = "󰎆 media";
-      }
-
-      {
-        matches = [ { app-id = "^Mullvad VPN$"; } ];
-        open-on-workspace = "󰦝 vpn";
+      (mkWorkspaceAppIdRule "^FreeTube$" ws.media { })
+      (mkWorkspaceAppIdRule "^muffon$" ws.media { })
+      (mkWorkspaceAppIdRule "^nuclear$" ws.media { })
+      (mkWorkspaceAppIdRule "^Mullvad VPN$" ws.vpn {
         open-floating = true;
-      }
+      })
     ];
 }

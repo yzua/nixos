@@ -1,4 +1,13 @@
 { apiQuotaScript, ... }:
+
+let
+  mkWidget = id: { inherit id; };
+  mkOnHoverWidget = id: {
+    inherit id;
+    displayMode = "onhover";
+  };
+in
+
 {
   programs.noctalia-shell.settings.bar = {
     position = "top";
@@ -40,10 +49,7 @@
           panelShowVisualizer = true;
           visualizerType = "linear";
         }
-        {
-          id = "Network";
-          displayMode = "onhover";
-        }
+        (mkOnHoverWidget "Network")
         {
           id = "Tray";
           colorizeIcons = false;
@@ -60,15 +66,9 @@
           textIntervalMs = 300000;
           leftClickUpdateText = true;
         }
-        { id = "NotificationHistory"; }
-        {
-          id = "Microphone";
-          displayMode = "onhover";
-        }
-        {
-          id = "Volume";
-          displayMode = "onhover";
-        }
+        (mkWidget "NotificationHistory")
+        (mkOnHoverWidget "Microphone")
+        (mkOnHoverWidget "Volume")
         {
           id = "ControlCenter";
           icon = "settings";

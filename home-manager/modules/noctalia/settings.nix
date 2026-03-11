@@ -1,4 +1,11 @@
 { constants, ... }:
+
+let
+  mkControlCenterCard = id: enabled: {
+    inherit id enabled;
+  };
+in
+
 {
   programs.noctalia-shell.settings = {
     colorSchemes = {
@@ -114,30 +121,12 @@
 
     controlCenter = {
       cards = [
-        {
-          enabled = true;
-          id = "profile-card";
-        }
-        {
-          enabled = true;
-          id = "shortcuts-card";
-        }
-        {
-          enabled = true;
-          id = "audio-card";
-        }
-        {
-          enabled = true;
-          id = "brightness-card";
-        }
-        {
-          enabled = false;
-          id = "weather-card";
-        }
-        {
-          enabled = true;
-          id = "media-sysmon-card";
-        }
+        (mkControlCenterCard "profile-card" true)
+        (mkControlCenterCard "shortcuts-card" true)
+        (mkControlCenterCard "audio-card" true)
+        (mkControlCenterCard "brightness-card" true)
+        (mkControlCenterCard "weather-card" false)
+        (mkControlCenterCard "media-sysmon-card" true)
       ];
     };
   };

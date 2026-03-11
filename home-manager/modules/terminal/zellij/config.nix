@@ -2,6 +2,19 @@
 
 { pkgs, ... }:
 
+let
+  scrollSearchSharedBinds = ''
+    bind "Esc" "q" { ScrollToBottom; SwitchToMode "Normal"; }
+    bind "Ctrl c" { ScrollToBottom; SwitchToMode "Normal"; }
+    bind "j" "Down" { ScrollDown; }
+    bind "k" "Up" { ScrollUp; }
+    bind "d" "Ctrl d" { HalfPageScrollDown; }
+    bind "u" "Ctrl u" { HalfPageScrollUp; }
+    bind "Ctrl f" "PageDown" { PageScrollDown; }
+    bind "Ctrl b" "PageUp" { PageScrollUp; }
+  '';
+in
+
 {
   programs.zellij = {
     enable = true;
@@ -58,14 +71,7 @@
         unbind "Ctrl q"
 
         scroll {
-          bind "Esc" "q" { ScrollToBottom; SwitchToMode "Normal"; }
-          bind "Ctrl c" { ScrollToBottom; SwitchToMode "Normal"; }
-          bind "j" "Down" { ScrollDown; }
-          bind "k" "Up" { ScrollUp; }
-          bind "d" "Ctrl d" { HalfPageScrollDown; }
-          bind "u" "Ctrl u" { HalfPageScrollUp; }
-          bind "Ctrl f" "PageDown" { PageScrollDown; }
-          bind "Ctrl b" "PageUp" { PageScrollUp; }
+          ${scrollSearchSharedBinds}
           bind "g" { ScrollToTop; }
           bind "G" { ScrollToBottom; }
           bind "e" { EditScrollback; SwitchToMode "Normal"; }
@@ -73,14 +79,7 @@
         }
 
         search {
-          bind "Esc" "q" { ScrollToBottom; SwitchToMode "Normal"; }
-          bind "Ctrl c" { ScrollToBottom; SwitchToMode "Normal"; }
-          bind "j" "Down" { ScrollDown; }
-          bind "k" "Up" { ScrollUp; }
-          bind "d" "Ctrl d" { HalfPageScrollDown; }
-          bind "u" "Ctrl u" { HalfPageScrollUp; }
-          bind "Ctrl f" "PageDown" { PageScrollDown; }
-          bind "Ctrl b" "PageUp" { PageScrollUp; }
+          ${scrollSearchSharedBinds}
           bind "n" { Search "down"; }
           bind "N" { Search "up"; }
           bind "c" { SearchToggleOption "CaseSensitivity"; }

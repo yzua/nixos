@@ -1,18 +1,28 @@
 # Nautilus (GNOME Files) dconf preferences, bookmarks, and document templates.
-{ config, ... }:
+{
+  config,
+  lib,
+  ...
+}:
+
+let
+  homeDir = "/home/${config.home.username}";
+  bookmarkDirs = [
+    "Documents"
+    "Pictures"
+    "Screens"
+    "Videos"
+    "Music"
+    "Downloads"
+  ];
+  bookmarksText = lib.concatMapStringsSep "\n" (dir: "file://${homeDir}/${dir}") bookmarkDirs;
+in
 
 {
   # Sidebar bookmarks (only existing directories)
   home.file.".config/gtk-3.0/bookmarks" = {
     force = true;
-    text = ''
-      file:///home/${config.home.username}/Documents
-      file:///home/${config.home.username}/Pictures
-      file:///home/${config.home.username}/Screens
-      file:///home/${config.home.username}/Videos
-      file:///home/${config.home.username}/Music
-      file:///home/${config.home.username}/Downloads
-    '';
+    text = "${bookmarksText}\n";
   };
 
   # Document templates — populates Nautilus "New Document" context menu

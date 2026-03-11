@@ -1,5 +1,13 @@
 # Starship cross-shell prompt with Gruvbox theming.
 
+let
+  mkVersionModule = style: {
+    symbol = " ";
+    inherit style;
+    format = "[$symbol$version]($style) ";
+  };
+in
+
 {
   programs.starship = {
     enable = true;
@@ -52,29 +60,13 @@
         heuristic = true;
       };
 
-      python = {
-        symbol = " ";
-        style = "bold yellow";
-        format = "[$symbol$version]($style) ";
-      };
+      python = mkVersionModule "bold yellow";
 
-      nodejs = {
-        symbol = " ";
-        style = "bold green";
-        format = "[$symbol$version]($style) ";
-      };
+      nodejs = mkVersionModule "bold green";
 
-      golang = {
-        symbol = " ";
-        style = "bold cyan";
-        format = "[$symbol$version]($style) ";
-      };
+      golang = mkVersionModule "bold cyan";
 
-      rust = {
-        symbol = " ";
-        style = "bold red";
-        format = "[$symbol$version]($style) ";
-      };
+      rust = mkVersionModule "bold red";
 
       docker_context = {
         symbol = " ";

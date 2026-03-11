@@ -49,80 +49,63 @@ let
       }
     }
   '';
+
+  mkLayoutWithStatus = body: ''
+    layout {
+      default_tab_template {
+        children
+        ${zjstatusConfig}
+      }
+
+      ${body}
+    }
+  '';
 in
 {
   xdg.configFile = {
-    "zellij/layouts/default.kdl".text = ''
-      layout {
-        default_tab_template {
-          children
-          ${zjstatusConfig}
-        }
-      }
-    '';
+    "zellij/layouts/default.kdl".text = mkLayoutWithStatus "";
 
-    "zellij/layouts/dev.kdl".text = ''
-      layout {
-        default_tab_template {
-          children
-          ${zjstatusConfig}
-        }
-
-        tab name="code" focus=true {
-          pane split_direction="vertical" {
-            pane size="75%" command="${pkgs.neovim}/bin/nvim" focus=true
-            pane split_direction="horizontal" size="25%" {
-              pane name="shell"
-              pane name="git" command="${pkgs.lazygit}/bin/lazygit"
-            }
-          }
-        }
-
-        tab name="servers" {
-          pane name="server"
-        }
-      }
-    '';
-
-    "zellij/layouts/ai.kdl".text = ''
-      layout {
-        default_tab_template {
-          children
-          ${zjstatusConfig}
-        }
-
-        tab name="agent" focus=true {
-          pane split_direction="vertical" {
-            pane size="60%" name="claude" command="${config.home.homeDirectory}/.bun/bin/claude"
-            pane split_direction="horizontal" {
-              pane size="50%" name="logs" command="${pkgs.bash}/bin/bash" {
-                args "-c" "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null || echo 'No agent logs yet. Waiting...'; sleep infinity"
-              }
-              pane name="git" command="${pkgs.lazygit}/bin/lazygit"
-            }
+    "zellij/layouts/dev.kdl".text = mkLayoutWithStatus ''
+      tab name="code" focus=true {
+        pane split_direction="vertical" {
+          pane size="75%" command="${pkgs.neovim}/bin/nvim" focus=true
+          pane split_direction="horizontal" size="25%" {
+            pane name="shell"
+            pane name="git" command="${pkgs.lazygit}/bin/lazygit"
           }
         }
       }
+
+      tab name="servers" {
+        pane name="server"
+      }
     '';
 
-    "zellij/layouts/monitoring.kdl".text = ''
-      layout {
-        default_tab_template {
-          children
-          ${zjstatusConfig}
-        }
-
-        tab name="system" focus=true {
+    "zellij/layouts/ai.kdl".text = mkLayoutWithStatus ''
+      tab name="agent" focus=true {
+        pane split_direction="vertical" {
+          pane size="60%" name="claude" command="${config.home.homeDirectory}/.bun/bin/claude"
           pane split_direction="horizontal" {
-            pane command="${pkgs.btop}/bin/btop"
-            pane command="${pkgs.nvtopPackages.full}/bin/nvtop"
+            pane size="50%" name="logs" command="${pkgs.bash}/bin/bash" {
+              args "-c" "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null || echo 'No agent logs yet. Waiting...'; sleep infinity"
+            }
+            pane name="git" command="${pkgs.lazygit}/bin/lazygit"
           }
         }
+      }
+    '';
 
-        tab name="logs" {
-          pane name="journal" command="/run/current-system/sw/bin/journalctl" {
-            args "-f"
-          }
+    "zellij/layouts/monitoring.kdl".text = mkLayoutWithStatus ''
+      tab name="system" focus=true {
+        pane split_direction="horizontal" {
+          pane command="${pkgs.btop}/bin/btop"
+          pane command="${pkgs.nvtopPackages.full}/bin/nvtop"
+        }
+      }
+
+      tab name="logs" {
+        pane name="journal" command="/run/current-system/sw/bin/journalctl" {
+          args "-f"
         }
       }
     '';

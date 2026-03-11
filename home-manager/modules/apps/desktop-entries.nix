@@ -5,6 +5,74 @@
   ...
 }:
 
+let
+  mkDesktopEntry =
+    {
+      name,
+      exec,
+      icon,
+      comment,
+      categories,
+      mimeType ? null,
+    }:
+    {
+      inherit
+        name
+        exec
+        icon
+        comment
+        categories
+        ;
+    }
+    // (if mimeType == null then { } else { inherit mimeType; });
+
+  librewolfDesktopProfiles = [
+    {
+      slug = "personal";
+      label = "Personal";
+      comment = "LibreWolf with Sweden proxy";
+    }
+    {
+      slug = "work";
+      label = "Work";
+      comment = "LibreWolf with Germany proxy";
+    }
+    {
+      slug = "banking";
+      label = "Banking";
+      comment = "LibreWolf with Netherlands proxy";
+    }
+    {
+      slug = "shopping";
+      label = "Shopping";
+      comment = "LibreWolf with Romania proxy";
+    }
+    {
+      slug = "illegal";
+      label = "Illegal";
+      comment = "LibreWolf with Switzerland proxy";
+    }
+    {
+      slug = "i2pd";
+      label = "I2P";
+      comment = "LibreWolf with I2P proxy";
+    }
+  ];
+
+  librewolfDesktopEntries = builtins.listToAttrs (
+    map (profile: {
+      name = "librewolf-${profile.slug}";
+      value = mkDesktopEntry {
+        name = "LibreWolf ${profile.label}";
+        exec = "/home/${user}/.local/bin/librewolf-${profile.slug} %U";
+        icon = "librewolf";
+        inherit (profile) comment;
+        categories = [ "Network" ];
+      };
+    }) librewolfDesktopProfiles
+  );
+in
+
 {
   home.file = {
     ".local/bin/element-desktop-keyring" = {
@@ -117,7 +185,7 @@
   ];
 
   xdg.desktopEntries = {
-    "youtube-mpv" = {
+    "youtube-mpv" = mkDesktopEntry {
       name = "YouTube MPV";
       exec = "/home/${user}/.local/bin/youtube-mpv %U";
       icon = "mpv";
@@ -128,7 +196,7 @@
       ];
       mimeType = [ "x-scheme-handler/ytmpv" ];
     };
-    "element-desktop" = {
+    "element-desktop" = mkDesktopEntry {
       name = "Element";
       exec = "/home/${user}/.local/bin/element-desktop-keyring %u";
       icon = "element-desktop";
@@ -145,62 +213,14 @@
       ];
     };
 
-    # === LibreWolf Profiles ===
-    "librewolf-personal" = {
-      name = "LibreWolf Personal";
-      exec = "/home/${user}/.local/bin/librewolf-personal %U";
-      icon = "librewolf";
-      comment = "LibreWolf with Sweden proxy";
-      categories = [ "Network" ];
-    };
-
-    "librewolf-work" = {
-      name = "LibreWolf Work";
-      exec = "/home/${user}/.local/bin/librewolf-work %U";
-      icon = "librewolf";
-      comment = "LibreWolf with Germany proxy";
-      categories = [ "Network" ];
-    };
-
-    "librewolf-banking" = {
-      name = "LibreWolf Banking";
-      exec = "/home/${user}/.local/bin/librewolf-banking %U";
-      icon = "librewolf";
-      comment = "LibreWolf with Netherlands proxy";
-      categories = [ "Network" ];
-    };
-
-    "librewolf-shopping" = {
-      name = "LibreWolf Shopping";
-      exec = "/home/${user}/.local/bin/librewolf-shopping %U";
-      icon = "librewolf";
-      comment = "LibreWolf with Romania proxy";
-      categories = [ "Network" ];
-    };
-
-    "librewolf-illegal" = {
-      name = "LibreWolf Illegal";
-      exec = "/home/${user}/.local/bin/librewolf-illegal %U";
-      icon = "librewolf";
-      comment = "LibreWolf with Switzerland proxy";
-      categories = [ "Network" ];
-    };
-
-    "librewolf-i2pd" = {
-      name = "LibreWolf I2P";
-      exec = "/home/${user}/.local/bin/librewolf-i2pd %U";
-      icon = "librewolf";
-      comment = "LibreWolf with I2P proxy";
-      categories = [ "Network" ];
-    };
-
     # === Brave ===
-    "brave-proxy" = {
+    "brave-proxy" = mkDesktopEntry {
       name = "Brave";
       exec = "/home/${user}/.local/bin/brave-proxy %U";
       icon = "brave";
       comment = "Brave with Finland proxy";
       categories = [ "Network" ];
     };
-  };
+  }
+  // librewolfDesktopEntries;
 }

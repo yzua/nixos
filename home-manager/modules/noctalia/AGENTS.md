@@ -20,7 +20,7 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 Niri binds communicate with Noctalia via IPC:
 `home-manager/modules/niri/binds.nix` uses a `noctalia` helper that calls `noctalia-shell ipc call`, starts Noctalia if needed, and retries once.
 
-**Tight coupling**: Changing Noctalia IPC commands requires updating all `noctalia` calls in `niri/binds.nix`.
+**Tight coupling**: Changing Noctalia IPC commands requires updating all `noctalia` calls in `home-manager/modules/niri/binds.nix`.
 
 Used for launcher, clipboard, notifications, session menu, and related shell actions (exact key combos are defined in `home-manager/modules/niri/binds.nix`).
 

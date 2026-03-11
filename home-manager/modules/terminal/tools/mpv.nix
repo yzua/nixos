@@ -1,6 +1,34 @@
 # mpv media player with Vim keybindings and stable rendering defaults.
 { constants, ... }:
 
+let
+  seekBindings = [
+    {
+      key = "l";
+      seconds = 5;
+    }
+    {
+      key = "h";
+      seconds = -5;
+    }
+    {
+      key = "j";
+      seconds = -60;
+    }
+    {
+      key = "k";
+      seconds = 60;
+    }
+  ];
+
+  generatedSeekBindings = builtins.listToAttrs (
+    map (binding: {
+      name = binding.key;
+      value = "seek ${toString binding.seconds}";
+    }) seekBindings
+  );
+in
+
 {
   programs.mpv = {
     enable = true;
@@ -18,11 +46,6 @@
       screenshot-directory = "~/Screens";
       screenshot-format = "png";
     };
-    bindings = {
-      l = "seek 5";
-      h = "seek -5";
-      j = "seek -60";
-      k = "seek 60";
-    };
+    bindings = generatedSeekBindings;
   };
 }

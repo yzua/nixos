@@ -2,6 +2,54 @@
 
 { inputs, ... }:
 
+let
+  mkEnabledPlugins =
+    names:
+    builtins.listToAttrs (
+      map (name: {
+        inherit name;
+        value.enable = true;
+      }) names
+    );
+
+  uiUxPlugins = [
+    "alwaysTrust"
+    "betterFolders"
+    "betterRoleContext"
+    "crashHandler"
+    "experiments"
+    "fakeNitro"
+    "fixSpotifyEmbeds"
+    "imageZoom"
+    "memberCount"
+    "permissionsViewer"
+    "PinDMs"
+    "quickMention"
+    "readAllNotificationsButton"
+    "revealAllSpoilers"
+    "serverListIndicators"
+    "showHiddenChannels"
+    "spotifyControls"
+    "themeAttributes"
+    "typingIndicator"
+    "voiceMessages"
+    "volumeBooster"
+    "webContextMenus"
+    "whoReacted"
+  ];
+
+  privacyPlugins = [
+    "anonymiseFileNames"
+    "ClearURLs"
+    "silentTyping"
+  ];
+
+  loggingNotificationPlugins = [
+    "messageLogger"
+    "relationshipNotifier"
+  ];
+in
+
 {
   imports = [ inputs.nixcord.homeModules.nixcord ];
 
@@ -20,41 +68,10 @@
         "https://raw.githubusercontent.com/shvedes/discord-gruvbox/main/gruvbox-dark.theme.css"
       ];
 
-      plugins = {
-        # === UI / UX ===
-        alwaysTrust.enable = true;
-        betterFolders.enable = true;
-        betterRoleContext.enable = true;
-        crashHandler.enable = true;
-        experiments.enable = true;
-        fakeNitro.enable = true;
-        fixSpotifyEmbeds.enable = true;
-        imageZoom.enable = true;
-        memberCount.enable = true;
-        permissionsViewer.enable = true;
-        PinDMs.enable = true;
-        quickMention.enable = true;
-        readAllNotificationsButton.enable = true;
-        revealAllSpoilers.enable = true;
-        serverListIndicators.enable = true;
-        showHiddenChannels.enable = true;
-        spotifyControls.enable = true;
-        themeAttributes.enable = true;
-        typingIndicator.enable = true;
-        voiceMessages.enable = true;
-        volumeBooster.enable = true;
-        webContextMenus.enable = true;
-        whoReacted.enable = true;
-
-        # === Privacy ===
-        anonymiseFileNames.enable = true;
-        ClearURLs.enable = true;
-        silentTyping.enable = true;
-
-        # === Logging / Notifications ===
-        messageLogger.enable = true;
-        relationshipNotifier.enable = true;
-      };
+      plugins =
+        mkEnabledPlugins uiUxPlugins
+        // mkEnabledPlugins privacyPlugins
+        // mkEnabledPlugins loggingNotificationPlugins;
     };
   };
 }

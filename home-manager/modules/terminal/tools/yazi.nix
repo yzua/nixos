@@ -6,6 +6,14 @@
   ...
 }:
 
+let
+  mkGitFetcher = name: {
+    id = "git";
+    inherit name;
+    run = "git";
+  };
+in
+
 {
   # file package provided by home.packages (utilities.nix)
   programs.yazi = {
@@ -66,16 +74,8 @@
       };
 
       plugin.prepend_fetchers = [
-        {
-          id = "git";
-          name = "*";
-          run = "git";
-        }
-        {
-          id = "git";
-          name = "*/";
-          run = "git";
-        }
+        (mkGitFetcher "*")
+        (mkGitFetcher "*/")
       ];
     };
   };

@@ -1,12 +1,12 @@
 # ActivityWatch app usage tracking (Wayland, dashboard at localhost:5600).
-{ pkgs, ... }:
+{ pkgsStable, ... }:
 
 {
   xdg.configFile."activitywatch/aw-server-rust/config.toml".force = true;
 
   services.activitywatch = {
     enable = true;
-    package = pkgs.aw-server-rust;
+    package = pkgsStable.aw-server-rust;
 
     settings = {
       port = 5600;
@@ -16,7 +16,7 @@
     watchers = {
       # Rust-based Wayland window watcher + AFK detection
       awatcher = {
-        package = pkgs.awatcher;
+        package = pkgsStable.awatcher;
         settings = {
           idle-timeout-seconds = 180; # Matches swayidle dim timeout
           poll-time-idle-seconds = 5;

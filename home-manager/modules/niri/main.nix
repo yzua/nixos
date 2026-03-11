@@ -6,6 +6,30 @@
   ...
 }:
 
+let
+  workspaceName = {
+    browser = "󰖟 browser";
+    editor = "󰨞 editor";
+    social = "󰍡 social";
+    media = "󰎆 media";
+    vpn = "󰦝 vpn";
+  };
+  mkSpring =
+    {
+      dampingRatio,
+      stiffness,
+      epsilon,
+    }:
+    {
+      damping-ratio = dampingRatio;
+      inherit stiffness epsilon;
+    };
+  mkBackdropRule = namespace: {
+    matches = [ { inherit namespace; } ];
+    place-within-backdrop = true;
+  };
+in
+
 {
   programs.niri.settings = {
     prefer-no-csd = true;
@@ -14,19 +38,19 @@
 
     workspaces = {
       "01-browser" = {
-        name = "󰖟 browser"; # nf-md-web
+        name = workspaceName.browser; # nf-md-web
       };
       "02-code" = {
-        name = "󰨞 editor"; # nf-md-code-braces
+        name = workspaceName.editor; # nf-md-code-braces
       };
       "03-social" = {
-        name = "󰍡 social"; # nf-md-chat
+        name = workspaceName.social; # nf-md-chat
       };
       "04-media" = {
-        name = "󰎆 media"; # nf-md-music
+        name = workspaceName.media; # nf-md-music
       };
       "05-vpn" = {
-        name = "󰦝 vpn"; # nf-md-shield-lock
+        name = workspaceName.vpn; # nf-md-shield-lock
       };
     };
 
@@ -91,8 +115,8 @@
     animations = {
       slowdown = 1.0;
 
-      workspace-switch.kind.spring = {
-        damping-ratio = 1.0;
+      workspace-switch.kind.spring = mkSpring {
+        dampingRatio = 1.0;
         stiffness = 1000;
         epsilon = 0.0001;
       };
@@ -107,40 +131,34 @@
         curve = "ease-out-quad";
       };
 
-      horizontal-view-movement.kind.spring = {
-        damping-ratio = 1.0;
+      horizontal-view-movement.kind.spring = mkSpring {
+        dampingRatio = 1.0;
         stiffness = 800;
         epsilon = 0.0001;
       };
 
-      window-movement.kind.spring = {
-        damping-ratio = 1.0;
+      window-movement.kind.spring = mkSpring {
+        dampingRatio = 1.0;
         stiffness = 800;
         epsilon = 0.0001;
       };
 
-      window-resize.kind.spring = {
-        damping-ratio = 1.0;
+      window-resize.kind.spring = mkSpring {
+        dampingRatio = 1.0;
         stiffness = 800;
         epsilon = 0.0001;
       };
 
-      config-notification-open-close.kind.spring = {
-        damping-ratio = 0.6;
+      config-notification-open-close.kind.spring = mkSpring {
+        dampingRatio = 0.6;
         stiffness = 1000;
         epsilon = 0.001;
       };
     };
 
     layer-rules = [
-      {
-        matches = [ { namespace = "^noctalia-wallpaper"; } ];
-        place-within-backdrop = true;
-      }
-      {
-        matches = [ { namespace = "^noctalia-overview"; } ];
-        place-within-backdrop = true;
-      }
+      (mkBackdropRule "^noctalia-wallpaper")
+      (mkBackdropRule "^noctalia-overview")
     ];
 
     gestures.hot-corners.enable = false;

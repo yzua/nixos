@@ -2,6 +2,23 @@
 
 { pkgs, ... }:
 
+let
+  mkLocalHookExec = hookName: ''
+    _local_hook="$(git rev-parse --git-dir 2>/dev/null)/hooks/${hookName}"
+    if [[ -x "$_local_hook" ]]; then
+      exec "$_local_hook" "$@"
+    fi
+  '';
+
+  mkLocalHookPipe = hookName: ''
+    _local_hook="$(git rev-parse --git-dir 2>/dev/null)/hooks/${hookName}"
+    if [[ -x "$_local_hook" ]]; then
+      echo "$input" | "$_local_hook" "$@"
+      exit $?
+    fi
+  '';
+in
+
 {
   programs.git.hooks = {
     pre-commit = pkgs.writeShellScript "git-hook-pre-commit" ''
@@ -42,10 +59,7 @@
       fi
 
       # --- Chain to repo-local hook ---
-      _local_hook="$(git rev-parse --git-dir 2>/dev/null)/hooks/pre-commit"
-      if [[ -x "$_local_hook" ]]; then
-        exec "$_local_hook" "$@"
-      fi
+      ${mkLocalHookExec "pre-commit"}
     '';
 
     commit-msg = pkgs.writeShellScript "git-hook-commit-msg" ''
@@ -73,10 +87,7 @@
       fi
 
       # --- Chain to repo-local hook ---
-      _local_hook="$(git rev-parse --git-dir 2>/dev/null)/hooks/commit-msg"
-      if [[ -x "$_local_hook" ]]; then
-        exec "$_local_hook" "$@"
-      fi
+      ${mkLocalHookExec "commit-msg"}
     '';
 
     # Defense layer 2/3: warn immediately if commit is unsigned.
@@ -135,11 +146,7 @@
       echo "✔ All commits have valid GPG signatures."
 
       # --- Chain to repo-local hook ---
-      _local_hook="$(git rev-parse --git-dir 2>/dev/null)/hooks/pre-push"
-      if [[ -x "$_local_hook" ]]; then
-        echo "$input" | "$_local_hook" "$@"
-        exit $?
-      fi
+      ${mkLocalHookPipe "pre-push"}
     '';
   };
 }

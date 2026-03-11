@@ -4,6 +4,33 @@
   pkgs,
 }:
 
+let
+  mkFormatterEntries =
+    formatter: languages:
+    builtins.listToAttrs (
+      map (language: {
+        name = "[${language}]";
+        value = {
+          "editor.defaultFormatter" = formatter;
+        };
+      }) languages
+    );
+
+  biomeFormatterEntries = mkFormatterEntries "biomejs.biome" [
+    "typescript"
+    "typescriptreact"
+    "javascript"
+    "javascriptreact"
+    "json"
+    "jsonc"
+  ];
+
+  cssFormatterEntries = mkFormatterEntries "vscode.css-language-features" [
+    "css"
+    "scss"
+  ];
+in
+
 {
   "workbench.colorTheme" = "Gruvbox Dark Soft";
   "workbench.iconTheme" = "vscode-icons";
@@ -124,19 +151,11 @@
     "editor.formatOnSave" = true;
     "editor.tabSize" = 4;
   };
-  "[typescript]"."editor.defaultFormatter" = "biomejs.biome";
-  "[typescriptreact]"."editor.defaultFormatter" = "biomejs.biome";
-  "[javascript]"."editor.defaultFormatter" = "biomejs.biome";
-  "[javascriptreact]"."editor.defaultFormatter" = "biomejs.biome";
-  "[json]"."editor.defaultFormatter" = "biomejs.biome";
-  "[jsonc]"."editor.defaultFormatter" = "biomejs.biome";
   "[svelte]"."editor.defaultFormatter" = "svelte.svelte-vscode";
   "[html]" = {
     "editor.defaultFormatter" = "vscode.html-language-features";
     "editor.tabSize" = 2;
   };
-  "[css]"."editor.defaultFormatter" = "vscode.css-language-features";
-  "[scss]"."editor.defaultFormatter" = "vscode.css-language-features";
   "css.lint.unknownAtRules" = "ignore";
   "[markdown]" = {
     "editor.defaultFormatter" = "yzhang.markdown-all-in-one";
@@ -195,3 +214,5 @@
   "security.workspace.trust.enabled" = true;
   "window.zoomLevel" = 0.5;
 }
+// biomeFormatterEntries
+// cssFormatterEntries

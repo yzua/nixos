@@ -5,6 +5,17 @@
   ...
 }:
 
+let
+  githubRemoteIncludeConditions = [
+    "hasconfig:remote.*.url:https://github.com/**"
+    "hasconfig:remote.*.url:git@github.com:*/**"
+  ];
+  githubEmailIncludes = map (condition: {
+    inherit condition;
+    contents.user.email = constants.user.githubEmail;
+  }) githubRemoteIncludeConditions;
+in
+
 {
   programs = {
     difftastic = {
@@ -112,16 +123,7 @@
         };
       };
 
-      includes = [
-        {
-          condition = "hasconfig:remote.*.url:https://github.com/**";
-          contents.user.email = constants.user.githubEmail;
-        }
-        {
-          condition = "hasconfig:remote.*.url:git@github.com:*/**";
-          contents.user.email = constants.user.githubEmail;
-        }
-      ];
+      includes = githubEmailIncludes;
 
       ignores = [
         ".cache/"

@@ -10,11 +10,7 @@
 {
   programs =
     let
-      shellAliases = {
-        py = "python3";
-        py2 = "python2";
-        pyi = "python3 -i";
-        pym = "python3 -m";
+      pipAliases = {
         pipi = "pip install";
         pipu = "pip install --upgrade";
         pipr = "pip uninstall";
@@ -22,6 +18,9 @@
         pipf = "pip freeze";
         pipreq = "pip install -r requirements.txt";
         pipfreeze = "pip freeze > requirements.txt";
+      };
+
+      uvPipAliases = {
         uvi = "uv pip install";
         uvu = "uv pip install --upgrade";
         uvr = "uv pip uninstall";
@@ -29,6 +28,13 @@
         uvf = "uv pip freeze";
         uvreq = "uv pip install -r requirements.txt";
         uvfreeze = "uv pip freeze > requirements.txt";
+      };
+
+      shellAliases = {
+        py = "python3";
+        py2 = "python2";
+        pyi = "python3 -i";
+        pym = "python3 -m";
         uvinit = "uv init";
         uvadd = "uv add";
         uvdev = "uv add --dev";
@@ -50,7 +56,9 @@
         coverage = "coverage run -m pytest && coverage report";
         jupyterl = "jupyter lab";
         jupytern = "jupyter notebook";
-      };
+      }
+      // pipAliases
+      // uvPipAliases;
     in
     {
       zsh.shellAliases = shellAliases;

@@ -85,21 +85,91 @@ let
       ../../../../themes/librewolf-userContent.css;
   };
 
-  librewolfProfileFiles =
-    # Launcher scripts for each profile.
-    (mkLauncher "personal" "personal.default")
-    // (mkLauncher "work" "work.default")
-    // (mkLauncher "banking" "banking.default")
-    // (mkLauncher "shopping" "shopping.default")
-    // (mkLauncher "illegal" "illegal.default")
-    // (mkLauncher "i2pd" "i2pd.default")
-    # Chrome theming for each profile.
-    // (mkChromeFiles "personal.default")
-    // (mkChromeFiles "work.default")
-    // (mkChromeFiles "banking.default")
-    // (mkChromeFiles "shopping.default")
-    // (mkChromeFiles "illegal.default")
-    // (mkChromeFiles "i2pd.default");
+  profileSpecs = [
+    {
+      name = "personal";
+      id = 0;
+      isDefault = true;
+      path = "personal.default";
+      proxyHost = personal;
+      homepage = "http://127.0.0.1:8082/search";
+      extraSettings = { };
+    }
+    {
+      name = "work";
+      id = 1;
+      isDefault = false;
+      path = "work.default";
+      proxyHost = work;
+      homepage = "about:blank";
+      extraSettings = { };
+    }
+    {
+      name = "banking";
+      id = 2;
+      isDefault = false;
+      path = "banking.default";
+      proxyHost = banking;
+      homepage = "about:blank";
+      extraSettings = { };
+    }
+    {
+      name = "shopping";
+      id = 3;
+      isDefault = false;
+      path = "shopping.default";
+      proxyHost = shopping;
+      homepage = "about:blank";
+      extraSettings = { };
+    }
+    {
+      name = "illegal";
+      id = 4;
+      isDefault = false;
+      path = "illegal.default";
+      proxyHost = illegal;
+      homepage = "about:blank";
+      extraSettings = { };
+    }
+    {
+      name = "i2pd";
+      id = 5;
+      isDefault = false;
+      path = "i2pd.default";
+      proxyHost = i2pd;
+      homepage = "about:blank";
+      extraSettings = {
+        "browser.newtabpage.enabled" = false;
+        "network.proxy.socks_port" = 4447;
+      };
+    }
+  ];
+
+  mkProfile = spec: {
+    inherit (spec)
+      id
+      isDefault
+      path
+      ;
+    settings =
+      baseSettings
+      // {
+        "browser.startup.homepage" = spec.homepage;
+        "network.proxy.socks" = spec.proxyHost;
+      }
+      // spec.extraSettings;
+  };
+
+  librewolfProfileFiles = builtins.foldl' (
+    acc: spec: acc // (mkLauncher spec.name spec.path) // (mkChromeFiles spec.path)
+  ) { } profileSpecs;
+
+  generatedProfiles = builtins.listToAttrs (
+    map (spec: {
+      inherit (spec) name;
+      value = mkProfile spec;
+    }) profileSpecs
+  );
 in
 {
   home.file = librewolfProfileFiles // {
@@ -231,75 +301,7 @@ in
       };
     };
 
-    profiles = {
-      # Personal profile - Sweden proxy (default)
-      personal = {
-        id = 0;
-        isDefault = true;
-        path = "personal.default";
-        settings = baseSettings // {
-          "browser.startup.homepage" = "http://127.0.0.1:8082/search";
-          "network.proxy.socks" = personal;
-        };
-      };
-
-      # Work profile - Germany proxy
-      work = {
-        id = 1;
-        isDefault = false;
-        path = "work.default";
-        settings = baseSettings // {
-          "browser.startup.homepage" = "about:blank";
-          "network.proxy.socks" = work;
-        };
-      };
-
-      # Banking profile - Netherlands proxy
-      banking = {
-        id = 2;
-        isDefault = false;
-        path = "banking.default";
-        settings = baseSettings // {
-          "browser.startup.homepage" = "about:blank";
-          "network.proxy.socks" = banking;
-        };
-      };
-
-      # Shopping profile - Switzerland proxy
-      shopping = {
-        id = 3;
-        isDefault = false;
-        path = "shopping.default";
-        settings = baseSettings // {
-          "browser.startup.homepage" = "about:blank";
-          "network.proxy.socks" = shopping;
-        };
-      };
-
-      # Illegal profile - USA proxy
-      illegal = {
-        id = 4;
-        isDefault = false;
-        path = "illegal.default";
-        settings = baseSettings // {
-          "browser.startup.homepage" = "about:blank";
-          "network.proxy.socks" = illegal;
-        };
-      };
-
-      # I2P profile - local I2P daemon (port 4447)
-      i2pd = {
-        id = 5;
-        isDefault = false;
-        path = "i2pd.default";
-        settings = baseSettings // {
-          "browser.startup.homepage" = "about:blank";
-          "browser.newtabpage.enabled" = false;
-          "network.proxy.socks" = i2pd;
-          "network.proxy.socks_port" = 4447;
-        };
-      };
-    };
+    profiles = generatedProfiles;
   };
 
 }

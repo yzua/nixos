@@ -1,6 +1,6 @@
 # Application Configurations
 
-9 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
+10 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
@@ -9,14 +9,14 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 
 | File | App | Config Pattern |
 |------|-----|----------------|
-| `activitywatch.nix` | ActivityWatch | `services.activitywatch` + systemd service (Wayland) |
+| `activitywatch.nix` | ActivityWatch | `services.activitywatch` (Wayland watcher setup) |
 | `desktop-entries.nix` | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries` |
-| `keepassxc.nix` | KeePassXC | Desktop entry + SSH agent socket |
+| `keepassxc.nix` | KeePassXC | Desktop entry |
 | `nautilus.nix` | GNOME Files | `dconf.settings` (preferences) |
 | `nixcord.nix` | Discord (Vesktop) | `programs.nixcord` (Vencord declarative plugins) |
 | `obs.nix` | OBS Studio | `programs.obs-studio` + CUDA + plugins |
-| `obsidian.nix` | Obsidian | Desktop entry with Wayland flags |
-| `opensnitch-ui.nix` | OpenSnitch | `home.file` for config + autostart |
+| `obsidian.nix` | Obsidian | Desktop entry + default vault registration |
+| `opensnitch-ui.nix` | OpenSnitch | `services.opensnitch-ui` enablement |
 | `syncthing.nix` | Syncthing | `services.syncthing` (local file sync) |
 
 ## Subdirectory Modules
@@ -50,7 +50,7 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 ## Adding a New App
 
 1. Create `home-manager/modules/apps/<name>.nix`
-2. Add import with comment to `apps/default.nix`
+2. Add import with comment to `default.nix`
 3. Use `programs.*`, `services.*`, or `home.file`/`xdg.configFile`
 4. For complex apps with multiple config files: create a subdirectory with `default.nix`
 5. Run: `just modules && just lint && just format && just check && just home`
