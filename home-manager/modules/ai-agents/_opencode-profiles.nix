@@ -8,6 +8,7 @@ let
     "opencode-gemini"
     "opencode-gpt"
     "opencode-sonnet"
+    "opencode-zen"
   ];
   configPath = name: "${config.xdg.configHome}/${name}/opencode.json";
 in

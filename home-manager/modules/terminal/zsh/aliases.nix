@@ -10,6 +10,17 @@
     let
       inherit (constants) editor;
       nixTemplates = "git+https://codeberg.org/yztr/nixos?ref=main&dir=dev-shells#";
+      devTemplateTargets = {
+        nfib = "bun";
+        nfid = "deno";
+        nfin = "nodejs";
+        nfip = "python-venv";
+        nfirs = "rust-stable";
+        nfirn = "rust-nightly";
+      };
+      devTemplateAliases = builtins.mapAttrs (
+        _: template: "nfi -t '${nixTemplates}${template}'"
+      ) devTemplateTargets;
       shellAliases = {
         # Agent-safe defaults (agents expect standard stdout)
         cat = "cat";
@@ -63,12 +74,6 @@
         nfi = "nix flake init";
 
         # Dev environment templates
-        nfib = "nfi -t '${nixTemplates}bun'";
-        nfid = "nfi -t '${nixTemplates}deno'";
-        nfin = "nfi -t '${nixTemplates}nodejs'";
-        nfip = "nfi -t '${nixTemplates}python-venv'";
-        nfirs = "nfi -t '${nixTemplates}rust-stable'";
-        nfirn = "nfi -t '${nixTemplates}rust-nightly'";
 
         # System reports
         sr = "sudo system-report full";
@@ -119,7 +124,8 @@
         cp = "cp -i";
 
         j = "just";
-      };
+      }
+      // devTemplateAliases;
     in
     {
       zsh.shellAliases = shellAliases;

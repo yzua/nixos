@@ -1,6 +1,21 @@
 # Oh-My-OpenCode agent definitions and orchestration settings.
 _:
 
+let
+  opusModel = "anthropic/claude-opus-4-6";
+  sonnetModel = "anthropic/claude-sonnet-4-6";
+  haikuModel = "anthropic/claude-haiku-4-5";
+  gptModel = "openai/gpt-5.3-codex";
+  geminiProModel = "google/gemini-2.5-pro";
+  geminiFlashModel = "google/gemini-2.5-flash";
+  mkCategory =
+    model: variant:
+    {
+      inherit model;
+    }
+    // (if variant == null then { } else { inherit variant; });
+in
+
 {
   programs.aiAgents = {
     opencode = {
@@ -9,13 +24,13 @@ _:
 
         agents = {
           sisyphus = {
-            model = "anthropic/claude-opus-4-6";
+            model = opusModel;
             description = "Primary orchestrator — delegates, verifies, ships";
             color = "#d79921"; # Gruvbox yellow
             skills = [ "git-master" ];
           };
           oracle = {
-            model = "anthropic/claude-opus-4-6";
+            model = opusModel;
             description = "Read-only consultant for architecture and debugging";
             color = "#458588"; # Gruvbox blue
             permission = {
@@ -25,7 +40,7 @@ _:
             };
           };
           librarian = {
-            model = "anthropic/claude-sonnet-4-6";
+            model = sonnetModel;
             description = "External reference search — docs, OSS, GitHub examples";
             color = "#b16286"; # Gruvbox purple
             permission = {
@@ -35,7 +50,7 @@ _:
             };
           };
           explore = {
-            model = "anthropic/claude-haiku-4-5";
+            model = haikuModel;
             description = "Fast contextual grep — codebase patterns and structure";
             color = "#98971a"; # Gruvbox green
             permission = {
@@ -45,35 +60,35 @@ _:
             };
           };
           multimodal-looker = {
-            model = "anthropic/claude-sonnet-4-6";
+            model = sonnetModel;
             description = "Visual content analysis — PDFs, images, diagrams";
             color = "#689d6a"; # Gruvbox aqua
             skills = [ "playwright" ];
           };
           prometheus = {
-            model = "anthropic/claude-opus-4-6";
+            model = opusModel;
             variant = "max";
             description = "Strategic planner with interview mode";
             color = "#cc241d"; # Gruvbox red
           };
           metis = {
-            model = "anthropic/claude-opus-4-6";
+            model = opusModel;
             description = "Pre-planning analysis — hidden requirements, ambiguities";
             color = "#d65d0e"; # Gruvbox orange
           };
           momus = {
-            model = "anthropic/claude-opus-4-6";
+            model = opusModel;
             description = "Plan reviewer — validates clarity and completeness";
             color = "#928374"; # Gruvbox gray
           };
           atlas = {
-            model = "anthropic/claude-sonnet-4-6";
+            model = sonnetModel;
             description = "Orchestrator/conductor — coordinates task execution";
             color = "#fabd2f"; # Gruvbox bright yellow
             skills = [ "git-master" ];
           };
           hephaestus = {
-            model = "openai/gpt-5.4";
+            model = gptModel;
             description = "Autonomous deep worker — goal-oriented, long-running tasks";
             color = "#fb4934"; # Gruvbox bright red
           };
@@ -90,40 +105,22 @@ _:
               google = 10;
             };
             modelConcurrency = {
-              "anthropic/claude-opus-4-6" = 2; # Expensive — limit hard
-              "anthropic/claude-haiku-4-5" = 8; # Cheap — allow many
-              "google/gemini-2.5-flash" = 10; # Cheap — allow many
+              ${opusModel} = 2; # Expensive — limit hard
+              ${haikuModel} = 8; # Cheap — allow many
+              ${geminiFlashModel} = 10; # Cheap — allow many
             };
           };
 
           # === Category Model Assignments ===
           categories = {
-            "visual-engineering" = {
-              model = "google/gemini-2.5-pro";
-            };
-            ultrabrain = {
-              model = "anthropic/claude-opus-4-6";
-            };
-            deep = {
-              model = "anthropic/claude-opus-4-6";
-              variant = "max";
-            };
-            artistry = {
-              model = "google/gemini-2.5-pro";
-            };
-            quick = {
-              model = "anthropic/claude-haiku-4-5";
-            };
-            "unspecified-low" = {
-              model = "anthropic/claude-sonnet-4-6";
-            };
-            "unspecified-high" = {
-              model = "anthropic/claude-opus-4-6";
-              variant = "max";
-            };
-            writing = {
-              model = "google/gemini-2.5-flash";
-            };
+            "visual-engineering" = mkCategory geminiProModel null;
+            ultrabrain = mkCategory opusModel null;
+            deep = mkCategory opusModel "max";
+            artistry = mkCategory geminiProModel null;
+            quick = mkCategory haikuModel null;
+            "unspecified-low" = mkCategory sonnetModel null;
+            "unspecified-high" = mkCategory opusModel "max";
+            writing = mkCategory geminiFlashModel null;
           };
 
           # === Tmux Visual Multi-Agent ===

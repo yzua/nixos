@@ -1,6 +1,23 @@
 # Model selections, provider registries, and per-agent tool configurations (OpenCode, Codex, Gemini).
 { config, constants, ... }:
 
+let
+  mkModelAlias = model: generateContentConfig: {
+    modelConfig = {
+      inherit model generateContentConfig;
+    };
+  };
+  mkThinkingAlias =
+    model: thinkingLevel: extraConfig:
+    mkModelAlias model (
+      {
+        thinkingConfig = {
+          inherit thinkingLevel;
+        };
+      }
+      // extraConfig
+    );
+in
 {
   programs.aiAgents = {
     # === OpenCode Configuration ===
@@ -14,7 +31,7 @@
 
       extraSettings = {
         share = "disabled";
-        autoupdate = false;
+        autoupdate = true;
         tui = {
           theme = "gruvbox";
           show_tokens = true;
@@ -54,7 +71,7 @@
     codex = {
       enable = true;
       useWrapper = true;
-      model = "gpt-5.4";
+      model = "gpt-5.3-codex";
       personality = "pragmatic";
       reasoningEffort = "medium";
       approvalPolicy = "on-request";
@@ -189,35 +206,13 @@
         # --- Model Aliases ---
         modelConfigs = {
           customAliases = {
-            fast = {
-              modelConfig = {
-                model = "gemini-2.5-flash-lite";
-                generateContentConfig = {
-                  temperature = 0;
-                  maxOutputTokens = 8192;
-                };
-              };
+            fast = mkModelAlias "gemini-2.5-flash-lite" {
+              temperature = 0;
+              maxOutputTokens = 8192;
             };
-            deep = {
-              modelConfig = {
-                model = "gemini-3-pro-preview";
-                generateContentConfig = {
-                  thinkingConfig = {
-                    thinkingLevel = "HIGH";
-                  };
-                };
-              };
-            };
-            code = {
-              modelConfig = {
-                model = "gemini-2.5-pro";
-                generateContentConfig = {
-                  thinkingConfig = {
-                    thinkingLevel = "HIGH";
-                  };
-                  maxOutputTokens = 65536;
-                };
-              };
+            deep = mkThinkingAlias "gemini-3-pro-preview" "HIGH" { };
+            code = mkThinkingAlias "gemini-2.5-pro" "HIGH" {
+              maxOutputTokens = 65536;
             };
           };
         };

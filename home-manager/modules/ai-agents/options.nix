@@ -7,6 +7,24 @@
 
 let
   ohMyOpencodeAgentType = import ./_oh-my-opencode-agent-type.nix { inherit lib; };
+  mkTypedOption =
+    type: default: description:
+    lib.mkOption {
+      inherit type default description;
+    };
+  mkTypedOptionWith =
+    type: default: description: extra:
+    lib.mkOption ({ inherit type default description; } // extra);
+  mkStrOption = default: description: mkTypedOption lib.types.str default description;
+  mkBoolOption = default: description: mkTypedOption lib.types.bool default description;
+  mkIntOption = default: description: mkTypedOption lib.types.int default description;
+  mkAttrsOption = default: description: mkTypedOption lib.types.attrs default description;
+  mkAttrsOfStrOption =
+    default: description: mkTypedOption (lib.types.attrsOf lib.types.str) default description;
+  mkStrListOption =
+    default: description: mkTypedOption (lib.types.listOf lib.types.str) default description;
+  mkNullOrStrOption =
+    default: description: mkTypedOption (lib.types.nullOr lib.types.str) default description;
 in
 {
   options.programs.aiAgents = {
@@ -20,11 +38,7 @@ in
     };
 
     secrets = {
-      zaiApiKeyFile = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = "/run/secrets/zai_api_key";
-        description = "Path to sops-decrypted Z.AI API key file";
-      };
+      zaiApiKeyFile = mkNullOrStrOption "/run/secrets/zai_api_key" "Path to sops-decrypted Z.AI API key file";
     };
 
     skills = lib.mkOption {
@@ -64,44 +78,18 @@ in
       type = lib.types.attrsOf (
         lib.types.submodule {
           options = {
-            enable = lib.mkOption {
-              type = lib.types.bool;
-              default = true;
-              description = "Enable this MCP server";
-            };
-            type = lib.mkOption {
-              type = lib.types.enum [
-                "local"
-                "remote"
-              ];
-              default = "local";
-              description = "Server type (local stdio or remote HTTP)";
-            };
-            command = lib.mkOption {
-              type = lib.types.str;
-              default = "";
-              description = "Command to run for local servers";
-            };
-            args = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [ ];
-              description = "Arguments for the command";
-            };
-            url = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "URL for remote MCP servers";
-            };
-            headers = lib.mkOption {
-              type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
-              default = null;
-              description = "Headers for remote MCP servers";
-            };
-            env = lib.mkOption {
-              type = lib.types.attrsOf lib.types.str;
-              default = { };
-              description = "Environment variables for the server";
-            };
+            enable = mkBoolOption true "Enable this MCP server";
+            type = mkTypedOption (lib.types.enum [
+              "local"
+              "remote"
+            ]) "local" "Server type (local stdio or remote HTTP)";
+            command = mkStrOption "" "Command to run for local servers";
+            args = mkStrListOption [ ] "Arguments for the command";
+            url = mkNullOrStrOption null "URL for remote MCP servers";
+            headers = mkTypedOption (lib.types.nullOr (
+              lib.types.attrsOf lib.types.str
+            )) null "Headers for remote MCP servers";
+            env = mkAttrsOfStrOption { } "Environment variables for the server";
           };
         }
       );
@@ -112,120 +100,41 @@ in
     logging = {
       enable = lib.mkEnableOption "centralized logging for AI agents";
 
-      directory = lib.mkOption {
-        type = lib.types.str;
-        default = "${config.xdg.dataHome}/ai-agents/logs";
-        description = "Directory for AI agent logs";
-      };
-
-      notifyOnError = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Send desktop notification on agent errors";
-      };
-
-      enableOtel = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Enable OpenTelemetry for supported agents";
-      };
-
-      otelEndpoint = lib.mkOption {
-        type = lib.types.str;
-        default = "http://localhost:4317";
-        description = "OpenTelemetry collector endpoint";
-      };
-
-      otelExporter = lib.mkOption {
-        type = lib.types.str;
-        default = "otlp";
-        description = "OpenTelemetry exporter type";
-      };
-
-      retentionDays = lib.mkOption {
-        type = lib.types.int;
-        default = 30;
-        description = "Days to retain log files";
-      };
+      directory = mkStrOption "${config.xdg.dataHome}/ai-agents/logs" "Directory for AI agent logs";
+      notifyOnError = mkBoolOption true "Send desktop notification on agent errors";
+      enableOtel = mkBoolOption false "Enable OpenTelemetry for supported agents";
+      otelEndpoint = mkStrOption "http://localhost:4317" "OpenTelemetry collector endpoint";
+      otelExporter = mkStrOption "otlp" "OpenTelemetry exporter type";
+      retentionDays = mkIntOption 30 "Days to retain log files";
     };
 
     # === Claude Options ===
     claude = {
       enable = lib.mkEnableOption "Claude Code configuration";
 
-      model = lib.mkOption {
-        type = lib.types.str;
-        default = "claude-sonnet-4-6";
-        description = "Default model for Claude Code";
-      };
-
-      env = lib.mkOption {
-        type = lib.types.attrsOf lib.types.str;
-        default = { };
-        description = "Environment variables for Claude Code";
-      };
-
-      permissions = lib.mkOption {
-        type = lib.types.attrs;
-        default = {
-          allow = [ ];
-          deny = [ ];
-        };
-        description = "Permission rules for Claude Code";
-      };
-
-      hooks = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
-        description = "Lifecycle hooks for Claude Code";
-      };
-
-      extraSettings = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
-        description = "Additional Claude Code settings";
-      };
+      model = mkStrOption "claude-sonnet-4-6" "Default model for Claude Code";
+      env = mkAttrsOfStrOption { } "Environment variables for Claude Code";
+      permissions = mkAttrsOption {
+        allow = [ ];
+        deny = [ ];
+      } "Permission rules for Claude Code";
+      hooks = mkAttrsOption { } "Lifecycle hooks for Claude Code";
+      extraSettings = mkAttrsOption { } "Additional Claude Code settings";
     };
 
     # === OpenCode Options ===
     opencode = {
       enable = lib.mkEnableOption "OpenCode configuration";
 
-      model = lib.mkOption {
-        type = lib.types.str;
-        default = "anthropic/claude-sonnet-4-6";
-        description = "Default model for OpenCode";
-      };
-
-      plugins = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default = [ "oh-my-opencode" ];
-        description = "OpenCode plugins to enable";
-      };
-
-      providers = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
-        description = "Provider configurations for OpenCode";
-      };
-
-      extraSettings = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
-        description = "Additional OpenCode settings";
-      };
+      model = mkStrOption "anthropic/claude-sonnet-4-6" "Default model for OpenCode";
+      plugins = mkStrListOption [ "oh-my-opencode" ] "OpenCode plugins to enable";
+      providers = mkAttrsOption { } "Provider configurations for OpenCode";
+      extraSettings = mkAttrsOption { } "Additional OpenCode settings";
 
       ohMyOpencode = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-          description = "Enable oh-my-opencode configuration";
-        };
+        enable = mkBoolOption true "Enable oh-my-opencode configuration";
 
-        agents = lib.mkOption {
-          type = ohMyOpencodeAgentType;
-          default = { };
-          description = "Agent configurations for oh-my-opencode";
+        agents = mkTypedOptionWith ohMyOpencodeAgentType { } "Agent configurations for oh-my-opencode" {
           example = {
             sisyphus = {
               model = "anthropic/claude-opus-4-6";
@@ -239,11 +148,7 @@ in
           };
         };
 
-        extraSettings = lib.mkOption {
-          type = lib.types.attrs;
-          default = { };
-          description = "Additional oh-my-opencode settings";
-        };
+        extraSettings = mkAttrsOption { } "Additional oh-my-opencode settings";
       };
     };
 
@@ -251,17 +156,8 @@ in
     codex = {
       enable = lib.mkEnableOption "Codex CLI configuration";
 
-      useWrapper = lib.mkOption {
-        type = lib.types.bool;
-        default = true;
-        description = "Use logging wrapper for Codex";
-      };
-
-      model = lib.mkOption {
-        type = lib.types.str;
-        default = "gpt-5.4";
-        description = "Default model for Codex";
-      };
+      useWrapper = mkBoolOption true "Use logging wrapper for Codex";
+      model = mkStrOption "gpt-5.3-codex" "Default model for Codex";
 
       personality = lib.mkOption {
         type = lib.types.enum [
@@ -297,11 +193,7 @@ in
         description = "Command approval policy";
       };
 
-      trustedProjects = lib.mkOption {
-        type = lib.types.listOf lib.types.str;
-        default = [ ];
-        description = "Paths to projects with trust_level = trusted";
-      };
+      trustedProjects = mkStrListOption [ ] "Paths to projects with trust_level = trusted";
 
       extraToml = lib.mkOption {
         type = lib.types.lines;
@@ -314,23 +206,9 @@ in
     gemini = {
       enable = lib.mkEnableOption "Gemini CLI configuration";
 
-      theme = lib.mkOption {
-        type = lib.types.str;
-        default = "Default";
-        description = "Theme for Gemini CLI";
-      };
-
-      sandboxMode = lib.mkOption {
-        type = lib.types.str;
-        default = "cautious";
-        description = "Sandbox mode (none, cautious, strict)";
-      };
-
-      extraSettings = lib.mkOption {
-        type = lib.types.attrs;
-        default = { };
-        description = "Additional Gemini CLI settings";
-      };
+      theme = mkStrOption "Default" "Theme for Gemini CLI";
+      sandboxMode = mkStrOption "cautious" "Sandbox mode (none, cautious, strict)";
+      extraSettings = mkAttrsOption { } "Additional Gemini CLI settings";
     };
   };
 }

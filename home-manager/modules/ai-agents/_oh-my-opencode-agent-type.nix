@@ -1,139 +1,51 @@
 # Type definition for programs.aiAgents.opencode.ohMyOpencode.agents entries.
 { lib, ... }:
 
+let
+  mkOptionNoDefault = type: description: lib.mkOption { inherit type description; };
+  mkTypedOption =
+    type: default: description:
+    lib.mkOption { inherit type default description; };
+  mkNullOrOption = type: description: mkTypedOption (lib.types.nullOr type) null description;
+  permissionStates = lib.types.enum [
+    "ask"
+    "allow"
+    "deny"
+  ];
+in
 lib.types.attrsOf (
   lib.types.submodule {
     options = {
-      model = lib.mkOption {
-        type = lib.types.str;
-        description = "Model to use for this agent";
-      };
-      variant = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Model variant (e.g., 'low', 'high', 'max')";
-      };
-      prompt = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "System prompt for this agent";
-      };
-      prompt_append = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Additional prompt appended to system prompt";
-      };
-      skills = lib.mkOption {
-        type = lib.types.nullOr (lib.types.listOf lib.types.str);
-        default = null;
-        description = "Skills to enable (playwright, frontend-ui-ux, git-master)";
-      };
-      temperature = lib.mkOption {
-        type = lib.types.nullOr lib.types.float;
-        default = null;
-        description = "Sampling temperature (0-2)";
-      };
-      top_p = lib.mkOption {
-        type = lib.types.nullOr lib.types.float;
-        default = null;
-        description = "Top-p sampling (0-1)";
-      };
-      tools = lib.mkOption {
-        type = lib.types.nullOr (lib.types.attrsOf lib.types.bool);
-        default = null;
-        description = "Enable/disable specific tools (e.g., { Edit = false; })";
-      };
-      description = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Agent description";
-      };
-      mode = lib.mkOption {
-        type = lib.types.nullOr (
-          lib.types.enum [
-            "subagent"
-            "primary"
-            "all"
-          ]
-        );
-        default = null;
-        description = "Agent mode";
-      };
-      color = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Hex color for UI (e.g., '#FF5500')";
-      };
-      permission = lib.mkOption {
-        type = lib.types.nullOr (
-          lib.types.submodule {
-            options = {
-              edit = lib.mkOption {
-                type = lib.types.nullOr (
-                  lib.types.enum [
-                    "ask"
-                    "allow"
-                    "deny"
-                  ]
-                );
-                default = null;
-              };
-              bash = lib.mkOption {
-                type = lib.types.nullOr (
-                  lib.types.either
-                    (lib.types.enum [
-                      "ask"
-                      "allow"
-                      "deny"
-                    ])
-                    (
-                      lib.types.attrsOf (
-                        lib.types.enum [
-                          "ask"
-                          "allow"
-                          "deny"
-                        ]
-                      )
-                    )
-                );
-                default = null;
-              };
-              webfetch = lib.mkOption {
-                type = lib.types.nullOr (
-                  lib.types.enum [
-                    "ask"
-                    "allow"
-                    "deny"
-                  ]
-                );
-                default = null;
-              };
-              doom_loop = lib.mkOption {
-                type = lib.types.nullOr (
-                  lib.types.enum [
-                    "ask"
-                    "allow"
-                    "deny"
-                  ]
-                );
-                default = null;
-              };
-              external_directory = lib.mkOption {
-                type = lib.types.nullOr (
-                  lib.types.enum [
-                    "ask"
-                    "allow"
-                    "deny"
-                  ]
-                );
-                default = null;
-              };
-            };
-          }
-        );
-        default = null;
-        description = "Fine-grained permission settings";
-      };
+      model = mkOptionNoDefault lib.types.str "Model to use for this agent";
+      variant = mkNullOrOption lib.types.str "Model variant (e.g., 'low', 'high', 'max')";
+      prompt = mkNullOrOption lib.types.str "System prompt for this agent";
+      prompt_append = mkNullOrOption lib.types.str "Additional prompt appended to system prompt";
+      skills = mkNullOrOption (lib.types.listOf lib.types.str) "Skills to enable (playwright, frontend-ui-ux, git-master)";
+      temperature = mkNullOrOption lib.types.float "Sampling temperature (0-2)";
+      top_p = mkNullOrOption lib.types.float "Top-p sampling (0-1)";
+      tools = mkNullOrOption (lib.types.attrsOf lib.types.bool) "Enable/disable specific tools (e.g., { Edit = false; })";
+      description = mkNullOrOption lib.types.str "Agent description";
+      mode = mkNullOrOption (lib.types.enum [
+        "subagent"
+        "primary"
+        "all"
+      ]) "Agent mode";
+      color = mkNullOrOption lib.types.str "Hex color for UI (e.g., '#FF5500')";
+      permission = mkTypedOption (lib.types.nullOr (
+        lib.types.submodule {
+          options = {
+            edit = mkTypedOption (lib.types.nullOr permissionStates) null "Edit permission mode";
+            bash = mkTypedOption (lib.types.nullOr (
+              lib.types.either permissionStates (lib.types.attrsOf permissionStates)
+            )) null "Bash permission mode";
+            webfetch = mkTypedOption (lib.types.nullOr permissionStates) null "Webfetch permission mode";
+            doom_loop = mkTypedOption (lib.types.nullOr permissionStates) null "Doom loop permission mode";
+            external_directory =
+              mkTypedOption (lib.types.nullOr permissionStates) null
+                "External directory permission mode";
+          };
+        }
+      )) null "Fine-grained permission settings";
     };
   }
 )

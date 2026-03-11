@@ -11,9 +11,34 @@ let
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   sonnetModel = "anthropic/claude-sonnet-4-6";
-  gptMainModel = "openai/gpt-5.4";
-  gptStandardModel = "openai/gpt-5.4";
+  gptMainModel = "openai/gpt-5.3-codex";
+  gptStandardModel = "openai/gpt-5.3-codex";
   gptFastModel = "opencode/gpt-5-nano";
+  zenMainModel = "opencode/minimax-m2.5-free";
+  zenFastModel = "opencode/mimo-v2-flash-free";
+  mkCategorySettings =
+    categoryModels: categoryVariants:
+    lib.mapAttrs (
+      category: model:
+      {
+        inherit model;
+      }
+      // (lib.optionalAttrs (builtins.hasAttr category categoryVariants) {
+        variant = categoryVariants.${category};
+      })
+    ) categoryModels;
+  mkAgentOverrides =
+    baseAgents: agentModels: agentVariants:
+    lib.mapAttrs (
+      name: agentCfg:
+      agentCfg
+      // (lib.optionalAttrs (builtins.hasAttr name agentModels) {
+        model = agentModels.${name};
+      })
+      // (lib.optionalAttrs (builtins.hasAttr name agentVariants) {
+        variant = agentVariants.${name};
+      })
+    ) baseAgents;
 
   replaceOpusWithSonnet =
     value:
@@ -97,6 +122,17 @@ let
     atlas = "zai-coding-plan/glm-4.7";
   };
 
+  glmCategoryModels = {
+    "visual-engineering" = "zai-coding-plan/glm-5";
+    ultrabrain = "zai-coding-plan/glm-5";
+    deep = "zai-coding-plan/glm-5";
+    artistry = "zai-coding-plan/glm-5";
+    quick = "zai-coding-plan/glm-4.7-flash";
+    "unspecified-low" = "zai-coding-plan/glm-4.7";
+    "unspecified-high" = "zai-coding-plan/glm-5";
+    writing = "zai-coding-plan/glm-4.7";
+  };
+
   # Gemini profile: Google Gemini models for Gemini-native coding sessions.
   geminiAgentModels = {
     sisyphus = "google/gemini-2.5-pro";
@@ -120,6 +156,26 @@ let
     explore = "minimal"; # Fast grep — speed over depth
   };
 
+  geminiCategoryModels = {
+    "visual-engineering" = "google/gemini-2.5-pro";
+    ultrabrain = "google/gemini-2.5-pro";
+    deep = "google/gemini-2.5-pro";
+    artistry = "google/gemini-2.5-pro";
+    quick = "google/gemini-2.5-flash";
+    "unspecified-low" = "google/gemini-2.5-flash";
+    "unspecified-high" = "google/gemini-2.5-pro";
+    writing = "google/gemini-2.5-flash";
+  };
+
+  geminiCategoryVariants = {
+    ultrabrain = "high";
+    deep = "high";
+    quick = "minimal";
+    "unspecified-low" = "medium";
+    "unspecified-high" = "high";
+    writing = "medium";
+  };
+
   # GPT profile: OpenAI GPT models for GPT-first coding sessions.
   gptAgentModels = {
     sisyphus = gptMainModel;
@@ -134,53 +190,55 @@ let
     hephaestus = gptMainModel;
   };
 
+  gptCategoryModels = {
+    "visual-engineering" = gptMainModel;
+    ultrabrain = gptMainModel;
+    deep = gptMainModel;
+    artistry = gptMainModel;
+    quick = gptFastModel;
+    "unspecified-low" = gptStandardModel;
+    "unspecified-high" = gptMainModel;
+    writing = gptStandardModel;
+  };
+
+  # Zen profile: OpenCode free-tier models for low-cost coding sessions.
+  zenAgentModels = {
+    sisyphus = zenMainModel;
+    oracle = zenMainModel;
+    librarian = zenMainModel;
+    explore = zenFastModel;
+    # multimodal-looker keeps its original vision-capable model
+    prometheus = zenMainModel;
+    metis = zenMainModel;
+    momus = zenMainModel;
+    atlas = zenMainModel;
+    hephaestus = zenMainModel;
+  };
+
+  zenCategoryModels = {
+    "visual-engineering" = zenMainModel;
+    ultrabrain = zenMainModel;
+    deep = zenMainModel;
+    artistry = zenMainModel;
+    quick = zenFastModel;
+    "unspecified-low" = zenFastModel;
+    "unspecified-high" = zenMainModel;
+    writing = zenMainModel;
+  };
+
   glmOpencodeSettings = opencodeSettings // {
     model = "zai-coding-plan/glm-5";
   };
 
   glmOhMyOpencodeSettings = ohMyOpencodeSettings // {
-    agents =
-      lib.mapAttrs (
-        name: agentCfg:
-        agentCfg
-        // (lib.optionalAttrs (builtins.hasAttr name glmAgentModels) {
-          model = glmAgentModels.${name};
-        })
-      ) ohMyOpencodeSettings.agents
-      // {
-        # Autonomous deep worker agent (defaults to openai/gpt-5.4)
-        hephaestus = {
-          model = "zai-coding-plan/glm-5";
-        };
-      };
-
-    # Override category models to use GLM instead of default providers
-    categories = {
-      "visual-engineering" = {
+    agents = mkAgentOverrides ohMyOpencodeSettings.agents glmAgentModels { } // {
+      # Autonomous deep worker agent (defaults to openai/gpt-5.3-codex)
+      hephaestus = {
         model = "zai-coding-plan/glm-5";
-      };
-      ultrabrain = {
-        model = "zai-coding-plan/glm-5";
-      };
-      deep = {
-        model = "zai-coding-plan/glm-5";
-      };
-      artistry = {
-        model = "zai-coding-plan/glm-5";
-      };
-      quick = {
-        model = "zai-coding-plan/glm-4.7-flash";
-      };
-      "unspecified-low" = {
-        model = "zai-coding-plan/glm-4.7";
-      };
-      "unspecified-high" = {
-        model = "zai-coding-plan/glm-5";
-      };
-      writing = {
-        model = "zai-coding-plan/glm-4.7";
       };
     };
+
+    categories = mkCategorySettings glmCategoryModels { };
   };
 
   # Gemini profile: Google Gemini models for Gemini-native coding sessions.
@@ -189,50 +247,9 @@ let
   };
 
   geminiOhMyOpencodeSettings = ohMyOpencodeSettings // {
-    agents = lib.mapAttrs (
-      name: agentCfg:
-      agentCfg
-      // (lib.optionalAttrs (builtins.hasAttr name geminiAgentModels) {
-        model = geminiAgentModels.${name};
-      })
-      // (lib.optionalAttrs (builtins.hasAttr name geminiAgentVariants) {
-        variant = geminiAgentVariants.${name};
-      })
-    ) ohMyOpencodeSettings.agents;
+    agents = mkAgentOverrides ohMyOpencodeSettings.agents geminiAgentModels geminiAgentVariants;
 
-    # Override category models to use Gemini instead of default providers
-    categories = {
-      "visual-engineering" = {
-        model = "google/gemini-2.5-pro";
-      };
-      ultrabrain = {
-        model = "google/gemini-2.5-pro";
-        variant = "high";
-      };
-      deep = {
-        model = "google/gemini-2.5-pro";
-        variant = "high";
-      };
-      artistry = {
-        model = "google/gemini-2.5-pro";
-      };
-      quick = {
-        model = "google/gemini-2.5-flash";
-        variant = "minimal";
-      };
-      "unspecified-low" = {
-        model = "google/gemini-2.5-flash";
-        variant = "medium";
-      };
-      "unspecified-high" = {
-        model = "google/gemini-2.5-pro";
-        variant = "high";
-      };
-      writing = {
-        model = "google/gemini-2.5-flash";
-        variant = "medium";
-      };
-    };
+    categories = mkCategorySettings geminiCategoryModels geminiCategoryVariants;
   };
 
   # GPT profile: OpenAI GPT models for GPT-first coding sessions.
@@ -241,41 +258,9 @@ let
   };
 
   gptOhMyOpencodeSettings = ohMyOpencodeSettings // {
-    agents = lib.mapAttrs (
-      name: agentCfg:
-      agentCfg
-      // (lib.optionalAttrs (builtins.hasAttr name gptAgentModels) {
-        model = gptAgentModels.${name};
-      })
-    ) ohMyOpencodeSettings.agents;
+    agents = mkAgentOverrides ohMyOpencodeSettings.agents gptAgentModels { };
 
-    # Override category models to use GPT defaults instead of mixed providers
-    categories = {
-      "visual-engineering" = {
-        model = gptMainModel;
-      };
-      ultrabrain = {
-        model = gptMainModel;
-      };
-      deep = {
-        model = gptMainModel;
-      };
-      artistry = {
-        model = gptMainModel;
-      };
-      quick = {
-        model = gptFastModel;
-      };
-      "unspecified-low" = {
-        model = gptStandardModel;
-      };
-      "unspecified-high" = {
-        model = gptMainModel;
-      };
-      writing = {
-        model = gptStandardModel;
-      };
-    };
+    categories = mkCategorySettings gptCategoryModels { };
   };
 
   # Sonnet profile: Default OpenCode config with Opus replaced by Sonnet for lower cost.
@@ -284,6 +269,17 @@ let
   };
 
   sonnetOhMyOpencodeSettings = replaceOpusWithSonnet ohMyOpencodeSettings;
+
+  # Zen profile: OpenCode free-tier models for low-cost coding sessions.
+  zenOpencodeSettings = opencodeSettings // {
+    model = zenMainModel;
+  };
+
+  zenOhMyOpencodeSettings = ohMyOpencodeSettings // {
+    agents = mkAgentOverrides ohMyOpencodeSettings.agents zenAgentModels { };
+
+    categories = mkCategorySettings zenCategoryModels { };
+  };
 in
 {
   inherit
@@ -299,5 +295,7 @@ in
     gptOhMyOpencodeSettings
     sonnetOpencodeSettings
     sonnetOhMyOpencodeSettings
+    zenOpencodeSettings
+    zenOhMyOpencodeSettings
     ;
 }

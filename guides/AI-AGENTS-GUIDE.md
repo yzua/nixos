@@ -118,6 +118,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `ocgem`                      | `opencode_gemini`                                                  | OpenCode with Gemini profile                                          |
 | `ocgpt`                      | `opencode_gpt`                                                     | OpenCode with GPT profile                                            |
 | `ocs`                        | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                         |
+| `oczen`                      | `opencode_zen`                                                     | OpenCode with Zen free profile                                       |
 | `gem`                        | `gemini --yolo`                                                    | Gemini CLI YOLO (default)                                            |
 | `cx`                         | `codex --no-alt-screen`                                            | Codex safe default                                                    |
 | `cxu`                        | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex YOLO (unsafe explicit)                                          |
@@ -126,13 +127,16 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `opencode_glm` (`ocglm`)    | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`         |
 | `opencode_gemini` (`ocgem`) | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`      |
 | `opencode_gpt` (`ocgpt`)    | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`         |
+| `opencode_sonnet` (`ocs`)   | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`      |
+| `opencode_zen` (`oczen`)    | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`         |
 | `occm`                      | `opencode --prompt '<review/split/sign prompt>'`                   | Review current git changes and commit logically with `git commit -S` |
 | `ocbp`                      | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas |
+| `cprf`                      | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`)   |
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `gem`, `cx`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) are generated automatically from the base agent alias list.
-- **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, sops key loading, or multi-line logic.
+- **Aliases** (`cl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `ocs`, `oczen`, `gem`, `cx`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 
 ---
 
@@ -216,7 +220,7 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`
 
 | Setting                  | Value                          | Why                                                           |
 | ------------------------ | ------------------------------ | ------------------------------------------------------------- |
-| Model                    | `gpt-5.4`                      | Current recommended Codex model                               |
+| Model                    | `gpt-5.3-codex`                | Current recommended Codex model                               |
 | Personality              | `pragmatic`                    | Direct, practical responses                                   |
 | Reasoning effort         | `medium`                       | Balanced speed/quality                                        |
 | Reasoning summary        | `concise`                      | Keeps reasoning visible without flooding the transcript        |
@@ -415,6 +419,22 @@ Provider prefixes: `openai/` (OpenAI API), `opencode/` (OpenCode hosted/free tie
 
 ---
 
+## Zen Free Profile (`opencode_zen`)
+
+OpenCode free-tier models as primary models for low-cost sessions.
+
+### `opencode_zen` (`oczen`) — OpenCode with Zen free profile
+
+Uses a separate config directory (`~/.config/opencode-zen/`) with models overridden to Zen free variants. Reuses the same MCP servers, plugins, and permissions as the default profile.
+
+| Scope | Model |
+| ----- | ----- |
+| Primary/default | `opencode/minimax-m2.5-free` |
+| Fast lane (`explore`, `quick`, `unspecified-low`) | `opencode/mimo-v2-flash-free` |
+| Other agent/category overrides | `opencode/minimax-m2.5-free` |
+
+---
+
 ## oh-my-claudecode (Claude Code Plugin)
 
 Installed automatically via activation script. Provides multi-agent orchestration.
@@ -599,6 +619,8 @@ API keys are managed via sops-nix (age-encrypted). The Z.AI API key lives at `/r
 | `opencode_glm` (`ocglm`)    | OpenCode with GLM-5 profile (separate config dir)              |
 | `opencode_gemini` (`ocgem`) | OpenCode with Gemini profile (separate config dir) |
 | `opencode_gpt` (`ocgpt`)    | OpenCode with GPT profile (separate config dir)                |
+| `opencode_sonnet` (`ocs`)   | OpenCode with Sonnet profile (separate config dir)             |
+| `opencode_zen` (`oczen`)    | OpenCode with Zen free profile (separate config dir)           |
 
 All sops functions use `_load_zai_key()` which reads `/run/secrets/zai_api_key`. If the file is missing, run `just nixos` to decrypt secrets.
 
@@ -610,9 +632,11 @@ All sops functions use `_load_zai_key()` which reads `/run/secrets/zai_api_key`.
 2. `~/.config/opencode-glm/opencode.json` — GLM profile MCP server env + remote MCPs
 3. `~/.config/opencode-gemini/opencode.json` — Gemini profile MCP server env + remote MCPs
 4. `~/.config/opencode-gpt/opencode.json` — GPT profile MCP server env + remote MCPs
-5. `~/.mcp.json` — Claude Code MCP server env + remote MCPs
-6. `~/.codex/config.toml` — MCP server env
-7. `~/.gemini/settings.json` — MCP server env + remote MCPs
+5. `~/.config/opencode-sonnet/opencode.json` — Sonnet profile MCP server env + remote MCPs
+6. `~/.config/opencode-zen/opencode.json` — Zen profile MCP server env + remote MCPs
+7. `~/.mcp.json` — Claude Code MCP server env + remote MCPs
+8. `~/.codex/config.toml` — MCP server env
+9. `~/.gemini/settings.json` — MCP server env + remote MCPs
 
 ---
 

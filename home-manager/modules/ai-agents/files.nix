@@ -25,6 +25,8 @@ let
     gptOhMyOpencodeSettings
     sonnetOpencodeSettings
     sonnetOhMyOpencodeSettings
+    zenOpencodeSettings
+    zenOhMyOpencodeSettings
     ;
 
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
@@ -36,6 +38,7 @@ let
     "opencode-gemini" = geminiOpencodeSettings;
     "opencode-gpt" = gptOpencodeSettings;
     "opencode-sonnet" = sonnetOpencodeSettings;
+    "opencode-zen" = zenOpencodeSettings;
   };
 
   ohMyOpencodeSettingsByProfile = {
@@ -44,6 +47,7 @@ let
     "opencode-gemini" = geminiOhMyOpencodeSettings;
     "opencode-gpt" = gptOhMyOpencodeSettings;
     "opencode-sonnet" = sonnetOhMyOpencodeSettings;
+    "opencode-zen" = zenOhMyOpencodeSettings;
   };
 
   opencodeConfigFiles = lib.foldl' (

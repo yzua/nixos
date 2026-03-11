@@ -43,20 +43,30 @@
       claude --dangerously-skip-permissions "$@"
     }
 
+    _opencode_profile() {
+      local profile="$1"
+      shift
+      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-$profile" opencode "$@"
+    }
+
     opencode_glm() {
-      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-glm" opencode "$@"
+      _opencode_profile "glm" "$@"
     }
 
     opencode_gemini() {
-      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gemini" opencode "$@"
+      _opencode_profile "gemini" "$@"
     }
 
     opencode_gpt() {
-      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode "$@"
+      _opencode_profile "gpt" "$@"
     }
 
     opencode_sonnet() {
-      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-sonnet" opencode "$@"
+      _opencode_profile "sonnet" "$@"
+    }
+
+    opencode_zen() {
+      _opencode_profile "zen" "$@"
     }
 
     # === AI multi-pane launcher ===
@@ -112,7 +122,7 @@
           # Build command with prompt injection per agent family
           if [[ -n "$prompt" ]]; then
             case "$agent" in
-              oc|ocglm|ocgem|ocgpt|ocs|ocf|ocrun|occm|ocrf|ocsa|ocmd|opencode*)
+              oc|ocglm|ocgem|ocgpt|ocs|oczen|ocf|ocrun|occm|ocrf|ocsa|ocmd|opencode*)
                 cmd="$agent --prompt '$kdl_prompt'" ;;
               *)
                 cmd="$agent '$kdl_prompt'" ;;

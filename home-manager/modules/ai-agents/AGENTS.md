@@ -66,7 +66,7 @@ services.nix (zsh aliases, systemd timers, packages)
 |-------|----------------|-----------------|--------|
 | Claude Code | `opus` alias (`programs.aiAgents.claude.model`) | `~/.claude/settings.json`, `~/.mcp.json`, `~/.claude/CLAUDE.md` | JSON + Markdown |
 | OpenCode | `anthropic/claude-opus-4-6` | `~/.config/opencode*/opencode.json` | JSON |
-| Codex CLI | `gpt-5.4` | `~/.codex/config.toml` | TOML |
+| Codex CLI | `gpt-5.3-codex` | `~/.codex/config.toml` | TOML |
 | Gemini CLI | Gemini aliases configured in `config/models.nix` | `~/.gemini/settings.json` | JSON |
 
 ### Profile Variants (OpenCode)
@@ -78,7 +78,7 @@ services.nix (zsh aliases, systemd timers, packages)
 | `opencode` | `opencode` | Anthropic Opus |
 | `opencode-glm` | `opencode-glm` | Z.AI GLM-5 |
 | `opencode-gemini` | `opencode-gemini` | Google Antigravity |
-| `opencode-gpt` | `opencode-gpt` | OpenAI GPT-5.4 |
+| `opencode-gpt` | `opencode-gpt` | OpenAI GPT-5.3-Codex |
 | `opencode-sonnet` | `opencode-sonnet` | Anthropic Sonnet |
 
 ### Oh-My-OpenCode Agents (10)
@@ -94,7 +94,7 @@ services.nix (zsh aliases, systemd timers, packages)
 | `metis` | Opus | Pre-planning analysis — hidden requirements |
 | `momus` | Opus | Plan reviewer — validates clarity |
 | `atlas` | Sonnet | Orchestrator/conductor — coordinates execution |
-| `hephaestus` | GPT-5.4 | Autonomous deep worker — long-running tasks |
+| `hephaestus` | GPT-5.3-Codex | Autonomous deep worker — long-running tasks |
 
 ---
 

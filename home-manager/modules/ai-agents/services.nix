@@ -81,6 +81,11 @@ let
       command = "opencode_sonnet";
       workflowPromptMode = "flag";
     }
+    {
+      alias = "oczen";
+      command = "opencode_zen";
+      workflowPromptMode = "flag";
+    }
   ];
 
   workflowPromptSpecs = [
@@ -122,7 +127,16 @@ let
     ) workflowPromptSpecs
   );
 
-  aiAliases = mkAliasAttrs (aiAgentAliasSpecs ++ aiWorkflowAliasSpecs);
+  workflowClipboardAliasSpecs = map (workflow: {
+    alias = "cp${workflow.suffix}";
+    command =
+      "if command -v wl-copy >/dev/null 2>&1; then printf '%s' ${lib.escapeShellArg workflow.prompt} | wl-copy; "
+      + "elif command -v xclip >/dev/null 2>&1; then printf '%s' ${lib.escapeShellArg workflow.prompt} | xclip -selection clipboard; "
+      + "else echo 'Clipboard tool not found (need wl-copy or xclip)' >&2; false; fi "
+      + "&& echo 'Copied ${workflow.suffix} prompt to clipboard'";
+  }) workflowPromptSpecs;
+
+  aiAliases = mkAliasAttrs (aiAgentAliasSpecs ++ aiWorkflowAliasSpecs ++ workflowClipboardAliasSpecs);
   logCleanupCommand = ''
     find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
   '';
@@ -191,31 +205,48 @@ in
           "d ${cfg.logging.directory} 0755 - - -"
         ];
 
-        services.ai-agent-log-cleanup = {
-          Unit.Description = "Clean up old AI agent logs";
-          Service = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.writeShellScript "cleanup" logCleanupCommand}";
+        services = {
+          ai-agent-log-cleanup = {
+            Unit.Description = "Clean up old AI agent logs";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.writeShellScript "cleanup" logCleanupCommand}";
+            };
+          };
+
+          opencode-db-vacuum = {
+            Unit.Description = "Vacuum OpenCode SQLite database";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.writeShellScript "opencode-vacuum" ''
+                DB="${config.xdg.dataHome}/opencode/opencode.db"
+                if [[ -f "$DB" ]]; then
+                  ${pkgs.sqlite}/bin/sqlite3 "$DB" "VACUUM;"
+                  echo "Vacuumed OpenCode database"
+                fi
+              ''}";
+            };
+          };
+
+          codex-autoupdate = {
+            Unit.Description = "Auto-update Codex CLI";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.writeShellScript "codex-autoupdate" ''
+                if command -v codex >/dev/null 2>&1; then
+                  bun install -g @openai/codex@latest
+                  echo "Updated Codex CLI"
+                fi
+              ''}";
+            };
           };
         };
 
-        timers.ai-agent-log-cleanup = mkWeeklyTimer "Weekly AI agent log cleanup";
-
-        services.opencode-db-vacuum = {
-          Unit.Description = "Vacuum OpenCode SQLite database";
-          Service = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.writeShellScript "opencode-vacuum" ''
-              DB="${config.xdg.dataHome}/opencode/opencode.db"
-              if [[ -f "$DB" ]]; then
-                ${pkgs.sqlite}/bin/sqlite3 "$DB" "VACUUM;"
-                echo "Vacuumed OpenCode database"
-              fi
-            ''}";
-          };
+        timers = {
+          ai-agent-log-cleanup = mkWeeklyTimer "Weekly AI agent log cleanup";
+          opencode-db-vacuum = mkWeeklyTimer "Weekly OpenCode database vacuum";
+          codex-autoupdate = mkWeeklyTimer "Weekly Codex CLI auto-update";
         };
-
-        timers.opencode-db-vacuum = mkWeeklyTimer "Weekly OpenCode database vacuum";
       };
     }
   );
