@@ -7,6 +7,42 @@
 }:
 
 let
+  localhost = "127.0.0.1";
+  netdataTarget = "${localhost}:19999";
+  lokiTarget = "${localhost}:3100";
+  prometheusTarget = "${localhost}:9090";
+  alertmanagerTarget = "${localhost}:9093";
+  mkStaticConfig = targets: [ { inherit targets; } ];
+  mkDatasource =
+    {
+      name,
+      type,
+      url,
+      uid,
+      isDefault ? false,
+    }:
+    {
+      inherit
+        name
+        type
+        url
+        uid
+        isDefault
+        ;
+      access = "proxy";
+      editable = true;
+      orgId = 1;
+      jsonData = { };
+    };
+  mkMemoryService =
+    {
+      max,
+      high,
+    }:
+    {
+      MemoryMax = max;
+      MemoryHigh = high;
+    };
   dashboardDir = pkgs.runCommand "grafana-dashboards" { } ''
     mkdir -p $out
     cp ${./dashboards/system-overview.json} $out/system-overview.json
@@ -24,7 +60,7 @@ in
       prometheus = {
         enable = true;
         port = 9090;
-        listenAddress = "127.0.0.1";
+        listenAddress = localhost;
 
         globalConfig = {
           scrape_interval = "30s"; # 30s sufficient for personal machine (halves disk/CPU vs 15s default)
@@ -36,15 +72,11 @@ in
             job_name = "netdata";
             metrics_path = "/api/v1/allmetrics";
             params.format = [ "prometheus" ];
-            static_configs = [
-              { targets = [ "127.0.0.1:19999" ]; }
-            ];
+            static_configs = mkStaticConfig [ netdataTarget ];
           }
           {
             job_name = "loki";
-            static_configs = [
-              { targets = [ "127.0.0.1:3100" ]; }
-            ];
+            static_configs = mkStaticConfig [ lokiTarget ];
           }
         ];
 
@@ -52,9 +84,7 @@ in
 
         alertmanagers = [
           {
-            static_configs = [
-              { targets = [ "127.0.0.1:9093" ]; }
-            ];
+            static_configs = mkStaticConfig [ alertmanagerTarget ];
           }
         ];
 
@@ -65,7 +95,7 @@ in
 
         alertmanager = {
           enable = true;
-          listenAddress = "127.0.0.1";
+          listenAddress = localhost;
           port = 9093;
           extraFlags = [
             "--cluster.listen-address="
@@ -104,7 +134,7 @@ in
 
         settings = {
           server = {
-            http_addr = "127.0.0.1";
+            http_addr = localhost;
             http_port = 3001;
           };
 
@@ -132,27 +162,19 @@ in
               }
             ];
             datasources = [
-              {
+              (mkDatasource {
                 name = "Prometheus";
                 type = "prometheus";
-                access = "proxy";
-                url = "http://127.0.0.1:9090";
+                url = "http://${prometheusTarget}";
                 uid = "prometheus";
                 isDefault = true;
-                editable = true;
-                orgId = 1;
-                jsonData = { };
-              }
-              {
+              })
+              (mkDatasource {
                 name = "Loki";
                 type = "loki";
-                access = "proxy";
-                url = "http://127.0.0.1:3100";
+                url = "http://${lokiTarget}";
                 uid = "loki";
-                editable = true;
-                orgId = 1;
-                jsonData = { };
-              }
+              })
             ];
           };
 
@@ -168,19 +190,19 @@ in
 
     # === Resource Limits ===
     systemd.services = {
-      prometheus.serviceConfig = {
-        MemoryMax = "512M";
-        MemoryHigh = "384M";
+      prometheus.serviceConfig = mkMemoryService {
+        max = "512M";
+        high = "384M";
       };
-      alertmanager.serviceConfig = {
-        MemoryMax = "128M";
-        MemoryHigh = "64M";
+      alertmanager.serviceConfig = mkMemoryService {
+        max = "128M";
+        high = "64M";
       };
       grafana = {
         restartTriggers = [ config.sops.secrets.grafana_admin_password.path ];
-        serviceConfig = {
-          MemoryMax = "256M";
-          MemoryHigh = "192M";
+        serviceConfig = mkMemoryService {
+          max = "256M";
+          high = "192M";
         };
       };
     };

@@ -1,15 +1,10 @@
 # Operational security (kexec, metadata stripping, zram, NTS time).
-{ lib, pkgsStable, ... }:
+{ lib, ... }:
 
 {
   boot.kernel.sysctl = {
     "kernel.kexec_load_disabled" = 1; # Prevent runtime kernel replacement
   };
-
-  environment.systemPackages = with pkgsStable; [
-    mat2 # Metadata removal (images, PDFs, office docs)
-    exiftool
-  ];
 
   # RAM-only swap — prevents sensitive data leaking to unencrypted partitions
   zramSwap = {

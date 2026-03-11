@@ -9,7 +9,10 @@
 
 let
   cleanupLib = import ./_lib.nix { inherit pkgs user; };
-  inherit (cleanupLib) mkCleanupTimer;
+  inherit (cleanupLib)
+    mkCleanupTimer
+    mkFindCleanupTimer
+    ;
   bash = "${pkgs.bash}/bin/bash";
   find = "${pkgs.findutils}/bin/find";
   home = "/home/${user}";
@@ -34,11 +37,11 @@ in
         delay = "1h";
       })
 
-      (mkCleanupTimer {
+      (mkFindCleanupTimer {
         name = "playwright";
         description = "Clean up Playwright browser cache";
-        command = "${bash} -c '${find} ${home}/.cache/ms-playwright -type d -mtime +30 -delete 2>/dev/null || true'";
-        postCommand = "${bash} -c '${find} ${home}/.cache/ms-playwright -type d -empty -delete 2>/dev/null || true'";
+        path = "${home}/.cache/ms-playwright";
+        mtimeDays = 30;
         calendar = "monthly";
         delay = "2h";
       })

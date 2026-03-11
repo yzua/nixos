@@ -60,8 +60,6 @@ let
   '';
 in
 {
-  environment.systemPackages = [ pkgs.aide ];
-
   systemd = {
     timers.aide-check = mkPersistentTimer {
       description = "Weekly AIDE file integrity check";

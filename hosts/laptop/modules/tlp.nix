@@ -1,6 +1,13 @@
 # TLP power management for laptop.
 { config, lib, ... }:
 
+let
+  mkAcBatPair = key: acValue: batValue: {
+    "${key}_ON_AC" = acValue;
+    "${key}_ON_BAT" = batValue;
+  };
+in
+
 {
   options.mySystem.laptop = {
     battery = {
@@ -27,40 +34,24 @@
 
         settings = {
           # CPU Performance - CRITICAL for battery life
-          CPU_SCALING_GOVERNOR_ON_AC = "performance";
-          CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-
-          CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-          CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-
+        }
+        // (mkAcBatPair "CPU_SCALING_GOVERNOR" "performance" "powersave")
+        // (mkAcBatPair "CPU_ENERGY_PERF_POLICY" "performance" "power")
+        // {
           CPU_MIN_PERF_ON_AC = 0;
           CPU_MAX_PERF_ON_AC = 100;
           CPU_MIN_PERF_ON_BAT = 0;
           CPU_MAX_PERF_ON_BAT = 50;
 
-          CPU_BOOST_ON_AC = 1;
-          CPU_BOOST_ON_BAT = 0;
-
           # Platform power profile settings
-          PLATFORM_PROFILE_ON_AC = "performance";
-          PLATFORM_PROFILE_ON_BAT = "low-power";
 
           # CRITICAL for ThinkPad battery longevity (75-80% optimal range)
           START_CHARGE_THRESH_BAT0 = config.mySystem.laptop.battery.startChargeThreshold;
           STOP_CHARGE_THRESH_BAT0 = config.mySystem.laptop.battery.stopChargeThreshold;
 
           # Wireless power management
-          WIFI_PWR_ON_AC = "off";
-          WIFI_PWR_ON_BAT = "on";
-
           # Runtime power management for devices
-          RUNTIME_PM_ON_AC = "on";
-          RUNTIME_PM_ON_BAT = "auto";
-
           # Disk power management
-          DISK_IDLE_SECS_ON_AC = 0;
-          DISK_IDLE_SECS_ON_BAT = 2;
-
           # USB autosuspend (saves power)
           USB_AUTOSUSPEND = 1;
           USB_BLACKLIST_PHONE = 1;
@@ -84,11 +75,14 @@
           NMI_WATCHDOG = 0;
 
           # Intel graphics power (if applicable)
-          INTEL_GPU_MIN_FREQ_ON_AC = 300;
-          INTEL_GPU_MIN_FREQ_ON_BAT = 300;
-          INTEL_GPU_MAX_FREQ_ON_AC = 1200;
-          INTEL_GPU_MAX_FREQ_ON_BAT = 600;
-        };
+        }
+        // (mkAcBatPair "CPU_BOOST" 1 0)
+        // (mkAcBatPair "PLATFORM_PROFILE" "performance" "low-power")
+        // (mkAcBatPair "WIFI_PWR" "off" "on")
+        // (mkAcBatPair "RUNTIME_PM" "on" "auto")
+        // (mkAcBatPair "DISK_IDLE_SECS" 0 2)
+        // (mkAcBatPair "INTEL_GPU_MIN_FREQ" 300 300)
+        // (mkAcBatPair "INTEL_GPU_MAX_FREQ" 1200 600);
       };
     };
   };

@@ -9,46 +9,48 @@
 
 let
   cleanupLib = import ./_lib.nix { inherit pkgs user; };
-  inherit (cleanupLib) mkCleanupTimer;
+  inherit (cleanupLib)
+    mkCleanupTimer
+    mkFindCleanupTimer
+    ;
   bash = "${pkgs.bash}/bin/bash";
-  find = "${pkgs.findutils}/bin/find";
   home = "/home/${user}";
 in
 {
   config = lib.mkIf config.mySystem.cleanup.enable (
     lib.mkMerge [
-      (mkCleanupTimer {
+      (mkFindCleanupTimer {
         name = "telegram-downloads";
         description = "Clean up old Telegram downloads";
-        command = "${bash} -c \"${find} '${home}/Downloads/Telegram Desktop' -type f -mtime +14 -delete 2>/dev/null || true\"";
-        postCommand = "${bash} -c \"${find} '${home}/Downloads/Telegram Desktop' -type d -empty -delete 2>/dev/null || true\"";
+        path = "${home}/Downloads/Telegram Desktop";
+        mtimeDays = 14;
         calendar = "daily";
         delay = "1h";
       })
 
-      (mkCleanupTimer {
+      (mkFindCleanupTimer {
         name = "downloads";
         description = "Clean up old general downloads";
-        command = "${bash} -c '${find} ${home}/Downloads -type f -mtime +30 -delete 2>/dev/null || true'";
-        postCommand = "${bash} -c '${find} ${home}/Downloads -type d -empty -delete 2>/dev/null || true'";
+        path = "${home}/Downloads";
+        mtimeDays = 30;
         calendar = "weekly";
         delay = "2h";
       })
 
-      (mkCleanupTimer {
+      (mkFindCleanupTimer {
         name = "screenshots";
         description = "Clean up old screenshots";
-        command = "${bash} -c '${find} ${home}/Screens -type f -mtime +14 -delete 2>/dev/null || true'";
-        postCommand = "${bash} -c '${find} ${home}/Screens -type d -empty -delete 2>/dev/null || true'";
+        path = "${home}/Screens";
+        mtimeDays = 14;
         calendar = "monthly";
         delay = "2h";
       })
 
-      (mkCleanupTimer {
+      (mkFindCleanupTimer {
         name = "telegram-desktop";
         description = "Clean up Telegram Desktop cached media";
-        command = "${bash} -c '${find} ${home}/.local/share/TelegramDesktop -type f -mtime +60 -delete 2>/dev/null || true'";
-        postCommand = "${bash} -c '${find} ${home}/.local/share/TelegramDesktop -type d -empty -delete 2>/dev/null || true'";
+        path = "${home}/.local/share/TelegramDesktop";
+        mtimeDays = 60;
         calendar = "monthly";
         delay = "3h";
       })

@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  pkgsStable,
   ...
 }:
 
@@ -79,6 +80,6 @@ in
     };
 
     # ntfy CLI for manual testing: ntfy pub $(cat /run/secrets/ntfy_topic) "message"
-    environment.systemPackages = [ pkgs.ntfy-sh ];
+    environment.systemPackages = [ pkgsStable.ntfy-sh ];
   };
 }

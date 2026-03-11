@@ -17,397 +17,299 @@
       enable = true;
       openFirewall = false; # SECURITY: Localhost only
 
-      settings = {
-        server = {
-          host = "127.0.0.1";
-          port = 8082;
-        };
+      settings =
+        let
+          searchBangs = [
+            {
+              title = "GitHub";
+              shortcut = "!gh";
+              url = "https://github.com/search?q={QUERY}";
+            }
+            {
+              title = "NixOS";
+              shortcut = "!nix";
+              url = "https://search.nixos.org/packages?query={QUERY}";
+            }
+            {
+              title = "YouTube";
+              shortcut = "!yt";
+              url = "https://www.youtube.com/results?search_query={QUERY}";
+            }
+            {
+              title = "Crates";
+              shortcut = "!crate";
+              url = "https://crates.io/search?q={QUERY}";
+            }
+            {
+              title = "NPM";
+              shortcut = "!npm";
+              url = "https://www.npmjs.com/search?q={QUERY}";
+            }
+          ];
 
-        branding = {
-          logo-text = "Y";
-          app-name = "Dashboard";
-          hide-footer = true;
-          app-background-color = constants.color.bg;
-        };
+          bookmarkGroups = [
+            {
+              title = "AI";
+              links = [
+                {
+                  title = "Claude";
+                  url = "https://claude.ai/";
+                  icon = "si:anthropic";
+                }
+                {
+                  title = "ChatGPT";
+                  url = "https://chatgpt.com/";
+                  icon = "si:openai";
+                }
+              ];
+            }
+            {
+              title = "Dev";
+              links = [
+                {
+                  title = "GitHub";
+                  url = "https://github.com";
+                  icon = "si:github";
+                }
+                {
+                  title = "Excalidraw";
+                  url = "https://excalidraw.com/";
+                  icon = "si:excalidraw";
+                }
+                {
+                  title = "Codeberg";
+                  url = "https://codeberg.org/";
+                  icon = "si:codeberg";
+                }
+              ];
+            }
+            {
+              title = "Social";
+              links = [
+                {
+                  title = "Reddit";
+                  url = "https://www.reddit.com/";
+                  icon = "si:reddit";
+                }
+                {
+                  title = "YouTube";
+                  url = "https://www.youtube.com/";
+                  icon = "si:youtube";
+                }
+                {
+                  title = "X";
+                  url = "https://x.com/home";
+                  icon = "si:x";
+                }
+              ];
+            }
+            {
+              title = "Accounts";
+              links = [
+                {
+                  title = "Proton Mail";
+                  url = "https://mail.proton.me/u/1/inbox";
+                  icon = "si:protonmail";
+                }
+                {
+                  title = "SimpleLogin";
+                  url = "https://app.simplelogin.io/dashboard/";
+                  icon = "mdi:shield-lock-outline";
+                }
+              ];
+            }
+          ];
 
-        # Gruvbox Dark theme
-        theme = {
-          background-color = "0 0 16";
-          primary-color = "43 59 81";
-          positive-color = "61 66 44";
-          negative-color = "6 96 59";
-          contrast-multiplier = 1.1;
-        };
+          searchWidget = {
+            type = "search";
+            search-engine = "duckduckgo";
+            new-tab = true;
+            bangs = searchBangs;
+          };
 
-        pages = [
-          {
-            name = "Home";
+          youtubeWidget = {
+            type = "videos";
+            title = "YouTube";
+            style = "grid-cards";
+            channels = import ./_youtube-channels.nix;
+          };
 
-            # Markets widget at top (crypto + metals)
-            head-widgets = [
-              {
-                type = "markets";
-                hide-header = true;
-                markets = [
-                  {
-                    symbol = "BTC-USD";
-                    name = "Bitcoin";
-                  }
-                  {
-                    symbol = "LTC-USD";
-                    name = "Litecoin";
-                  }
-                  {
-                    symbol = "XMR-USD";
-                    name = "Monero";
-                  }
-                  {
-                    symbol = "GC=F";
-                    name = "Gold";
-                  }
-                  {
-                    symbol = "SI=F";
-                    name = "Silver";
-                  }
-                ];
-              }
-            ];
+          bookmarksWidget = {
+            type = "bookmarks";
+            groups = bookmarkGroups;
+          };
+        in
+        {
+          server = {
+            host = "127.0.0.1";
+            port = 8082;
+          };
 
-            columns = [
-              # LEFT SIDEBAR
-              {
-                size = "small";
-                widgets = [
-                  # Search with bangs
-                  {
-                    type = "search";
-                    search-engine = "duckduckgo";
-                    new-tab = true;
-                    bangs = [
-                      {
-                        title = "GitHub";
-                        shortcut = "!gh";
-                        url = "https://github.com/search?q={QUERY}";
-                      }
-                      {
-                        title = "NixOS";
-                        shortcut = "!nix";
-                        url = "https://search.nixos.org/packages?query={QUERY}";
-                      }
-                      {
-                        title = "YouTube";
-                        shortcut = "!yt";
-                        url = "https://www.youtube.com/results?search_query={QUERY}";
-                      }
-                      {
-                        title = "Crates";
-                        shortcut = "!crate";
-                        url = "https://crates.io/search?q={QUERY}";
-                      }
-                      {
-                        title = "NPM";
-                        shortcut = "!npm";
-                        url = "https://www.npmjs.com/search?q={QUERY}";
-                      }
-                    ];
-                  }
+          branding = {
+            logo-text = "Y";
+            app-name = "Dashboard";
+            hide-footer = true;
+            app-background-color = constants.color.bg;
+          };
 
-                  # Service health monitoring
-                  {
-                    type = "monitor";
-                    title = "Services";
-                    cache = "1m";
-                    sites = import ./_service-sites.nix;
-                  }
+          # Gruvbox Dark theme
+          theme = {
+            background-color = "0 0 16";
+            primary-color = "43 59 81";
+            positive-color = "61 66 44";
+            negative-color = "6 96 59";
+            contrast-multiplier = 1.1;
+          };
 
-                  # NOTE: Tor exposes SOCKS/DNS ports (9050/9053), not an HTTP UI endpoint,
-                  # so it cannot be health-checked by Glance's HTTP monitor widget.
+          pages = [
+            {
+              name = "Home";
 
-                  # Docker containers
-                  {
-                    type = "docker-containers";
-                    format-container-names = true;
-                  }
-                ];
-              }
+              # Markets widget at top (crypto + metals)
+              head-widgets = [
+                {
+                  type = "markets";
+                  hide-header = true;
+                  markets = [
+                    {
+                      symbol = "BTC-USD";
+                      name = "Bitcoin";
+                    }
+                    {
+                      symbol = "LTC-USD";
+                      name = "Litecoin";
+                    }
+                    {
+                      symbol = "XMR-USD";
+                      name = "Monero";
+                    }
+                    {
+                      symbol = "GC=F";
+                      name = "Gold";
+                    }
+                    {
+                      symbol = "SI=F";
+                      name = "Silver";
+                    }
+                  ];
+                }
+              ];
 
-              # CENTER MAIN
-              {
-                size = "full";
-                widgets = [
-                  # Hacker News
-                  {
-                    type = "hacker-news";
-                    limit = 10;
-                    collapse-after = 5;
-                    extra-sort-by = "engagement";
-                  }
+              columns = [
+                # LEFT SIDEBAR
+                {
+                  size = "small";
+                  widgets = [
+                    # Search with bangs
+                    searchWidget
 
-                  # YouTube feeds
-                  {
-                    type = "videos";
-                    title = "YouTube";
-                    style = "grid-cards";
-                    channels = import ./_youtube-channels.nix;
-                  }
-                ];
-              }
+                    # Service health monitoring
+                    {
+                      type = "monitor";
+                      title = "Services";
+                      cache = "1m";
+                      sites = import ./_service-sites.nix;
+                    }
 
-              # RIGHT SIDEBAR
-              {
-                size = "small";
-                widgets = [
-                  # System stats
-                  {
-                    type = "server-stats";
-                    servers = [
-                      {
-                        type = "local";
-                        name = "PC";
-                        mountpoints = {
-                          "/" = {
-                            name = "Root";
+                    # NOTE: Tor exposes SOCKS/DNS ports (9050/9053), not an HTTP UI endpoint,
+                    # so it cannot be health-checked by Glance's HTTP monitor widget.
+
+                    # Docker containers
+                    {
+                      type = "docker-containers";
+                      format-container-names = true;
+                    }
+                  ];
+                }
+
+                # CENTER MAIN
+                {
+                  size = "full";
+                  widgets = [
+                    # Hacker News
+                    {
+                      type = "hacker-news";
+                      limit = 10;
+                      collapse-after = 5;
+                      extra-sort-by = "engagement";
+                    }
+
+                    # YouTube feeds
+                    youtubeWidget
+                  ];
+                }
+
+                # RIGHT SIDEBAR
+                {
+                  size = "small";
+                  widgets = [
+                    # System stats
+                    {
+                      type = "server-stats";
+                      servers = [
+                        {
+                          type = "local";
+                          name = "PC";
+                          mountpoints = {
+                            "/" = {
+                              name = "Root";
+                            };
+                            "/home" = {
+                              name = "Home";
+                            };
                           };
-                          "/home" = {
-                            name = "Home";
-                          };
-                        };
-                      }
-                    ];
-                  }
+                        }
+                      ];
+                    }
 
-                  # Bookmarks
-                  {
-                    type = "bookmarks";
-                    groups = [
-                      {
-                        title = "AI";
-                        links = [
-                          {
-                            title = "Claude";
-                            url = "https://claude.ai/";
-                            icon = "si:anthropic";
-                          }
-                          {
-                            title = "ChatGPT";
-                            url = "https://chatgpt.com/";
-                            icon = "si:openai";
-                          }
-                        ];
-                      }
-                      {
-                        title = "Dev";
-                        links = [
-                          {
-                            title = "GitHub";
-                            url = "https://github.com";
-                            icon = "si:github";
-                          }
-                          {
-                            title = "Excalidraw";
-                            url = "https://excalidraw.com/";
-                            icon = "si:excalidraw";
-                          }
-                          {
-                            title = "Codeberg";
-                            url = "https://codeberg.org/";
-                            icon = "si:codeberg";
-                          }
-                        ];
-                      }
-                      {
-                        title = "Social";
-                        links = [
-                          {
-                            title = "Reddit";
-                            url = "https://www.reddit.com/";
-                            icon = "si:reddit";
-                          }
-                          {
-                            title = "YouTube";
-                            url = "https://www.youtube.com/";
-                            icon = "si:youtube";
-                          }
-                          {
-                            title = "X";
-                            url = "https://x.com/home";
-                            icon = "si:x";
-                          }
-                        ];
-                      }
-                      {
-                        title = "Accounts";
-                        links = [
-                          {
-                            title = "Proton Mail";
-                            url = "https://mail.proton.me/u/1/inbox";
-                            icon = "si:protonmail";
-                          }
-                          {
-                            title = "SimpleLogin";
-                            url = "https://app.simplelogin.io/dashboard/";
-                            icon = "mdi:shield-lock-outline";
-                          }
-                        ];
-                      }
-                    ];
-                  }
+                    # Bookmarks
+                    bookmarksWidget
 
-                  # GitHub releases
-                  {
-                    type = "releases";
-                    title = "Releases";
-                    show-source-icon = true;
-                    limit = 6;
-                    collapse-after = 3;
-                    repositories = [
-                      "rust-lang/rust"
-                      "YaLTeR/niri"
-                      "neovim/neovim"
-                      "glanceapp/glance"
-                    ];
-                  }
-                ];
-              }
-            ];
-          }
-          {
-            name = "Search";
+                    # GitHub releases
+                    {
+                      type = "releases";
+                      title = "Releases";
+                      show-source-icon = true;
+                      limit = 6;
+                      collapse-after = 3;
+                      repositories = [
+                        "rust-lang/rust"
+                        "YaLTeR/niri"
+                        "neovim/neovim"
+                        "glanceapp/glance"
+                      ];
+                    }
+                  ];
+                }
+              ];
+            }
+            {
+              name = "Search";
 
-            columns = [
-              {
-                size = "full";
-                widgets = [
-                  {
-                    type = "search";
-                    search-engine = "duckduckgo";
-                    new-tab = true;
-                    bangs = [
-                      {
-                        title = "GitHub";
-                        shortcut = "!gh";
-                        url = "https://github.com/search?q={QUERY}";
-                      }
-                      {
-                        title = "NixOS";
-                        shortcut = "!nix";
-                        url = "https://search.nixos.org/packages?query={QUERY}";
-                      }
-                      {
-                        title = "YouTube";
-                        shortcut = "!yt";
-                        url = "https://www.youtube.com/results?search_query={QUERY}";
-                      }
-                      {
-                        title = "Crates";
-                        shortcut = "!crate";
-                        url = "https://crates.io/search?q={QUERY}";
-                      }
-                      {
-                        title = "NPM";
-                        shortcut = "!npm";
-                        url = "https://www.npmjs.com/search?q={QUERY}";
-                      }
-                    ];
-                  }
-                  {
-                    type = "bookmarks";
-                    groups = [
-                      {
-                        title = "AI";
-                        links = [
-                          {
-                            title = "Claude";
-                            url = "https://claude.ai/";
-                            icon = "si:anthropic";
-                          }
-                          {
-                            title = "ChatGPT";
-                            url = "https://chatgpt.com/";
-                            icon = "si:openai";
-                          }
-                        ];
-                      }
-                      {
-                        title = "Dev";
-                        links = [
-                          {
-                            title = "GitHub";
-                            url = "https://github.com";
-                            icon = "si:github";
-                          }
-                          {
-                            title = "Excalidraw";
-                            url = "https://excalidraw.com/";
-                            icon = "si:excalidraw";
-                          }
-                          {
-                            title = "Codeberg";
-                            url = "https://codeberg.org/";
-                            icon = "si:codeberg";
-                          }
-                        ];
-                      }
-                      {
-                        title = "Social";
-                        links = [
-                          {
-                            title = "Reddit";
-                            url = "https://www.reddit.com/";
-                            icon = "si:reddit";
-                          }
-                          {
-                            title = "YouTube";
-                            url = "https://www.youtube.com/";
-                            icon = "si:youtube";
-                          }
-                          {
-                            title = "X";
-                            url = "https://x.com/home";
-                            icon = "si:x";
-                          }
-                        ];
-                      }
-                      {
-                        title = "Accounts";
-                        links = [
-                          {
-                            title = "Proton Mail";
-                            url = "https://mail.proton.me/u/1/inbox";
-                            icon = "si:protonmail";
-                          }
-                          {
-                            title = "SimpleLogin";
-                            url = "https://app.simplelogin.io/dashboard/";
-                            icon = "mdi:shield-lock-outline";
-                          }
-                        ];
-                      }
-                    ];
-                  }
-                ];
-              }
-            ];
-          }
-          {
-            name = "YouTube";
+              columns = [
+                {
+                  size = "full";
+                  widgets = [
+                    searchWidget
+                    bookmarksWidget
+                  ];
+                }
+              ];
+            }
+            {
+              name = "YouTube";
 
-            columns = [
-              {
-                size = "full";
-                widgets = [
-                  {
-                    type = "videos";
-                    title = "YouTube";
-                    style = "grid-cards";
-                    channels = import ./_youtube-channels.nix;
-                  }
-                ];
-              }
-            ];
-          }
-        ];
-      };
+              columns = [
+                {
+                  size = "full";
+                  widgets = [
+                    youtubeWidget
+                  ];
+                }
+              ];
+            }
+          ];
+        };
     };
 
     systemd.services.glance.serviceConfig.SupplementaryGroups = [ "docker" ];

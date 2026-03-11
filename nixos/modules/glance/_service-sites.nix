@@ -1,4 +1,15 @@
-[
+let
+  mkSite =
+    {
+      title,
+      url,
+      icon,
+    }:
+    {
+      inherit title url icon;
+    };
+in
+map mkSite [
   {
     title = "Glance";
     url = "http://localhost:8082";

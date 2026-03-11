@@ -2,7 +2,6 @@
 {
   config,
   lib,
-  pkgsStable,
   ...
 }:
 
@@ -22,9 +21,5 @@
         maxtime = "168h"; # 1 week
       };
     };
-
-    environment.systemPackages = with pkgsStable; [
-      audit # provides aureport, ausearch, auditctl, etc.
-    ];
   };
 }

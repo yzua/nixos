@@ -1,8 +1,8 @@
 # Bootloader configuration (systemd-boot).
-{ pkgs, ... }:
+{ pkgsStable, ... }:
 {
   boot = {
-    kernelPackages = pkgs.linuxPackages_6_18;
+    kernelPackages = pkgsStable.linuxPackages_6_18;
 
     loader = {
       timeout = 2; # Show generation menu briefly (hold Space to pause and select)

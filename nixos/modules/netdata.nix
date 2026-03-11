@@ -17,7 +17,7 @@ in
   config = lib.mkIf config.mySystem.netdata.enable {
     services.netdata = {
       enable = true;
-      package = pkgs.netdataCloud;
+      package = pkgsStable.netdataCloud;
 
       config = {
         global = {

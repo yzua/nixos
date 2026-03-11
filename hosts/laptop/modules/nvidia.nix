@@ -1,21 +1,21 @@
 # NVIDIA Optimus (hybrid graphics) for ThinkPad.
 { config, lib, ... }:
 
+let
+  mkBusIdOption =
+    description: default:
+    lib.mkOption {
+      type = lib.types.str;
+      inherit default description;
+      example = "PCI:0:2:0:0";
+    };
+in
+
 {
   options.mySystem.nvidia = {
-    intelBusId = lib.mkOption {
-      type = lib.types.str;
-      default = "PCI:0:2:0:0";
-      example = "PCI:0:2:0:0";
-      description = "Intel GPU PCI bus ID (format: PCI:bus:device:function).";
-    };
+    intelBusId = mkBusIdOption "Intel GPU PCI bus ID (format: PCI:bus:device:function)." "PCI:0:2:0:0";
 
-    nvidiaBusId = lib.mkOption {
-      type = lib.types.str;
-      default = "PCI:2:0:0:0";
-      example = "PCI:2:0:0:0";
-      description = "NVIDIA GPU PCI bus ID (format: PCI:bus:device:function).";
-    };
+    nvidiaBusId = mkBusIdOption "NVIDIA GPU PCI bus ID (format: PCI:bus:device:function)." "PCI:2:0:0:0";
   };
 
   config = {

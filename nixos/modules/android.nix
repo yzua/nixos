@@ -1,8 +1,8 @@
 # Android device support (ADB, Fastboot, udev rules).
-{ pkgs, ... }:
+{ pkgsStable, ... }:
 
 {
-  environment.systemPackages = [ pkgs.android-tools ];
+  environment.systemPackages = [ pkgsStable.android-tools ];
 
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", MODE="0660", GROUP="users"
