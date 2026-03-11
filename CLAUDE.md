@@ -12,6 +12,7 @@ Flake-based NixOS + Home Manager personal system configuration. Hosts: `desktop`
 
 ```bash
 just modules   # Validate default.nix imports match .nix files on disk (fastest)
+just pkgs      # Check for duplicate packages and program/module conflicts
 just lint      # statix + deadnix + shellcheck + markdownlint
 just dead      # deadnix only (subset of lint)
 just format    # nixfmt-tree via nix fmt
@@ -156,54 +157,54 @@ Update the parent `default.nix` imports list, then run `just modules`.
 
 ## Common Fixes
 
-| Symptom | Fix |
-| ------- | --- |
-| Missing import error | Add file to parent `default.nix` imports list |
-| deadnix warning | Remove unused binding or prefix with `_` |
-| statix suggestion | Apply the suggested fix directly |
-| Module not found | Check path in `default.nix`, ensure file exists on disk |
+| Symptom              | Fix                                                     |
+| -------------------- | ------------------------------------------------------- |
+| Missing import error | Add file to parent `default.nix` imports list           |
+| deadnix warning      | Remove unused binding or prefix with `_`                |
+| statix suggestion    | Apply the suggested fix directly                        |
+| Module not found     | Check path in `default.nix`, ensure file exists on disk |
 
 ## Host Defaults (`host-defaults.nix`)
 
-| Option | Desktop | Laptop |
-| ------ | ------- | ------ |
-| `gaming.enable` | `true` | `false` |
-| `gaming.enableGamescope` | `true` | `false` |
-| `bluetooth.enable` | `false` | `true` |
+| Option                                  | Desktop | Laptop  |
+| --------------------------------------- | ------- | ------- |
+| `gaming.enable`                         | `true`  | `false` |
+| `gaming.enableGamescope`                | `true`  | `false` |
+| `bluetooth.enable`                      | `false` | `true`  |
 | `backup.enable` / `auditLogging.enable` | `false` | `false` |
-| All others | `true` | `true` |
+| All others                              | `true`  | `true`  |
 
 ## Forbidden Patterns
 
-| Pattern | Reason |
-| ------- | ------ |
-| PulseAudio + PipeWire | Audio stack conflict (validated) |
-| Multiple power daemons | Service conflicts (validated) |
-| nouveau + NVIDIA proprietary | Driver conflict (validated) |
-| DNSCrypt-Proxy + systemd-resolved | DNS conflict (validated) |
-| `allowBroken = true` | Unstable packages; find alternative |
-| Avahi without explicit `allowInterfaces` | Security risk (validated) |
-| Gaming without `hardware.graphics.enable` | Graphics drivers required (validated) |
-| `graphene-hardened` kernel | Crashes glycin/bwrap image loaders (Loupe, Nautilus) |
-| `auditd` with AppArmor | Kernel panic via `audit_log_subj_ctx` |
-| `mkForce` outside security hardening | Use `mkDefault`/`mkOverride` instead; `mkForce` reserved for security overrides only |
+| Pattern                                   | Reason                                                                               |
+| ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| PulseAudio + PipeWire                     | Audio stack conflict (validated)                                                     |
+| Multiple power daemons                    | Service conflicts (validated)                                                        |
+| nouveau + NVIDIA proprietary              | Driver conflict (validated)                                                          |
+| DNSCrypt-Proxy + systemd-resolved         | DNS conflict (validated)                                                             |
+| `allowBroken = true`                      | Unstable packages; find alternative                                                  |
+| Avahi without explicit `allowInterfaces`  | Security risk (validated)                                                            |
+| Gaming without `hardware.graphics.enable` | Graphics drivers required (validated)                                                |
+| `graphene-hardened` kernel                | Crashes glycin/bwrap image loaders (Loupe, Nautilus)                                 |
+| `auditd` with AppArmor                    | Kernel panic via `audit_log_subj_ctx`                                                |
+| `mkForce` outside security hardening      | Use `mkDefault`/`mkOverride` instead; `mkForce` reserved for security overrides only |
 
 "Validated" = enforced by assertions in `nixos/modules/validation.nix`.
 
 ## Where to Look
 
-| Task | Location |
-| ---- | -------- |
-| Add system service/feature | `nixos/modules/*.nix` (use `mySystem.*` option pattern) |
-| Add user package | `home-manager/packages/*.nix` (pick domain chunk) |
-| Configure program (dotfiles) | `home-manager/modules/` (`programs.*` pattern) |
-| Niri compositor settings | `home-manager/modules/niri/` |
-| Noctalia Shell (bar, launcher) | `home-manager/modules/noctalia/` |
-| AI agent configuration | `home-manager/modules/ai-agents/` |
-| Per-host feature toggle | `hosts/<hostname>/configuration.nix` (set `mySystem.*`) |
-| Cross-module validation | `nixos/modules/validation.nix` |
-| Profile defaults | `nixos/modules/host-defaults.nix` |
-| Shared constants | `shared/constants.nix` |
-| Secrets | `secrets/secrets.yaml` (edit with `just sops-edit`) |
-| Utility scripts | `scripts/` (ai, browser, build, lib, sops, system) |
-| Dev environments | `dev-shells/<lang>/flake.nix` |
+| Task                           | Location                                                |
+| ------------------------------ | ------------------------------------------------------- |
+| Add system service/feature     | `nixos/modules/*.nix` (use `mySystem.*` option pattern) |
+| Add user package               | `home-manager/packages/*.nix` (pick domain chunk)       |
+| Configure program (dotfiles)   | `home-manager/modules/` (`programs.*` pattern)          |
+| Niri compositor settings       | `home-manager/modules/niri/`                            |
+| Noctalia Shell (bar, launcher) | `home-manager/modules/noctalia/`                        |
+| AI agent configuration         | `home-manager/modules/ai-agents/`                       |
+| Per-host feature toggle        | `hosts/<hostname>/configuration.nix` (set `mySystem.*`) |
+| Cross-module validation        | `nixos/modules/validation.nix`                          |
+| Profile defaults               | `nixos/modules/host-defaults.nix`                       |
+| Shared constants               | `shared/constants.nix`                                  |
+| Secrets                        | `secrets/secrets.yaml` (edit with `just sops-edit`)     |
+| Utility scripts                | `scripts/` (ai, browser, build, lib, sops, system)      |
+| Dev environments               | `dev-shells/<lang>/flake.nix`                           |
