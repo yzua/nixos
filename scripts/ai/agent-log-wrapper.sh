@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+	echo "Usage: ai-agent-log-wrapper <agent-name> <command> [args...]" >&2
+	exit 1
+fi
+
+AGENT_NAME="$1"
+shift
+
+LOG_DIR="${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agent-logs}"
+LOG_FILE="$LOG_DIR/$AGENT_NAME-$(date +%Y-%m-%d).log"
+ERROR_LOG="$LOG_DIR/$AGENT_NAME-errors-$(date +%Y-%m-%d).log"
+NOTIFY_ON_ERROR="${AI_AGENT_NOTIFY_ON_ERROR:-false}"
+
+mkdir -p "$LOG_DIR"
+
+echo "[$(date -Iseconds)] Starting $AGENT_NAME: $*" >>"$LOG_FILE"
+
+set +e
+"$@" 2> >(tee -a "$ERROR_LOG" >&2) | tee -a "$LOG_FILE"
+EXIT_CODE=$?
+set -e
+
+echo "[$(date -Iseconds)] $AGENT_NAME exited with code $EXIT_CODE" >>"$LOG_FILE"
+
+if [[ "$NOTIFY_ON_ERROR" == "true" && $EXIT_CODE -ne 0 ]]; then
+	notify-send -u critical "AI Agent Error" "$AGENT_NAME failed with exit code $EXIT_CODE"
+fi
+
+exit $EXIT_CODE

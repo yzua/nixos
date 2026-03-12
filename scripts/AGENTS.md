@@ -1,6 +1,6 @@
 # Utility Scripts
 
-23 executable Bash scripts across `ai/`, `build/`, `sops/`, `system/`, `lib/`, and root-level `scripts/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
+28 executable Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`, and `lib/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
 
 ---
 
@@ -10,10 +10,18 @@
 scripts/
 ├── ai/
 │   ├── ask.sh              # Z.ai API client (GLM-4.5-air/GLM-5, clipboard support)
-│   ├── api-quota.sh         # Noctalia bar widget entrypoint (orchestration + output)
-│   ├── api-quota-helpers.sh # Shared formatting/cache/time helper functions
-│   ├── api-quota-providers.sh # Provider collectors (Z.ai, Claude, Codex)
-│   └── api-quota-test.sh    # Unit tests for api-quota.sh
+│   ├── api-quota/
+│   │   ├── api-quota.sh         # Noctalia bar widget entrypoint (orchestration + output)
+│   │   ├── api-quota-helpers.sh # Shared formatting/cache/time helper functions
+│   │   ├── api-quota-providers.sh # Provider collectors (Z.ai, Claude, Codex)
+│   │   └── api-quota-test.sh    # Unit tests for api-quota.sh
+│   ├── agent-launcher.sh    # Interactive multi-provider AI agent launcher
+│   ├── agent-log-wrapper.sh # Agent command logging wrapper with error split
+│   ├── agent-analyze.sh     # Log analyzer CLI (stats/errors/sessions/search/tail/report)
+│   ├── agent-patterns.sh    # Error pattern detector across agent logs
+│   └── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
+├── apps/
+│   └── browser-select.sh    # Browser profile selector (wofi menu)
 ├── build/
 │   ├── modules-check.sh     # Validates default.nix imports match .nix files on disk
 │   ├── modules-check-test.sh # Unit tests for modules-check.sh
@@ -21,21 +29,22 @@ scripts/
 │   ├── pre-commit-hook.sh   # Git hook: modules → lint → format → check
 │   ├── pre-push-hook.sh     # Git hook: enforces GPG-signed commits
 │   └── shellcheck-nix-inline.sh # Lints inline Bash in writeShellScript blocks
+├── hardware/
+│   └── nvidia-fans.sh       # GPU fan control
 ├── lib/
 │   ├── logging.sh           # Shared logging library (colored output, timestamps)
 │   └── test-helpers.sh      # Shared test utilities (assertions, mocking)
 ├── sops/
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)
 ├── system/
-│   ├── system-report.sh     # Unified health report (full/errors mode)
-│   ├── report-collectors.sh # Compatibility shim loading collector modules
-│   ├── report-collectors-core.sh # Core collectors: systemd, timers, network, builds, AI logs
-│   ├── report-collectors-observability.sh # Observability collectors: Loki/Netdata/Scrutiny/resource metrics
-│   ├── report-collectors-security.sh # Security collectors: fail2ban, Lynis, OpenSnitch, hardening
-│   ├── report-helpers.sh    # Report generation helper functions
-│   └── report-collectors-test.sh # Unit tests for report collectors
-├── browser-select.sh        # Browser profile selector (wofi menu)
-└── nvidia-fans.sh           # GPU fan control
+│   └── report/
+│       ├── system-report.sh     # Unified health report (full/errors mode)
+│       ├── report-collectors.sh # Compatibility shim loading collector modules
+│       ├── report-collectors-core.sh # Core collectors: systemd, timers, network, builds, AI logs
+│       ├── report-collectors-observability.sh # Observability collectors: Loki/Netdata/Scrutiny/resource metrics
+│       ├── report-collectors-security.sh # Security collectors: fail2ban, Lynis, OpenSnitch, hardening
+│       ├── report-helpers.sh    # Report generation helper functions
+│       └── report-collectors-test.sh # Unit tests for report collectors
 ```
 
 ---
@@ -79,12 +88,18 @@ source "$(dirname "$0")/../lib/logging.sh"
 | `build/modules-check.sh` | `justfile` (`just modules`) |
 | `build/packages-check.sh` | `justfile` (`just pkgs`) |
 | `build/shellcheck-nix-inline.sh` | `justfile` (`just lint`) |
-| `system/system-report.sh` | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`) |
-| `system/report-collectors.sh` | Sourced by `system-report.sh` (loads module files) |
-| `system/report-collectors-core.sh` | Sourced by `system/report-collectors.sh` |
-| `system/report-collectors-observability.sh` | Sourced by `system/report-collectors.sh` |
-| `system/report-collectors-security.sh` | Sourced by `system/report-collectors.sh` |
-| `system/report-helpers.sh` | Sourced by `system-report.sh` |
-| `ai/api-quota.sh` | `home-manager/modules/noctalia/default.nix` (bar widget) |
+| `system/report/system-report.sh` | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`) |
+| `system/report/report-collectors.sh` | Sourced by `system-report.sh` (loads module files) |
+| `system/report/report-collectors-core.sh` | Sourced by `system/report/report-collectors.sh` |
+| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh` |
+| `system/report/report-collectors-security.sh` | Sourced by `system/report/report-collectors.sh` |
+| `system/report/report-helpers.sh` | Sourced by `system-report.sh` |
+| `ai/api-quota/api-quota.sh` | `home-manager/modules/noctalia/default.nix` (bar widget) |
+| `ai/agent-launcher.sh` | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper) |
+| `ai/agent-log-wrapper.sh` | `home-manager/modules/ai-agents/_mcp-transforms.nix` (`ai-agent-log-wrapper` wrapper) |
+| `ai/agent-analyze.sh` | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper) |
+| `ai/agent-patterns.sh` | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper) |
+| `ai/agent-dashboard.sh` | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper) |
 | `sops/sops-edit.sh` | `justfile` (`just sops-edit`) |
-| `browser-select.sh` | Niri keybinding (browser profile picker) |
+| `apps/browser-select.sh` | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper) |
+| `hardware/nvidia-fans.sh` | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper) |
