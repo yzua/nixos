@@ -1,8 +1,8 @@
 # Multimedia packages for media playback and processing.
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     amberol # GNOME audio player
     ffmpeg # Multimedia processing toolkit
     mediainfo # Media file analyzer

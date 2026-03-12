@@ -1,8 +1,8 @@
 # GNOME utilities used with Niri (minimal set — GNOME desktop disabled).
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     gnome-disk-utility
     gnome-text-editor
   ];

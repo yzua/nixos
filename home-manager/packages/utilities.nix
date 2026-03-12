@@ -1,8 +1,8 @@
 # General utilities: archive tools, system management, and audio control.
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     # Application packaging
     appimage-run
 

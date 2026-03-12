@@ -1,8 +1,8 @@
 # Niri compositor and Wayland utilities.
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     # Clipboard
     cliphist
     wl-clip-persist

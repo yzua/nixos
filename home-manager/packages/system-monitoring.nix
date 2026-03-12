@@ -1,8 +1,8 @@
 # System monitoring and diagnostic tools.
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     # Benchmarking
     stress-ng
     sysbench

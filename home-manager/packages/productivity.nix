@@ -1,8 +1,8 @@
 # Productivity tools for time tracking and focus management.
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     porsmo # CLI Pomodoro timer
     watson # Project-based time tracking
     timewarrior # Taskwarrior companion

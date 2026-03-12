@@ -3,7 +3,6 @@
 {
   config,
   lib,
-  pkgs,
   pkgsStable,
   ...
 }:
@@ -23,7 +22,7 @@
     pkgsStable.lynis
     pkgsStable.mat2
     pkgsStable.exiftool
-    pkgs.aide
+    pkgsStable.aide
   ]
   ++ lib.optionals config.mySystem.auditLogging.enable [ pkgsStable.audit ];
 }

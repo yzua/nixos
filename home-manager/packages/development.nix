@@ -21,6 +21,11 @@ let
     nurl # Nix URL fetcher hash helper
     uv # Python package manager; provides uvx for MCP servers
     python313Packages.fastmcp # Pythonic MCP server/client framework
+    docker-compose
+    mdbook # Book generator from Markdown (Rust/Nix ecosystem standard)
+    repomix # Bundle repo into single file for AI context windows
+    sccache # Shared compilation cache (Rust/C++)
+    process-compose # Multi-service dev orchestrator
   ];
 
   stable = with pkgsStable; [
@@ -32,12 +37,10 @@ let
 
     # Build tools
     act # Run GitHub Actions locally in Docker
-    docker-compose
     earthly # Reproducible CI builds (Dockerfile + Makefile hybrid)
     git-lfs
     just
     pandoc
-    repomix # Bundle repo into single file for AI context windows
 
     # C/C++ development
     cmake
@@ -62,7 +65,6 @@ let
 
     # Documentation
     d2 # Declarative diagramming language (text -> SVG)
-    mdbook # Book generator from Markdown (Rust/Nix ecosystem standard)
     typst # Modern typesetting system (fast LaTeX alternative)
 
     # Java
@@ -98,11 +100,6 @@ let
     bats # Bash testing framework
     shfmt # Shell script formatter
 
-    # Build acceleration
-    sccache # Shared compilation cache (Rust/C++)
-
-    # Dev orchestration
-    process-compose # Multi-service dev orchestrator
   ];
 in
 {

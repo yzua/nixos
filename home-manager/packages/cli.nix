@@ -1,10 +1,10 @@
 # CLI tools for file management, text processing, and development.
 # NOTE: fzf and carapace are managed by programs.* modules.
 # NOTE: restic managed by services.restic
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     # Backup (restic managed by services.restic)
     borgbackup
 

@@ -11,31 +11,33 @@ let
   inherit (eglWrap) wrapWithMesaEgl;
 in
 {
-  home.packages = with pkgsStable; [
-    # Network analysis
-    nmap
-    tcpdump
+  home.packages =
+    (with pkgsStable; [
+      # Network analysis
+      nmap
+      tcpdump
 
-    # Network anonymity (i2pd managed by services.i2pd)
-    tribler
+      # Network anonymity (i2pd managed by services.i2pd)
+      tribler
 
-    # Privacy browsers — wrapped to force Mesa EGL (see wrapWithMesaEgl above)
-    (wrapWithMesaEgl "mullvad-browser" mullvad-browser)
-    (wrapWithMesaEgl "tor-browser" tor-browser)
+      # Privacy browsers — wrapped to force Mesa EGL (see wrapWithMesaEgl above)
+      (wrapWithMesaEgl "mullvad-browser" mullvad-browser)
+      (wrapWithMesaEgl "tor-browser" tor-browser)
 
-    # Secure Boot preparation
-    sbctl
-    tpm2-tools
+      # Secure Boot preparation
+      sbctl
+      tpm2-tools
 
-    # Security tools
-    metadata-cleaner
-    socat # Network relay
-    srm # Secure file removal
-    veracrypt # Disk encryption
-
-    # Supply-chain and vulnerability scanning
-    gitleaks # Pre-commit/pre-push secret scanning
-    trivy # Vulnerability, misconfiguration, and secret scanning
-    vulnix # Nix closure CVE checker
-  ];
+      # Security tools
+      metadata-cleaner
+      socat # Network relay
+      srm # Secure file removal
+      veracrypt # Disk encryption
+    ])
+    ++ (with pkgs; [
+      # Supply-chain and vulnerability scanning
+      gitleaks # Pre-commit/pre-push secret scanning
+      trivy # Vulnerability, misconfiguration, and secret scanning
+      vulnix # Nix closure CVE checker
+    ]);
 }

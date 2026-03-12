@@ -1,8 +1,8 @@
 # Desktop applications and theming packages.
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     (bottles.override { removeWarningPopup = true; })
     element-desktop
     imv

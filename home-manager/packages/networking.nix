@@ -1,9 +1,9 @@
 # Networking tools for analysis, monitoring, and security testing.
 # NOTE: openssh managed by services.openssh, bandwhich by programs.bandwhich
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
-  home.packages = with pkgsStable; [
+  home.packages = with pkgs; [
     # Core networking (networkmanagerapplet managed by services.network-manager-applet)
     openssl
     openssl.dev
