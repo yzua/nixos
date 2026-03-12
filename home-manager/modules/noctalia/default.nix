@@ -6,7 +6,7 @@
 }:
 
 let
-  apiQuotaScript = "bash ${../../../scripts/ai}/api-quota.sh";
+  apiQuotaScript = "bash ${../../../scripts/ai/api-quota}/api-quota.sh";
 in
 {
   imports = [

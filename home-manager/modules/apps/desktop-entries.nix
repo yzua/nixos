@@ -96,7 +96,7 @@ in
 
     ".local/bin/browser-select" = {
       executable = true;
-      text = builtins.readFile ../../../scripts/browser-select.sh;
+      text = builtins.readFile ../../../scripts/apps/browser-select.sh;
     };
 
     ".local/bin/youtube-mpv" = {

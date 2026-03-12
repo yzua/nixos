@@ -4,7 +4,7 @@
 {
   home.packages = with pkgs; [
     (writeShellScriptBin "nvidia-fans" ''
-      exec ${config.home.homeDirectory}/System/scripts/nvidia-fans.sh "$@"
+      exec ${config.home.homeDirectory}/System/scripts/hardware/nvidia-fans.sh "$@"
     '')
   ];
 }
