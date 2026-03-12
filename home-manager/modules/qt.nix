@@ -10,13 +10,13 @@
   qt = {
     enable = true;
     platformTheme.name = "qtct";
-    style.name = lib.mkForce "fusion";
+    style.name = lib.mkForce "kvantum";
     qt5ctSettings = {
       Appearance = {
-        custom_palette = true;
+        custom_palette = false;
         icon_theme = "Gruvbox-Plus-Dark";
         standard_dialogs = "default";
-        style = "fusion";
+        style = "kvantum";
       };
       Fonts = {
         fixed = "\"${constants.font.mono},11\"";
@@ -25,10 +25,10 @@
     };
     qt6ctSettings = {
       Appearance = {
-        custom_palette = true;
+        custom_palette = false;
         icon_theme = "Gruvbox-Plus-Dark";
         standard_dialogs = "default";
-        style = "fusion";
+        style = "kvantum";
       };
       Fonts = {
         fixed = "\"${constants.font.mono},11\"";
@@ -45,5 +45,10 @@
     gruvbox-kvantum
   ];
 
-  # Keep Kvantum packages installed, but use Fusion for squarer widgets.
+  xdg.configFile."Kvantum/kvantum.kvconfig".text = ''
+    [General]
+    theme=Gruvbox-Dark-Brown
+  '';
+
+  # Force Qt apps to a deterministic dark Gruvbox Kvantum theme.
 }

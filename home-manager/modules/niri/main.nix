@@ -57,7 +57,7 @@ in
     environment = {
       ELECTRON_OZONE_PLATFORM_HINT = "auto";
       # QT_QPA_PLATFORM is set globally in home.nix sessionVariables
-      QT_STYLE_OVERRIDE = "fusion";
+      QT_STYLE_OVERRIDE = "kvantum";
       XDG_SCREENSHOTS_DIR = "$HOME/Screens";
       SSH_AUTH_SOCK = "$XDG_RUNTIME_DIR/keepassxc-ssh-agent.socket";
     };
