@@ -1,8 +1,15 @@
-# Android device support (ADB, Fastboot, udev rules).
-{ pkgsStable, ... }:
+# Android device and emulator support (ADB, Fastboot, Android Studio/AVD).
+{
+  pkgs,
+  pkgsStable,
+  ...
+}:
 
 {
-  environment.systemPackages = [ pkgsStable.android-tools ];
+  environment.systemPackages = [
+    pkgsStable.android-tools
+    pkgs.android-studio
+  ];
 
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", MODE="0660", GROUP="users"
