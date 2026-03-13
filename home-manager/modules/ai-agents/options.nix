@@ -75,6 +75,16 @@ in
       ];
     };
 
+    omitSkills = mkStrListOption [ ] "Installed skill names to remove after sync (global scope)";
+
+    agencyAgents = {
+      enable = mkBoolOption false "Install msitarzewski/agency-agents for Claude and OpenCode";
+    };
+
+    impeccable = {
+      enable = mkBoolOption false "Install pbakaus/impeccable skills for Claude and OpenCode";
+    };
+
     mcpServers = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule {

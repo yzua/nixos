@@ -1,5 +1,5 @@
 # Oh-My-OpenCode agent definitions and orchestration settings.
-_:
+{ constants, ... }:
 
 let
   opusModel = "anthropic/claude-opus-4-6";
@@ -26,13 +26,13 @@ in
           sisyphus = {
             model = opusModel;
             description = "Primary orchestrator — delegates, verifies, ships";
-            color = "#d79921"; # Gruvbox yellow
+            color = constants.color.yellow_dim;
             skills = [ "git-master" ];
           };
           oracle = {
             model = opusModel;
             description = "Read-only consultant for architecture and debugging";
-            color = "#458588"; # Gruvbox blue
+            color = constants.color.blue_dim;
             permission = {
               edit = "deny";
               bash = "ask";
@@ -42,7 +42,7 @@ in
           librarian = {
             model = sonnetModel;
             description = "External reference search — docs, OSS, GitHub examples";
-            color = "#b16286"; # Gruvbox purple
+            color = constants.color.purple_dim;
             permission = {
               edit = "deny";
               bash = "deny";
@@ -52,7 +52,7 @@ in
           explore = {
             model = haikuModel;
             description = "Fast contextual grep — codebase patterns and structure";
-            color = "#98971a"; # Gruvbox green
+            color = constants.color.green_dim;
             permission = {
               edit = "deny";
               bash = "deny";
@@ -62,35 +62,34 @@ in
           multimodal-looker = {
             model = sonnetModel;
             description = "Visual content analysis — PDFs, images, diagrams";
-            color = "#689d6a"; # Gruvbox aqua
-            skills = [ "playwright" ];
+            color = constants.color.aqua_dim;
           };
           prometheus = {
             model = opusModel;
             variant = "max";
             description = "Strategic planner with interview mode";
-            color = "#cc241d"; # Gruvbox red
+            color = constants.color.red_dim;
           };
           metis = {
             model = opusModel;
             description = "Pre-planning analysis — hidden requirements, ambiguities";
-            color = "#d65d0e"; # Gruvbox orange
+            color = constants.color.orange_dim;
           };
           momus = {
             model = opusModel;
             description = "Plan reviewer — validates clarity and completeness";
-            color = "#928374"; # Gruvbox gray
+            color = constants.color.gray;
           };
           atlas = {
             model = sonnetModel;
             description = "Orchestrator/conductor — coordinates task execution";
-            color = "#fabd2f"; # Gruvbox bright yellow
+            color = constants.color.yellow;
             skills = [ "git-master" ];
           };
           hephaestus = {
             model = gptModel;
             description = "Autonomous deep worker — goal-oriented, long-running tasks";
-            color = "#fb4934"; # Gruvbox bright red
+            color = constants.color.red;
           };
         };
 
