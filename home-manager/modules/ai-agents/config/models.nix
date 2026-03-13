@@ -20,6 +20,9 @@ let
 in
 {
   programs.aiAgents = {
+    agencyAgents.enable = true;
+    impeccable.enable = true;
+
     # === OpenCode Configuration ===
     opencode = {
       enable = true;
@@ -43,25 +46,16 @@ in
           prune = true; # Remove old tool outputs during compaction
           reserved = 10000; # Reserved tokens after compaction
         };
-        command = {
-          test = {
-            template = "Run the project test suite. If a justfile exists, use 'just check'. Otherwise find and run the appropriate test command.";
-            description = "Run project tests";
-            agent = "build";
-            subtask = true;
-          };
-          deploy = {
-            template = "Run the NixOS deployment pipeline: just modules && just lint && just format && just check && just home. Only run 'just nixos' if I explicitly confirm.";
-            description = "Deploy NixOS configuration";
-            agent = "build";
-          };
-          review = {
-            template = "Review the staged git changes (git diff --staged). Check for: correctness, edge cases, security issues, performance problems, maintainability. Rate issues as CRITICAL/WARNING/SUGGESTION.";
-            description = "Review staged changes";
-            agent = "plan";
-            subtask = true;
-          };
-        };
+        # Custom slash commands are disabled by default.
+        # To add one, uncomment and adapt this block:
+        # command = {
+        #   mycmd = {
+        #     template = "Describe what /mycmd should do.";
+        #     description = "Short help text shown in command list";
+        #     agent = "build";
+        #     subtask = true;
+        #   };
+        # };
       };
 
       providers = {
@@ -142,7 +136,6 @@ in
         mcp = {
           allowed = [
             "context7"
-            "cloudflare-docs"
             "github"
             "web-search-prime"
             "web-reader"

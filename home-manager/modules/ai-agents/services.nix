@@ -200,6 +200,9 @@ let
       MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg markdownSyncPrompt} \
       exec ${config.home.homeDirectory}/System/scripts/ai/agent-launcher.sh "$@"
   '';
+  aiAgentInventory = pkgs.writeShellScriptBin "ai-agent-inventory" ''
+    exec ${config.home.homeDirectory}/System/scripts/ai/agent-inventory.sh "$@"
+  '';
   logCleanupCommand = ''
     find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
   '';
@@ -238,6 +241,7 @@ in
               "ai-report" = "ai-agent-analyze report";
               "ai-dash" = "ai-agent-dashboard";
               "ais" = "ai-agent-launcher";
+              "ait" = "ai-agent-inventory";
             }
           else
             { }
@@ -254,6 +258,7 @@ in
       home.packages = [
         agentLogWrapper
         aiAgentLauncher
+        aiAgentInventory
       ]
       ++ (lib.optional cfg.logging.enable (
         pkgs.writeShellScriptBin "ai-agent-log-cleanup" ''
