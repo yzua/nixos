@@ -44,11 +44,12 @@ lib.mkIf (cfg.secrets.zaiApiKeyFile != null || cfg.secrets.openrouterApiKeyFile 
 
         CODEX_CFG="$HOME/.codex/config.toml"
         if [[ -f "$CODEX_CFG" ]]; then
+          ESCAPED_ZAI="$(escape_sed_replacement "$ZAI_KEY")"
+          ${pkgs.gnused}/bin/sed -i "s/__ZAI_API_KEY_PLACEHOLDER__/$ESCAPED_ZAI/g" "$CODEX_CFG"
           if grep -q '\[mcp_servers.zai-mcp-server.env\]' "$CODEX_CFG"; then
-            ESCAPED_ZAI="$(escape_sed_replacement "$ZAI_KEY")"
             ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ESCAPED_ZAI\"" "$CODEX_CFG"
-            unset ESCAPED_ZAI
           fi
+          unset ESCAPED_ZAI
           echo "✓ Patched codex config.toml with Z.AI API key"
         fi
 

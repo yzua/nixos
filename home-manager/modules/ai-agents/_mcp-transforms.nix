@@ -34,7 +34,7 @@ let
     let
       isLocal = (server.type or "local") == "local";
       base = {
-        type = server.type or "local";
+        type = if isLocal then "local" else "remote";
       };
       localAttrs = if isLocal then { command = [ server.command ] ++ (server.args or [ ]); } else { };
       remoteAttrs =

@@ -16,24 +16,27 @@
         enable = true;
         type = "remote";
         url = "https://api.z.ai/api/mcp/web_search_prime/mcp";
+        headers = {
+          Authorization = "Bearer {env:ZAI_API_KEY}";
+        };
       };
 
       web-reader = {
         enable = true;
         type = "remote";
         url = "https://api.z.ai/api/mcp/web_reader/mcp";
+        headers = {
+          Authorization = "Bearer {env:ZAI_API_KEY}";
+        };
       };
 
       zread = {
         enable = true;
         type = "remote";
         url = "https://api.z.ai/api/mcp/zread/mcp";
-      };
-
-      cloudflare-docs = {
-        enable = true;
-        type = "remote";
-        url = "https://docs.mcp.cloudflare.com/mcp";
+        headers = {
+          Authorization = "Bearer {env:ZAI_API_KEY}";
+        };
       };
 
       github = {
