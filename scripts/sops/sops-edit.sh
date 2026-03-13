@@ -8,5 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 export TMPDIR=/dev/shm
-export EDITOR="${EDITOR:-code --wait}"
+
+DEFAULT_EDITOR="${SCRIPT_DIR}/editor-code-wait.sh"
+export SOPS_EDITOR="${SOPS_EDITOR:-${DEFAULT_EDITOR}}"
 exec sops "${REPO_DIR}/secrets/secrets.yaml"

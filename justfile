@@ -125,7 +125,7 @@ security-audit:
 # Edit secrets with SOPS (uses RAM-backed tmpfs for security)
 sops-edit:
 	@echo -e "\n➤ Editing secrets with SOPS…"
-	@./scripts/sops/sops-edit.sh || if [ $$? -eq 200 ]; then echo "No changes made."; else exit $$?; fi
+	@status=0; ./scripts/sops/sops-edit.sh || status=$?; if [ $status -eq 200 ]; then echo "No changes made."; elif [ $status -ne 0 ]; then exit $status; fi
 
 # View decrypted secrets (read-only)
 sops-view:
@@ -136,5 +136,5 @@ sops-view:
 secrets-add key:
 	@echo "{{key}}" | grep -qE '^[a-zA-Z_][a-zA-Z0-9_]*$$' || (echo "✗ Invalid key name. Use alphanumeric characters and underscores only." && exit 1)
 	@read -s -p "Enter secret value for '{{key}}': " VALUE && echo "" && \
-	nix run nixpkgs#sops -- --set "[\"{{key}}\"] \"$$VALUE\"" secrets/secrets.yaml && \
+	nix run nixpkgs#sops -- --set "[\"{{key}}\"] \"$VALUE\"" secrets/secrets.yaml && \
 	echo "✔ Secret added!"
