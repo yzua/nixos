@@ -7,6 +7,7 @@ let
     "opencode-glm"
     "opencode-gemini"
     "opencode-gpt"
+    "opencode-openrouter"
     "opencode-sonnet"
     "opencode-zen"
   ];

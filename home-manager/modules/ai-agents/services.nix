@@ -107,6 +107,11 @@ let
       workflowPromptMode = "flag";
     }
     {
+      alias = "ocor";
+      command = "opencode_openrouter";
+      workflowPromptMode = "flag";
+    }
+    {
       alias = "locgpt";
       command = "opencode_gpt --model openai/gpt-5.3-codex-spark";
       workflowPromptMode = "flag";

@@ -23,6 +23,8 @@ let
     geminiOhMyOpencodeSettings
     gptOpencodeSettings
     gptOhMyOpencodeSettings
+    openrouterOpencodeSettings
+    openrouterOhMyOpencodeSettings
     sonnetOpencodeSettings
     sonnetOhMyOpencodeSettings
     zenOpencodeSettings
@@ -37,6 +39,7 @@ let
     "opencode-glm" = glmOpencodeSettings;
     "opencode-gemini" = geminiOpencodeSettings;
     "opencode-gpt" = gptOpencodeSettings;
+    "opencode-openrouter" = openrouterOpencodeSettings;
     "opencode-sonnet" = sonnetOpencodeSettings;
     "opencode-zen" = zenOpencodeSettings;
   };
@@ -46,6 +49,7 @@ let
     "opencode-glm" = glmOhMyOpencodeSettings;
     "opencode-gemini" = geminiOhMyOpencodeSettings;
     "opencode-gpt" = gptOhMyOpencodeSettings;
+    "opencode-openrouter" = openrouterOhMyOpencodeSettings;
     "opencode-sonnet" = sonnetOhMyOpencodeSettings;
     "opencode-zen" = zenOhMyOpencodeSettings;
   };

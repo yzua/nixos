@@ -14,6 +14,7 @@ let
   gptMainModel = "openai/gpt-5.3-codex";
   gptStandardModel = "openai/gpt-5.3-codex";
   gptFastModel = "opencode/gpt-5-nano";
+  openrouterModel = "openrouter/openrouter/hunter-alpha";
   zenMainModel = "opencode/minimax-m2.5-free";
   zenFastModel = "opencode/mimo-v2-flash-free";
   mkCategorySettings =
@@ -263,6 +264,22 @@ let
     categories = mkCategorySettings gptCategoryModels { };
   };
 
+  # OpenRouter profile: Hunter Alpha model across OpenCode and oh-my-opencode agents.
+  openrouterAgentModels = lib.mapAttrs (_: _: openrouterModel) ohMyOpencodeSettings.agents;
+  openrouterCategoryModels = lib.mapAttrs (_: _: openrouterModel) (
+    ohMyOpencodeSettings.categories or { }
+  );
+
+  openrouterOpencodeSettings = opencodeSettings // {
+    model = openrouterModel;
+  };
+
+  openrouterOhMyOpencodeSettings = ohMyOpencodeSettings // {
+    agents = mkAgentOverrides ohMyOpencodeSettings.agents openrouterAgentModels { };
+
+    categories = mkCategorySettings openrouterCategoryModels { };
+  };
+
   # Sonnet profile: Default OpenCode config with Opus replaced by Sonnet for lower cost.
   sonnetOpencodeSettings = opencodeSettings // {
     model = sonnetModel;
@@ -293,6 +310,8 @@ in
     geminiOhMyOpencodeSettings
     gptOpencodeSettings
     gptOhMyOpencodeSettings
+    openrouterOpencodeSettings
+    openrouterOhMyOpencodeSettings
     sonnetOpencodeSettings
     sonnetOhMyOpencodeSettings
     zenOpencodeSettings

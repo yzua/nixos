@@ -31,6 +31,15 @@
       cat "$key_file"
     }
 
+    _load_openrouter_key() {
+      local key_file="/run/secrets/openrouter_api_key"
+      if [[ ! -f "$key_file" ]]; then
+        echo "Error: $key_file not found. Run 'just nixos' to decrypt secrets." >&2
+        return 1
+      fi
+      cat "$key_file"
+    }
+
     # === AI agent wrappers ===
     claude_glm() {
       local key; key="$(_load_zai_key)" || return 1
@@ -59,6 +68,11 @@
 
     opencode_gpt() {
       _opencode_profile "gpt" "$@"
+    }
+
+    opencode_openrouter() {
+      local key; key="$(_load_openrouter_key)" || return 1
+      OPENROUTER_API_KEY="$key" _opencode_profile "openrouter" "$@"
     }
 
     opencode_sonnet() {
@@ -122,7 +136,7 @@
           # Build command with prompt injection per agent family
           if [[ -n "$prompt" ]]; then
             case "$agent" in
-              oc|ocglm|ocgem|ocgpt|ocs|oczen|ocf|ocrun|occm|ocrf|ocsa|ocmd|opencode*)
+              oc|ocglm|ocgem|ocgpt|ocor|ocs|oczen|ocf|ocrun|occm|ocrf|ocsa|ocmd|opencode*)
                 cmd="$agent --prompt '$kdl_prompt'" ;;
               *)
                 cmd="$agent '$kdl_prompt'" ;;

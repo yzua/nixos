@@ -64,7 +64,13 @@ in
         };
       };
 
-      providers = { };
+      providers = {
+        openrouter = {
+          options = {
+            apiKey = "__OPENROUTER_API_KEY_PLACEHOLDER__";
+          };
+        };
+      };
     };
 
     # === Codex Configuration ===
@@ -239,11 +245,12 @@ in
                     "if [ -n \"$FILE_PATH\" ]; then"
                     "case \"$FILE_PATH\" in"
                     "*.nix) command -v nixfmt >/dev/null 2>&1 && nixfmt \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.ts|*.tsx|*.js|*.jsx|*.json) command -v biome >/dev/null 2>&1 && biome check --write \"$FILE_PATH\" 2>/dev/null ;;"
+                    "*.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.json|*.jsonc|*.css|*.scss|*.less|*.graphql|*.gql) command -v biome >/dev/null 2>&1 && biome check --write \"$FILE_PATH\" 2>/dev/null ;;"
                     "*.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$FILE_PATH\" 2>/dev/null ;;"
                     "*.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.py) command -v ruff >/dev/null 2>&1 && ruff format \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.zig) command -v zig >/dev/null 2>&1 && zig fmt \"$FILE_PATH\" 2>/dev/null ;;"
+                    "*.py|*.pyi) command -v ruff >/dev/null 2>&1 && ruff format \"$FILE_PATH\" 2>/dev/null ;;"
+                    "*.zig|*.zon) command -v zig >/dev/null 2>&1 && zig fmt \"$FILE_PATH\" 2>/dev/null ;;"
+                    "*.md|*.mdx|*.yaml|*.yml|*.html|*.vue|*.svelte|*.astro) command -v prettier >/dev/null 2>&1 && prettier --write \"$FILE_PATH\" 2>/dev/null ;;"
                     "esac;"
                     "fi;"
                     "echo \"$INPUT\""
