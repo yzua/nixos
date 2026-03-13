@@ -177,6 +177,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v biome >/dev/null 2>&1; then
+              case "$file_path" in
+                *.js|*.jsx|*.ts|*.tsx|*.mjs|*.cjs|*.json|*.jsonc|*.css|*.scss|*.less|*.graphql|*.gql) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               biome check --write "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -193,6 +197,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v rustfmt >/dev/null 2>&1; then
+              case "$file_path" in
+                *.rs) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               rustfmt "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -209,6 +217,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v zig >/dev/null 2>&1; then
+              case "$file_path" in
+                *.zig|*.zon) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               zig fmt "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -225,6 +237,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v gofmt >/dev/null 2>&1; then
+              case "$file_path" in
+                *.go) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               gofmt -w "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -241,6 +257,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v nixfmt >/dev/null 2>&1; then
+              case "$file_path" in
+                *.nix) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               nixfmt "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -257,6 +277,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v ruff >/dev/null 2>&1; then
+              case "$file_path" in
+                *.py|*.pyi) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               ruff format "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -273,6 +297,10 @@
             INPUT=$(cat)
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v prettier >/dev/null 2>&1; then
+              case "$file_path" in
+                *.md|*.mdx|*.yaml|*.yml|*.html|*.vue|*.svelte|*.astro) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               prettier --write "$file_path" 2>&1 | head -3 >&2
             fi
             echo "$INPUT"
@@ -289,7 +317,7 @@
             INPUT=$(cat)
             COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
             if echo "$COMMAND" | grep -Eq 'gh pr create'; then
-              PR_URL=$(echo "$INPUT" | jq -r '.tool_output.output // ""' | grep -oE 'https://github.com/[^/]+/[^/]+/pull/[0-9]+' || true)
+              PR_URL=$(echo "$INPUT" | jq -r '(.tool_response.output // .tool_response.stdout // .tool_output.output // "")' | grep -oE 'https://github.com/[^/]+/[^/]+/pull/[0-9]+' || true)
               if [ -n "$PR_URL" ]; then
                 echo "[Hook] PR created: $PR_URL" >&2
               fi
@@ -304,6 +332,8 @@
       hooks = [
         {
           type = "command";
+          run_in_background = true;
+          timeout = 20000;
           command = ''
             INPUT=$(cat)
             FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
@@ -328,6 +358,10 @@
             INPUT=$(cat)
             FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$FILE_PATH" ] && [ -f "$FILE_PATH" ]; then
+              case "$FILE_PATH" in
+                *.ts|*.tsx|*.mts|*.cts) ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
               DIR=$(dirname "$FILE_PATH")
               while [ "$DIR" != "/" ] && [ ! -f "$DIR/tsconfig.json" ]; do
                 DIR=$(dirname "$DIR")
@@ -378,7 +412,7 @@
             GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
             echo "$INPUT" | jq --arg cwd "$PWD" --arg branch "$GIT_BRANCH" '{
               timestamp: now,
-              stop_reason: .stop_reason,
+              reason: (.reason // .stop_reason // "other"),
               cwd: $cwd,
               git_branch: $branch
             }' > "$SESSION_DIR/last-session.json" 2>/dev/null || true
