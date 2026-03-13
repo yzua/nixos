@@ -3,84 +3,95 @@
 Shared system modules imported by all hosts via `default.nix` (50+ imports including sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`). Each module handles one subsystem.
 Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
 
-Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values and security module guidance.
+Sub-directory `AGENTS.md` files exist at:
+
+- `security/AGENTS.md` — Hardening values, always-on security modules
+- `cleanup/AGENTS.md` — Cleanup timer helper pattern, retention policies
+- `glance/AGENTS.md` — Dashboard widgets, pages, helper file patterns
+- `prometheus-grafana/AGENTS.md` — Observability stack wiring, dashboards
 
 ---
 
 ## Module Categories
 
 ### Core System
-| Module | Purpose | Custom Options |
-|--------|---------|----------------|
-| `bootloader.nix` | systemd-boot configuration | None |
-| `nix.nix` | Nix package manager settings (flakes, gc) | None |
-| `nh.nix` | Nix Helper — build tool wrapper | None |
-| `users.nix` | User accounts and permissions | None |
-| `environment.nix` | System-wide env vars and paths | None |
-| `i18n.nix` | Locale and internationalization | None |
-| `timezone.nix` | Time zone configuration | None |
-| `stability.nix` | System stability optimizations | None |
-| `cleanup/` | Automated cleanup timers (downloads, caches, Docker, Telegram) | `mySystem.cleanup.enable` |
-| `host-defaults.nix` | Profile-based defaults (desktop/laptop) for all `mySystem.*` options | `mySystem.hostProfile` |
-| `host-info.nix` | Sets hostname and stateVersion from flake arguments | `mySystem.hostInfo.enable` |
-| `backup.nix` | Automated restic backup service | `mySystem.backup.*` |
-| `boot-optimization.nix` | Defer monitoring services from blocking boot | None |
+
+| Module                  | Purpose                                                              | Custom Options             |
+| ----------------------- | -------------------------------------------------------------------- | -------------------------- |
+| `bootloader.nix`        | systemd-boot configuration                                           | None                       |
+| `nix.nix`               | Nix package manager settings (flakes, gc)                            | None                       |
+| `nh.nix`                | Nix Helper — build tool wrapper                                      | None                       |
+| `users.nix`             | User accounts and permissions                                        | None                       |
+| `environment.nix`       | System-wide env vars and paths                                       | None                       |
+| `i18n.nix`              | Locale and internationalization                                      | None                       |
+| `timezone.nix`          | Time zone configuration                                              | None                       |
+| `stability.nix`         | System stability optimizations                                       | None                       |
+| `cleanup/`              | Automated cleanup timers (downloads, caches, Docker, Telegram)       | `mySystem.cleanup.enable`  |
+| `host-defaults.nix`     | Profile-based defaults (desktop/laptop) for all `mySystem.*` options | `mySystem.hostProfile`     |
+| `host-info.nix`         | Sets hostname and stateVersion from flake arguments                  | `mySystem.hostInfo.enable` |
+| `backup.nix`            | Automated restic backup service                                      | `mySystem.backup.*`        |
+| `boot-optimization.nix` | Defer monitoring services from blocking boot                         | None                       |
 
 ### Security & Privacy
-| Module | Purpose | Custom Options |
-|--------|---------|----------------|
-| `security/` | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | `mySystem.auditLogging.enable` (for fail2ban only; other security sub-modules are always-on) |
-| `tor.nix` | Tor SOCKS proxy (9050/9150) | `mySystem.tor.enable` |
-| `mullvad-vpn.nix` | Mullvad VPN client | `mySystem.mullvadVpn.enable` |
-| `dnscrypt-proxy.nix` | Encrypted DNS with DNSSEC | `mySystem.dnscryptProxy.enable` |
-| `sops.nix` | Secret management (age encryption) | None (always-on) |
+
+| Module               | Purpose                                                                                       | Custom Options                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `security/`          | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | `mySystem.auditLogging.enable` (for fail2ban only; other security sub-modules are always-on) |
+| `tor.nix`            | Tor SOCKS proxy (9050/9150)                                                                   | `mySystem.tor.enable`                                                                        |
+| `mullvad-vpn.nix`    | Mullvad VPN client                                                                            | `mySystem.mullvadVpn.enable`                                                                 |
+| `dnscrypt-proxy.nix` | Encrypted DNS with DNSSEC                                                                     | `mySystem.dnscryptProxy.enable`                                                              |
+| `sops.nix`           | Secret management (age encryption)                                                            | None (always-on)                                                                             |
 
 ### Hardware & Desktop
-| Module | Purpose | Custom Options |
-|--------|---------|----------------|
-| `nvidia.nix` | NVIDIA GPU drivers, CUDA, Wayland integration | `mySystem.nvidia.enable` |
-| `audio.nix` | PipeWire audio stack | None (always-on) |
-| `bluetooth.nix` | Bluetooth services | `mySystem.bluetooth.*` |
-| `niri.nix` | Niri compositor (scrollable tiling Wayland) system integration | None |
-| `greetd.nix` | greetd display manager with tuigreet | `mySystem.greetd.enable` |
-| `xserver.nix` | X11 display server | None |
-| `xdg-desktop-portal.nix` | XDG portals for Wayland | None |
-| `libinput.nix` | Touchpad/mouse input | None |
-| `upower.nix` | Power/battery monitoring | None |
-| `fwupd.nix` | Firmware updates (fwupd/LVFS) | `mySystem.fwupd.enable` |
-| `printing.nix` | CUPS print services | `mySystem.printing.enable` |
-| `monitoring.nix` | Hardware sensors, vnStat, bandwhich | None |
+
+| Module                   | Purpose                                                        | Custom Options             |
+| ------------------------ | -------------------------------------------------------------- | -------------------------- |
+| `nvidia.nix`             | NVIDIA GPU drivers, CUDA, Wayland integration                  | `mySystem.nvidia.enable`   |
+| `audio.nix`              | PipeWire audio stack                                           | None (always-on)           |
+| `bluetooth.nix`          | Bluetooth services                                             | `mySystem.bluetooth.*`     |
+| `niri.nix`               | Niri compositor (scrollable tiling Wayland) system integration | None                       |
+| `greetd.nix`             | greetd display manager with tuigreet                           | `mySystem.greetd.enable`   |
+| `xserver.nix`            | X11 display server                                             | None                       |
+| `xdg-desktop-portal.nix` | XDG portals for Wayland                                        | None                       |
+| `libinput.nix`           | Touchpad/mouse input                                           | None                       |
+| `upower.nix`             | Power/battery monitoring                                       | None                       |
+| `fwupd.nix`              | Firmware updates (fwupd/LVFS)                                  | `mySystem.fwupd.enable`    |
+| `printing.nix`           | CUPS print services                                            | `mySystem.printing.enable` |
+| `monitoring.nix`         | Hardware sensors, vnStat, bandwhich                            | None                       |
 
 ### Observability Stack
-| Module | Purpose | Custom Options |
-|--------|---------|----------------|
-| `netdata.nix` | Real-time system monitoring dashboard | `mySystem.netdata.enable` |
-| `scrutiny.nix` | SMART disk health monitoring | `mySystem.scrutiny.enable` |
-| `glance/` | Minimal dashboard with Gruvbox theme (localhost:8082) | `mySystem.glance.enable` |
-| `opensnitch.nix` | Application firewall with network logging | `mySystem.opensnitch.enable` |
-| `loki.nix` | Loki log aggregation with Promtail | `mySystem.loki.enable` |
+
+| Module                | Purpose                                                              | Custom Options                  |
+| --------------------- | -------------------------------------------------------------------- | ------------------------------- |
+| `netdata.nix`         | Real-time system monitoring dashboard                                | `mySystem.netdata.enable`       |
+| `scrutiny.nix`        | SMART disk health monitoring                                         | `mySystem.scrutiny.enable`      |
+| `glance/`             | Minimal dashboard with Gruvbox theme (localhost:8082)                | `mySystem.glance.enable`        |
+| `opensnitch.nix`      | Application firewall with network logging                            | `mySystem.opensnitch.enable`    |
+| `loki.nix`            | Loki log aggregation with Promtail                                   | `mySystem.loki.enable`          |
 | `prometheus-grafana/` | Prometheus + Alertmanager + Grafana stack (includes JSON dashboards) | `mySystem.observability.enable` |
-| `system-report.nix` | Unified system health reporting (aggregates monitoring sources) | `mySystem.systemReport.enable` |
-| `ntfy.nix` | Alertmanager → ntfy.sh push notifications | `mySystem.ntfy.enable` |
+| `system-report.nix`   | Unified system health reporting (aggregates monitoring sources)      | `mySystem.systemReport.enable`  |
+| `ntfy.nix`            | Alertmanager → ntfy.sh push notifications                            | `mySystem.ntfy.enable`          |
 
 ### Applications & Services
-| Module | Purpose | Custom Options |
-|--------|---------|----------------|
-| `gaming.nix` | Steam, Lutris, Wine, MangoHud | `mySystem.gaming.*` |
-| `flatpak.nix` | Flatpak + Flathub | `mySystem.flatpak.enable` |
-| `virtualisation.nix` | Docker, libvirt/QEMU | `mySystem.virtualisation.enable` |
-| `networking.nix` | NetworkManager, firewall rules | None |
-| `nix-ld.nix` | Dynamic linker for non-Nix binaries | `mySystem.nixLd.enable` |
-| `nautilus.nix` | GNOME Files manager | `mySystem.nautilus.enable` |
-| `android.nix` | Android tools and platform support | None |
-| `browser-deps.nix` | Chrome/Chromium dependencies (Wayland + X11) | None |
-| `kdeconnect.nix` | KDE Connect phone-desktop integration | `mySystem.kdeconnect.enable` |
-| `vnc.nix` | VNC remote access (x11vnc, noVNC, websockify) | `mySystem.vnc.enable` |
-| `waydroid.nix` | Waydroid Android emulation (LXC container) | `mySystem.waydroid.enable` |
+
+| Module               | Purpose                                       | Custom Options                   |
+| -------------------- | --------------------------------------------- | -------------------------------- |
+| `gaming.nix`         | Steam, Lutris, Wine, MangoHud                 | `mySystem.gaming.*`              |
+| `flatpak.nix`        | Flatpak + Flathub                             | `mySystem.flatpak.enable`        |
+| `virtualisation.nix` | Docker, libvirt/QEMU                          | `mySystem.virtualisation.enable` |
+| `networking.nix`     | NetworkManager, firewall rules                | None                             |
+| `nix-ld.nix`         | Dynamic linker for non-Nix binaries           | `mySystem.nixLd.enable`          |
+| `nautilus.nix`       | GNOME Files manager                           | `mySystem.nautilus.enable`       |
+| `android.nix`        | Android tools and platform support            | None                             |
+| `browser-deps.nix`   | Chrome/Chromium dependencies (Wayland + X11)  | None                             |
+| `kdeconnect.nix`     | KDE Connect phone-desktop integration         | `mySystem.kdeconnect.enable`     |
+| `vnc.nix`            | VNC remote access (x11vnc, noVNC, websockify) | `mySystem.vnc.enable`            |
+| `waydroid.nix`       | Waydroid Android emulation (LXC container)    | `mySystem.waydroid.enable`       |
 
 ### Cross-Cutting
-| Module | Purpose |
-|--------|---------|
+
+| Module           | Purpose                                        |
+| ---------------- | ---------------------------------------------- |
 | `validation.nix` | **CRITICAL**: Cross-module conflict assertions |
 
 ---
@@ -88,6 +99,7 @@ Sub-directory `AGENTS.md`: `security/AGENTS.md` has detailed hardening values an
 ## Directory Modules
 
 ### `cleanup/`
+
 Split into sub-modules. Guarded by `mySystem.cleanup.enable`.
 | Sub-module | Purpose |
 |------------|---------|
@@ -97,6 +109,7 @@ Split into sub-modules. Guarded by `mySystem.cleanup.enable`.
 | `cache.nix` | Cache cleanup timers (pip, npm, bun, go, Playwright), Docker prune |
 
 ### `security/`
+
 Split from monolithic `security.nix`. Always-on (no enable guard), except audit-logging. See `security/AGENTS.md` for detailed hardening values.
 | Sub-module | Purpose |
 |------------|---------|
@@ -116,18 +129,19 @@ Split from monolithic `security.nix`. Always-on (no enable guard), except audit-
 Defines `mySystem.hostProfile` (enum: `"desktop"` | `"laptop"`).
 Sets `lib.mkDefault` for all shared `mySystem.*` options so hosts only need to set the profile + overrides.
 
-| Option | Desktop Default | Laptop Default |
-|--------|-----------------|----------------|
-| `gaming.enable` | `true` | `false` |
-| `gaming.enableGamescope` | `true` | `false` |
-| `bluetooth.enable` | `false` | `true` |
-| `bluetooth.powerOnBoot` | `false` | `false` |
-| `backup.enable` | `false` | `false` |
-| `auditLogging.enable` | `true` | `true` |
-| `vnc.enable` | `false` | `false` |
-| Most others (flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect) | `true` | `true` |
+| Option                                                                                                                                                                                                                                 | Desktop Default | Laptop Default |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | -------------- |
+| `gaming.enable`                                                                                                                                                                                                                        | `true`          | `false`        |
+| `gaming.enableGamescope`                                                                                                                                                                                                               | `true`          | `false`        |
+| `bluetooth.enable`                                                                                                                                                                                                                     | `false`         | `true`         |
+| `bluetooth.powerOnBoot`                                                                                                                                                                                                                | `false`         | `false`        |
+| `backup.enable`                                                                                                                                                                                                                        | `false`         | `false`        |
+| `auditLogging.enable`                                                                                                                                                                                                                  | `true`          | `true`         |
+| `vnc.enable`                                                                                                                                                                                                                           | `false`         | `false`        |
+| Most others (flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect) | `true`          | `true`         |
 
 Host configs only need:
+
 ```nix
 mySystem.hostProfile = "desktop"; # or "laptop"
 # Override specific defaults as needed
@@ -138,6 +152,7 @@ mySystem.hostProfile = "desktop"; # or "laptop"
 ## Option Pattern Quick Reference
 
 Modules with `mySystem.*` options use the **enable-guard** pattern:
+
 ```nix
 config = lib.mkIf config.mySystem.<feature>.enable { ... };
 ```
@@ -145,6 +160,7 @@ config = lib.mkIf config.mySystem.<feature>.enable { ... };
 Modules **without** custom options apply unconditionally (audio, security, networking).
 
 ### inherit Pattern for Sub-Options
+
 ```nix
 # Pass option value directly to NixOS config
 hardware.bluetooth = {
@@ -157,14 +173,14 @@ hardware.bluetooth = {
 
 ## Validation Dependencies (validation.nix)
 
-| If Enabled | Requires | Error If Missing |
-|------------|----------|------------------|
-| `mySystem.gaming` | `hardware.graphics.enable` | Graphics drivers required |
-| `mySystem.gaming` | `services.pipewire.pulse.enable` | PipeWire with PulseAudio compat |
-| `mySystem.mullvadVpn` | `networking.networkmanager.enable` | NetworkManager required |
-| `mySystem.dnscryptProxy` | `!services.resolved.enable` | Conflicts with systemd-resolved |
-| Any config | `networking.firewall.enable` | Firewall mandatory |
-| `services.avahi` | `allowInterfaces != []` | Explicit interface list required |
+| If Enabled               | Requires                           | Error If Missing                 |
+| ------------------------ | ---------------------------------- | -------------------------------- |
+| `mySystem.gaming`        | `hardware.graphics.enable`         | Graphics drivers required        |
+| `mySystem.gaming`        | `services.pipewire.pulse.enable`   | PipeWire with PulseAudio compat  |
+| `mySystem.mullvadVpn`    | `networking.networkmanager.enable` | NetworkManager required          |
+| `mySystem.dnscryptProxy` | `!services.resolved.enable`        | Conflicts with systemd-resolved  |
+| Any config               | `networking.firewall.enable`       | Firewall mandatory               |
+| `services.avahi`         | `allowInterfaces != []`            | Explicit interface list required |
 
 ---
 
