@@ -15,8 +15,9 @@ result-*
 .direnv/
 .envrc
 
-# Sisyphus (Nix garbage collection)
+# Opencode
 .sisyphus/
+.omc/
 
 # Result files
 *.log
