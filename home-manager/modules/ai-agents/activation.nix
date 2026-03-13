@@ -83,90 +83,52 @@ let
   githubPlaceholderFilter = ''
     walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
   '';
+  openrouterPlaceholderFilter = ''
+    walk(if type == "string" then gsub("__OPENROUTER_API_KEY_PLACEHOLDER__"; $key) else . end)
+  '';
+
+  # Import helper modules
+  secretPatching = import ./_secret-patching.nix {
+    inherit
+      cfg
+      pkgs
+      lib
+      opencodeConfigPathList
+      opencodeZaiFilter
+      claudeZaiFilter
+      geminiZaiFilter
+      githubPlaceholderFilter
+      openrouterPlaceholderFilter
+      ;
+  };
+  codexConfig = import ./_codex-config.nix {
+    inherit
+      cfg
+      pkgs
+      lib
+      sharedMcpServers
+      ;
+  };
+  claudeConfig = import ./_claude-config.nix {
+    inherit
+      cfg
+      pkgs
+      lib
+      toJSON
+      claudeSettings
+      claudeMcpServers
+      ;
+  };
+  pluginInstalls = import ./_plugin-installs.nix {
+    inherit cfg pkgs lib;
+  };
 in
 {
   config = lib.mkIf cfg.enable {
     home.activation = {
       # === Secret Patching ===
       # Runs after all config writers so keys can be injected last.
-      patchAiAgentSecrets = lib.mkIf (cfg.secrets.zaiApiKeyFile != null) (
-        lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "setupClaudeConfig" ] ''
-          patch_json_file() {
-            local file="$1"
-            local arg_name="$2"
-            local arg_value="$3"
-            local filter="$4"
-
-            ${pkgs.jq}/bin/jq --arg "$arg_name" "$arg_value" "$filter" "$file" > "$file.tmp" && mv "$file.tmp" "$file"
-          }
-
-          escape_sed_replacement() {
-            printf '%s\n' "$1" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g'
-          }
-
-          if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
-            ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
-
-            for OPENCODE_CFG in ${opencodeConfigPathList}; do
-              if [[ -f "$OPENCODE_CFG" ]]; then
-                patch_json_file "$OPENCODE_CFG" key "$ZAI_KEY" ${lib.escapeShellArg opencodeZaiFilter}
-                echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Z.AI API key"
-              fi
-            done
-
-            CLAUDE_MCP="$HOME/.mcp.json"
-            if [[ -f "$CLAUDE_MCP" ]]; then
-              patch_json_file "$CLAUDE_MCP" key "$ZAI_KEY" ${lib.escapeShellArg claudeZaiFilter}
-              echo "✓ Patched .mcp.json with Z.AI API key + remote MCPs"
-            fi
-
-            CODEX_CFG="$HOME/.codex/config.toml"
-            if [[ -f "$CODEX_CFG" ]]; then
-              if grep -q '\[mcp_servers.zai-mcp-server.env\]' "$CODEX_CFG"; then
-                ESCAPED_ZAI="$(escape_sed_replacement "$ZAI_KEY")"
-                ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ESCAPED_ZAI\"" "$CODEX_CFG"
-                unset ESCAPED_ZAI
-              fi
-              echo "✓ Patched codex config.toml with Z.AI API key"
-            fi
-
-            GEMINI_CFG="$HOME/.gemini/settings.json"
-            if [[ -f "$GEMINI_CFG" ]]; then
-              patch_json_file "$GEMINI_CFG" key "$ZAI_KEY" ${lib.escapeShellArg geminiZaiFilter}
-              echo "✓ Patched gemini settings.json with Z.AI API key + remote MCPs"
-            fi
-
-          else
-            echo "⚠ ${cfg.secrets.zaiApiKeyFile} not found - run 'just nixos' first"
-          fi
-
-          # Inject GitHub token from gh CLI into all agent configs
-          if ${pkgs.gh}/bin/gh auth status &> /dev/null; then
-            GH_TOKEN="$(${pkgs.gh}/bin/gh auth token)"
-            # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
-            for OPENCODE_CFG in ${opencodeConfigPathList}; do
-              if [[ -f "$OPENCODE_CFG" ]]; then
-                patch_json_file "$OPENCODE_CFG" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
-              fi
-            done
-            if [[ -f "$HOME/.mcp.json" ]]; then
-              patch_json_file "$HOME/.mcp.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
-            fi
-            if [[ -f "$HOME/.codex/config.toml" ]]; then
-              ESCAPED_TOKEN="$(escape_sed_replacement "$GH_TOKEN")"
-              ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$ESCAPED_TOKEN/g" "$HOME/.codex/config.toml"
-            fi
-            if [[ -f "$HOME/.gemini/settings.json" ]]; then
-              patch_json_file "$HOME/.gemini/settings.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
-            fi
-            unset GH_TOKEN
-            echo "✓ Patched GitHub token from gh CLI into all agent configs"
-          else
-            echo "⚠ gh CLI not authenticated - GitHub MCP will not work (run 'gh auth login')"
-          fi
-
-        ''
-      );
+      patchAiAgentSecrets = secretPatching;
 
       # === Skill Installation ===
       installAgentSkills =
@@ -210,244 +172,14 @@ in
         );
 
       # === Codex Configuration ===
-      setupCodexConfig = lib.mkIf cfg.codex.enable (
-        let
-          codexNotifyScript = pkgs.writeShellScript "codex-notify" ''
-            set -euo pipefail
-
-            payload=""
-            for arg in "$@"; do
-              if [[ -n "$arg" ]] && ${pkgs.jq}/bin/jq -e . >/dev/null 2>&1 <<< "$arg"; then
-                payload="$arg"
-                break
-              fi
-            done
-
-            if [[ -z "$payload" ]]; then
-              payload="$*"
-            fi
-
-            if [[ -z "$payload" ]] && [[ ! -t 0 ]]; then
-              payload="$(cat)"
-            fi
-
-            summary="Codex"
-            body="$payload"
-
-            if [[ -n "$payload" ]] && ${pkgs.jq}/bin/jq -e . >/dev/null 2>&1 <<< "$payload"; then
-              summary="$(${pkgs.jq}/bin/jq -r 'if type == "object" then (.title // .summary // "Codex") else "Codex" end' <<< "$payload")"
-              body="$(${pkgs.jq}/bin/jq -r '
-                if type == "object" then
-                  (.message // .body // ."last-assistant-message" // .content // .type // "Codex notification")
-                else
-                  .
-                end
-              ' <<< "$payload")"
-            fi
-
-            body="$(printf '%s' "$body" | tr '\n' ' ')"
-            body="$(printf '%s' "$body" | ${pkgs.gnused}/bin/sed -E 's/[[:space:]]+/ /g; s/^ //; s/ $//')"
-            if [[ -z "$body" ]]; then
-              body="Notification"
-            fi
-
-            notify-send -a "Codex" -i dialog-information "$summary" "$body" 2>/dev/null || true
-          '';
-          mcpToml = lib.concatStringsSep "\n" (
-            lib.mapAttrsToList (
-              name: server:
-              let
-                argsStr = lib.concatMapStringsSep ", " (a: ''"${a}"'') (server.args or [ ]);
-                envLines = lib.concatStringsSep "\n" (
-                  lib.mapAttrsToList (k: v: ''${k} = "${v}"'') (server.env or { })
-                );
-              in
-              ''
-                [mcp_servers.${name}]
-                command = "${server.command}"
-                args = [${argsStr}]
-                enabled = true
-              ''
-              + lib.optionalString (server.env or { } != { }) ''
-                [mcp_servers.${name}.env]
-                ${envLines}
-              ''
-            ) (lib.filterAttrs (_: s: s.enable && (s.type or "local") == "local") sharedMcpServers)
-          );
-          projectsToml = lib.concatMapStringsSep "\n" (path: ''
-            [projects."${path}"]
-            trust_level = "trusted"
-          '') cfg.codex.trustedProjects;
-        in
-        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p "$HOME/.codex"
-          cat > "$HOME/.codex/config.toml" << 'CODEX_EOF'
-          personality = "${cfg.codex.personality}"
-          model = "${cfg.codex.model}"
-          model_reasoning_effort = "${cfg.codex.reasoningEffort}"
-          model_reasoning_summary = "concise"
-          approval_policy = "${cfg.codex.approvalPolicy}"
-          allow_login_shell = false
-          check_for_update_on_startup = true
-          suppress_unstable_features_warning = true
-
-          web_search = "cached"
-
-          notify = ["${codexNotifyScript}"]
-
-          developer_instructions = """
-          Experienced developer. Concise communication, no preamble.
-          Evidence-based decisions. Minimal changes - fix bugs without refactoring.
-          Never suppress type errors. Never commit unless asked.
-          Run diagnostics/tests on changed files before claiming done.
-          Match existing codebase patterns and conventions.
-          ${lib.optionalString (cfg.globalInstructions != "") cfg.globalInstructions}
-          """
-
-          [tui]
-          animations = true
-          notifications = true
-
-          [history]
-          persistence = "save-all"
-          max_bytes = 52428800
-
-          [profiles.quick]
-          model_reasoning_effort = "low"
-
-          [profiles.deep]
-          model_reasoning_effort = "xhigh"
-          approval_policy = "on-request"
-
-          [profiles.safe]
-          approval_policy = "untrusted"
-          sandbox_mode = "read-only"
-
-          [shell_environment_policy]
-          inherit = "core"
-          include_only = ["PATH", "HOME", "USER", "SHELL", "TERM", "EDITOR", "VISUAL", "LANG", "LC_ALL", "PWD"]
-          exclude = ["AWS_*", "AZURE_*", "GCP_*", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
-
-          ${mcpToml}
-          ${projectsToml}
-          ${cfg.codex.extraToml}
-          CODEX_EOF
-          ${pkgs.gnused}/bin/sed -i 's/^          //' "$HOME/.codex/config.toml"
-          echo "✓ Codex config.toml configured"
-        ''
-      );
+      setupCodexConfig = codexConfig;
 
       # === Claude Configuration ===
       # Real files (not symlinks) so plugins can modify them.
-      setupClaudeConfig = lib.mkIf cfg.claude.enable (
-        let
-          claudeSettingsFile = pkgs.writeText "claude-settings.json" (toJSON claudeSettings);
-          claudeMcpFile = pkgs.writeText "claude-mcp.json" (toJSON {
-            mcpServers = claudeMcpServers;
-          });
-        in
-        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p "$HOME/.claude"
+      setupClaudeConfig = claudeConfig;
 
-          CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-
-          if [[ -f "$CLAUDE_SETTINGS" ]] && [[ ! -L "$CLAUDE_SETTINGS" ]]; then
-            ${pkgs.jq}/bin/jq -s '.[0] * .[1]' "$CLAUDE_SETTINGS" "${claudeSettingsFile}" > "$CLAUDE_SETTINGS.tmp"
-            mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
-          else
-            rm -f "$CLAUDE_SETTINGS"
-            cp "${claudeSettingsFile}" "$CLAUDE_SETTINGS"
-            chmod 644 "$CLAUDE_SETTINGS"
-          fi
-          echo "✓ Claude settings.json configured"
-
-          CLAUDE_MCP="$HOME/.mcp.json"
-
-          if [[ -f "$CLAUDE_MCP" ]] && [[ ! -L "$CLAUDE_MCP" ]]; then
-            ${pkgs.jq}/bin/jq -s '(.[1].mcpServers) as $mcpServers | .[0] * .[1] | .mcpServers = $mcpServers' "$CLAUDE_MCP" "${claudeMcpFile}" > "$CLAUDE_MCP.tmp"
-            mv "$CLAUDE_MCP.tmp" "$CLAUDE_MCP"
-          else
-            rm -f "$CLAUDE_MCP"
-            cp "${claudeMcpFile}" "$CLAUDE_MCP"
-            chmod 644 "$CLAUDE_MCP"
-          fi
-          echo "✓ Claude .mcp.json configured"
-
-          ${lib.optionalString (cfg.globalInstructions != "") ''
-              CLAUDE_MD="$HOME/.claude/CLAUDE.md"
-              cat > "$CLAUDE_MD" << 'CLAUDE_INSTRUCTIONS_EOF'
-            ${cfg.globalInstructions}
-            CLAUDE_INSTRUCTIONS_EOF
-              ${pkgs.gnused}/bin/sed -i 's/^            //' "$CLAUDE_MD"
-              echo "✓ Claude CLAUDE.md configured"
-          ''}
-        ''
-      );
-
-      # === Claude Plugin Installation ===
-      installOhMyClaudeCode = lib.mkIf cfg.claude.enable (
-        lib.hm.dag.entryAfter [ "setupClaudeConfig" ] ''
-          if command -v claude &> /dev/null; then
-            if ! claude plugin marketplace list 2>/dev/null | grep -q "omc"; then
-              echo "📦 Adding oh-my-claudecode marketplace..."
-              claude plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode 2>/dev/null || true
-            fi
-
-            if ! claude plugin list 2>/dev/null | grep -q "oh-my-claudecode"; then
-              echo "📦 Installing oh-my-claudecode plugin..."
-              claude plugin install oh-my-claudecode@omc 2>/dev/null || true
-            fi
-            echo "✓ oh-my-claudecode ready"
-          fi
-        ''
-      );
-
-      # === Everything Claude Code Plugin ===
-      installEverythingClaudeCode = lib.mkIf cfg.claude.enable (
-        lib.hm.dag.entryAfter [ "setupClaudeConfig" ] ''
-          ECC_DIR="$HOME/.local/share/everything-claude-code"
-
-          if command -v claude &> /dev/null; then
-            if [[ -d "$ECC_DIR/.git" ]]; then
-              echo "📦 Updating everything-claude-code..."
-              ${pkgs.git}/bin/git -C "$ECC_DIR" pull --ff-only 2>/dev/null || true
-            else
-              echo "📦 Cloning everything-claude-code..."
-              rm -rf "$ECC_DIR"
-              ${pkgs.git}/bin/git clone --depth 1 https://github.com/affaan-m/everything-claude-code.git "$ECC_DIR" 2>/dev/null || true
-            fi
-
-            if ! claude plugin marketplace list 2>/dev/null | grep -q "everything-claude-code"; then
-              echo "📦 Adding everything-claude-code marketplace..."
-              claude plugin marketplace add affaan-m/everything-claude-code 2>/dev/null || true
-            fi
-
-            if ! claude plugin list 2>/dev/null | grep -q "everything-claude-code"; then
-              echo "📦 Installing everything-claude-code plugin..."
-              claude plugin install everything-claude-code@everything-claude-code 2>/dev/null || true
-            fi
-
-            if [[ -d "$ECC_DIR/rules" ]]; then
-              mkdir -p "$HOME/.claude/rules"
-              if [[ -d "$ECC_DIR/rules/common" ]]; then
-                cp -r "$ECC_DIR/rules/common/"* "$HOME/.claude/rules/" 2>/dev/null || true
-              fi
-              if [[ -d "$ECC_DIR/rules/typescript" ]]; then
-                cp -r "$ECC_DIR/rules/typescript/"* "$HOME/.claude/rules/" 2>/dev/null || true
-              fi
-              if [[ -d "$ECC_DIR/rules/python" ]]; then
-                cp -r "$ECC_DIR/rules/python/"* "$HOME/.claude/rules/" 2>/dev/null || true
-              fi
-              if [[ -d "$ECC_DIR/rules/golang" ]]; then
-                cp -r "$ECC_DIR/rules/golang/"* "$HOME/.claude/rules/" 2>/dev/null || true
-              fi
-              echo "✓ Installed ECC rules (common + typescript + python + golang)"
-            fi
-
-            echo "✓ everything-claude-code ready"
-          fi
-        ''
-      );
+      # === Claude Plugin Installation + Everything Claude Code ===
+      inherit (pluginInstalls) installOhMyClaudeCode installEverythingClaudeCode;
     };
   };
 }
