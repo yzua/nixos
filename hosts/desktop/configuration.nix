@@ -12,6 +12,7 @@
 
   mySystem = {
     hostProfile = "desktop";
+    waydroid.enable = false;
     flatpak.enable = false;
     kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.
     i2pd.enable = true;
