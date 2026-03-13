@@ -1,6 +1,6 @@
 # Utility Scripts
 
-28 executable Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`, and `lib/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
+30 executable Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`, and `lib/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
 
 ---
 
@@ -19,7 +19,8 @@ scripts/
 │   ├── agent-log-wrapper.sh # Agent command logging wrapper with error split
 │   ├── agent-analyze.sh     # Log analyzer CLI (stats/errors/sessions/search/tail/report)
 │   ├── agent-patterns.sh    # Error pattern detector across agent logs
-│   └── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
+│   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
+│   └── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
 ├── apps/
 │   └── browser-select.sh    # Browser profile selector (wofi menu)
 ├── build/
@@ -35,6 +36,7 @@ scripts/
 │   ├── logging.sh           # Shared logging library (colored output, timestamps)
 │   └── test-helpers.sh      # Shared test utilities (assertions, mocking)
 ├── sops/
+│   ├── editor-code-wait.sh  # VS Code wait wrapper for sops editing
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)
 ├── system/
 │   └── report/
@@ -83,23 +85,24 @@ source "$(dirname "$0")/../lib/logging.sh"
 
 ## Scripts Referenced from Nix
 
-| Script | Referenced By |
-|--------|-------------|
-| `build/modules-check.sh` | `justfile` (`just modules`) |
-| `build/packages-check.sh` | `justfile` (`just pkgs`) |
-| `build/shellcheck-nix-inline.sh` | `justfile` (`just lint`) |
-| `system/report/system-report.sh` | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`) |
-| `system/report/report-collectors.sh` | Sourced by `system-report.sh` (loads module files) |
-| `system/report/report-collectors-core.sh` | Sourced by `system/report/report-collectors.sh` |
-| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh` |
-| `system/report/report-collectors-security.sh` | Sourced by `system/report/report-collectors.sh` |
-| `system/report/report-helpers.sh` | Sourced by `system-report.sh` |
-| `ai/api-quota/api-quota.sh` | `home-manager/modules/noctalia/default.nix` (bar widget) |
-| `ai/agent-launcher.sh` | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper) |
-| `ai/agent-log-wrapper.sh` | `home-manager/modules/ai-agents/_mcp-transforms.nix` (`ai-agent-log-wrapper` wrapper) |
-| `ai/agent-analyze.sh` | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper) |
-| `ai/agent-patterns.sh` | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper) |
-| `ai/agent-dashboard.sh` | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper) |
-| `sops/sops-edit.sh` | `justfile` (`just sops-edit`) |
-| `apps/browser-select.sh` | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper) |
-| `hardware/nvidia-fans.sh` | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper) |
+| Script                                             | Referenced By                                                                         |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `build/modules-check.sh`                           | `justfile` (`just modules`)                                                           |
+| `build/packages-check.sh`                          | `justfile` (`just pkgs`)                                                              |
+| `build/shellcheck-nix-inline.sh`                   | `justfile` (`just lint`)                                                              |
+| `system/report/system-report.sh`                   | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`)              |
+| `system/report/report-collectors.sh`               | Sourced by `system-report.sh` (loads module files)                                    |
+| `system/report/report-collectors-core.sh`          | Sourced by `system/report/report-collectors.sh`                                       |
+| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                       |
+| `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                       |
+| `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                         |
+| `ai/api-quota/api-quota.sh`                        | `home-manager/modules/noctalia/default.nix` (bar widget)                              |
+| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper)           |
+| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/_mcp-transforms.nix` (`ai-agent-log-wrapper` wrapper) |
+| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)        |
+| `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)       |
+| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)      |
+| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-inventory` wrapper)          |
+| `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                         |
+| `apps/browser-select.sh`                           | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper)            |
+| `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)                   |
