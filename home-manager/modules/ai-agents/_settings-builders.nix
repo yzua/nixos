@@ -17,6 +17,8 @@ let
   openrouterModel = "openrouter/openrouter/hunter-alpha";
   zenMainModel = "opencode/minimax-m2.5-free";
   zenFastModel = "opencode/mimo-v2-flash-free";
+  antigravityProModel = "google/antigravity-gemini-3.1-pro";
+  antigravityFlashModel = "google/antigravity-gemini-3-flash";
   mkCategorySettings =
     categoryModels: categoryVariants:
     lib.mapAttrs (
@@ -86,6 +88,7 @@ let
   ohMyOpencodeSettings = {
     "$schema" =
       "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json";
+    google_auth = false;
     agents = lib.mapAttrs (
       _: agent:
       {
@@ -136,16 +139,16 @@ let
 
   # Gemini profile: Google Gemini models for Gemini-native coding sessions.
   geminiAgentModels = {
-    sisyphus = "google/gemini-2.5-pro";
-    oracle = "google/gemini-2.5-pro";
-    librarian = "google/gemini-2.5-flash";
-    explore = "google/gemini-2.5-flash";
-    # multimodal-looker keeps its original vision-capable model
-    prometheus = "google/gemini-2.5-pro";
-    metis = "google/gemini-2.5-pro";
-    momus = "google/gemini-2.5-pro";
-    atlas = "google/gemini-2.5-flash";
-    hephaestus = "google/gemini-2.5-pro";
+    sisyphus = antigravityProModel;
+    oracle = antigravityProModel;
+    librarian = antigravityFlashModel;
+    explore = antigravityFlashModel;
+    multimodal-looker = antigravityFlashModel;
+    prometheus = antigravityProModel;
+    metis = antigravityProModel;
+    momus = antigravityProModel;
+    atlas = antigravityFlashModel;
+    hephaestus = antigravityProModel;
   };
 
   # Variant overrides for Gemini agents (thinking levels per role).
@@ -158,14 +161,14 @@ let
   };
 
   geminiCategoryModels = {
-    "visual-engineering" = "google/gemini-2.5-pro";
-    ultrabrain = "google/gemini-2.5-pro";
-    deep = "google/gemini-2.5-pro";
-    artistry = "google/gemini-2.5-pro";
-    quick = "google/gemini-2.5-flash";
-    "unspecified-low" = "google/gemini-2.5-flash";
-    "unspecified-high" = "google/gemini-2.5-pro";
-    writing = "google/gemini-2.5-flash";
+    "visual-engineering" = antigravityProModel;
+    ultrabrain = antigravityProModel;
+    deep = antigravityProModel;
+    artistry = antigravityProModel;
+    quick = antigravityFlashModel;
+    "unspecified-low" = antigravityFlashModel;
+    "unspecified-high" = antigravityProModel;
+    writing = antigravityFlashModel;
   };
 
   geminiCategoryVariants = {
@@ -244,7 +247,7 @@ let
 
   # Gemini profile: Google Gemini models for Gemini-native coding sessions.
   geminiOpencodeSettings = opencodeSettings // {
-    model = "google/gemini-2.5-pro";
+    model = antigravityProModel;
   };
 
   geminiOhMyOpencodeSettings = ohMyOpencodeSettings // {
