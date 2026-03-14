@@ -49,74 +49,25 @@ lib.mkIf cfg.codex.enable (
       notify-send -a "Codex" -i dialog-information "$summary" "$body" 2>/dev/null || true
     '';
     mcpToml = lib.concatStringsSep "\n" (
-      lib.mapAttrsToList
-        (
-          name: server:
-          let
-            isLocal = (server.type or "local") == "local";
-            argsStr = lib.concatMapStringsSep ", " (a: ''"${a}"'') (server.args or [ ]);
-            envSet = if (server.env or null) == null then { } else server.env;
-            envLines = lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: ''${k} = "${v}"'') envSet);
-            baseHeaders = if (server.headers or null) == null then { } else server.headers;
-            authHeaders =
-              if
-                builtins.elem name [
-                  "web-search-prime"
-                  "web-reader"
-                  "zread"
-                ]
-              then
-                {
-                  Authorization = "Bearer __ZAI_API_KEY_PLACEHOLDER__";
-                }
-              else
-                { };
-            headerLines = lib.concatStringsSep "\n" (
-              lib.mapAttrsToList (k: v: ''${k} = "${v}"'') (baseHeaders // authHeaders)
-            );
-          in
-          if isLocal then
-            ''
-              [mcp_servers.${name}]
-              command = "${server.command}"
-              args = [${argsStr}]
-              enabled = true
-            ''
-            + lib.optionalString (envSet != { }) ''
+      lib.mapAttrsToList (
+        name: server:
+        let
+          argsStr = lib.concatMapStringsSep ", " (a: ''"${a}"'') (server.args or [ ]);
+          envSet = if (server.env or null) == null then { } else server.env;
+          envLines = lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: ''${k} = "${v}"'') envSet);
+        in
+        ''
+          [mcp_servers.${name}]
+          command = "${server.command}"
+          args = [${argsStr}]
+          enabled = true
+        ''
+        + lib.optionalString (envSet != { }) ''
 
-              [mcp_servers.${name}.env]
-              ${envLines}
-            ''
-          else
-            ''
-              [mcp_servers.${name}]
-              url = "${server.url}"
-              enabled = true
-              required = false
-            ''
-            + lib.optionalString ((baseHeaders // authHeaders) != { }) ''
-
-              [mcp_servers.${name}.http_headers]
-              ${headerLines}
-            ''
-        )
-        (
-          lib.filterAttrs (
-            n: s:
-            s.enable
-            && (
-              (s.type or "local") == "local"
-              || (
-                (s.type or "local") == "remote"
-                && builtins.elem n [
-                  "web-search-prime"
-                  "web-reader"
-                  "zread"
-                ]
-              )
-            )
-          ) sharedMcpServers
-        )
+          [mcp_servers.${name}.env]
+          ${envLines}
+        ''
+      ) (lib.filterAttrs (_: s: s.enable && (s.type or "local") == "local") sharedMcpServers)
     );
     projectsToml = lib.concatMapStringsSep "\n" (path: ''
       [projects."${path}"]
