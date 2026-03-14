@@ -20,6 +20,7 @@
     environment.systemPackages = with pkgsStable; [
       nautilus
       nautilus-python
+      gnome-control-center # Provides org.gnome.Settings DBus app for Nautilus "Trash Settings"
       file-roller
       sushi # Quick Look-style file previewer
 
