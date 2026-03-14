@@ -12,7 +12,7 @@
     let
       wrap = if useMkForce then lib.mkForce else (x: x);
     in
-    lib.optionalAttrs (readWritePaths != [ ]) { inherit readWritePaths; }
+    lib.optionalAttrs (readWritePaths != [ ]) { ReadWritePaths = readWritePaths; }
     // {
       PrivateTmp = wrap true;
       ProtectHome = wrap protectHome;

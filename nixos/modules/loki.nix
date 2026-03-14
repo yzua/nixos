@@ -136,7 +136,6 @@ in
           MemoryHigh = "64M";
         }
         // mkOneshotHardening {
-          readWritePaths = [ "/var/lib/promtail" ];
           protectHome = true;
           useMkForce = true;
         };
