@@ -10,6 +10,7 @@
     libreoffice-qt6-fresh
     sqlitebrowser
     keepassxc
+    antigravity-fhs
 
     # Messaging
     signal-desktop
