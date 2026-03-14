@@ -54,8 +54,8 @@
       sockets.libvirtd.wantedBy = [ "sockets.target" ];
 
       # Disable libvirt-guests entirely — onBoot = "ignore" makes it pointless,
-      # and missing /var/lib/libvirt/libvirt-guests state file causes boot hangs.
-      services.libvirt-guests.wantedBy = lib.mkForce [ ];
+      # and its default shutdown handling can block poweroff for minutes.
+      services.libvirt-guests.enable = false;
     };
 
     # Only enable GPU containers on desktop (Optimus laptops can't reliably passthrough)
