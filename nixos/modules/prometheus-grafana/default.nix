@@ -138,14 +138,6 @@ in
             http_port = 3001;
           };
 
-          database = {
-            type = "sqlite3";
-            wal = true;
-            cache_mode = "private";
-            transaction_retries = 10;
-            query_retries = 5;
-          };
-
           security = {
             admin_user = "admin";
             admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
