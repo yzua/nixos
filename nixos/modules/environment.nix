@@ -39,5 +39,9 @@ in
 
     # System PATH with additional directories
     PATH = [ xdgBinHome ];
+
+    # SQLite performance and concurrency settings
+    SQLITE_BUSY_TIMEOUT = "10000";
+    SQLITE_RETRY_DELAY = "100";
   };
 }
