@@ -6,12 +6,12 @@ Top-level system boundary for host wiring. This directory only contains `modules
 
 ## Structure
 
-| Path | Role |
-|------|------|
-| `modules/` | Shared NixOS modules imported by every host |
-| `modules/default.nix` | System import hub (module aggregation order) |
+| Path                        | Role                                                   |
+| --------------------------- | ------------------------------------------------------ |
+| `modules/`                  | Shared NixOS modules imported by every host            |
+| `modules/default.nix`       | System import hub (module aggregation order)           |
 | `modules/host-defaults.nix` | Profile defaults (`desktop`/`laptop`) for `mySystem.*` |
-| `modules/validation.nix` | Cross-module assertions and forbidden combinations |
+| `modules/validation.nix`    | Cross-module assertions and forbidden combinations     |
 
 ---
 
@@ -47,6 +47,7 @@ Top-level system boundary for host wiring. This directory only contains `modules
 
 ```bash
 just modules
+just pkgs
 just lint
 just format
 just check

@@ -1,139 +1,80 @@
-# AI Agents Configuration
+# AI Agents Infrastructure
 
-Multi-agent orchestration for Claude Code, OpenCode, Codex CLI, and Gemini CLI. Uses a layered architecture: options → config values → settings builders → file generation → activation-time secret injection.
-
-**Option namespace**: `programs.aiAgents.*` (exception — only HM module with custom options).
+High-density orchestration for Claude Code, OpenCode, Codex CLI, and Gemini CLI. This module manages a specialized 10-agent fleet with dynamic provider switching and secure secret injection.
 
 ---
 
-## Architecture
+## OVERVIEW
 
+This module centralizes AI agent behavior across multiple CLI tools. It implements a layered configuration system that translates high-level Nix options into tool-specific JSON/TOML formats, enriched with lifecycle hooks and shared MCP capabilities.
+
+---
+
+## ARCHITECTURE
+
+The system follows a strict unidirectional flow:
+
+1. **Options** (`options.nix`): Defines the `programs.aiAgents.*` namespace.
+2. **Config Hub** (`config/`): Domain-specific values for models, prompts, and permissions.
+3. **Settings Builders** (`_settings-builders.nix`): Implements **Profile-Driven Polymorphism**.
+4. **MCP Transforms** (`_mcp-transforms.nix`): **Unified MCP Abstraction** converts shared server definitions into agent-specific schemas (Claude stdio vs OpenCode remote vs Gemini HTTP).
+5. **File Generation** (`files.nix`): Declares configuration files in XDG paths.
+6. **Activation Logic** (`activation.nix`): Handles late-stage secret injection, skill management, and state caching.
+
+### Profile-Driven Polymorphism
+
+The fleet is polymorphic. Switching the active profile (e.g., from `sonnet` to `glm`) re-maps every agent's model and variant (thinking level) across the entire fleet via `_settings-builders.nix`. This allows instant provider migration with zero configuration redundancy.
+
+---
+
+## FLEET CONFIG
+
+The specialized 10-agent fleet is defined in `config/agents.nix` using the custom agent type in `_oh-my-opencode-agent-type.nix`.
+
+| Role                | Core Purpose                                                                   |
+| :------------------ | :----------------------------------------------------------------------------- |
+| `sisyphus`          | **Focused Executor**. Delegates tasks, verifies outputs, and handles shipping. |
+| `oracle`            | **Consultant**. Architecture review and deep debugging without write access.   |
+| `librarian`         | **Researcher**. Manages external documentation and OSS pattern searches.       |
+| `explore`           | **Code Map Navigator**. Fast contextual search and pattern extraction.         |
+| `multimodal-looker` | **Visual Analyst**. Interprets PDFs, UI screenshots, and diagrams.             |
+| `prometheus`        | **Strategist**. High-thinking planning with interactive Socratic interviewing. |
+| `metis`             | **Analyst**. Pre-planning requirement discovery and risk assessment.           |
+| `momus`             | **Critic**. Plan reviewer that validates clarity and execution safety.         |
+| `atlas`             | **Coordinator**. Manages multi-agent execution and dependency tracking.        |
+| `hephaestus`        | **Deep Worker**. Long-running autonomous tasks and heavy refactors.            |
+
+---
+
+## SECRETS
+
+Secure secret injection is handled during the Home Manager activation phase to prevent sensitive keys from entering the Nix store.
+
+1. **Placeholders**: Config files are written with unique placeholders (e.g., `__GITHUB_TOKEN_PLACEHOLDER__`).
+2. **DAG Patching**: The `patchAiAgentSecrets` script runs as a DAG entry after `writeBoundary`.
+3. **Injection**: It uses `jq` for JSON files and `sed` for TOML/Markdown, reading keys directly from `/run/secrets/` or `gh` CLI and overwriting the placeholders in-place.
+
+---
+
+## CONVENTIONS
+
+### Unified MCP Abstraction
+
+Never define MCP servers per-agent. Define them once in `programs.aiAgents.mcpServers`. The `_mcp-transforms.nix` logic automatically generates the correct transport configuration for every supported agent.
+
+### Complexity Hotspots (WARNING)
+
+This module contains significant **embedded Bash logic** that bypasses standard Nix abstraction for performance and compatibility:
+
+- **`_claude-hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
+- **`activation.nix`**: Complex sequential skill installation logic with state-caching to prevent redundant network calls.
+
+### Validation Pipeline
+
+```bash
+just modules   # Validate import tree
+just lint      # Run statix/deadnix
+just format    # nixfmt-tree
+just check     # Full flake evaluation
+just home      # Apply configuration
 ```
-options.nix (defines programs.aiAgents.*)
-    ↓
-config/ (split configuration values)
-    ├── instructions.nix   # Global rules + skills
-    ├── mcp-servers.nix    # Shared MCP definitions (local + remote)
-    ├── permissions.nix    # Claude permissions and lifecycle hooks
-    ├── models.nix         # Provider registries (OpenCode, Codex, Gemini)
-    └── agents.nix         # 10 oh-my-opencode agents + categories + concurrency
-    ↓
-_settings-builders.nix (generates 5 profile variants: default, glm, gemini, gpt, sonnet)
-_mcp-transforms.nix (converts shared MCP defs → agent-specific formats)
-    ↓
-files.nix (writes JSON/TOML/Markdown config files to ~/.config/*)
-    ↓
-activation.nix (injects secrets from sops, installs plugins)
-    ↓
-services.nix (zsh aliases, systemd timers, packages)
-```
-
----
-
-## File Map
-
-| File | Purpose |
-|------|---------|
-| `options.nix` | All `programs.aiAgents.*` option definitions |
-| `activation.nix` | Secret patching (Z.AI key, GitHub token), plugin installs |
-| `files.nix` | `home.file` + `xdg.configFile` declarations for all agents |
-| `services.nix` | Packages, zsh aliases, systemd log-cleanup timers |
-| `log-analyzer.nix` | CLI: `ai-agent-analyze stats\|errors\|sessions\|search\|tail\|report` |
-| `config.nix` | Pass-through to `config/` subdirectory |
-| `config/instructions.nix` | Global instructions + skill installations |
-| `config/mcp-servers.nix` | MCP server definitions + logging config |
-| `config/permissions.nix` | Claude permissions, hooks, and settings |
-| `config/models.nix` | Model/provider registries |
-| `config/agents.nix` | Oh-My-OpenCode agent definitions |
-
-### Helper Files (prefixed `_`, NOT in `default.nix`)
-
-| File | Purpose |
-|------|---------|
-| `_settings-builders.nix` | Per-agent settings with profile variants |
-| `_mcp-transforms.nix` | Shared MCP → Claude/OpenCode/Gemini format transforms |
-| `_opencode-profiles.nix` | Profile names and config paths |
-| `_oh-my-opencode-agent-type.nix` | Agent type NixOS module option definition |
-| `_workflow-prompts.nix` | Workflow prompt templates |
-| `config/_claude-hooks.nix` | Claude Code lifecycle hook definitions |
-| `config/_claude-permission-rules.nix` | Claude Code permission rule definitions |
-
----
-
-## Supported Agents
-
-| Agent | Model (configured) | Config Location | Format |
-|-------|----------------|-----------------|--------|
-| Claude Code | `opus` alias (`programs.aiAgents.claude.model`) | `~/.claude/settings.json`, `~/.mcp.json`, `~/.claude/CLAUDE.md` | JSON + Markdown |
-| OpenCode | `anthropic/claude-opus-4-6` | `~/.config/opencode*/opencode.json` | JSON |
-| Codex CLI | `gpt-5.3-codex` | `~/.codex/config.toml` | TOML |
-| Gemini CLI | Gemini aliases configured in `config/models.nix` | `~/.gemini/settings.json` | JSON |
-
-### Profile Variants (OpenCode)
-
-5 profiles swap the entire agent fleet between providers:
-
-| Profile | Binary | Primary Model |
-|---------|--------|---------------|
-| `opencode` | `opencode` | Anthropic Opus |
-| `opencode-glm` | `opencode-glm` | Z.AI GLM-5 |
-| `opencode-gemini` | `opencode-gemini` | Google Antigravity |
-| `opencode-gpt` | `opencode-gpt` | OpenAI GPT-5.3-Codex |
-| `opencode-sonnet` | `opencode-sonnet` | Anthropic Sonnet |
-
-### Oh-My-OpenCode Agents (10)
-
-| Agent | Model | Role |
-|-------|-------|------|
-| `sisyphus` | Opus | Primary orchestrator — delegates, verifies, ships |
-| `oracle` | Opus | Read-only consultant — architecture, debugging |
-| `librarian` | Sonnet | External reference search — docs, OSS |
-| `explore` | Haiku | Fast contextual grep — codebase patterns |
-| `multimodal-looker` | Sonnet | Visual content analysis — PDFs, images |
-| `prometheus` | Opus (max thinking) | Strategic planner with interview mode |
-| `metis` | Opus | Pre-planning analysis — hidden requirements |
-| `momus` | Opus | Plan reviewer — validates clarity |
-| `atlas` | Sonnet | Orchestrator/conductor — coordinates execution |
-| `hephaestus` | GPT-5.3-Codex | Autonomous deep worker — long-running tasks |
-
----
-
-## Unique Patterns
-
-### Profile Variant System (`_settings-builders.nix`)
-
-Generates 5 OpenCode configs at eval time. Each profile overrides model + agent models + category models. Switching provider = changing one profile, zero duplication.
-
-### Activation-Time Secret Injection
-
-Secrets from sops-nix injected **after** config files are written via `jq` (JSON) and `sed` (TOML). Secrets never touch disk unencrypted. DAG order: `writeBoundary` → `patchAiAgentSecrets` → `installAgentSkills` → agent-specific setup.
-
-### Lifecycle Hooks (Claude Code)
-
-Lifecycle hooks are generated in `config/permissions.nix` for multiple hook groups:
-- **PreToolUse**: Destructive command detection, pre-commit lint, dev server blocking
-- **PostToolUse**: Auto-format per language (biome, rustfmt, ruff, prettier, nixfmt), TypeScript checking
-- **SessionStart/End**: Session state persistence
-- **PreCompact**: Compaction state saving
-
----
-
-## Adding an MCP Server
-
-1. Define in `config/mcp-servers.nix` under `programs.aiAgents.mcpServers`
-2. Set `type = "local"` (with `command`/`args`) or `type = "remote"` (with `url`)
-3. MCP transforms in `_mcp-transforms.nix` auto-convert to each agent's format
-4. Run `just home`
-
-## Adding a Lifecycle Hook
-
-1. Edit `config/permissions.nix` under the appropriate hook type
-2. Add matcher pattern and command array
-3. Run `just home`
-
-## Adding an Agent (Oh-My-OpenCode)
-
-1. Define in `config/agents.nix` under `programs.aiAgents.opencode.ohMyOpencode.agents`
-2. Set model, description, and optional system prompt
-3. Add per-profile model overrides in `_settings-builders.nix` if needed
-4. Run `just home`

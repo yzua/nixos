@@ -27,17 +27,17 @@ To start a **separate named session** instead of the default `main`, run manuall
 
 Zellij is modal, like Vim. The current mode is shown in the bottom-left of the status bar (colored label). Most of your time is spent in **Normal** mode.
 
-| Mode | Color | How to Enter | What It Does |
-|------|-------|-------------|--------------|
-| **Normal** | Gray | `Esc` from any mode | Default. All Alt shortcuts work here |
-| **Locked** | Yellow | `Ctrl g` | Passes all keys to the running program |
-| **Scroll** | Green | `Ctrl s` | Navigate scrollback with Vim keys |
-| **Search** | Purple | `/` or `s` from Scroll mode | Search through scrollback |
-| **Session** | Red | `Ctrl o` | Session management (detach) |
-| **Resize** | Orange | (default bindings) | Resize panes |
-| **Pane** | Green | (default bindings) | Pane management |
-| **Tab** | Blue | (default bindings) | Tab management |
-| **Move** | Gold | (default bindings) | Move panes around |
+| Mode        | Color  | How to Enter                | What It Does                           |
+| ----------- | ------ | --------------------------- | -------------------------------------- |
+| **Normal**  | Gray   | `Esc` from any mode         | Default. All Alt shortcuts work here   |
+| **Locked**  | Yellow | `Ctrl g`                    | Passes all keys to the running program |
+| **Scroll**  | Green  | `Ctrl s`                    | Navigate scrollback with Vim keys      |
+| **Search**  | Purple | `/` or `s` from Scroll mode | Search through scrollback              |
+| **Session** | Red    | `Ctrl o`                    | Session management (detach/quit)       |
+| **Resize**  | Orange | (default bindings)          | Resize panes                           |
+| **Pane**    | Green  | (default bindings)          | Pane management                        |
+| **Tab**     | Blue   | (default bindings)          | Tab management                         |
+| **Move**    | Gold   | (default bindings)          | Move panes around                      |
 
 **Auto-lock**: The `zellij-autolock` plugin automatically switches to Locked mode when you're inside `nvim`, `vim`, `git`, `fzf`, `zoxide`, `atuin`, or `lazygit`. It switches back when you exit.
 
@@ -47,29 +47,29 @@ Zellij is modal, like Vim. The current mode is shown in the bottom-left of the s
 
 Panes split your terminal screen. You can have as many as you want in any tab.
 
-| Key | Action |
-|-----|--------|
-| `Alt n` | New pane (auto-placed) |
-| `Alt s` | Split horizontally (new pane below) |
-| `Alt v` | Split vertically (new pane right) |
-| `Alt x` | Close focused pane |
+| Key     | Action                                    |
+| ------- | ----------------------------------------- |
+| `Alt n` | New pane (auto-placed)                    |
+| `Alt s` | Split horizontally (new pane below)       |
+| `Alt v` | Split vertically (new pane right)         |
+| `Alt x` | Close focused pane                        |
 | `Alt z` | Toggle fullscreen (zoom) for focused pane |
-| `Alt w` | Toggle floating panes |
+| `Alt w` | Toggle floating panes                     |
 | `Alt f` | Toggle pane between floating and embedded |
 
 ### Navigating Between Panes
 
-| Key | Action |
-|-----|--------|
+| Key     | Action                                      |
+| ------- | ------------------------------------------- |
 | `Alt h` | Focus left (or previous tab at screen edge) |
-| `Alt j` | Focus down |
-| `Alt k` | Focus up |
-| `Alt l` | Focus right (or next tab at screen edge) |
+| `Alt j` | Focus down                                  |
+| `Alt k` | Focus up                                    |
+| `Alt l` | Focus right (or next tab at screen edge)    |
 
 ### Resizing Panes
 
-| Key | Action |
-|-----|--------|
+| Key     | Action             |
+| ------- | ------------------ |
 | `Alt =` | Increase pane size |
 | `Alt -` | Decrease pane size |
 
@@ -79,14 +79,14 @@ Panes split your terminal screen. You can have as many as you want in any tab.
 
 Tabs group sets of panes. Each tab is a separate workspace.
 
-| Key | Action |
-|-----|--------|
-| `Alt Enter` | New tab |
-| `Alt q` | Close current tab |
-| `Alt 1`-`Alt 9` | Jump to tab by number |
-| `Alt 0` | Toggle between last two tabs |
-| `Alt .` | Move tab right |
-| `Alt ,` | Move tab left |
+| Key             | Action                       |
+| --------------- | ---------------------------- |
+| `Alt Enter`     | New tab                      |
+| `Alt q`         | Close current tab            |
+| `Alt 1`-`Alt 9` | Jump to tab by number        |
+| `Alt 0`         | Toggle between last two tabs |
+| `Alt .`         | Move tab right               |
+| `Alt ,`         | Move tab left                |
 
 ---
 
@@ -94,12 +94,12 @@ Tabs group sets of panes. Each tab is a separate workspace.
 
 Sessions persist your entire workspace. If your terminal crashes or you close the window, everything survives.
 
-| Key | Action |
-|-----|--------|
-| `Ctrl o` | Enter Session mode |
-| `d` (in Session mode) | Detach from session |
-| `Esc` (in Session mode) | Back to Normal |
-| `Alt o` | Open session manager (floating plugin) |
+| Key                     | Action                                 |
+| ----------------------- | -------------------------------------- |
+| `Ctrl o`                | Enter Session mode                     |
+| `d` (in Session mode)   | Detach from session                    |
+| `Esc` (in Session mode) | Back to Normal                         |
+| `Alt o`                 | Open session manager (floating plugin) |
 
 Sessions auto-serialize to disk (`session_serialization = true`), so they survive reboots. Use `zellij attach` to reconnect.
 
@@ -111,24 +111,24 @@ Enter scroll mode to navigate through terminal output. This is where you browse 
 
 ### Entering Scroll Mode
 
-| Key | Action |
-|-----|--------|
+| Key      | Action                                          |
+| -------- | ----------------------------------------------- |
 | `Ctrl s` | Enter Scroll mode (from any mode except Locked) |
 
 ### Navigating Scrollback (in Scroll Mode)
 
-| Key | Action |
-|-----|--------|
-| `j` / `Down` | Scroll down one line |
-| `k` / `Up` | Scroll up one line |
-| `d` / `Ctrl d` | Half page down |
-| `u` / `Ctrl u` | Half page up |
-| `Ctrl f` / `PageDown` | Full page down |
-| `Ctrl b` / `PageUp` | Full page up |
-| `g` | Scroll to top |
-| `G` | Scroll to bottom |
-| `e` | Edit scrollback in Neovim |
-| `Esc` / `q` | Exit scroll mode |
+| Key                   | Action                    |
+| --------------------- | ------------------------- |
+| `j` / `Down`          | Scroll down one line      |
+| `k` / `Up`            | Scroll up one line        |
+| `d` / `Ctrl d`        | Half page down            |
+| `u` / `Ctrl u`        | Half page up              |
+| `Ctrl f` / `PageDown` | Full page down            |
+| `Ctrl b` / `PageUp`   | Full page up              |
+| `g`                   | Scroll to top             |
+| `G`                   | Scroll to bottom          |
+| `e`                   | Edit scrollback in Neovim |
+| `Esc` / `q`           | Exit scroll mode          |
 
 ### Copying Text
 
@@ -144,17 +144,17 @@ The scrollback buffer holds **50,000 lines** per pane.
 
 From Scroll mode, press `/` or `s` to enter search:
 
-| Key | Action |
-|-----|--------|
-| `/` or `s` (in Scroll) | Start search (type your query, press Enter) |
-| `Esc` (while typing) | Cancel search, back to Scroll |
-| `n` (in Search) | Next match (downward) |
-| `N` (in Search) | Previous match (upward) |
-| `c` (in Search) | Toggle case sensitivity |
-| `w` (in Search) | Toggle wrap around |
-| `o` (in Search) | Toggle whole word matching |
-| `j`/`k` (in Search) | Scroll while viewing results |
-| `Esc` / `q` (in Search) | Exit search |
+| Key                     | Action                                      |
+| ----------------------- | ------------------------------------------- |
+| `/` or `s` (in Scroll)  | Start search (type your query, press Enter) |
+| `Esc` (while typing)    | Cancel search, back to Scroll               |
+| `n` (in Search)         | Next match (downward)                       |
+| `N` (in Search)         | Previous match (upward)                     |
+| `c` (in Search)         | Toggle case sensitivity                     |
+| `w` (in Search)         | Toggle wrap around                          |
+| `o` (in Search)         | Toggle whole word matching                  |
+| `j`/`k` (in Search)     | Scroll while viewing results                |
+| `Esc` / `q` (in Search) | Exit search                                 |
 
 ---
 
@@ -208,10 +208,10 @@ Two tabs for system monitoring:
 
 Within any tab, you can cycle through different pane arrangements:
 
-| Key | Action |
-|-----|--------|
+| Key     | Action                  |
+| ------- | ----------------------- |
 | `Alt [` | Previous layout variant |
-| `Alt ]` | Next layout variant |
+| `Alt ]` | Next layout variant     |
 
 ---
 
@@ -227,40 +227,40 @@ Automatically switches to Locked mode when a trigger program is detected (nvim, 
 
 ### monocle (Fuzzy Finder)
 
-| Key | Action |
-|-----|--------|
+| Key     | Action                  |
+| ------- | ----------------------- |
 | `Alt p` | Open monocle (floating) |
 
 Fuzzy-find and open files directly from Zellij. Like a built-in fzf for file navigation.
 
 ### room (Session/Pane Switcher)
 
-| Key | Action |
-|-----|--------|
+| Key     | Action               |
+| ------- | -------------------- |
 | `Alt r` | Open room (floating) |
 
 Fuzzy-find and switch between panes and tabs. Case-insensitive search.
 
 ### harpoon (Pane Bookmarks)
 
-| Key | Action |
-|-----|--------|
+| Key     | Action                  |
+| ------- | ----------------------- |
 | `Alt b` | Open harpoon (floating) |
 
 Bookmark panes and quickly jump between them. Like Neovim's harpoon plugin but for Zellij panes.
 
 ### zellij-forgot (Keybinding Helper)
 
-| Key | Action |
-|-----|--------|
+| Key     | Action                        |
+| ------- | ----------------------------- |
 | `Alt /` | Open zellij-forgot (floating) |
 
 Forgot a keybinding? This plugin shows all configured Zellij keybindings in a searchable floating panel. It auto-loads your actual bindings.
 
 ### multitask (Multi-Pane Command Runner)
 
-| Key | Action |
-|-----|--------|
+| Key     | Action                    |
+| ------- | ------------------------- |
 | `Alt m` | Open multitask (embedded) |
 
 Run the same command across multiple panes simultaneously.
@@ -269,24 +269,24 @@ Run the same command across multiple panes simultaneously.
 
 ## Miscellaneous
 
-| Key | Action |
-|-----|--------|
-| `Alt e` | Open scrollback in Neovim (from any mode) |
-| `Ctrl g` | Toggle Locked mode |
+| Key      | Action                                    |
+| -------- | ----------------------------------------- |
+| `Alt e`  | Open scrollback in Neovim (from any mode) |
+| `Ctrl g` | Toggle Locked mode                        |
 
 ### Settings Summary
 
-| Setting | Value |
-|---------|-------|
-| Default shell | zsh |
-| Pane frames | Off (borderless) |
-| Mouse | Enabled |
-| Copy | `wl-copy` (Wayland), copy on select |
-| Scrollback | 50,000 lines |
-| Session persistence | Enabled (survives crashes) |
-| Force close behavior | Detach (not quit) |
-| Auto-layout | Enabled |
-| Scrollback editor | Neovim |
+| Setting              | Value                               |
+| -------------------- | ----------------------------------- |
+| Default shell        | zsh                                 |
+| Pane frames          | Off (borderless)                    |
+| Mouse                | Enabled                             |
+| Copy                 | `wl-copy` (Wayland), copy on select |
+| Scrollback           | 50,000 lines                        |
+| Session persistence  | Enabled (survives crashes)          |
+| Force close behavior | Quit (session ends)                 |
+| Auto-layout          | Enabled                             |
+| Scrollback editor    | Neovim                              |
 
 ---
 
@@ -322,7 +322,7 @@ Sessions auto-persist. Run `zellij attach` to reconnect. Run `zellij list-sessio
 
 ### "I want to detach and come back later"
 
-Press `Ctrl o` then `d` to detach. Or just close the terminal — `on_force_close` is set to "detach", so the session survives.
+Press `Ctrl o` then `d` to detach. If you close the terminal window, the session will end because `on_force_close` is set to "quit". To keep sessions alive across window closes, use the detach command (`Ctrl o` then `d`) explicitly before closing.
 
 ---
 
@@ -330,46 +330,46 @@ Press `Ctrl o` then `d` to detach. Or just close the terminal — `on_force_clos
 
 ### Global Shortcuts (work in all modes except Locked)
 
-| Key | Action |
-|-----|--------|
-| `Alt h/j/k/l` | Navigate panes (Vim-style) |
-| `Alt 1-9` | Jump to tab |
-| `Alt 0` | Toggle last tab |
-| `Alt n` | New pane |
-| `Alt s` | Split below |
-| `Alt v` | Split right |
-| `Alt x` | Close pane |
-| `Alt z` | Zoom pane |
-| `Alt w` | Toggle floating panes |
-| `Alt f` | Float/embed toggle |
-| `Alt Enter` | New tab |
-| `Alt q` | Close tab |
-| `Alt ,` / `Alt .` | Move tab left/right |
-| `Alt =` / `Alt -` | Resize bigger/smaller |
-| `Alt [` / `Alt ]` | Cycle layouts |
-| `Alt e` | Edit scrollback in Neovim |
-| `Ctrl s` | Enter Scroll mode |
-| `Ctrl g` | Toggle Locked mode |
+| Key               | Action                     |
+| ----------------- | -------------------------- |
+| `Alt h/j/k/l`     | Navigate panes (Vim-style) |
+| `Alt 1-9`         | Jump to tab                |
+| `Alt 0`           | Toggle last tab            |
+| `Alt n`           | New pane                   |
+| `Alt s`           | Split below                |
+| `Alt v`           | Split right                |
+| `Alt x`           | Close pane                 |
+| `Alt z`           | Zoom pane                  |
+| `Alt w`           | Toggle floating panes      |
+| `Alt f`           | Float/embed toggle         |
+| `Alt Enter`       | New tab                    |
+| `Alt q`           | Close tab                  |
+| `Alt ,` / `Alt .` | Move tab left/right        |
+| `Alt =` / `Alt -` | Resize bigger/smaller      |
+| `Alt [` / `Alt ]` | Cycle layouts              |
+| `Alt e`           | Edit scrollback in Neovim  |
+| `Ctrl s`          | Enter Scroll mode          |
+| `Ctrl g`          | Toggle Locked mode         |
 
 ### Plugin Shortcuts
 
-| Key | Plugin |
-|-----|--------|
-| `Alt o` | Session manager |
-| `Alt p` | Monocle (file finder) |
-| `Alt r` | Room (pane/tab switcher) |
-| `Alt b` | Harpoon (bookmarks) |
-| `Alt /` | Forgot (keybinding helper) |
+| Key     | Plugin                          |
+| ------- | ------------------------------- |
+| `Alt o` | Session manager                 |
+| `Alt p` | Monocle (file finder)           |
+| `Alt r` | Room (pane/tab switcher)        |
+| `Alt b` | Harpoon (bookmarks)             |
+| `Alt /` | Forgot (keybinding helper)      |
 | `Alt m` | Multitask (multi-pane commands) |
 
 ### Scroll Mode (`Ctrl s`)
 
-| Key | Action |
-|-----|--------|
-| `j`/`k` | Line up/down |
-| `d`/`u` | Half page down/up |
+| Key               | Action            |
+| ----------------- | ----------------- |
+| `j`/`k`           | Line up/down      |
+| `d`/`u`           | Half page down/up |
 | `Ctrl f`/`Ctrl b` | Full page down/up |
-| `g`/`G` | Top/bottom |
-| `/` | Search |
-| `e` | Edit in Neovim |
-| `Esc`/`q` | Exit |
+| `g`/`G`           | Top/bottom        |
+| `/`               | Search            |
+| `e`               | Edit in Neovim    |
+| `Esc`/`q`         | Exit              |

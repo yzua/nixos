@@ -26,7 +26,7 @@ terminal/
 │   ├── functions.nix # Custom zsh functions (40+)
 │   └── local-vars.nix # Local shell variables
 └── tools/           # CLI tools — one .nix file per tool
-    ├── default.nix  # Import hub (15 tools)
+    ├── default.nix  # Import hub (16 tools)
     ├── atuin.nix    # Shell history (fuzzy, secrets filter, sync disabled)
     ├── bat.nix      # Syntax-highlighting cat
     ├── btop.nix     # System monitor (GPU support)
@@ -52,13 +52,13 @@ terminal/
 
 ## Key Components
 
-### Zsh (`zsh/`, 5 files)
+### Zsh (`zsh/`, 4 files)
 
 - **Framework**: Oh My Zsh with oxide theme
 - **Plugins**: sudo, extract, copypath, copyfile, bgnotify, fzf-tab
 - **Completions**: Carapace (not OMZ completions)
 - **Privacy history**: 20+ patterns filtered (tokens, passwords, API keys, SSH, sops commands)
-- **Custom functions**: `aip` (multi-agent Zellij panes), agent wrappers (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`)
+- **Custom functions**: `aip` (multi-agent Zellij panes), agent wrappers (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_openrouter`, `opencode_sonnet`, `opencode_zen`)
 - **Agent wrappers**: Load secrets from sops at runtime, launch agents with correct env vars
 
 ### Zellij (`zellij/`, 4 files)
@@ -69,6 +69,7 @@ terminal/
 - **Integration**: Auto-attach on terminal launch, `zjstatus` bar with git/mode/tabs
 
 ### Git (`tools/git/`, 3 files)
+
 - **Identity**: `constants.user.*` (name, email, signingKey, githubEmail)
 - **Conditional email**: GitHub noreply email for github.com repos via `includeIf`
 - **Signing**: GPG commit/tag signing enabled
@@ -84,6 +85,19 @@ terminal/
 - Tools reference `constants` for theming/identity (git, fzf, yazi, starship)
 - Gruvbox colors applied via Stylix auto-theming or manual `constants.color.*`
 - Shell aliases defined per-tool; aggregated in zsh via `shellAliases`
+
+---
+
+## Validation
+
+```bash
+just modules
+just pkgs
+just lint
+just format
+just check
+just home
+```
 
 ---
 

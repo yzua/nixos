@@ -8,11 +8,11 @@ Ghostty is a GPU-accelerated terminal emulator with native Wayland support, imag
 
 From Niri:
 
-| Key | What It Does |
-|-----|-------------|
-| `Super+Return` | Open Ghostty with Zellij |
-| `Super+Shift+Return` | Open Ghostty without Zellij |
-| `Super+T` | Open scratchpad terminal (floating dropdown) |
+| Key                  | What It Does                                 |
+| -------------------- | -------------------------------------------- |
+| `Super+Return`       | Open Ghostty with Zellij                     |
+| `Super+Shift+Return` | Open Ghostty without Zellij                  |
+| `Super+T`            | Open scratchpad terminal (floating dropdown) |
 
 From command line:
 
@@ -28,39 +28,39 @@ ghostty --class=scratchpad # Launch with custom app-id (for window rules)
 
 ### Copy and Paste
 
-| Key | What It Does |
-|-----|-------------|
-| `Ctrl+Shift+C` | Copy to clipboard |
+| Key            | What It Does         |
+| -------------- | -------------------- |
+| `Ctrl+Shift+C` | Copy to clipboard    |
 | `Ctrl+Shift+V` | Paste from clipboard |
 
 Text is also automatically copied to clipboard when you select it with the mouse (`copy-on-select` is enabled).
 
 ### Font Size
 
-| Key | What It Does |
-|-----|-------------|
-| `Ctrl++` | Increase font size |
-| `Ctrl+-` | Decrease font size |
+| Key      | What It Does               |
+| -------- | -------------------------- |
+| `Ctrl++` | Increase font size         |
+| `Ctrl+-` | Decrease font size         |
 | `Ctrl+0` | Reset font size to default |
 
 ### Scrolling
 
-| Key | What It Does |
-|-----|-------------|
-| `Shift+PageUp` | Scroll up one page |
-| `Shift+PageDown` | Scroll down one page |
-| `Shift+Home` | Scroll to top of buffer |
-| `Shift+End` | Scroll to bottom of buffer |
+| Key              | What It Does               |
+| ---------------- | -------------------------- |
+| `Shift+PageUp`   | Scroll up one page         |
+| `Shift+PageDown` | Scroll down one page       |
+| `Shift+Home`     | Scroll to top of buffer    |
+| `Shift+End`      | Scroll to bottom of buffer |
 
 You can also scroll with the mouse wheel.
 
 ### Other
 
-| Key | What It Does |
-|-----|-------------|
-| `Ctrl+Shift+N` | New window |
-| `Ctrl+L` | Clear screen (sends Ctrl+L to shell) |
-| `Ctrl+Shift+I` | Toggle inspector (for debugging) |
+| Key            | What It Does                         |
+| -------------- | ------------------------------------ |
+| `Ctrl+Shift+N` | New window                           |
+| `Ctrl+L`       | Clear screen (sends Ctrl+L to shell) |
+| `Ctrl+Shift+I` | Toggle inspector (for debugging)     |
 
 ### URLs
 
@@ -73,24 +73,24 @@ You can also scroll with the mouse wheel.
 
 Your Ghostty setup includes:
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| Font | JetBrainsMono Nerd Font | Ligatures, icons, code readability |
-| Font size | System default (from constants) | Consistent with other apps |
-| Font thicken | Enabled | Bolder strokes for readability |
-| Line height | +10% | Slightly taller lines for readability |
-| Theme | Gruvbox Dark | Managed by Stylix for consistency |
-| Cursor | Block, blinking, yellow | Gruvbox yellow for visibility |
-| Scrollback | 50,000 lines | Large buffer for log viewing |
-| Window padding | 8px | Clean spacing |
-| Window decorations | Off | Niri handles decorations |
-| Copy on select | Enabled | Select text to copy automatically |
-| Clipboard paste protection | Enabled | Warns about suspicious pastes |
-| Selection highlight | Inverted fg/bg | Clear visibility when selecting text |
-| Bold is bright | Disabled | Bold text stays same color (cleaner look) |
-| GTK tabs | Hidden | Zellij handles multiplexing |
-| VSync | Enabled | Smooth scrolling on Wayland |
-| Auto-update | Off | Managed by Nix |
+| Setting                    | Value                           | Why                                       |
+| -------------------------- | ------------------------------- | ----------------------------------------- |
+| Font                       | JetBrainsMono Nerd Font         | Ligatures, icons, code readability        |
+| Font size                  | System default (from constants) | Consistent with other apps                |
+| Font thicken               | Enabled                         | Bolder strokes for readability            |
+| Line height                | 0%                              | Default system spacing                    |
+| Theme                      | Gruvbox Dark                    | Managed by Stylix for consistency         |
+| Cursor                     | Block, blinking, yellow         | Gruvbox yellow for visibility             |
+| Scrollback                 | 50,000 lines                    | Large buffer for log viewing              |
+| Window padding             | 8px                             | Clean spacing                             |
+| Window decorations         | Off                             | Niri handles decorations                  |
+| Copy on select             | Enabled                         | Select text to copy automatically         |
+| Clipboard paste protection | Enabled                         | Warns about suspicious pastes             |
+| Selection highlight        | Inverted fg/bg                  | Clear visibility when selecting text      |
+| Bold is bright             | Disabled                        | Bold text stays same color (cleaner look) |
+| GTK tabs                   | Hidden                          | Zellij handles multiplexing               |
+| VSync                      | Enabled                         | Smooth scrolling on Wayland               |
+| Auto-update                | Off                             | Managed by Nix                            |
 
 ---
 
@@ -98,11 +98,11 @@ Your Ghostty setup includes:
 
 Ghostty has built-in shell integration for Zsh with these features:
 
-| Feature | What It Does |
-|---------|-------------|
+| Feature         | What It Does                                   |
+| --------------- | ---------------------------------------------- |
 | Cursor tracking | Shell knows cursor position for better prompts |
-| Sudo detection | Automatic handling of sudo prompts |
-| Title updates | Terminal title shows current command/directory |
+| Sudo detection  | Automatic handling of sudo prompts             |
+| Title updates   | Terminal title shows current command/directory |
 
 Shell integration is automatically injected — no manual setup needed.
 
@@ -110,12 +110,12 @@ Shell integration is automatically injected — no manual setup needed.
 
 ## Mouse Features
 
-| Action | What It Does |
-|--------|-------------|
-| Select text | Copies to clipboard automatically |
-| Ctrl+Click URL | Opens URL in browser |
-| Scroll wheel | Scroll through terminal output |
-| Mouse hidden while typing | Cleaner visual experience |
+| Action                    | What It Does                      |
+| ------------------------- | --------------------------------- |
+| Select text               | Copies to clipboard automatically |
+| Ctrl+Click URL            | Opens URL in browser              |
+| Scroll wheel              | Scroll through terminal output    |
+| Mouse hidden while typing | Cleaner visual experience         |
 
 ---
 
@@ -146,8 +146,8 @@ Apps like `yazi` (file manager) can show image previews directly in Ghostty.
 
 ## Configuration File
 
-| File | What It Controls |
-|------|-----------------|
+| File                                        | What It Controls                         |
+| ------------------------------------------- | ---------------------------------------- |
 | `home-manager/modules/terminal/ghostty.nix` | All Ghostty settings, keybindings, theme |
 
 To apply changes after editing: `just home` (rebuilds Home Manager configuration).
@@ -156,13 +156,13 @@ To apply changes after editing: `just home` (rebuilds Home Manager configuration
 
 ## Quick Reference
 
-| Key | Action |
-|-----|--------|
-| `Ctrl+Shift+C` | Copy |
-| `Ctrl+Shift+V` | Paste |
-| `Ctrl++` / `Ctrl+-` | Font size up/down |
-| `Ctrl+0` | Reset font size |
-| `Shift+PageUp/Down` | Scroll page |
-| `Shift+Home/End` | Scroll to top/bottom |
-| `Ctrl+Shift+N` | New window |
-| `Ctrl+Click` | Open URL |
+| Key                 | Action               |
+| ------------------- | -------------------- |
+| `Ctrl+Shift+C`      | Copy                 |
+| `Ctrl+Shift+V`      | Paste                |
+| `Ctrl++` / `Ctrl+-` | Font size up/down    |
+| `Ctrl+0`            | Reset font size      |
+| `Shift+PageUp/Down` | Scroll page          |
+| `Shift+Home/End`    | Scroll to top/bottom |
+| `Ctrl+Shift+N`      | New window           |
+| `Ctrl+Click`        | Open URL             |

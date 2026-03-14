@@ -7,15 +7,15 @@ This subtree is report-focused: collect metrics, format sections, and test colle
 
 ## Structure
 
-| File | Purpose |
-|------|---------|
-| `report/system-report.sh` | Main entrypoint (`errors`, `full`, `view`, `view-errors`) |
-| `report/report-collectors.sh` | Compatibility shim sourcing collector modules |
-| `report/report-collectors-core.sh` | Core collectors (systemd errors/timers, traffic, builds, AI logs) |
-| `report/report-collectors-observability.sh` | Netdata/Loki/Scrutiny/resource collectors |
-| `report/report-collectors-security.sh` | Security collectors (fail2ban, Lynis, OpenSnitch, unit hardening) |
-| `report/report-helpers.sh` | Shared helpers (`section`, `safe_cmd`, table output, status labels) |
-| `report/report-collectors-test.sh` | Focused tests for helpers/collectors |
+| File                                        | Purpose                                                             |
+| ------------------------------------------- | ------------------------------------------------------------------- |
+| `report/system-report.sh`                   | Main entrypoint (`errors`, `full`, `view`, `view-errors`)           |
+| `report/report-collectors.sh`               | Compatibility shim sourcing collector modules                       |
+| `report/report-collectors-core.sh`          | Core collectors (systemd errors/timers, traffic, builds, AI logs)   |
+| `report/report-collectors-observability.sh` | Netdata/Loki/Scrutiny/resource collectors                           |
+| `report/report-collectors-security.sh`      | Security collectors (fail2ban, Lynis, OpenSnitch, unit hardening)   |
+| `report/report-helpers.sh`                  | Shared helpers (`section`, `safe_cmd`, table output, status labels) |
+| `report/report-collectors-test.sh`          | Focused tests for helpers/collectors                                |
 
 ---
 
@@ -49,6 +49,10 @@ This subtree is report-focused: collect metrics, format sections, and test colle
 ## Validation
 
 ```bash
+just modules
+just pkgs
 just lint
+just format
+just check
 bash scripts/system/report/report-collectors-test.sh
 ```

@@ -7,11 +7,11 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 
 ## Module Map
 
-| File | Purpose | Key Details |
-|------|---------|-------------|
-| `default.nix` | Import hub | Imports `noctalia.homeModules.default` from flake, bar, settings; defines `apiQuotaScript`, `status-notifier-watcher` |
-| `bar.nix` | Bar widgets | Left (workspaces, window title), center (clock, media), right (system tray, monitoring, power) |
-| `settings.nix` | Shell config | Theme colors (Gruvbox, hardcoded), dock, wallpaper, OSD, control center, hooks |
+| File           | Purpose      | Key Details                                                                                                           |
+| -------------- | ------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `default.nix`  | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings; defines `apiQuotaScript`, `status-notifier-watcher` |
+| `bar.nix`      | Bar widgets  | Left (workspaces, window title), center (clock, media), right (system tray, monitoring, power)                        |
+| `settings.nix` | Shell config | Theme colors (Gruvbox, hardcoded), dock, wallpaper, OSD, control center, hooks                                        |
 
 ---
 
@@ -29,6 +29,7 @@ Used for launcher, clipboard, notifications, session menu, and related shell act
 ## Theming (Stylix-Exempt)
 
 Noctalia ignores Stylix auto-theming. Colors are hardcoded Gruvbox values in `settings.nix`:
+
 - Background: `#282828` / `#32302f`
 - Foreground: `#ebdbb2`
 - Accent: `#458588` (blue)
@@ -42,6 +43,19 @@ When Stylix base16 scheme changes, Noctalia colors must be updated **manually** 
 
 `default.nix` defines `apiQuotaScript` — wraps `scripts/ai/api-quota/api-quota.sh` as a Nix derivation.
 Displays Z.AI + Claude Max + Codex usage in the bar's right panel.
+
+---
+
+## Validation
+
+```bash
+just modules
+just pkgs
+just lint
+just format
+just check
+just home
+```
 
 ---
 

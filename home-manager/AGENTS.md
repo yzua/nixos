@@ -6,13 +6,13 @@ Top-level user configuration boundary. `home.nix` is the entrypoint and composes
 
 ## Structure
 
-| Path | Role |
-|------|------|
-| `home.nix` | HM entrypoint and shared user/session wiring |
-| `modules/` | Program/service configuration modules |
-| `modules/default.nix` | HM module import hub |
-| `packages/` | Domain package chunks for `home.packages` |
-| `packages/default.nix` | Package chunk import hub |
+| Path                   | Role                                         |
+| ---------------------- | -------------------------------------------- |
+| `home.nix`             | HM entrypoint and shared user/session wiring |
+| `modules/`             | Program/service configuration modules        |
+| `modules/default.nix`  | HM module import hub                         |
+| `packages/`            | Domain package chunks for `home.packages`    |
+| `packages/default.nix` | Package chunk import hub                     |
 
 ---
 
@@ -49,6 +49,7 @@ Top-level user configuration boundary. `home.nix` is the entrypoint and composes
 
 ```bash
 just modules
+just pkgs
 just lint
 just format
 just check

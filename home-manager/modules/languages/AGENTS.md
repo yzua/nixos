@@ -7,14 +7,14 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 
 ## Structure
 
-| File | Purpose |
-|------|---------|
-| `default.nix` | Import hub for language modules |
-| `go.nix` | Go runtime, aliases, GOPATH/GOBIN/session settings, Go tooling packages |
-| `javascript.nix` | Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper, global package bootstrap |
-| `python.nix` | Python toolchain, uv/poetry aliases, env/session vars, managed `.pythonrc`, workspace dirs |
-| `lsp-servers.nix` | Shared language servers and markdown tooling |
-| `mise.nix` | Runtime manager configuration and shim path |
+| File              | Purpose                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| `default.nix`     | Import hub for language modules                                                            |
+| `go.nix`          | Go runtime, aliases, GOPATH/GOBIN/session settings, Go tooling packages                    |
+| `javascript.nix`  | Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper, global package bootstrap       |
+| `python.nix`      | Python toolchain, uv/poetry aliases, env/session vars, managed `.pythonrc`, workspace dirs |
+| `lsp-servers.nix` | Shared language servers and markdown tooling                                               |
+| `mise.nix`        | Runtime manager configuration and shim path                                                |
 
 ---
 
@@ -51,6 +51,7 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 
 ```bash
 just modules
+just pkgs
 just lint
 just format
 just check

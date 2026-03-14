@@ -8,17 +8,17 @@ Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defa
 
 ## Host Comparison
 
-| Setting | desktop | laptop (dormant) |
-|---------|-------------|-------------------|
-| Gaming | enabled + Gamescope | disabled |
-| Bluetooth | disabled | enabled (manual start) |
-| NVIDIA Optimus | — | Intel + NVIDIA hybrid |
-| Power mgmt | minimal | TLP (charge limits 75-80%) |
-| Avahi interface | `eno1` (ethernet) | `wlp0s20f3` (WiFi) |
-| Sandboxing | enabled | enabled |
-| Privacy stack | full (VPN, Tor, DNS, MAC) | full (VPN, Tor, DNS, MAC) |
-| VNC remote access | enabled | — |
-| KDE Connect | disabled (overridden in host config) | enabled |
+| Setting           | desktop                              | laptop (dormant)           |
+| ----------------- | ------------------------------------ | -------------------------- |
+| Gaming            | enabled + Gamescope                  | disabled                   |
+| Bluetooth         | disabled                             | enabled (manual start)     |
+| NVIDIA Optimus    | —                                    | Intel + NVIDIA hybrid      |
+| Power mgmt        | minimal                              | TLP (charge limits 75-80%) |
+| Avahi interface   | `eno1` (ethernet)                    | `wlp0s20f3` (WiFi)         |
+| Sandboxing        | enabled                              | enabled                    |
+| Privacy stack     | full (VPN, Tor, DNS, MAC)            | full (VPN, Tor, DNS, MAC)  |
+| VNC remote access | enabled                              | —                          |
+| KDE Connect       | disabled (overridden in host config) | enabled                    |
 
 ---
 
@@ -35,9 +35,11 @@ hosts/<hostname>/
 ```
 
 ### PC modules
+
 - `default.nix` applies small desktop-specific tuning (kernel params and BFQ scheduler udev rule)
 
 ### Laptop modules
+
 - `boot.nix` — Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)
 - `nvidia.nix` — Optimus offload mode (`mySystem.nvidia.*` bus IDs from laptop module options), fine-grained power mgmt
 - `power.nix` — Disables power-profiles-daemon, loads laptop kernel modules (thinkpad_acpi, tp_smapi)
@@ -49,13 +51,27 @@ hosts/<hostname>/
 ## Host-Specific Options
 
 Laptop defines extra options not used by desktop:
+
 ```nix
 mySystem.nvidia.intelBusId    # PCI bus ID for Intel GPU
 mySystem.nvidia.nvidiaBusId   # PCI bus ID for NVIDIA GPU
 mySystem.laptop.battery.startChargeThreshold  # Default: 75
 mySystem.laptop.battery.stopChargeThreshold   # Default: 80
 ```
+
 Bus IDs are defined as `mySystem.nvidia.*` options in `hosts/laptop/modules/nvidia.nix` and can be overridden in the laptop's `configuration.nix`.
+
+---
+
+## Validation
+
+```bash
+just modules
+just pkgs
+just lint
+just format
+just check
+```
 
 ---
 
@@ -74,6 +90,7 @@ Bus IDs are defined as `mySystem.nvidia.*` options in `hosts/laptop/modules/nvid
 ## Configuration Pattern
 
 Every host `configuration.nix` follows the same structure:
+
 ```nix
 { ... }:
 {

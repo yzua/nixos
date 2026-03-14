@@ -53,37 +53,53 @@ scripts/
 
 ## Conventions
 
-- Shebang: `#!/usr/bin/env bash` + `set -euo pipefail`
-- **Sourced libraries** (`lib/`): Do NOT include `set -euo pipefail` (inherited from caller)
-- Quote all variables: `"$var"`, `"${array[@]}"`
-- Conditionals: `[[ ... ]]` (not `[ ... ]`)
-- Arrays: `mapfile` for reading from commands
-- Error handling: `error_exit "message" code`
-- Logging: Source `scripts/lib/logging.sh` — never define `log_info`/`print_info` locally
-- Test files: `*-test.sh` suffix, same directory as source
+- **Strict Shebang**: `#!/usr/bin/env bash` followed by `set -euo pipefail`. This is mandatory for all executable scripts to ensure portability and immediate exit on errors or unset variables.
+- **Sourced libraries** (`lib/`): Do NOT include `set -euo pipefail` (inherited from caller).
+- **Quote all variables**: `"$var"`, `"${array[@]}"`.
+- **Conditionals**: `[[ ... ]]` (not `[ ... ]`).
+- **Arrays**: `mapfile` for reading from commands.
+- **Error handling**: `error_exit "message" code`.
+- **Logging**: Source `scripts/lib/logging.sh` — never define `log_info`/`print_info` locally.
+- **Unit Testing**: Use the `*-test.sh` suffix for test files, placed in the same directory as the script under test. Run tests frequently.
 
 ---
 
 ## Shared Logging Library (`lib/logging.sh`)
 
-Functions: `print_info`, `print_success`, `print_warning`, `print_error` (colored), `log_info`, `log_warning`, `log_error`, `log_success` (timestamped, optional file logging).
+Source the library using:
 
 ```bash
 source "$(dirname "$0")/../lib/logging.sh"
 ```
 
+### Functions
+
+- **Colored Output**: `print_info`, `print_success`, `print_warning`, `print_error`. These use emojis and ANSI colors for terminal visibility.
+- **Timestamped Logging**: `log_info`, `log_success`, `log_warning`, `log_error`. These add ISO-style timestamps and log to `stderr` for warnings/errors.
+
+### File Logging
+
+If the `LOG_FILE` environment variable is set, all `log_*` functions will append their output to that file using `tee`, ensuring logs are captured both in the terminal and on disk.
+
+---
+
+## Complexity Hotspots (Warnings)
+
+- **`ai/agent-launcher.sh`**: Uses a procedural registry (large `case` statements) for agent and workflow selection. When adding new agents, you must update multiple functions (`supports_workflow_suffix`, `resolve_workflow_prompt`, `execute_agent`, etc.).
+- **`ai/agent-inventory.sh`**: Relies on manual JSON/TOML parsing and directory traversal to build the AI tool inventory. Ensure changes to config locations are reflected here.
+
 ---
 
 ## Adding a Script
 
-1. Create `scripts/<category>/<name>.sh`
-2. Start with `#!/usr/bin/env bash` and `set -euo pipefail`
-3. Source `../lib/logging.sh` for logging (adjust relative path)
-4. Add test file `<name>-test.sh` if testable
-5. If referenced from Nix modules, use `pkgs.writeShellApplication` with runtime deps
-6. Run: `just lint` (includes shellcheck)
+1. Create `scripts/<category>/<name>.sh`.
+2. Start with the mandatory `#!/usr/bin/env bash` and `set -euo pipefail`.
+3. Source `../lib/logging.sh` for standard logging.
+4. Add a unit test file `<name>-test.sh`.
+5. If the script is referenced from Nix, use `pkgs.writeShellApplication` in the relevant Nix module to manage runtime dependencies.
+6. Run `just lint` to verify with `shellcheck`.
 
-## Scripts Referenced from Nix
+## Nix Integration Table
 
 | Script                                             | Referenced By                                                                         |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------- |

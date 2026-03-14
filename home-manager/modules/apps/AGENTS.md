@@ -7,43 +7,56 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 
 ## App Map
 
-| File | App | Config Pattern |
-|------|-----|----------------|
-| `activitywatch.nix` | ActivityWatch | `services.activitywatch` (Wayland watcher setup) |
-| `desktop-entries.nix` | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries` |
-| `keepassxc.nix` | KeePassXC | Desktop entry |
-| `nautilus.nix` | GNOME Files | `dconf.settings` (preferences) |
-| `nixcord.nix` | Discord (Vesktop) | `programs.nixcord` (Vencord declarative plugins) |
-| `obs.nix` | OBS Studio | `programs.obs-studio` + CUDA + plugins |
-| `obsidian.nix` | Obsidian | Desktop entry + default vault registration |
-| `opensnitch-ui.nix` | OpenSnitch | `services.opensnitch-ui` enablement |
-| `syncthing.nix` | Syncthing | `services.syncthing` (local file sync) |
+| File                  | App                        | Config Pattern                                   |
+| --------------------- | -------------------------- | ------------------------------------------------ |
+| `activitywatch.nix`   | ActivityWatch              | `services.activitywatch` (Wayland watcher setup) |
+| `desktop-entries.nix` | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries`               |
+| `keepassxc.nix`       | KeePassXC                  | Desktop entry                                    |
+| `nautilus.nix`        | GNOME Files                | `dconf.settings` (preferences)                   |
+| `nixcord.nix`         | Discord (Vesktop)          | `programs.nixcord` (Vencord declarative plugins) |
+| `obs.nix`             | OBS Studio                 | `programs.obs-studio` + CUDA + plugins           |
+| `obsidian.nix`        | Obsidian                   | Desktop entry + default vault registration       |
+| `opensnitch-ui.nix`   | OpenSnitch                 | `services.opensnitch-ui` enablement              |
+| `syncthing.nix`       | Syncthing                  | `services.syncthing` (local file sync)           |
 
 ## Subdirectory Modules
 
 ### `vscode/` (3 files + 1 helper)
 
-| File | Purpose |
-|------|---------|
-| `default.nix` | Import hub: enable, package (`pkgs.vscode`), `mutableExtensionsDir = true` |
-| `extensions.nix` | Extensions from nixpkgs + VS Code marketplace |
-| `_settings.nix` | Settings builder (helper, not in `default.nix`) |
+| File             | Purpose                                                                         |
+| ---------------- | ------------------------------------------------------------------------------- |
+| `default.nix`    | Import hub: enable, package (`pkgs.vscode`), `mutableExtensionsDir = true`      |
+| `extensions.nix` | Extensions from nixpkgs + VS Code marketplace                                   |
+| `_settings.nix`  | Settings builder (helper, not in `default.nix`)                                 |
 | `activation.nix` | Writes mutable `settings.json` via activation script (avoids read-only symlink) |
 
 **Unique pattern**: VS Code settings must be mutable (extensions write to it). `activation.nix` writes `settings.json` at activation time instead of using `home.file` symlink.
 
 ### `brave/` (2 files)
 
-| File | Purpose |
-|------|---------|
-| `default.nix` | Import hub: `programs.chromium` with Brave package |
+| File             | Purpose                                                  |
+| ---------------- | -------------------------------------------------------- |
+| `default.nix`    | Import hub: `programs.chromium` with Brave package       |
 | `extensions.nix` | 30+ declarative extensions (privacy, dev tools, YouTube) |
 
 ### `librewolf/` (1 file)
 
-| File | Purpose |
-|------|---------|
+| File          | Purpose                                                                    |
+| ------------- | -------------------------------------------------------------------------- |
 | `default.nix` | `programs.librewolf` with declarative policies + profile settings (SOCKS5) |
+
+---
+
+## Validation
+
+```bash
+just modules
+just pkgs
+just lint
+just format
+just check
+just home
+```
 
 ---
 

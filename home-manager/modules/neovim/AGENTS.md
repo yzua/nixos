@@ -7,13 +7,13 @@ Scope here is Neovim-only behavior; shared editor defaults belong in parent HM m
 
 ## Structure
 
-| Path | Purpose |
-|------|---------|
-| `default.nix` | Main Neovim module: enable flags, plugin set, extra packages, `initLua` assembly |
-| `lua/` | Core Lua config (`options.lua`, `keymaps.lua`, `diagnostics.lua`, `treesitter.lua`, `lsp.lua`) |
-| `lua/plugins/` | Plugin-specific Lua setup (cmp, telescope, neo-tree, lint, DAP, etc.) |
-| `plugins/default.nix` | Import hub for plugin submodules |
-| `plugins/wakatime.nix` | WakaTime plugin + CLI wiring |
+| Path                   | Purpose                                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| `default.nix`          | Main Neovim module: enable flags, plugin set, extra packages, `initLua` assembly               |
+| `lua/`                 | Core Lua config (`options.lua`, `keymaps.lua`, `diagnostics.lua`, `treesitter.lua`, `lsp.lua`) |
+| `lua/plugins/`         | Plugin-specific Lua setup (cmp, telescope, neo-tree, lint, DAP, etc.)                          |
+| `plugins/default.nix`  | Import hub for plugin submodules                                                               |
+| `plugins/wakatime.nix` | WakaTime plugin + CLI wiring                                                                   |
 
 ---
 
@@ -49,6 +49,7 @@ Scope here is Neovim-only behavior; shared editor defaults belong in parent HM m
 
 ```bash
 just modules
+just pkgs
 just lint
 just format
 just check

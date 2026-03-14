@@ -104,6 +104,7 @@ modules/
 ## Package Chunks (`../packages/`)
 
 Packages live separately from modules. Each chunk is a Home Manager module:
+
 ```nix
 { pkgs, ... }:
 {
@@ -126,7 +127,9 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 - GTK extra CSS: flat style, no rounded corners (177 lines custom CSS)
 
 ### Stylix-Exempt Modules
+
 These manage their own theming (Stylix `autoEnable` disabled):
+
 - Noctalia Shell
 
 When adding a new program: Stylix auto-applies theme. Override only if custom styling needed.
@@ -136,6 +139,7 @@ When adding a new program: Stylix auto-applies theme. Override only if custom st
 ## Configuration Patterns
 
 ### Program Config (most common)
+
 ```nix
 programs.<tool> = {
   enable = true;
@@ -144,6 +148,7 @@ programs.<tool> = {
 ```
 
 ### Service Config
+
 ```nix
 services.<service> = {
   enable = true;
@@ -152,6 +157,7 @@ services.<service> = {
 ```
 
 ### Home Files (dotfiles)
+
 ```nix
 home.file.".config/app/config" = {
   text = ''...'';  # or source = ./path;
@@ -166,9 +172,10 @@ xdg.configFile."app/style.css".text = ''...'';
 1. Create `home-manager/modules/<name>.nix`
 2. Add import with comment to `home-manager/modules/default.nix`
 3. Use `programs.*` or `services.*` — do NOT define custom options
-4. Run: `just modules && just lint && just format && just check && just home`
+4. Run: `just modules && just pkgs && just lint && just format && just check && just home`
 
 For subdirectory modules (e.g., new tool in `terminal/tools/`):
+
 1. Create the `.nix` file in the subdirectory
 2. Add import to that subdirectory's `default.nix`
 3. Same validation pipeline
@@ -178,6 +185,7 @@ For subdirectory modules (e.g., new tool in `terminal/tools/`):
 ## Sub-directory AGENTS.md
 
 More detailed module-level guidance exists at:
+
 - `ai-agents/AGENTS.md` — Multi-agent architecture, profile variants, activation, hooks
 - `neovim/AGENTS.md` — Neovim module boundaries, Lua/plugin wiring patterns
 - `terminal/AGENTS.md` — Shell, multiplexer, CLI tools, one-per-tool pattern

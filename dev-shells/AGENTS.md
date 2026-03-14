@@ -6,16 +6,16 @@
 
 ## Available Templates
 
-| Template | Directory | Key Tools |
-|----------|-----------|-----------|
-| `python-venv` | `python-venv/` | venv, ruff, black, isort, pytest, jupyter, django, fastapi |
-| `rust-stable` | `rust-stable/` | cargo, rustc, clippy, rustfmt, cargo-audit |
-| `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy |
-| `nodejs` | `nodejs/` | node, pnpm, yarn, typescript, prettier, eslint |
-| `bun` | `bun/` | bun, typescript, biome |
-| `deno` | `deno/` | deno |
-| `go` | `go/` | go, gopls, golangci-lint, gofumpt, delve, air, protobuf |
-| `cpp` | `cpp/` | gcc, cmake, gnumake, clang-tools, gdb, valgrind, cppcheck |
+| Template       | Directory       | Key Tools                                                  |
+| -------------- | --------------- | ---------------------------------------------------------- |
+| `python-venv`  | `python-venv/`  | venv, ruff, black, isort, pytest, jupyter, django, fastapi |
+| `rust-stable`  | `rust-stable/`  | cargo, rustc, clippy, rustfmt, cargo-audit                 |
+| `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy           |
+| `nodejs`       | `nodejs/`       | node, pnpm, yarn, typescript, prettier, eslint             |
+| `bun`          | `bun/`          | bun, typescript, biome                                     |
+| `deno`         | `deno/`         | deno                                                       |
+| `go`           | `go/`           | go, gopls, golangci-lint, gofumpt, delve, air, protobuf    |
+| `cpp`          | `cpp/`          | gcc, cmake, gnumake, clang-tools, gdb, valgrind, cppcheck  |
 
 ---
 
@@ -61,6 +61,18 @@ All dev-shell flakes follow the same structure:
 - Python uses `venvShellHook` for automatic venv creation
 - Go sets `GOPATH=.go` and `GOBIN`
 - `.envrc` with `use flake` for direnv integration
+
+---
+
+## Validation
+
+```bash
+just modules
+just pkgs
+just lint
+just format
+just check
+```
 
 ---
 

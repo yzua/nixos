@@ -7,11 +7,11 @@ Enabled through `mySystem.observability.enable` and integrated with Netdata/Loki
 
 ## Structure
 
-| File | Purpose |
-|------|---------|
-| `default.nix` | Main stack wiring: Prometheus scrape/jobs, Alertmanager route, Grafana provisioning, resource limits |
-| `alert-rules.nix` | Alert rule groups (system, disk, services, network) |
-| `dashboards/` | Provisioned Grafana dashboard JSON files |
+| File              | Purpose                                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `default.nix`     | Main stack wiring: Prometheus scrape/jobs, Alertmanager route, Grafana provisioning, resource limits |
+| `alert-rules.nix` | Alert rule groups (system, disk, services, network)                                                  |
+| `dashboards/`     | Provisioned Grafana dashboard JSON files                                                             |
 
 ---
 
@@ -46,6 +46,7 @@ Enabled through `mySystem.observability.enable` and integrated with Netdata/Loki
 
 ```bash
 just modules
+just pkgs
 just lint
 just format
 just check

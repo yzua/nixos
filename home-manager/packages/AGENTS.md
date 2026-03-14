@@ -73,6 +73,7 @@ After edits in this directory:
 
 ```bash
 just modules
+just pkgs
 just lint
 just format
 just check

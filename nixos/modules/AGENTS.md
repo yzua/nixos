@@ -1,195 +1,86 @@
-# NixOS System Modules
+# NixOS Modules - Agent Guidance
 
-Shared system modules imported by all hosts via `default.nix` (50+ imports including sub-modules in `security/`, `cleanup/`, `prometheus-grafana/`). Each module handles one subsystem.
-Directories (`cleanup/`, `security/`, `prometheus-grafana/`) contain sub-modules or resources imported via their own `default.nix`.
+## OVERVIEW
 
-Sub-directory `AGENTS.md` files exist at:
+This directory contains shared NixOS system modules. These files define the core behavior and optional features for every host in the fleet. All modules are aggregated in a central hub. This setup ensures that every machine follows the same rules while allowing for specific host overrides.
 
-- `security/AGENTS.md` — Hardening values, always-on security modules
-- `cleanup/AGENTS.md` — Cleanup timer helper pattern, retention policies
-- `glance/AGENTS.md` — Dashboard widgets, pages, helper file patterns
-- `prometheus-grafana/AGENTS.md` — Observability stack wiring, dashboards
+## STRUCTURE
 
----
+The module system follows a strict layout:
 
-## Module Categories
+- **default.nix**: The central hub. It imports every module and directory in this path.
+- **host-defaults.nix**: Sets profile defaults. It handles common settings for desktops and laptops.
+- **validation.nix**: The safety layer. It uses assertions to stop conflicting services.
+- **Feature Modules**: Single files like `gaming.nix` or `nvidia.nix` that manage specific subsystems.
+- **Sub-module Directories**: Paths like `security/` or `cleanup/` that have their own internal hubs.
 
-### Core System
+## WHERE TO LOOK
 
-| Module                  | Purpose                                                              | Custom Options             |
-| ----------------------- | -------------------------------------------------------------------- | -------------------------- |
-| `bootloader.nix`        | systemd-boot configuration                                           | None                       |
-| `nix.nix`               | Nix package manager settings (flakes, gc)                            | None                       |
-| `nh.nix`                | Nix Helper — build tool wrapper                                      | None                       |
-| `users.nix`             | User accounts and permissions                                        | None                       |
-| `environment.nix`       | System-wide env vars and paths                                       | None                       |
-| `i18n.nix`              | Locale and internationalization                                      | None                       |
-| `timezone.nix`          | Time zone configuration                                              | None                       |
-| `stability.nix`         | System stability optimizations                                       | None                       |
-| `cleanup/`              | Automated cleanup timers (downloads, caches, Docker, Telegram)       | `mySystem.cleanup.enable`  |
-| `host-defaults.nix`     | Profile-based defaults (desktop/laptop) for all `mySystem.*` options | `mySystem.hostProfile`     |
-| `host-info.nix`         | Sets hostname and stateVersion from flake arguments                  | `mySystem.hostInfo.enable` |
-| `backup.nix`            | Automated restic backup service                                      | `mySystem.backup.*`        |
-| `boot-optimization.nix` | Defer monitoring services from blocking boot                         | None                       |
+- **Toggle a feature**: Open the specific module file and look for `mySystem.*` options.
+- **Add a safety rule**: Edit `validation.nix`. Add your rule to the `assertions` list.
+- **Change laptop defaults**: Find the laptop section in `host-defaults.nix`.
+- **Find security values**: Go to `security/AGENTS.md` for hardening details.
 
-### Security & Privacy
+## CONVENTIONS
 
-| Module               | Purpose                                                                                       | Custom Options                                                                               |
-| -------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `security/`          | Kernel hardening, firewall, dbus-broker, audit timers, AIDE, opsec (split into 7 sub-modules) | `mySystem.auditLogging.enable` (for fail2ban only; other security sub-modules are always-on) |
-| `tor.nix`            | Tor SOCKS proxy (9050/9150)                                                                   | `mySystem.tor.enable`                                                                        |
-| `mullvad-vpn.nix`    | Mullvad VPN client                                                                            | `mySystem.mullvadVpn.enable`                                                                 |
-| `dnscrypt-proxy.nix` | Encrypted DNS with DNSSEC                                                                     | `mySystem.dnscryptProxy.enable`                                                              |
-| `sops.nix`           | Secret management (age encryption)                                                            | None (always-on)                                                                             |
+### The mySystem.\* Pattern
 
-### Hardware & Desktop
+We use the `mySystem` namespace for all custom toggles. This makes it easy to see which features are active. Most modules use this three step pattern:
 
-| Module                   | Purpose                                                        | Custom Options             |
-| ------------------------ | -------------------------------------------------------------- | -------------------------- |
-| `nvidia.nix`             | NVIDIA GPU drivers, CUDA, Wayland integration                  | `mySystem.nvidia.enable`   |
-| `audio.nix`              | PipeWire audio stack                                           | None (always-on)           |
-| `bluetooth.nix`          | Bluetooth services                                             | `mySystem.bluetooth.*`     |
-| `niri.nix`               | Niri compositor (scrollable tiling Wayland) system integration | None                       |
-| `greetd.nix`             | greetd display manager with tuigreet                           | `mySystem.greetd.enable`   |
-| `xserver.nix`            | X11 display server                                             | None                       |
-| `xdg-desktop-portal.nix` | XDG portals for Wayland                                        | None                       |
-| `libinput.nix`           | Touchpad/mouse input                                           | None                       |
-| `upower.nix`             | Power/battery monitoring                                       | None                       |
-| `fwupd.nix`              | Firmware updates (fwupd/LVFS)                                  | `mySystem.fwupd.enable`    |
-| `printing.nix`           | CUPS print services                                            | `mySystem.printing.enable` |
-| `monitoring.nix`         | Hardware sensors, vnStat, bandwhich                            | None                       |
+1. **Define the option**: Create an `enable` toggle under `options.mySystem.<name>`.
+2. **Guard the config**: Wrap everything in `lib.mkIf config.mySystem.<name>.enable`.
+3. **Apply settings**: Use standard NixOS options inside that guard.
 
-### Observability Stack
+### Import Hub Rules
 
-| Module                | Purpose                                                              | Custom Options                  |
-| --------------------- | -------------------------------------------------------------------- | ------------------------------- |
-| `netdata.nix`         | Real-time system monitoring dashboard                                | `mySystem.netdata.enable`       |
-| `scrutiny.nix`        | SMART disk health monitoring                                         | `mySystem.scrutiny.enable`      |
-| `glance/`             | Minimal dashboard with Gruvbox theme (localhost:8082)                | `mySystem.glance.enable`        |
-| `opensnitch.nix`      | Application firewall with network logging                            | `mySystem.opensnitch.enable`    |
-| `loki.nix`            | Loki log aggregation with Promtail                                   | `mySystem.loki.enable`          |
-| `prometheus-grafana/` | Prometheus + Alertmanager + Grafana stack (includes JSON dashboards) | `mySystem.observability.enable` |
-| `system-report.nix`   | Unified system health reporting (aggregates monitoring sources)      | `mySystem.systemReport.enable`  |
-| `ntfy.nix`            | Alertmanager → ntfy.sh push notifications                            | `mySystem.ntfy.enable`          |
+The `default.nix` file is the master registry. Every new module must be listed there. Add a comment next to each import to explain what the file does.
 
-### Applications & Services
+### Helper Files
 
-| Module               | Purpose                                       | Custom Options                   |
-| -------------------- | --------------------------------------------- | -------------------------------- |
-| `gaming.nix`         | Steam, Lutris, Wine, MangoHud                 | `mySystem.gaming.*`              |
-| `flatpak.nix`        | Flatpak + Flathub                             | `mySystem.flatpak.enable`        |
-| `virtualisation.nix` | Docker, libvirt/QEMU                          | `mySystem.virtualisation.enable` |
-| `networking.nix`     | NetworkManager, firewall rules                | None                             |
-| `nix-ld.nix`         | Dynamic linker for non-Nix binaries           | `mySystem.nixLd.enable`          |
-| `nautilus.nix`       | GNOME Files manager                           | `mySystem.nautilus.enable`       |
-| `android.nix`        | Android tools and platform support            | None                             |
-| `browser-deps.nix`   | Chrome/Chromium dependencies (Wayland + X11)  | None                             |
-| `kdeconnect.nix`     | KDE Connect phone-desktop integration         | `mySystem.kdeconnect.enable`     |
-| `vnc.nix`            | VNC remote access (x11vnc, noVNC, websockify) | `mySystem.vnc.enable`            |
-| `waydroid.nix`       | Waydroid Android emulation (LXC container)    | `mySystem.waydroid.enable`       |
+Files that start with an underscore are internal helpers. `_lib.nix` is a common example. These are not added to the central hub. You must import them manually in the files that need their logic.
 
-### Cross-Cutting
+## ANTI-PATTERNS
 
-| Module           | Purpose                                        |
-| ---------------- | ---------------------------------------------- |
-| `validation.nix` | **CRITICAL**: Cross-module conflict assertions |
+- **Host-specific hardware**: Don't put policy for a single machine here. Keep those files in the `hosts/` path.
+- **Scattered checks**: Avoid putting cross-module assertions inside feature files. Use `validation.nix` instead.
+- **Hidden enablement**: Don't turn on services without a `mySystem` toggle. Mandatory features are the only exception.
 
 ---
 
-## Directory Modules
+## Adding a New System Feature
 
-### `cleanup/`
+Follow these steps to add a new capability:
 
-Split into sub-modules. Guarded by `mySystem.cleanup.enable`.
-| Sub-module | Purpose |
-|------------|---------|
-| `default.nix` | Import hub + `mySystem.cleanup.enable` option definition |
-| `_lib.nix` | Reusable `mkCleanupTimer` helper (imported manually by sub-modules, not in `default.nix`) |
-| `downloads.nix` | Download, screenshot, Telegram, and clipboard cleanup timers |
-| `cache.nix` | Cache cleanup timers (pip, npm, bun, go, Playwright), Docker prune |
+1. **Create the file**: Make a new module like `nixos/modules/new-feature.nix`.
+2. **Add options**: Define a `mySystem.new-feature.enable` toggle.
+3. **Update the hub**: Register the file in `nixos/modules/default.nix`.
+4. **Define defaults**: Update `host-defaults.nix` if the feature should be on by default.
+5. **Enforce safety**: Add assertions to `validation.nix` if there are conflicts with other modules.
+6. **Verify work**: Run `just check` to make sure the evaluation passes.
 
-### `security/`
+## Validation and Conflicts
 
-Split from monolithic `security.nix`. Always-on (no enable guard), except audit-logging. See `security/AGENTS.md` for detailed hardening values.
-| Sub-module | Purpose |
-|------------|---------|
-| `default.nix` | Import hub |
-| `hardening.nix` | sysctl hardening, PAM core dumps, AppArmor, sudo, hidepid, coredump |
-| `firewall.nix` | `networking.firewall` block, LLMNR/NetBIOS/SMB hostname leak prevention |
-| `services.nix` | dbus broker, Avahi (authoritative config), systemd Manager timeouts |
-| `audit.nix` | security-audit timer + service (weekly Lynis scan) |
-| `audit-logging.nix` | Security event logging with fail2ban (`mySystem.auditLogging.enable`) |
-| `opsec.nix` | Operational security (MAC randomization, kexec, metadata, zram, NTS, Thunderbolt) |
-| `aide.nix` | AIDE file integrity monitoring (weekly scan) |
+`validation.nix` acts as the system immune system. It blocks bad combinations that could break the build or cause runtime errors. It handles things like:
 
----
+- **Power conflicts**: Stopping TLP and Power Profiles Daemon from fighting.
+- **Audio battles**: Making sure PipeWire and PulseAudio don't overlap.
+- **Driver issues**: Ensuring proprietary and open-source GPU drivers stay separate.
+- **Safety checks**: Requiring the firewall and AppArmor to be active at all times.
 
-## Host Defaults System (host-defaults.nix)
+## Profile Defaults
 
-Defines `mySystem.hostProfile` (enum: `"desktop"` | `"laptop"`).
-Sets `lib.mkDefault` for all shared `mySystem.*` options so hosts only need to set the profile + overrides.
+We use `host-defaults.nix` to reduce boilerplate. Setting `mySystem.hostProfile` to `desktop` or `laptop` turns on a pre-selected set of features. This allows host configurations to stay small. You only need to write overrides for the things that differ from the profile.
 
-| Option                                                                                                                                                                                                                                 | Desktop Default | Laptop Default |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | -------------- |
-| `gaming.enable`                                                                                                                                                                                                                        | `true`          | `false`        |
-| `gaming.enableGamescope`                                                                                                                                                                                                               | `true`          | `false`        |
-| `bluetooth.enable`                                                                                                                                                                                                                     | `false`         | `true`         |
-| `bluetooth.powerOnBoot`                                                                                                                                                                                                                | `false`         | `false`        |
-| `backup.enable`                                                                                                                                                                                                                        | `false`         | `false`        |
-| `auditLogging.enable`                                                                                                                                                                                                                  | `true`          | `true`         |
-| `vnc.enable`                                                                                                                                                                                                                           | `false`         | `false`        |
-| Most others (flatpak, mullvadVpn, tor, dnscryptProxy, printing, virtualisation, nautilus, nixLd, cleanup, glance, netdata, opensnitch, scrutiny, waydroid, greetd, nvidia, observability, loki, systemReport, ntfy, fwupd, kdeconnect) | `true`          | `true`         |
+## Feature Namespaces
 
-Host configs only need:
+Modules are grouped into these namespaces:
 
-```nix
-mySystem.hostProfile = "desktop"; # or "laptop"
-# Override specific defaults as needed
-```
-
----
-
-## Option Pattern Quick Reference
-
-Modules with `mySystem.*` options use the **enable-guard** pattern:
-
-```nix
-config = lib.mkIf config.mySystem.<feature>.enable { ... };
-```
-
-Modules **without** custom options apply unconditionally (audio, security, networking).
-
-### inherit Pattern for Sub-Options
-
-```nix
-# Pass option value directly to NixOS config
-hardware.bluetooth = {
-  enable = true;
-  inherit (config.mySystem.bluetooth) powerOnBoot;
-};
-```
-
----
-
-## Validation Dependencies (validation.nix)
-
-| If Enabled               | Requires                           | Error If Missing                 |
-| ------------------------ | ---------------------------------- | -------------------------------- |
-| `mySystem.gaming`        | `hardware.graphics.enable`         | Graphics drivers required        |
-| `mySystem.gaming`        | `services.pipewire.pulse.enable`   | PipeWire with PulseAudio compat  |
-| `mySystem.mullvadVpn`    | `networking.networkmanager.enable` | NetworkManager required          |
-| `mySystem.dnscryptProxy` | `!services.resolved.enable`        | Conflicts with systemd-resolved  |
-| Any config               | `networking.firewall.enable`       | Firewall mandatory               |
-| `services.avahi`         | `allowInterfaces != []`            | Explicit interface list required |
-
----
-
-## Adding a New Module
-
-1. Create `nixos/modules/<name>.nix` following canonical pattern (see root AGENTS.md)
-2. Add import with comment to `nixos/modules/default.nix`
-3. If feature is optional: define `options.mySystem.<name>.enable` + guard with `lib.mkIf`
-4. If feature has cross-module deps: add assertion to `validation.nix`
-5. If feature should be on by default: add `mkDefault` entry to `host-defaults.nix`
-6. Enable/override in host configs: `hosts/*/configuration.nix`
-7. Run: `just modules && just lint && just format && just check`
+- **Core**: Boot, nix, users, timezone, i18n, environment, stability.
+- **Hardware**: GPU, audio, bluetooth, input, power, firmware updates.
+- **Desktop**: Niri, greetd, xserver, portals, file manager.
+- **Networking**: NetworkManager, encrypted DNS, VPNs, Tor, mesh networks.
+- **Security**: Hardening, application firewall, secrets.
+- **Apps**: Gaming, flatpak, printing, android, phone sync, remote access.
+- **Virtualization**: Docker, VMs, android containers.
+- **Observability**: Metrics, dashboards, logs, health reports, alerts.
+- **Maintenance**: Cleanup timers, backups.
