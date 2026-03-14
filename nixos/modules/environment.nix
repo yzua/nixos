@@ -1,7 +1,6 @@
 # Environment variables and session settings.
 
 {
-  user,
   constants,
   ...
 }:
@@ -10,7 +9,7 @@ let
   xdgBinHome = "$HOME/.local/bin";
   xdgDataDirs = [
     "/var/lib/flatpak/exports/share"
-    "/home/${user}/.local/share/flatpak/exports/share"
+    "$HOME/.local/share/flatpak/exports/share"
     "/run/current-system/sw/share"
   ];
   inherit (constants) terminal editor;
