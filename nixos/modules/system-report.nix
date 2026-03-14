@@ -24,10 +24,30 @@ let
     HAS_FAIL2BAN = lib.boolToString config.mySystem.auditLogging.enable;
     SYSTEM_REPORT_DIR = cfg.outputDir;
     REPORT_USER = user;
-    SYSTEM_REPORT_HELPERS = ../../scripts/system/report/report-helpers.sh;
-    SYSTEM_REPORT_COLLECTORS = ../../scripts/system/report/report-collectors.sh;
+    SYSTEM_REPORT_HELPERS = "${reportScriptsDir}/bin/report-helpers.sh";
+    SYSTEM_REPORT_COLLECTORS = "${reportScriptsDir}/bin/report-collectors.sh";
+    SYSTEM_REPORT_COLLECTORS_CORE = "${reportScriptsDir}/bin/report-collectors-core.sh";
+    SYSTEM_REPORT_COLLECTORS_OBSERVABILITY = "${reportScriptsDir}/bin/report-collectors-observability.sh";
+    SYSTEM_REPORT_COLLECTORS_SECURITY = "${reportScriptsDir}/bin/report-collectors-security.sh";
     AI_AGENT_LOG_DIR = "/home/${user}/.local/share/ai-agents/logs";
   };
+
+  # Build a directory with all report scripts included
+  # Each script is wrapped as a derivation, then joined into a single directory
+  reportScriptsDir =
+    let
+      mkScript = name: path: pkgs.writeScriptBin name (builtins.readFile path);
+    in
+    pkgs.symlinkJoin {
+      name = "system-report-scripts";
+      paths = [
+        (mkScript "report-helpers.sh" ../../scripts/system/report/report-helpers.sh)
+        (mkScript "report-collectors.sh" ../../scripts/system/report/report-collectors.sh)
+        (mkScript "report-collectors-core.sh" ../../scripts/system/report/report-collectors-core.sh)
+        (mkScript "report-collectors-observability.sh" ../../scripts/system/report/report-collectors-observability.sh)
+        (mkScript "report-collectors-security.sh" ../../scripts/system/report/report-collectors-security.sh)
+      ];
+    };
 
   featureFlagExports = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (k: v: "export ${k}=\"\${${k}:-${v}}\"") featureFlags
@@ -69,7 +89,7 @@ let
     timerConfig = {
       OnCalendar = onCalendar;
       Persistent = true;
-      inherit randomizedDelaySec;
+      RandomizedDelaySec = randomizedDelaySec;
     };
   };
 
@@ -90,7 +110,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ reportScriptBase ];
+    environment.systemPackages = [
+      reportScriptBase
+      reportScriptsDir
+    ];
 
     systemd = {
       services = {
