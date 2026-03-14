@@ -52,8 +52,8 @@
 
     # Memory management
     "vm.swappiness" = 10;
-    "vm.dirty_ratio" = 15;
-    "vm.dirty_background_ratio" = 5;
+    "vm.dirty_ratio" = 10;
+    "vm.dirty_background_ratio" = 3;
     "vm.vfs_cache_pressure" = 50; # Keep dentries/inodes longer (good for dev work with large codebases)
 
     # TCP optimizations
