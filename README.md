@@ -83,7 +83,7 @@ Set `hostProfile` first, then override as needed:
 | `i2pd.enable`                | I2P anonymous network router                    |
 | `i2pd.port`                  | I2P transport port (used with firewall opening) |
 | `i2pd.openFirewall`          | Open firewall for I2P transport port            |
-| `i2pd.notransit`             | Disable transit traffic mode                    |
+| `i2pd.notransit`             | Disable transit tunnel participation            |
 | `i2pd.bandwidth`             | Optional I2P bandwidth cap (KB/s)               |
 | `yggdrasil.enable`           | Yggdrasil mesh network                          |
 | `dnscryptProxy.enable`       | Encrypted DNS with DNSSEC                       |
