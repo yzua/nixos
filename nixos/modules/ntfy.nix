@@ -49,8 +49,6 @@ in
     # Topic is read from sops secret (ntfy_topic) at runtime for privacy.
     systemd.services.alertmanager-ntfy = lib.mkIf config.mySystem.observability.enable {
       description = "Alertmanager to ntfy.sh notification bridge";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
       restartTriggers = [ config.sops.secrets.ntfy_topic.path ];
 
