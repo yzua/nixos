@@ -28,11 +28,16 @@
 
   systemd.user.services.activitywatch-watcher-awatcher = {
     Unit = {
-      After = [ "activitywatch.service" ];
+      After = [
+        "graphical-session.target"
+        "activitywatch.service"
+      ];
       Requires = [ "activitywatch.service" ];
     };
     Service = {
-      Restart = "on-failure";
+      # awatcher may exit 0 when started before Wayland window protocols are ready.
+      # Keep retrying so tracking starts once the compositor session is fully available.
+      Restart = "always";
       RestartSec = 5;
     };
   };
