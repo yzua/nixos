@@ -54,19 +54,6 @@ in
         }
       }
 
-      plugins {
-        autolock location="file:~/.config/zellij/plugins/zellij-autolock.wasm" {
-          is_enabled true
-          triggers "nvim|vim|git|fzf|zoxide|atuin|lazygit"
-          reaction_seconds "0.3"
-          print_to_log false
-        }
-      }
-
-      load_plugins {
-        autolock
-      }
-
       keybinds {
         unbind "Ctrl q"
 
