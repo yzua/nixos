@@ -28,13 +28,4 @@
     "/dev/disk/by-uuid/4e98b5c2-4022-41a6-8e97-dddf0fe5c408";
 
   services.avahi.allowInterfaces = [ "eno1" ];
-
-  fileSystems."/mnt/dbdata" = {
-    device = "/dev/disk/by-uuid/0acc9be8-92f9-41a1-a06d-63105137a493";
-    fsType = "ext4";
-    options = [
-      "noatime"
-      "commit=60"
-    ];
-  };
 }
