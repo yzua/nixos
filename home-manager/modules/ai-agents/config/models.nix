@@ -29,9 +29,10 @@ in
       model = "anthropic/claude-opus-4-6";
 
       plugins = [
-        "oh-my-opencode"
         "opencode-antigravity-auth@latest"
       ];
+
+      ohMyOpencode.enable = false;
 
       extraSettings = {
         share = "disabled";

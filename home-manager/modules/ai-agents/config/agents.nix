@@ -20,8 +20,6 @@ in
   programs.aiAgents = {
     opencode = {
       ohMyOpencode = {
-        enable = true;
-
         agents = {
           sisyphus = {
             model = opusModel;
