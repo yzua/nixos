@@ -10,7 +10,6 @@
       verbose = false;
       quiet = false;
       python_compile = false;
-      python_venv_auto_create = false;
       disable_tools = [ "python" ];
     };
   };
