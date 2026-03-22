@@ -4,13 +4,7 @@
   programs.niri.settings.window-rules =
     let
       r = 0.0; # Square corners
-      ws = {
-        browser = "󰖟 browser";
-        editor = "󰨞 editor";
-        social = "󰍡 social";
-        media = "󰎆 media";
-        vpn = "󰦝 vpn";
-      };
+      ws = import ./_workspace-names.nix;
       appIdMatch = pattern: { app-id = pattern; };
       mkFloatingRule = matches: {
         inherit matches;

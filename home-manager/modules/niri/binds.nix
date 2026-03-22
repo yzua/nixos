@@ -28,6 +28,7 @@ let
   booksScript = import ./scripts/open-books.nix { inherit pkgsStable; };
   screenshotAnnotate = import ./scripts/screenshot.nix { inherit pkgsStable; };
   colorPicker = import ./scripts/color-picker.nix { inherit pkgsStable; };
+  ws = import ./_workspace-names.nix;
 in
 {
   home.packages = [
@@ -39,10 +40,10 @@ in
   programs.niri.settings.binds =
     let
       workspaceTargets = {
-        "1" = "󰖟 browser";
-        "2" = "󰨞 editor";
-        "3" = "󰍡 social";
-        "4" = "󰎆 media";
+        "1" = ws.browser;
+        "2" = ws.editor;
+        "3" = ws.social;
+        "4" = ws.media;
         "5" = 5;
         "6" = 6;
         "7" = 7;

@@ -7,13 +7,7 @@
 }:
 
 let
-  workspaceName = {
-    browser = "󰖟 browser";
-    editor = "󰨞 editor";
-    social = "󰍡 social";
-    media = "󰎆 media";
-    vpn = "󰦝 vpn";
-  };
+  workspaceName = import ./_workspace-names.nix;
   mkSpring =
     {
       dampingRatio,
