@@ -8,7 +8,11 @@
 }:
 
 let
-  inherit (import ./helpers/_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
+    mkOneshotHardening
+    mkOneshotService
+    mkPersistentTimer
+    ;
 
   cfg = config.mySystem.systemReport;
 
@@ -31,6 +35,13 @@ let
     SYSTEM_REPORT_COLLECTORS_SECURITY = "${reportScriptsDir}/bin/report-collectors-security.sh";
     AI_AGENT_LOG_DIR = "/home/${user}/.local/share/ai-agents/logs";
   };
+
+  mkReportService =
+    description: execStart:
+    mkOneshotService {
+      inherit description execStart;
+      extraServiceConfig = reportHardening;
+    };
 
   # Build a directory with all report scripts included
   # Each script is wrapped as a derivation, then joined into a single directory
@@ -74,25 +85,6 @@ let
     text = featureFlagExports + "\n" + builtins.readFile ../../scripts/system/report/system-report.sh;
   };
 
-  mkReportService = description: execStart: {
-    inherit description;
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = execStart;
-    }
-    // reportHardening;
-  };
-
-  mkReportTimer = description: onCalendar: randomizedDelaySec: {
-    inherit description;
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = onCalendar;
-      Persistent = true;
-      RandomizedDelaySec = randomizedDelaySec;
-    };
-  };
-
 in
 {
   options.mySystem.systemReport = {
@@ -125,11 +117,23 @@ in
       };
 
       timers = {
-        system-report-errors = mkReportTimer "Hourly system error scan" "hourly" "5m";
+        system-report-errors = mkPersistentTimer {
+          description = "Hourly system error scan";
+          onCalendar = "hourly";
+          randomizedDelaySec = "5m";
+        };
 
-        system-report-full = mkReportTimer "Daily full system health report" "06:00" "15m";
+        system-report-full = mkPersistentTimer {
+          description = "Daily full system health report";
+          onCalendar = "06:00";
+          randomizedDelaySec = "15m";
+        };
 
-        system-report-cleanup = mkReportTimer "Weekly cleanup of old system reports" "weekly" "1h";
+        system-report-cleanup = mkPersistentTimer {
+          description = "Weekly cleanup of old system reports";
+          onCalendar = "weekly";
+          randomizedDelaySec = "1h";
+        };
       };
 
       tmpfiles.rules = [

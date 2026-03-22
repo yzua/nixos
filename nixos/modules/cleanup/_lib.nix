@@ -1,6 +1,57 @@
 # Helper library for creating cleanup timers.
-{ pkgs, user }:
 {
+  pkgs,
+  lib,
+  user,
+}:
+let
+  timerHelpers = import ../helpers/_systemd-helpers.nix { inherit lib; };
+  inherit (timerHelpers) mkPersistentTimer;
+
+  bash = "${pkgs.bash}/bin/bash";
+  find = "${pkgs.findutils}/bin/find";
+  home = "/home/${user}";
+
+  mkCleanupService =
+    {
+      name,
+      description,
+      execStart,
+      postCommand ? null,
+      serviceUser ? user,
+    }:
+    {
+      systemd.services."cleanup-${name}" = {
+        inherit description;
+        serviceConfig = {
+          Type = "oneshot";
+          User = serviceUser;
+          ExecStart = execStart;
+        }
+        // lib.optionalAttrs (postCommand != null) {
+          ExecStartPost = postCommand;
+        };
+      };
+    };
+
+  mkCleanupTimerUnit =
+    {
+      name,
+      description,
+      calendar,
+      delay,
+    }:
+    {
+      systemd.timers."cleanup-${name}" = mkPersistentTimer {
+        inherit description;
+        onCalendar = calendar;
+        randomizedDelaySec = delay;
+      };
+    };
+in
+{
+  inherit bash find home;
+
   mkFindCleanupTimer =
     {
       name,
@@ -12,31 +63,22 @@
       serviceUser ? user,
       removeEmptyDirs ? true,
     }:
-    let
-      bash = "${pkgs.bash}/bin/bash";
-      find = "${pkgs.findutils}/bin/find";
-    in
-    {
-      systemd.services."cleanup-${name}" = {
-        inherit description;
-        serviceConfig = {
-          Type = "oneshot";
-          User = serviceUser;
-          ExecStart = "${bash} -c \"${find} '${path}' -type f -mtime +${toString mtimeDays} -delete 2>/dev/null || true\"";
-        }
-        // pkgs.lib.optionalAttrs removeEmptyDirs {
-          ExecStartPost = "${bash} -c \"${find} '${path}' -type d -empty -delete 2>/dev/null || true\"";
-        };
-      };
-      systemd.timers."cleanup-${name}" = {
-        description = "Timer for ${description}";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnCalendar = calendar;
-          Persistent = true;
-          RandomizedDelaySec = delay;
-        };
-      };
+    mkCleanupService {
+      inherit name description serviceUser;
+      execStart = "${bash} -c \"${find} '${path}' -type f -mtime +${toString mtimeDays} -delete 2>/dev/null || true\"";
+      postCommand =
+        if removeEmptyDirs then
+          "${bash} -c \"${find} '${path}' -type d -empty -delete 2>/dev/null || true\""
+        else
+          null;
+    }
+    // mkCleanupTimerUnit {
+      inherit
+        name
+        description
+        calendar
+        delay
+        ;
     };
 
   mkCleanupTimer =
@@ -49,26 +91,21 @@
       delay,
       serviceUser ? user,
     }:
-    {
-      systemd.services."cleanup-${name}" = {
-        inherit description;
-        serviceConfig = {
-          Type = "oneshot";
-          User = serviceUser;
-          ExecStart = command;
-        }
-        // pkgs.lib.optionalAttrs (postCommand != null) {
-          ExecStartPost = postCommand;
-        };
-      };
-      systemd.timers."cleanup-${name}" = {
-        description = "Timer for ${description}";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnCalendar = calendar;
-          Persistent = true;
-          RandomizedDelaySec = delay;
-        };
-      };
+    mkCleanupService {
+      inherit
+        name
+        description
+        postCommand
+        serviceUser
+        ;
+      execStart = command;
+    }
+    // mkCleanupTimerUnit {
+      inherit
+        name
+        description
+        calendar
+        delay
+        ;
     };
 }

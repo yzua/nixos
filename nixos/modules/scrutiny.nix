@@ -81,14 +81,10 @@ in
           };
         };
 
-        timers.scrutiny-retention-cleanup = {
+        timers.scrutiny-retention-cleanup = hardening.mkPersistentTimer {
           description = "Monthly Scrutiny InfluxDB data cleanup";
-          wantedBy = [ "timers.target" ];
-          timerConfig = {
-            OnCalendar = "monthly";
-            Persistent = true;
-            RandomizedDelaySec = "1h";
-          };
+          onCalendar = "monthly";
+          randomizedDelaySec = "1h";
         };
       };
   };

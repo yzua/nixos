@@ -8,14 +8,14 @@
 }:
 
 let
-  cleanupLib = import ./_lib.nix { inherit pkgs user; };
+  cleanupLib = import ./_lib.nix { inherit pkgs lib user; };
   inherit (cleanupLib)
     mkCleanupTimer
     mkFindCleanupTimer
+    bash
+    find
+    home
     ;
-  bash = "${pkgs.bash}/bin/bash";
-  find = "${pkgs.findutils}/bin/find";
-  home = "/home/${user}";
 in
 {
   config = lib.mkIf config.mySystem.cleanup.enable (
