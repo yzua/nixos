@@ -1,121 +1,125 @@
 # Lifecycle hook configuration for Claude Code.
+let
+  mkFormatterHook =
+    {
+      tool,
+      extensions,
+      command,
+    }:
+    {
+      matcher = "Edit|Write";
+      hooks = [
+        {
+          type = "command";
+          command = ''
+            INPUT=$(cat)
+            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
+            if [ -n "$file_path" ] && command -v ${tool} >/dev/null 2>&1; then
+              case "$file_path" in
+                ${builtins.concatStringsSep "|" (map (e: "*.${e}") extensions)} ;;
+                *) echo "$INPUT"; exit 0 ;;
+              esac
+              ${command} "$file_path" 2>&1 | head -3 >&2
+            fi
+            echo "$INPUT"
+          '';
+        }
+      ];
+    };
+
+  mkBashHook =
+    {
+      body,
+      matcher ? "Bash",
+      runInBackground ? false,
+      timeout ? null,
+    }:
+    let
+      bgAttrs = if runInBackground then { run_in_background = true; } else { };
+      toAttrs = if timeout != null then { inherit timeout; } else { };
+    in
+    {
+      inherit matcher;
+      hooks = [
+        (
+          {
+            type = "command";
+            command = ''
+              INPUT=$(cat)
+              COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+              ${body}
+              echo "$INPUT"
+            '';
+          }
+          // bgAttrs
+          // toAttrs
+        )
+      ];
+    };
+in
 {
   # --- PreToolUse Hooks ---
   PreToolUse = [
-    {
-      matcher = "Bash";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-            if echo "$COMMAND" | grep -Eq '(rm -rf|DROP|DELETE FROM|truncate)'; then
-              echo "⚠️  DESTRUCTIVE COMMAND DETECTED" >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Bash";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-            if echo "$COMMAND" | grep -Eq 'git commit'; then
-              if [ -f "justfile" ] && just --summary 2>/dev/null | grep -qw "lint"; then
-                echo "🔍 Pre-commit: running just lint..." >&2
-                just lint 2>&1 | tail -5 >&2
-              elif [ -f ".pre-commit-config.yaml" ] && command -v pre-commit >/dev/null 2>&1; then
-                echo "🔍 Pre-commit: running pre-commit..." >&2
-                pre-commit run --all-files 2>&1 | tail -5 >&2
-              elif [ -f "package.json" ] && grep -q '"lint"' package.json 2>/dev/null; then
-                echo "🔍 Pre-commit: running npm run lint..." >&2
-                npm run lint 2>&1 | tail -5 >&2
-              elif [ -f "Cargo.toml" ] && command -v cargo >/dev/null 2>&1; then
-                echo "🔍 Pre-commit: running cargo check..." >&2
-                cargo check 2>&1 | tail -5 >&2
-              fi
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Bash";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-            if echo "$COMMAND" | grep -Eq '(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)'; then
-              echo "[Hook] BLOCKED: Dev server must run in tmux for log access" >&2
-              echo "[Hook] Use: tmux new-session -d -s dev \"npm run dev\"" >&2
-              echo "[Hook] Then: tmux attach -t dev" >&2
-              exit 2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Bash";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-            if [ -z "$TMUX" ] && echo "$COMMAND" | grep -Eq '(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make|docker|pytest|vitest|playwright)'; then
-              echo "[Hook] Consider running in tmux for session persistence" >&2
-              echo "[Hook] tmux new -s dev  |  tmux attach -t dev" >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Bash";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-            if echo "$COMMAND" | grep -Eq 'git push'; then
-              echo "[Hook] Review changes before push..." >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Bash";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-            if echo "$COMMAND" | grep -Eq '(git push --force|git push -f|git reset --hard|git clean -fd)'; then
-              echo "[Hook] BLOCKED: destructive git command requires explicit manual execution" >&2
-              echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
-              exit 2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
+    (mkBashHook {
+      body = ''
+        if echo "$COMMAND" | grep -Eq '(rm -rf|DROP|DELETE FROM|truncate)'; then
+          echo "⚠️  DESTRUCTIVE COMMAND DETECTED" >&2
+        fi
+      '';
+    })
+    (mkBashHook {
+      body = ''
+        if echo "$COMMAND" | grep -Eq 'git commit'; then
+          if [ -f "justfile" ] && just --summary 2>/dev/null | grep -qw "lint"; then
+            echo "🔍 Pre-commit: running just lint..." >&2
+            just lint 2>&1 | tail -5 >&2
+          elif [ -f ".pre-commit-config.yaml" ] && command -v pre-commit >/dev/null 2>&1; then
+            echo "🔍 Pre-commit: running pre-commit..." >&2
+            pre-commit run --all-files 2>&1 | tail -5 >&2
+          elif [ -f "package.json" ] && grep -q '"lint"' package.json 2>/dev/null; then
+            echo "🔍 Pre-commit: running npm run lint..." >&2
+            npm run lint 2>&1 | tail -5 >&2
+          elif [ -f "Cargo.toml" ] && command -v cargo >/dev/null 2>&1; then
+            echo "🔍 Pre-commit: running cargo check..." >&2
+            cargo check 2>&1 | tail -5 >&2
+          fi
+        fi
+      '';
+    })
+    (mkBashHook {
+      body = ''
+        if echo "$COMMAND" | grep -Eq '(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)'; then
+          echo "[Hook] BLOCKED: Dev server must run in tmux for log access" >&2
+          echo "[Hook] Use: tmux new-session -d -s dev \"npm run dev\"" >&2
+          echo "[Hook] Then: tmux attach -t dev" >&2
+          exit 2
+        fi
+      '';
+    })
+    (mkBashHook {
+      body = ''
+        if [ -z "$TMUX" ] && echo "$COMMAND" | grep -Eq '(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make|docker|pytest|vitest|playwright)'; then
+          echo "[Hook] Consider running in tmux for session persistence" >&2
+          echo "[Hook] tmux new -s dev  |  tmux attach -t dev" >&2
+        fi
+      '';
+    })
+    (mkBashHook {
+      body = ''
+        if echo "$COMMAND" | grep -Eq 'git push'; then
+          echo "[Hook] Review changes before push..." >&2
+        fi
+      '';
+    })
+    (mkBashHook {
+      body = ''
+        if echo "$COMMAND" | grep -Eq '(git push --force|git push -f|git reset --hard|git clean -fd)'; then
+          echo "[Hook] BLOCKED: destructive git command requires explicit manual execution" >&2
+          echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
+          exit 2
+        fi
+      '';
+    })
   ];
 
   # --- Notification Hooks ---
@@ -168,146 +172,70 @@
 
   # --- PostToolUse Hooks (Auto-Format + Analysis) ---
   PostToolUse = [
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v biome >/dev/null 2>&1; then
-              case "$file_path" in
-                *.js|*.jsx|*.ts|*.tsx|*.mjs|*.cjs|*.json|*.jsonc|*.css|*.scss|*.less|*.graphql|*.gql) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              biome check --write "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
+    (mkFormatterHook {
+      tool = "biome";
+      extensions = [
+        "js"
+        "jsx"
+        "ts"
+        "tsx"
+        "mjs"
+        "cjs"
+        "json"
+        "jsonc"
+        "css"
+        "scss"
+        "less"
+        "graphql"
+        "gql"
       ];
-    }
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v rustfmt >/dev/null 2>&1; then
-              case "$file_path" in
-                *.rs) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              rustfmt "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
+      command = "biome check --write";
+    })
+    (mkFormatterHook {
+      tool = "rustfmt";
+      extensions = [ "rs" ];
+      command = "rustfmt";
+    })
+    (mkFormatterHook {
+      tool = "zig";
+      extensions = [
+        "zig"
+        "zon"
       ];
-    }
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v zig >/dev/null 2>&1; then
-              case "$file_path" in
-                *.zig|*.zon) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              zig fmt "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
+      command = "zig fmt";
+    })
+    (mkFormatterHook {
+      tool = "gofmt";
+      extensions = [ "go" ];
+      command = "gofmt -w";
+    })
+    (mkFormatterHook {
+      tool = "nixfmt";
+      extensions = [ "nix" ];
+      command = "nixfmt";
+    })
+    (mkFormatterHook {
+      tool = "ruff";
+      extensions = [
+        "py"
+        "pyi"
       ];
-    }
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v gofmt >/dev/null 2>&1; then
-              case "$file_path" in
-                *.go) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              gofmt -w "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
+      command = "ruff format";
+    })
+    (mkFormatterHook {
+      tool = "prettier";
+      extensions = [
+        "md"
+        "mdx"
+        "yaml"
+        "yml"
+        "html"
+        "vue"
+        "svelte"
+        "astro"
       ];
-    }
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v nixfmt >/dev/null 2>&1; then
-              case "$file_path" in
-                *.nix) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              nixfmt "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v ruff >/dev/null 2>&1; then
-              case "$file_path" in
-                *.py|*.pyi) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              ruff format "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
-            if [ -n "$file_path" ] && command -v prettier >/dev/null 2>&1; then
-              case "$file_path" in
-                *.md|*.mdx|*.yaml|*.yml|*.html|*.vue|*.svelte|*.astro) ;;
-                *) echo "$INPUT"; exit 0 ;;
-              esac
-              prettier --write "$file_path" 2>&1 | head -3 >&2
-            fi
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
+      command = "prettier --write";
+    })
     {
       matcher = "Bash";
       hooks = [
