@@ -2,11 +2,8 @@
 { lib, ... }:
 
 let
-  mkOptionNoDefault = type: description: lib.mkOption { inherit type description; };
-  mkTypedOption =
-    type: default: description:
-    lib.mkOption { inherit type default description; };
-  mkNullOrOption = type: description: mkTypedOption (lib.types.nullOr type) null description;
+  opt = import ./_option-helpers.nix { inherit lib; };
+  inherit (opt) mkOptionNoDefault mkTypedOption mkNullOrOption;
   permissionStates = lib.types.enum [
     "ask"
     "allow"

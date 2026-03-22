@@ -6,25 +6,19 @@
 }:
 
 let
+  opt = import ./_option-helpers.nix { inherit lib; };
+  inherit (opt)
+    mkTypedOption
+    mkTypedOptionWith
+    mkStrOption
+    mkBoolOption
+    mkIntOption
+    mkAttrsOption
+    mkAttrsOfStrOption
+    mkStrListOption
+    mkNullOrStrOption
+    ;
   ohMyOpencodeAgentType = import ./_oh-my-opencode-agent-type.nix { inherit lib; };
-  mkTypedOption =
-    type: default: description:
-    lib.mkOption {
-      inherit type default description;
-    };
-  mkTypedOptionWith =
-    type: default: description: extra:
-    lib.mkOption ({ inherit type default description; } // extra);
-  mkStrOption = default: description: mkTypedOption lib.types.str default description;
-  mkBoolOption = default: description: mkTypedOption lib.types.bool default description;
-  mkIntOption = default: description: mkTypedOption lib.types.int default description;
-  mkAttrsOption = default: description: mkTypedOption lib.types.attrs default description;
-  mkAttrsOfStrOption =
-    default: description: mkTypedOption (lib.types.attrsOf lib.types.str) default description;
-  mkStrListOption =
-    default: description: mkTypedOption (lib.types.listOf lib.types.str) default description;
-  mkNullOrStrOption =
-    default: description: mkTypedOption (lib.types.nullOr lib.types.str) default description;
 in
 {
   options.programs.aiAgents = {
