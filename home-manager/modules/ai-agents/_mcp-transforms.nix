@@ -10,63 +10,65 @@ let
   cfg = config.programs.aiAgents;
   sharedMcpServers = cfg.mcpServers;
 
-  claudeMcpServers = lib.mapAttrs (
-    _: server:
-    let
-      isLocal = (server.type or "local") == "local";
-    in
-    if isLocal then
-      {
-        inherit (server) command;
-        args = server.args or [ ];
-        env = server.env or { };
-      }
-    else
+  mkMcpTransform =
+    {
+      localAttrs,
+      remoteAttrs,
+      envKey ? "env",
+    }:
+    lib.mapAttrs (
+      _: server:
+      let
+        isLocal = (server.type or "local") == "local";
+        base = if isLocal then localAttrs server else remoteAttrs server;
+        envAttrs = lib.optionalAttrs (server.env or { } != { }) {
+          ${envKey} = server.env;
+        };
+      in
+      base // envAttrs
+    ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+
+  claudeMcpServers = mkMcpTransform {
+    localAttrs = server: {
+      inherit (server) command;
+      args = server.args or [ ];
+    };
+    remoteAttrs =
+      server:
       {
         type = "http";
         inherit (server) url;
       }
-      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; })
-  ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+  };
 
-  opencodeMcpServers = lib.mapAttrs (
-    _: server:
-    let
-      isLocal = (server.type or "local") == "local";
-      base = {
-        type = if isLocal then "local" else "remote";
-      };
-      localAttrs = if isLocal then { command = [ server.command ] ++ (server.args or [ ]); } else { };
-      remoteAttrs =
-        if !isLocal then
-          {
-            inherit (server) url;
-          }
-          // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; })
-        else
-          { };
-      envAttrs = lib.optionalAttrs (server.env or { } != { }) { environment = server.env; };
-    in
-    base // localAttrs // remoteAttrs // envAttrs
-  ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
-
-  geminiMcpServers = lib.mapAttrs (
-    _: server:
-    let
-      isLocal = (server.type or "local") == "local";
-    in
-    if isLocal then
+  opencodeMcpServers = mkMcpTransform {
+    localAttrs = server: {
+      type = "local";
+      command = [ server.command ] ++ (server.args or [ ]);
+    };
+    remoteAttrs =
+      server:
       {
-        inherit (server) command;
-        args = server.args or [ ];
-        env = server.env or { };
+        type = "remote";
+        inherit (server) url;
       }
-    else
+      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+    envKey = "environment";
+  };
+
+  geminiMcpServers = mkMcpTransform {
+    localAttrs = server: {
+      inherit (server) command;
+      args = server.args or [ ];
+    };
+    remoteAttrs =
+      server:
       {
         httpUrl = server.url;
       }
-      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; })
-  ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+  };
 
   agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
     AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
