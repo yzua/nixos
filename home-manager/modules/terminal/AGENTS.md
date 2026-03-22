@@ -20,10 +20,10 @@ terminal/
 ├── scripts.nix      # Custom script wrappers (currently `nvidia-fans`)
 ├── shell.nix        # Nix shell integration and dev tools
 ├── zsh/
-│   ├── default.nix  # Zsh + OMZ (oxide theme, 21 setOptions)
+│   ├── default.nix  # Zsh + OMZ (oxide theme, 23 setOptions)
 │   ├── aliases.nix  # Shell aliases
 │   ├── config.nix   # Zsh settings and initialization
-│   ├── functions.nix # Custom zsh functions (40+)
+│   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   └── local-vars.nix # Local shell variables
 └── tools/           # CLI tools — one .nix file per tool
     ├── default.nix  # Import hub (16 tools)
@@ -52,7 +52,7 @@ terminal/
 
 ## Key Components
 
-### Zsh (`zsh/`, 4 files)
+### Zsh (`zsh/`, 5 files)
 
 - **Framework**: Oh My Zsh with oxide theme
 - **Plugins**: sudo, extract, copypath, copyfile, bgnotify, fzf-tab

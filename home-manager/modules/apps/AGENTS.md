@@ -39,11 +39,12 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 | `default.nix`    | Import hub: `programs.chromium` with Brave package       |
 | `extensions.nix` | 30+ declarative extensions (privacy, dev tools, YouTube) |
 
-### `librewolf/` (1 file)
+### `librewolf/` (2 files)
 
 | File          | Purpose                                                                    |
 | ------------- | -------------------------------------------------------------------------- |
 | `default.nix` | `programs.librewolf` with declarative policies + profile settings (SOCKS5) |
+| `_profiles.nix` | Single source of truth for 6 browser profiles (name, proxy, homepage) |
 
 ---
 

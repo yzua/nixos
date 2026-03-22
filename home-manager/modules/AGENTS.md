@@ -14,14 +14,17 @@ modules/
 │   ├── options.nix     # All programs.aiAgents option definitions
 │   ├── _mcp-transforms.nix  # MCP server transform helpers (not a module, imported by others)
 │   ├── _settings-builders.nix # Per-agent settings builders (not a module, imported by others)
+│   ├── _option-helpers.nix # Shared option constructors (not a module, imported by others)
 │   ├── _opencode-profiles.nix # OpenCode profile names and config paths (not a module)
+│   ├── _oh-my-opencode-agent-type.nix # Agent type definition (not a module, imported by options)
 │   ├── activation.nix  # Activation scripts (secret patching, config setup, plugin installs)
 │   ├── files.nix       # home.file + xdg.configFile declarations
 │   ├── services.nix    # Packages, zsh aliases, systemd user services/timers
 │   ├── config.nix      # Pass-through to config/ subdirectory
 │   ├── config/         # Split configuration values
 │   │   ├── default.nix      # Import hub
-│   │   ├── instructions.nix # Global instructions + skills
+│   │   ├── instructions.nix # Global instructions (imports _skills.nix)
+│   │   ├── _skills.nix      # Skill installations and omissions (not a module)
 │   │   ├── mcp-servers.nix  # MCP server definitions + logging
 │   │   ├── permissions.nix  # Claude permissions, hooks, settings
 │   │   ├── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)
@@ -41,13 +44,17 @@ modules/
 │   │   ├── extensions.nix   # Extensions (nixpkgs + marketplace)
 │   │   ├── _settings.nix    # Settings builder (not a module, imported by activation)
 │   │   └── activation.nix   # Writes mutable settings.json
-│   └── brave/          # Brave browser
-│       ├── default.nix      # Import hub
-│       └── extensions.nix   # 30+ declarative extensions (privacy, dev tools, YouTube)
+│   ├── brave/          # Brave browser
+│   │   ├── default.nix      # Import hub
+│   │   └── extensions.nix   # 30+ declarative extensions (privacy, dev tools, YouTube)
+│   └── librewolf/      # LibreWolf browser (multi-profile SOCKS5 proxy)
+│       ├── default.nix      # Import hub: programs.librewolf with policies + profiles
+│       └── _profiles.nix    # Profile definitions (not a module, imported by desktop-entries.nix)
 ├── niri/               # Niri compositor (scrollable tiling Wayland)
 │   ├── default.nix     # Import hub
 │   ├── main.nix        # Compositor settings (autostart, workspaces, environment, animations)
 │   ├── binds.nix       # Keybindings and custom scripts
+│   ├── _workspace-names.nix # Workspace display names (not a module, imported by main/binds/rules)
 │   ├── input.nix       # Input devices (keyboard, mouse, touchpad, trackpoint)
 │   ├── layout.nix      # Layout settings (columns, gaps, focus ring, border)
 │   ├── rules.nix       # Window rules (opacity, rounding, floating, workspace assignments)
@@ -85,7 +92,7 @@ modules/
 │   │   ├── default.nix # Main zsh config with setOptions, OMZ
 │   │   ├── aliases.nix # Shell aliases
 │   │   ├── config.nix  # Zsh settings and initialization
-│   │   ├── functions.nix # Custom zsh functions (40+)
+│   │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   │   └── local-vars.nix # Local shell variables
 │   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, gh, git, htop, lazygit, mpv, starship, yazi, zathura, zoxide)
 │       └── git/        # Git (identity from constants, GPG signing, 30+ aliases, hooks)
