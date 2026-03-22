@@ -1,9 +1,14 @@
 # Claude plugin installation — oh-my-claudecode and everything-claude-code.
 {
   cfg,
+  config,
   pkgs,
   lib,
 }:
+
+let
+  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+in
 {
   installImpeccable = lib.mkIf cfg.impeccable.enable (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -46,15 +51,18 @@
       if [[ -d "$IMPECCABLE_DIR/dist/opencode/.opencode/skills" && "${
         if cfg.opencode.enable then "1" else "0"
       }" == "1" ]]; then
-        mkdir -p "$HOME/.config/opencode/skills"
-        for src in "$IMPECCABLE_DIR"/dist/opencode/.opencode/skills/*; do
-          [[ -e "$src" ]] || continue
-          name="$(basename "$src")"
-          dst="$HOME/.config/opencode/skills/$name"
-          if [[ -e "$dst" && ! -d "$dst" ]]; then
-            rm -f "$dst"
-          fi
-          cp -r "$src" "$dst" 2>/dev/null || true
+        for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfiles.names)}; do
+          skills_dir="$HOME/.config/$profile/skills"
+          mkdir -p "$skills_dir"
+          for src in "$IMPECCABLE_DIR"/dist/opencode/.opencode/skills/*; do
+            [[ -e "$src" ]] || continue
+            name="$(basename "$src")"
+            dst="$skills_dir/$name"
+            if [[ -e "$dst" && ! -d "$dst" ]]; then
+              rm -f "$dst"
+            fi
+            cp -r "$src" "$dst" 2>/dev/null || true
+          done
         done
         echo "✓ impeccable installed for OpenCode"
       fi

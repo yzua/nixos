@@ -120,7 +120,12 @@ let
       ;
   };
   pluginInstalls = import ./_plugin-installs.nix {
-    inherit cfg pkgs lib;
+    inherit
+      cfg
+      config
+      pkgs
+      lib
+      ;
   };
 in
 {
