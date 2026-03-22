@@ -17,6 +17,14 @@ let
   buildPerformancePrompt = workflowPrompts.buildPerformance;
   markdownSyncPrompt = workflowPrompts.markdownSync;
 
+  codexBase = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
+
+  # GPT model tier aliases for opencode_gpt variants
+  gptLowModel = "openai/gpt-5.3-codex-spark";
+  gptMedModel = "openai/gpt-5.3-codex";
+  gptHighModel = "openai/gpt-5.4";
+  gptXHighModel = "openai/gpt-5.1-codex-max";
+
   mkAliasAttrs =
     aliasSpecs:
     builtins.listToAttrs (
@@ -58,32 +66,32 @@ let
     }
     {
       alias = "cx";
-      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
+      command = codexBase;
       workflowPromptMode = "positional";
     }
     {
       alias = "cxu";
-      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
+      command = codexBase;
       workflowPromptMode = "positional";
     }
     {
       alias = "lcx";
-      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'";
+      command = "${codexBase} -c 'model_reasoning_effort=\"low\"'";
       workflowPromptMode = "positional";
     }
     {
       alias = "mcx";
-      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'";
+      command = "${codexBase} -c 'model_reasoning_effort=\"medium\"'";
       workflowPromptMode = "positional";
     }
     {
       alias = "hcx";
-      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'";
+      command = "${codexBase} -c 'model_reasoning_effort=\"high\"'";
       workflowPromptMode = "positional";
     }
     {
       alias = "xcx";
-      command = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"xhigh\"'";
+      command = "${codexBase} -c 'model_reasoning_effort=\"xhigh\"'";
       workflowPromptMode = "positional";
     }
     {
@@ -113,22 +121,22 @@ let
     }
     {
       alias = "locgpt";
-      command = "opencode_gpt --model openai/gpt-5.3-codex-spark";
+      command = "opencode_gpt --model ${gptLowModel}";
       workflowPromptMode = "flag";
     }
     {
       alias = "mocgpt";
-      command = "opencode_gpt --model openai/gpt-5.3-codex";
+      command = "opencode_gpt --model ${gptMedModel}";
       workflowPromptMode = "flag";
     }
     {
       alias = "hocgpt";
-      command = "opencode_gpt --model openai/gpt-5.4";
+      command = "opencode_gpt --model ${gptHighModel}";
       workflowPromptMode = "flag";
     }
     {
       alias = "xocgpt";
-      command = "opencode_gpt --model openai/gpt-5.1-codex-max";
+      command = "opencode_gpt --model ${gptXHighModel}";
       workflowPromptMode = "flag";
     }
     {

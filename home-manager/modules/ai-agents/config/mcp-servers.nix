@@ -1,6 +1,16 @@
 # MCP server definitions and logging configuration.
 { config, ... }:
 
+let
+  mkZaiRemoteMcp = path: {
+    enable = true;
+    type = "remote";
+    url = "https://api.z.ai/api/mcp/${path}/mcp";
+    headers = {
+      Authorization = "Bearer {env:ZAI_API_KEY}";
+    };
+  };
+in
 {
   programs.aiAgents = {
     mcpServers = {
@@ -12,32 +22,9 @@
         ];
       };
 
-      web-search-prime = {
-        enable = true;
-        type = "remote";
-        url = "https://api.z.ai/api/mcp/web_search_prime/mcp";
-        headers = {
-          Authorization = "Bearer {env:ZAI_API_KEY}";
-        };
-      };
-
-      web-reader = {
-        enable = true;
-        type = "remote";
-        url = "https://api.z.ai/api/mcp/web_reader/mcp";
-        headers = {
-          Authorization = "Bearer {env:ZAI_API_KEY}";
-        };
-      };
-
-      zread = {
-        enable = true;
-        type = "remote";
-        url = "https://api.z.ai/api/mcp/zread/mcp";
-        headers = {
-          Authorization = "Bearer {env:ZAI_API_KEY}";
-        };
-      };
+      web-search-prime = mkZaiRemoteMcp "web_search_prime";
+      web-reader = mkZaiRemoteMcp "web_reader";
+      zread = mkZaiRemoteMcp "zread";
 
       github = {
         enable = true;
