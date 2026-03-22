@@ -39,17 +39,9 @@
         require_nolog = true;
         require_nofilter = true;
 
-        blocked_names = {
-          blocked_names_file = "/var/lib/dnscrypt-proxy/blocked-names.txt";
-        };
-
         log_level = 0; # Critical errors only
         block_ipv6 = true;
       };
     };
-
-    systemd.tmpfiles.rules = [
-      "f /var/lib/dnscrypt-proxy/blocked-names.txt 0644 root root - # DNSCrypt blocklist"
-    ];
   };
 }
