@@ -1,6 +1,6 @@
 # Utility Scripts
 
-30 executable Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`, and `lib/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
+31 executable Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`, and `lib/`, plus two shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`). All must pass `shellcheck` (enforced by `just lint`).
 
 ---
 

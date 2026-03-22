@@ -1,6 +1,6 @@
 # System Security Hardening
 
-7 always-on sub-modules (no enable guard — security is unconditional). Split from monolithic `security.nix` for maintainability. Only exception: `audit-logging.nix` is guarded by `mySystem.auditLogging.enable`.
+6 always-on sub-modules plus 1 guarded module (`audit-logging.nix`). Split from monolithic `security.nix` for maintainability. Guarded exception: `audit-logging.nix` is behind `mySystem.auditLogging.enable`.
 
 Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable security features outside this directory.
 

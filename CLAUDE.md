@@ -69,7 +69,7 @@ just secrets-add KEY    # Add single secret (prompts securely for value)
 ```text
 flake.nix
   ├─ hosts/<hostname>/configuration.nix     # Per-host: hardware, mySystem.* options
-  │    ├─ nixos/modules/default.nix          # ~58 shared NixOS modules (48 top-level + sub-modules)
+  │    ├─ nixos/modules/default.nix          # 52 NixOS modules (48 files + 4 sub-module directories)
   │    └─ hosts/<hostname>/modules/          # Host-specific hardware modules
   ├─ home-manager/home.nix                   # HM entry point (standalone)
   │    ├─ home-manager/modules/default.nix   # User-level modules
@@ -171,7 +171,8 @@ Update the parent `default.nix` imports list, then run `just modules`.
 | `gaming.enable`                         | `true`  | `false` |
 | `gaming.enableGamescope`                | `true`  | `false` |
 | `bluetooth.enable`                      | `false` | `true`  |
-| `backup.enable` / `auditLogging.enable` | `false` | `false` |
+| `backup.enable`                          | `false` | `false` |
+| `auditLogging.enable`                    | `true`  | `true`  |
 | All others                              | `true`  | `true`  |
 
 ## Forbidden Patterns

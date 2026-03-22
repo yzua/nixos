@@ -1,6 +1,6 @@
 # Application Configurations
 
-10 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
+11 app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
@@ -10,6 +10,7 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 | File                  | App                        | Config Pattern                                   |
 | --------------------- | -------------------------- | ------------------------------------------------ |
 | `activitywatch.nix`   | ActivityWatch              | `services.activitywatch` (Wayland watcher setup) |
+| `chromium.nix`        | Chromium                   | Launch wrapper with Wayland crash workaround     |
 | `desktop-entries.nix` | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries`               |
 | `keepassxc.nix`       | KeePassXC                  | Desktop entry                                    |
 | `nautilus.nix`        | GNOME Files                | `dconf.settings` (preferences)                   |
