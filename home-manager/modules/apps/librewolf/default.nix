@@ -6,16 +6,7 @@
   ...
 }:
 let
-  inherit (constants.proxies.librewolf)
-    personal
-    work
-    banking
-    shopping
-    illegal
-    ;
-  inherit (constants.proxies) i2pd;
-
-  # Shared profile settings for all profiles.
+  profileSpecs = import ./_profiles.nix { inherit constants; };
   baseSettings = {
     "app.update.auto" = false;
     "browser.shell.checkDefaultBrowser" = false;
@@ -84,66 +75,6 @@ let
     ".librewolf/${profilePath}/chrome/userContent.css".source =
       ../../../../themes/librewolf-userContent.css;
   };
-
-  profileSpecs = [
-    {
-      name = "personal";
-      id = 0;
-      isDefault = true;
-      path = "personal.default";
-      proxyHost = personal;
-      homepage = "http://127.0.0.1:8082/search";
-      extraSettings = { };
-    }
-    {
-      name = "work";
-      id = 1;
-      isDefault = false;
-      path = "work.default";
-      proxyHost = work;
-      homepage = "about:blank";
-      extraSettings = { };
-    }
-    {
-      name = "banking";
-      id = 2;
-      isDefault = false;
-      path = "banking.default";
-      proxyHost = banking;
-      homepage = "about:blank";
-      extraSettings = { };
-    }
-    {
-      name = "shopping";
-      id = 3;
-      isDefault = false;
-      path = "shopping.default";
-      proxyHost = shopping;
-      homepage = "about:blank";
-      extraSettings = { };
-    }
-    {
-      name = "illegal";
-      id = 4;
-      isDefault = false;
-      path = "illegal.default";
-      proxyHost = illegal;
-      homepage = "about:blank";
-      extraSettings = { };
-    }
-    {
-      name = "i2pd";
-      id = 5;
-      isDefault = false;
-      path = "i2pd.default";
-      proxyHost = i2pd;
-      homepage = "about:blank";
-      extraSettings = {
-        "browser.newtabpage.enabled" = false;
-        "network.proxy.socks_port" = 4447;
-      };
-    }
-  ];
 
   mkProfile = spec: {
     inherit (spec)

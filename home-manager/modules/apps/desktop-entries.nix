@@ -6,6 +6,8 @@
 }:
 
 let
+  constants = import ../../../shared/constants.nix;
+
   mkDesktopEntry =
     {
       name,
@@ -26,45 +28,14 @@ let
     }
     // (if mimeType == null then { } else { inherit mimeType; });
 
-  librewolfDesktopProfiles = [
-    {
-      slug = "personal";
-      label = "Personal";
-      comment = "LibreWolf with Sweden proxy";
-    }
-    {
-      slug = "work";
-      label = "Work";
-      comment = "LibreWolf with Germany proxy";
-    }
-    {
-      slug = "banking";
-      label = "Banking";
-      comment = "LibreWolf with Netherlands proxy";
-    }
-    {
-      slug = "shopping";
-      label = "Shopping";
-      comment = "LibreWolf with Romania proxy";
-    }
-    {
-      slug = "illegal";
-      label = "Illegal";
-      comment = "LibreWolf with Switzerland proxy";
-    }
-    {
-      slug = "i2pd";
-      label = "I2P";
-      comment = "LibreWolf with I2P proxy";
-    }
-  ];
+  librewolfDesktopProfiles = import ./librewolf/_profiles.nix { inherit constants; };
 
   librewolfDesktopEntries = builtins.listToAttrs (
     map (profile: {
-      name = "librewolf-${profile.slug}";
+      name = "librewolf-${profile.name}";
       value = mkDesktopEntry {
         name = "LibreWolf ${profile.label}";
-        exec = "/home/${user}/.local/bin/librewolf-${profile.slug} %U";
+        exec = "/home/${user}/.local/bin/librewolf-${profile.name} %U";
         icon = "librewolf";
         inherit (profile) comment;
         categories = [ "Network" ];
