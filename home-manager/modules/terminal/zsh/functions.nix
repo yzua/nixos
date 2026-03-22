@@ -22,8 +22,8 @@
     fi
 
     # Sops-enabled agent wrappers
-    _load_zai_key() {
-      local key_file="/run/secrets/zai_api_key"
+    _load_secret() {
+      local key_file="/run/secrets/$1"
       if [[ ! -f "$key_file" ]]; then
         echo "Error: $key_file not found. Run 'just nixos' to decrypt secrets." >&2
         return 1
@@ -31,14 +31,8 @@
       cat "$key_file"
     }
 
-    _load_openrouter_key() {
-      local key_file="/run/secrets/openrouter_api_key"
-      if [[ ! -f "$key_file" ]]; then
-        echo "Error: $key_file not found. Run 'just nixos' to decrypt secrets." >&2
-        return 1
-      fi
-      cat "$key_file"
-    }
+    _load_zai_key() { _load_secret zai_api_key; }
+    _load_openrouter_key() { _load_secret openrouter_api_key; }
 
     # === AI agent wrappers ===
     claude_glm() {
