@@ -8,20 +8,36 @@
 
 let
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+
+  mkGitClone =
+    {
+      name,
+      url,
+      dir,
+      var ? null,
+    }:
+    (lib.optionalString (var != null) ''${var}="${dir}"'')
+    + ''
+
+      if [[ -d "${dir}/.git" ]]; then
+        echo "📦 Updating ${name}..."
+        ${pkgs.git}/bin/git -C "${dir}" pull --ff-only 2>/dev/null || true
+      else
+        echo "📦 Cloning ${name}..."
+        rm -rf "${dir}"
+        ${pkgs.git}/bin/git clone --depth 1 ${url} "${dir}" 2>/dev/null || true
+      fi
+    '';
 in
 {
   installImpeccable = lib.mkIf cfg.impeccable.enable (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      IMPECCABLE_DIR="$HOME/.local/share/impeccable"
-
-      if [[ -d "$IMPECCABLE_DIR/.git" ]]; then
-        echo "📦 Updating impeccable..."
-        ${pkgs.git}/bin/git -C "$IMPECCABLE_DIR" pull --ff-only 2>/dev/null || true
-      else
-        echo "📦 Cloning impeccable..."
-        rm -rf "$IMPECCABLE_DIR"
-        ${pkgs.git}/bin/git clone --depth 1 https://github.com/pbakaus/impeccable.git "$IMPECCABLE_DIR" 2>/dev/null || true
-      fi
+      ${mkGitClone {
+        name = "impeccable";
+        url = "https://github.com/pbakaus/impeccable.git";
+        dir = "$HOME/.local/share/impeccable";
+        var = "IMPECCABLE_DIR";
+      }}
 
       if [[ -d "$IMPECCABLE_DIR" ]]; then
         echo "📦 Building impeccable bundles..."
@@ -71,16 +87,12 @@ in
 
   installAgencyAgents = lib.mkIf cfg.agencyAgents.enable (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      AGENCY_DIR="$HOME/.local/share/agency-agents"
-
-      if [[ -d "$AGENCY_DIR/.git" ]]; then
-        echo "📦 Updating agency-agents..."
-        ${pkgs.git}/bin/git -C "$AGENCY_DIR" pull --ff-only 2>/dev/null || true
-      else
-        echo "📦 Cloning agency-agents..."
-        rm -rf "$AGENCY_DIR"
-        ${pkgs.git}/bin/git clone --depth 1 https://github.com/msitarzewski/agency-agents.git "$AGENCY_DIR" 2>/dev/null || true
-      fi
+      ${mkGitClone {
+        name = "agency-agents";
+        url = "https://github.com/msitarzewski/agency-agents.git";
+        dir = "$HOME/.local/share/agency-agents";
+        var = "AGENCY_DIR";
+      }}
 
       if [[ -d "$AGENCY_DIR" && "${if cfg.claude.enable then "1" else "0"}" == "1" ]]; then
         mkdir -p "$HOME/.claude/agents"
@@ -145,14 +157,11 @@ in
       ECC_DIR="$HOME/.local/share/everything-claude-code"
 
       if command -v claude &> /dev/null; then
-        if [[ -d "$ECC_DIR/.git" ]]; then
-          echo "📦 Updating everything-claude-code..."
-          ${pkgs.git}/bin/git -C "$ECC_DIR" pull --ff-only 2>/dev/null || true
-        else
-          echo "📦 Cloning everything-claude-code..."
-          rm -rf "$ECC_DIR"
-          ${pkgs.git}/bin/git clone --depth 1 https://github.com/affaan-m/everything-claude-code.git "$ECC_DIR" 2>/dev/null || true
-        fi
+        ${mkGitClone {
+          name = "everything-claude-code";
+          url = "https://github.com/affaan-m/everything-claude-code.git";
+          dir = "$ECC_DIR";
+        }}
 
         if ! claude plugin marketplace list 2>/dev/null | grep -q "everything-claude-code"; then
           echo "📦 Adding everything-claude-code marketplace..."
