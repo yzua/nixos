@@ -90,17 +90,31 @@
       # Exploit surface reduction
       "kernel.io_uring_disabled" = 2; # Disable io_uring (frequent exploit target, rarely needed on desktop)
       "vm.unprivileged_userfaultfd" = 0; # Restrict userfaultfd (used in exploit chains)
+
+      # === IPv6 Neighbor Discovery Hardening ===
+      "net.ipv6.conf.all.accept_ra" = 0; # Don't accept router advertisements
+      "net.ipv6.conf.default.accept_ra" = 0;
+
+      # === Additional Kernel Hardening ===
+      "kernel.ftrace_enabled" = 0; # Disable function tracing (exploit tooling uses this)
+      "net.ipv4.tcp_sack" = 0; # Disable TCP SACK (CVE-2019-11478 resource exhaustion)
+      "net.ipv4.tcp_dsack" = 0; # Disable DACK (related to SACK)
+      "net.ipv4.tcp_fack" = 0; # Disable Forward ACK
+
+      # === Enhanced ASLR ===
+      # Maximize address space randomization for 64-bit (28 bits = 256MB range)
+      "vm.mmap_rnd_bits" = 28;
+      "vm.mmap_rnd_compat_bits" = 8;
     };
   };
 
   services.logind.settings.Login = {
     IdleAction = "lock";
     IdleActionSec = 300; # seconds
+    HandleLidSwitch = "lock"; # Lock on lid close (laptop)
+    HandleLidSwitchExternalPower = "lock";
+    HandleLidSwitchDocked = "lock";
   };
-
-  # lynis is in security/audit.nix (where the security-audit timer uses it)
-
-  services.openssh.enable = false; # Desktop workstation — no remote access
 
   security = {
     apparmor.enable = true;
