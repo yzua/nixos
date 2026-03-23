@@ -13,12 +13,24 @@
   };
 
   config = lib.mkIf config.mySystem.virtualisation.enable {
-    boot.kernelModules = [ "kvm" ]; # intel/amd modules auto-detected
+    boot.kernelModules = [
+      "kvm" # intel/amd modules auto-detected
+      "bridge"
+      "br_netfilter"
+      "ip_tables"
+      "iptable_nat"
+      "nf_nat"
+      "xt_addrtype"
+    ];
 
     virtualisation = {
       docker = {
         enable = true;
         enableOnBoot = false;
+        rootless = {
+          enable = true;
+          setSocketVariable = true; # Set DOCKER_HOST for rootless socket
+        };
         daemon.settings = {
           # Route container DNS through DNSCrypt-Proxy on host.
           # NOTE: flaresolverr container tries to resolve "redis" (no redis running) —
@@ -26,8 +38,11 @@
           dns = [ "127.0.0.1" ];
           ipv6 = false;
           iptables = true;
+          # SECURITY: Limit container capabilities
+          "no-new-privileges" = true;
+          # SECURITY: Default seccomp profile (blocks dangerous syscalls)
+          seccomp-profile = "";
         };
-        rootless.enable = false; # System Docker handles all containers
       };
 
       libvirtd = {

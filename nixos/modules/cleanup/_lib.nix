@@ -45,6 +45,7 @@ let
       systemd.timers."cleanup-${name}" = mkPersistentTimer {
         inherit description;
         onCalendar = calendar;
+        unit = "cleanup-${name}.service";
         randomizedDelaySec = delay;
       };
     };
