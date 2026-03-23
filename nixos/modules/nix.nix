@@ -1,5 +1,11 @@
-# Nix package manager configuration (flakes, GC, binary caches).
-{ inputs, pkgConfig, ... }:
+# Nix package manager configuration (flakes, GC, binary caches, update notifications).
+{
+  inputs,
+  lib,
+  pkgConfig,
+  pkgsStable,
+  ...
+}:
 
 {
   # Mirror pkgConfig from flake.nix — nixosSystem evaluates its own nixpkgs instance
@@ -63,6 +69,36 @@
       persistent = true;
       dates = "weekly";
       options = "--delete-older-than 7d";
+    };
+  };
+
+  # === Security Update Notification Timer ===
+  # Daily reminder that updates should be checked. Does NOT auto-apply.
+  # Run `just update && just nixos` manually when convenient.
+  systemd.services.security-update-check = {
+    description = "Log security update check timestamp";
+    script = ''
+      set -euo pipefail
+      LOG=/var/log/security-update-check.log
+      ${pkgsStable.coreutils}/bin/date -Iseconds >> "$LOG"
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      PrivateTmp = true;
+      ProtectHome = true;
+      ProtectSystem = "strict";
+      NoNewPrivileges = true;
+      ReadWritePaths = [ "/var/log" ];
+    };
+  };
+
+  systemd.timers.security-update-check = {
+    description = "Daily security update check";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily";
+      Persistent = true;
+      RandomizedDelaySec = "1h";
     };
   };
 }

@@ -39,6 +39,7 @@
     # Security
     ./security # Kernel hardening, firewall, AppArmor, opsec
     ./opensnitch.nix # Application firewall with network logging
+    ./secure-boot.nix # Secure Boot preparation with sbctl
     ./sops.nix # SOPS-Nix encrypted secrets (age)
 
     # Applications
