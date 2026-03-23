@@ -156,6 +156,14 @@ let
         text = toJSON opencodeSettingsByProfile.${name};
         force = true;
       };
+      "${name}/tui.json" = {
+        text = toJSON {
+          theme = "gruvbox";
+          show_tokens = true;
+          show_cost = true;
+        };
+        force = true;
+      };
     }
     // (lib.optionalAttrs cfg.opencode.ohMyOpencode.enable {
       "${name}/oh-my-opencode.json" = {

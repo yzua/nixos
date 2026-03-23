@@ -243,9 +243,11 @@ in
             if [[ -d "$HOME/.claude" ]]; then
               skill_agents+=(claude-code)
             fi
-            if [[ -d "$HOME/.config/opencode" ]] || [[ -d "$HOME/.config/opencode-gpt" ]] || [[ -d "$HOME/.config/opencode-sonnet" ]] || [[ -d "$HOME/.config/opencode-glm" ]] || [[ -d "$HOME/.config/opencode-gemini" ]]; then
-              skill_agents+=(opencode)
-            fi
+
+            # Do not install skills.sh packs into the shared ~/.agents/skills tree for
+            # OpenCode. OpenCode already has explicit per-profile local skills under
+            # ~/.config/opencode*/skills, and the shared tree causes massive duplicate
+            # skill discovery warnings and large log files.
 
             declare -a skill_agent_scope_args=()
             if [[ "''${#skill_agents[@]}" -gt 0 ]]; then
@@ -318,14 +320,22 @@ in
               echo "🧠 Skills summary: configured=$configured_entries processed=$processed_entries attempted=$total_attempts success=$successful_installs skipped=$skipped_installs omit_failures=$omit_failures failures=$failed_installs duration=''${install_duration_seconds}s"
 
               if [[ "$failed_installs" -gt 0 ]]; then
-                echo "❌ Skills installation finished with $failed_installs failures"
-                exit 1
+                echo "⚠ Skills installation finished with $failed_installs failures"
+                echo "⚠ Continuing Home Manager activation; agent skills sync is best-effort"
               fi
 
               mkdir -p "$skill_state_cache_dir"
               printf '%s' "$desired_skill_state_hash" > "$skill_state_cache_file"
 
               echo "✓ Skills installation complete"
+            fi
+
+            if [[ -d "$HOME/.agents/skills" ]]; then
+              disabled_dir="$HOME/.agents/skills.disabled-by-home-manager"
+              if [[ ! -e "$disabled_dir" ]]; then
+                echo "🧹 Disabling shared ~/.agents/skills tree to prevent OpenCode duplicate-skill spam"
+                mv "$HOME/.agents/skills" "$disabled_dir"
+              fi
             fi
           ''
         );

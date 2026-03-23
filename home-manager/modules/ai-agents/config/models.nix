@@ -37,11 +37,6 @@ in
       extraSettings = {
         share = "disabled";
         autoupdate = true;
-        tui = {
-          theme = "gruvbox";
-          show_tokens = true;
-          show_cost = true;
-        };
         small_model = "anthropic/claude-haiku-4-5"; # Cheap model for titles, summaries
         compaction = {
           auto = true;
