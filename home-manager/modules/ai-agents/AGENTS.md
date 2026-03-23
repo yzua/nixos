@@ -19,7 +19,7 @@ The system follows a strict unidirectional flow:
 3. **Settings Builders** (`_settings-builders.nix`): Implements **Profile-Driven Polymorphism**.
 4. **MCP Transforms** (`_mcp-transforms.nix`): **Unified MCP Abstraction** converts shared server definitions into agent-specific schemas (Claude stdio vs OpenCode remote vs Gemini HTTP).
 5. **File Generation** (`files.nix`): Declares configuration files in XDG paths.
-6. **Activation Logic** (`activation.nix`): Handles late-stage secret injection, skill management, and state caching.
+6. **Activation Logic** (`activation.nix`): Handles late-stage secret injection, best-effort skill management, and state caching.
 
 ### Profile-Driven Polymorphism
 
@@ -67,7 +67,7 @@ Never define MCP servers per-agent. Define them once in `programs.aiAgents.mcpSe
 This module contains significant **embedded Bash logic** that bypasses standard Nix abstraction for performance and compatibility:
 
 - **`_claude-hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
-- **`activation.nix`**: Complex sequential skill installation logic with state-caching to prevent redundant network calls.
+- **`activation.nix`**: Complex sequential skill installation/removal logic with state-caching to prevent redundant network calls; skill sync failures are logged as warnings so Home Manager activation can continue.
 
 ### Validation Pipeline
 

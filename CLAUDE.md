@@ -22,10 +22,12 @@ just check     # nix flake check --no-build (evaluates without building)
 ### Apply changes
 
 ```bash
-just home      # Home Manager switch (safe, user-level) — run FIRST
-just nixos     # NixOS switch (system-level) — run AFTER just home
+just home      # Home Manager switch (user-level, narrower blast radius)
+just nixos     # NixOS switch (system-level)
 just all       # Full pipeline: modules → pkgs → lint → format → check → nixos → home
 ```
+
+When running commands manually, `just home` is still the safer first iteration step, but `just all` applies `nixos` before `home` because that is the exact order in `justfile`.
 
 ### Other commands
 
@@ -69,7 +71,7 @@ just secrets-add KEY    # Add single secret (prompts securely for value)
 ```text
 flake.nix
   ├─ hosts/<hostname>/configuration.nix     # Per-host: hardware, mySystem.* options
-  │    ├─ nixos/modules/default.nix          # 52 NixOS modules (48 files + 4 sub-module directories)
+  │    ├─ nixos/modules/default.nix          # Shared NixOS modules and sub-module directories
   │    └─ hosts/<hostname>/modules/          # Host-specific hardware modules
   ├─ home-manager/home.nix                   # HM entry point (standalone)
   │    ├─ home-manager/modules/default.nix   # User-level modules
@@ -103,7 +105,7 @@ More detailed module-level guidance exists at:
 - `home-manager/modules/noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
 - `home-manager/modules/apps/AGENTS.md` — Application configs (VS Code, Brave, OBS, Discord, etc.)
 - `home-manager/modules/terminal/AGENTS.md` — Terminal module structure, zsh functions, zellij layouts
-- `home-manager/modules/ai-agents/AGENTS.md` — AI agent architecture, OpenCode profiles, Claude hooks
+- `home-manager/modules/ai-agents/AGENTS.md` — AI agent architecture, OpenCode profiles, best-effort activation-time skill sync, Claude hooks
 - `hosts/AGENTS.md` — Host comparison, adding new hosts
 - `scripts/AGENTS.md` — Script inventory, test conventions, Nix-referenced scripts
 - `dev-shells/AGENTS.md` — Standalone flake templates (not part of main flake), usage

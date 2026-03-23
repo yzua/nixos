@@ -631,8 +631,11 @@ Column 2 holds two windows stacked vertically (merged with `Super+Comma`/`Super+
 
 | File                                    | What It Controls                                                |
 | --------------------------------------- | --------------------------------------------------------------- |
-| `home-manager/modules/niri/main.nix`    | Layout, window rules, workspaces, animations, input, auto-start |
-| `home-manager/modules/niri/binds.nix`   | All keybindings and custom scripts                              |
+| `home-manager/modules/niri/main.nix`    | Workspaces, autostart, environment, animations                  |
+| `home-manager/modules/niri/binds.nix`   | All keybindings and imported helper scripts                     |
+| `home-manager/modules/niri/input.nix`   | Keyboard, mouse, touchpad, trackpoint                           |
+| `home-manager/modules/niri/layout.nix`  | Gaps, columns, focus behavior                                   |
+| `home-manager/modules/niri/rules.nix`   | Window rules, opacity, floating, workspace assignment           |
 | `home-manager/modules/niri/idle.nix`    | Idle timeouts (dim → lock → DPMS)                               |
 | `home-manager/modules/niri/lock.nix`    | Swaylock fallback configuration                                 |
 | `home-manager/modules/niri/default.nix` | Module imports and Niri flake integration                       |

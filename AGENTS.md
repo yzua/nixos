@@ -30,9 +30,10 @@
 
 ### Apply changes
 
-- `just home`: Home Manager switch (safe, user-level) — run FIRST.
-- `just nixos`: NixOS switch (system-level) — run AFTER `just home`.
+- `just home`: Home Manager switch (user-level, narrower blast radius).
+- `just nixos`: NixOS switch (system-level).
 - `just all`: Full pipeline: modules → pkgs → lint → format → check → nixos → home.
+- Manual iteration can still start with `just home`, but `just all` currently applies `nixos` before `home` because that is the exact order encoded in `justfile`.
 
 ### Other
 
@@ -125,7 +126,7 @@ Update the parent `default.nix` imports list, then run `just modules`.
 - **HM Entry**: `home-manager/home.nix` → `home-manager/modules/default.nix`.
 - **Identity**: `shared/constants.nix`.
 - **Secrets**: `secrets/secrets.yaml` (sops-nix).
-- **AI Fleet**: `home-manager/modules/ai-agents/` (10-agent orchestration, embedded bash, `activation.nix`).
+- **AI Fleet**: `home-manager/modules/ai-agents/` (10-agent orchestration, embedded bash, best-effort skill sync in `activation.nix`).
 - **Observability**: `nixos/modules/prometheus-grafana/` (Loki, Grafana, Prometheus).
 
 ## Common Fixes

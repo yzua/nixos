@@ -17,9 +17,7 @@ zellij kill-session myproject   # Kill a named session
 zellij kill-all-sessions        # Kill all sessions
 ```
 
-Zellij **auto-starts** with every interactive shell. Your Zsh `initContent` runs `zellij attach --create main` — this attaches to the `main` session (or creates it if it doesn't exist). SSH sessions are excluded. The Home Manager `enableZshIntegration` option is disabled because its built-in `zellij attach -c` breaks with multiple sessions; the custom initContent replaces it with a smarter approach.
-
-To start a **separate named session** instead of the default `main`, run manually:
+Home Manager enables Zellij itself, but `programs.zellij.enableZshIntegration` is disabled in `home-manager/modules/terminal/zellij/config.nix`. Start or attach sessions explicitly with the commands above.
 
 ---
 

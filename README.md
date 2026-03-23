@@ -41,7 +41,7 @@ just all   # modules -> pkgs -> lint -> format -> check -> nixos -> home
 
 | Command                   | Description                                          |
 | ------------------------- | ---------------------------------------------------- |
-| `just all`                | Full pipeline: validate, lint, format, check, deploy |
+| `just all`                | Full pipeline: `modules -> pkgs -> lint -> format -> check -> nixos -> home` |
 | `just home`               | Apply Home Manager (user-level, safe)                |
 | `just nixos`              | Apply NixOS (system-level)                           |
 | `just modules`            | Validate import structure                            |
@@ -116,7 +116,7 @@ Set `hostProfile` first, then override as needed:
 
 ## Security
 
-Always-on: kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, AIDE file integrity.
+Always-on: kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, AIDE file integrity, metadata scrubbing, firewall hostname leak prevention, Chrony with NTS.
 
 Toggleable: Mullvad VPN, Tor, Yggdrasil, DNSCrypt, OpenSnitch, fail2ban.
 

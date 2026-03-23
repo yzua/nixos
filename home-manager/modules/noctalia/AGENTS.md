@@ -41,7 +41,7 @@ When Stylix base16 scheme changes, Noctalia colors must be updated **manually** 
 
 ## API Quota Widget
 
-`default.nix` defines `apiQuotaScript` — wraps `scripts/ai/api-quota/api-quota.sh` as a Nix derivation.
+`default.nix` defines `apiQuotaScript` as a shell command string pointing at `scripts/ai/api-quota/api-quota.sh`.
 Displays Z.AI + Claude Max + Codex usage in the bar's right panel.
 
 ---

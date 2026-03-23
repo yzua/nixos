@@ -26,7 +26,7 @@ terminal/
 │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   └── local-vars.nix # Local shell variables
 └── tools/           # CLI tools — one .nix file per tool
-    ├── default.nix  # Import hub (16 tools)
+    ├── default.nix  # Import hub (15 tool entries including `git/`)
     ├── atuin.nix    # Shell history (fuzzy, secrets filter, sync disabled)
     ├── bat.nix      # Syntax-highlighting cat
     ├── btop.nix     # System monitor (GPU support)
@@ -35,7 +35,7 @@ terminal/
     ├── eza.nix      # Modern ls
     ├── fzf.nix      # Fuzzy finder (Gruvbox colors, Zsh integration)
     ├── gh.nix       # GitHub CLI
-    ├── git/         # Git (identity from constants, GPG signing, 30+ aliases, hooks)
+    ├── git/         # Git (identity from constants, GPG signing, aliases, hooks)
     │   ├── default.nix # Import hub
     │   ├── config.nix  # Git settings, aliases, includes, ignores
     │   └── hooks.nix   # Global hooks (secret scanning, conventional commits, GPG enforcement)
@@ -74,7 +74,7 @@ terminal/
 - **Conditional email**: GitHub noreply email for github.com repos via `includeIf`
 - **Signing**: GPG commit/tag signing enabled
 - **Diff tool**: difftastic (structural diff)
-- **Aliases**: 30+ (st, co, br, lg, amend, wip, undo, etc.)
+- **Aliases**: Extensive set including `st`, `co`, `br`, `lg`, `amend`, `wip`, `undo`, and changelog helpers
 - **Global hooks** (`hooks.nix`): Secret scanning (blocks commits with tokens/keys), conventional commit enforcement, GPG signature enforcement
 
 ---
@@ -110,7 +110,7 @@ just home
 
 ## Adding a Zsh Function
 
-1. Add to `zsh/default.nix` → `programs.zsh.initContent` section
+1. Add to `zsh/functions.nix` (`programs.zsh.initContent`)
 2. For aliases: add to `zsh/aliases.nix`
 3. Run: `just home`
 

@@ -46,9 +46,9 @@ Terminal tools enforce a "Multi-Layered Git Defense" strategy to prevent secrets
 
 ### Runtime Secret Loading
 
-Tools that require API keys or tokens (e.g., AI agents, cloud CLIs) use Zsh wrappers defined in `terminal/zsh/functions.nix` or `terminal/zsh/config.nix`. These wrappers:
+Tools that require API keys or tokens (for example AI agents) use Zsh wrappers defined in `terminal/zsh/functions.nix`. These wrappers:
 
-- Use `sops` or `age` to load secrets into the environment at runtime.
+- Read secrets from `/run/secrets/` at runtime.
 - Never store plain-text secrets in the Nix store or environment variables.
 
 ---

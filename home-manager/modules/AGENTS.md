@@ -30,8 +30,10 @@ modules/
 │   │   ├── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)
 │   │   └── agents.nix       # Oh-My-OpenCode agent definitions
 │   └── log-analyzer.nix # AI agent log analysis and dashboard
-├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, etc.)
+├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
+│   ├── chromium.nix    # Chromium launch wrapper with Wayland crash workaround
+│   ├── desktop-entries.nix # Desktop launchers/wrappers
 │   ├── keepassxc.nix   # KeePassXC desktop entry
 │   ├── nautilus.nix    # Nautilus (GNOME Files) dconf preferences
 │   ├── nixcord.nix     # Discord (Vesktop + Vencord) declarative config
@@ -46,7 +48,7 @@ modules/
 │   │   └── activation.nix   # Writes mutable settings.json
 │   ├── brave/          # Brave browser
 │   │   ├── default.nix      # Import hub
-│   │   └── extensions.nix   # 30+ declarative extensions (privacy, dev tools, YouTube)
+│   │   └── extensions.nix   # Declarative extension groups (privacy, dev tools, YouTube/social)
 │   └── librewolf/      # LibreWolf browser (multi-profile SOCKS5 proxy)
 │       ├── default.nix      # Import hub: programs.librewolf with policies + profiles
 │       └── _profiles.nix    # Profile definitions (not a module, imported by desktop-entries.nix)
@@ -95,7 +97,7 @@ modules/
 │   │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   │   └── local-vars.nix # Local shell variables
 │   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, gh, git, htop, lazygit, mpv, starship, yazi, zathura, zoxide)
-│       └── git/        # Git (identity from constants, GPG signing, 30+ aliases, hooks)
+│       └── git/        # Git (identity from constants, GPG signing, aliases, hooks)
 │           ├── default.nix # Import hub
 │           ├── config.nix  # Git settings, aliases, includes
 │           └── hooks.nix   # Global hooks (secret scanning, conventional commits, GPG)

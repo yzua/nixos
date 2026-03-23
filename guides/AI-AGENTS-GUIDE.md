@@ -80,7 +80,7 @@ Upstream-verified facts:
 
 ---
 
-## Verification Snapshot (2026-03-13)
+## Verification Snapshot (2026-03-23)
 
 This guide is verified against the live configuration sources in:
 
@@ -154,7 +154,7 @@ Why this pattern exists:
 
 - `skills add` is convenient for large repos with `--all`.
 - skills CLI behavior currently does not provide a reliable native exclude flow for repo-wide sync.
-- Post-install removal is deterministic and keeps behavior reproducible across `just home` runs.
+- Post-install removal keeps the desired state declarative, but activation now treats skills sync as best-effort so `just home` can continue when the skills CLI or network is unavailable.
 
 Maintenance workflow:
 
@@ -610,10 +610,9 @@ Browser automation is handled by [`@playwright/cli`](https://github.com/microsof
 playwright-cli open https://example.com   # open browser
 playwright-cli snapshot                   # capture page snapshot
 playwright-cli screenshot                 # take screenshot
-playwright-cli install --skills           # install skill into a project
 ```
 
-The skill is installed globally via the `skills` CLI activation. Set `PLAYWRIGHT_CLI_SESSION=<name>` to isolate sessions per project.
+In this repo, the Playwright CLI skill is installed via the global `skills` CLI activation flow.
 
 ### BTCA Resources
 

@@ -1,6 +1,6 @@
 # System Security Hardening
 
-6 always-on sub-modules plus 1 guarded module (`audit-logging.nix`). Split from monolithic `security.nix` for maintainability. Guarded exception: `audit-logging.nix` is behind `mySystem.auditLogging.enable`.
+7 always-on sub-modules plus 1 guarded module (`audit-logging.nix`). Split from monolithic `security.nix` for maintainability. Guarded exception: `audit-logging.nix` is behind `mySystem.auditLogging.enable`.
 
 Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable security features outside this directory.
 
@@ -12,10 +12,11 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 | ------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------ |
 | `hardening.nix`     | Kernel sysctl, AppArmor, PAM core dumps, sudo, hidepid=2, coredump                                      | Always-on                      |
 | `firewall.nix`      | nftables firewall, LLMNR/NetBIOS/SMB hostname leak prevention                                           | Always-on                      |
-| `services.nix`      | dbus-broker, Avahi (explicit `allowInterfaces`), systemd Manager timeouts                               | Always-on                      |
+| `services.nix`      | dbus-broker and journald hardening                                                                       | Always-on                      |
 | `audit.nix`         | Weekly Lynis security audit timer + service                                                             | Always-on                      |
 | `audit-logging.nix` | fail2ban intrusion prevention (5 retries, 1h ban, exponential backoff)                                  | `mySystem.auditLogging.enable` |
-| `opsec.nix`         | MAC randomization, kexec disable, metadata removal (mat2, exiftool), zram swap, Chrony NTS, Thunderbolt | Always-on                      |
+| `metadata-scrubber.nix` | Automatic metadata scrubbing for user files and periodic full scrub                                 | `mySystem.metadataScrubber.enable` |
+| `opsec.nix`         | kexec disable, zram swap, Chrony NTS                                                                     | Always-on                      |
 | `aide.nix`          | AIDE file integrity monitoring (weekly scan)                                                            | Always-on                      |
 
 ---
@@ -46,7 +47,7 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 - Section headers use `# === Section Name ===` for visual structure
 - Non-default security values get inline comments explaining rationale
 - `mkForce` used only for security hardening overrides (e.g., IPv6 privacy extensions)
-- Avahi **must** have explicit `allowInterfaces` (validated in `validation.nix`)
+- Avahi policy is validated in `validation.nix`, but Avahi itself is configured outside this directory.
 
 ---
 
