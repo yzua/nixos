@@ -16,6 +16,9 @@
     signal-desktop
     telegram-desktop
 
+    # VPN GUIs
+    protonvpn-gui
+
     # Torrents
     qbittorrent
 

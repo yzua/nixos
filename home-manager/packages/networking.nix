@@ -40,6 +40,8 @@
 
     # VPN tools
     openvpn
+    proton-vpn-cli
     wireguard-tools
+    wgnord
   ];
 }

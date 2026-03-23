@@ -40,6 +40,22 @@ let
     "privacy.clearOnShutdown.cache" = false;
     "privacy.sanitize.sanitizeOnShutdown" = false;
 
+    # Anti-fingerprinting
+    "privacy.resistFingerprinting" = true; # Resist canvas/font/WebGL fingerprinting
+    "privacy.fingerprintingProtection" = true; # Firefox fingerprinting protection
+    "privacy.fingerprintingProtection.overrides" = ""; # No overrides
+    "privacy.trackingprotection.enabled" = true; # Enhanced Tracking Protection
+    "privacy.trackingprotection.socialtracking.enabled" = true; # Block social trackers
+    "privacy.trackingprotection.cryptomining.enabled" = true; # Block cryptominers
+    "privacy.trackingprotection.fingerprinting.enabled" = true; # Block fingerprinters
+    "privacy.firstparty.isolate" = true; # First-party isolation (no cross-site tracking)
+    "privacy.query_stripping.enabled" = true; # Strip tracking params from URLs
+    "privacy.query_stripping.strip_list" =
+      "utm_source utm_medium utm_campaign utm_term utm_content fbclid gclid dclid twclid";
+    "webgl.disabled" = true; # Disable WebGL (fingerprint vector)
+    "geo.enabled" = false; # Disable geolocation API
+    "media.navigator.enabled" = false; # Disable JS media device enumeration
+
     # Proxy base config (host set per-profile)
     "network.proxy.type" = 1;
     "network.proxy.socks_port" = 1080;
