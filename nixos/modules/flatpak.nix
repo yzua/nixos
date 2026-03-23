@@ -1,4 +1,5 @@
 # Flatpak sandboxed application distribution with Flathub.
+# SECURITY: Default overrides restrict Flatpak apps to VPN tunnel and limit filesystem access.
 { config, lib, ... }:
 
 {
@@ -10,10 +11,11 @@
     services.flatpak.enable = true;
 
     systemd = {
-      # PRIVACY: Share host network so Flatpak uses system DNS/VPN
+      # SECURITY: Default Flatpak overrides — force network through VPN, restrict filesystem
       tmpfiles.rules = [
         "d /etc/flatpak/overrides 0755 root root -"
-        ''f /etc/flatpak/overrides/global 0644 root root - [Context]\nshared=network;\n''
+        # Global: share host network (uses system DNS/VPN), deny home filesystem by default
+        ''f /etc/flatpak/overrides/global 0644 root root - [Context]\nshared=network;\nfilesystem=!home;\nfilesystem=!host;\n[Environment]\nDBUS_SESSION_BUS_ADDRESS=\n''
       ];
 
       services.add-flathub = {
