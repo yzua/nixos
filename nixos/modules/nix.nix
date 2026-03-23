@@ -26,6 +26,13 @@
         "pipe-operators"
       ];
 
+      # SECURITY: Restrict Nix daemon access
+      allowed-users = [ "@wheel" ];
+      trusted-users = [
+        "root"
+        "@wheel"
+      ];
+
       auto-optimise-store = true;
       download-buffer-size = 262144000; # 250 MB
 
