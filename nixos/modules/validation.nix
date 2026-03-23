@@ -73,5 +73,11 @@
     }
   ];
 
-  warnings = lib.optional config.services.prometheus.exporters.node.enable "prometheus.exporters.node was removed due to service failures. Use Netdata (mySystem.netdata.enable) instead.";
+  warnings =
+    lib.optional config.services.prometheus.exporters.node.enable "prometheus.exporters.node was removed due to service failures. Use Netdata (mySystem.netdata.enable) instead."
+    ++ lib.optional (builtins.pathExists /etc/nixos/configuration.nix) ''
+      Legacy /etc/nixos/configuration.nix exists alongside your flake config.
+      This file may conflict with your flake-based configuration (different kernel, GNOME vs niri, etc.).
+      Consider removing it: sudo mv /etc/nixos/configuration.nix /etc/nixos/configuration.nix.bak
+    '';
 }
