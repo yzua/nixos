@@ -20,6 +20,17 @@
       package = pkgs.mullvad-vpn; # Includes GUI
     };
 
+    # Mullvad's packaged unit waits for network-online, which adds ~14s of
+    # boot delay via NetworkManager-wait-online. Starting after NetworkManager
+    # is sufficient; the daemon can reconnect as soon as the link is usable.
+    systemd.services.mullvad-daemon = {
+      wants = lib.mkForce [ "network.target" ];
+      after = lib.mkForce [
+        "network.target"
+        "NetworkManager.service"
+      ];
+    };
+
     # Declarative settings applied after daemon starts
     systemd.services.mullvad-settings = {
       description = "Apply declarative Mullvad VPN settings";
@@ -40,9 +51,11 @@
         done
 
         # === DNS ===
-        # Route through local dnscrypt-proxy (127.0.0.1:53) instead of Mullvad's DNS.
-        # Prevents DNS conflicts and keeps encrypted DNS under our control.
-        $mullvad dns set custom 127.0.0.1
+        # Do not set Mullvad-side custom DNS. The host already resolves through
+        # local dnscrypt-proxy via resolv.conf/NetworkManager. Forcing Mullvad's
+        # tunnel DNS to 127.0.0.1 adds unnecessary complexity and can slow tunnel
+        # establishment.
+        $mullvad dns set default
 
         # === Kill Switch ===
         # Block ALL traffic when VPN is disconnected. No leaks.
@@ -53,12 +66,11 @@
         $mullvad auto-connect set on
 
         # === Relay Selection ===
-        # Random exit server, no multihop.
-        # Multihop (US entry → random exit) disabled: from Jordan, routing through
-        # a US entry server adds latency and often fails with obfuscation, causing
-        # 10-15min connection loops at boot. Re-enable on unrestricted networks.
+        # Prefer the currently reliable nearby region instead of `location any`.
+        # Random far-away relays caused repeated WireGuard timeout/obfuscation
+        # loops during boot before eventually landing on Israel anyway.
         $mullvad relay set multihop off
-        $mullvad relay set location any
+        $mullvad relay set location il
 
         # === Tunnel Hardening ===
         # Quantum-resistant key exchange (post-quantum crypto on top of WireGuard)
@@ -77,8 +89,18 @@
         $mullvad obfuscation set mode auto
 
         # === Local Network ===
-        # Allow LAN access for KDE Connect and LocalSend
-        $mullvad lan set allow
+        # SECURITY: Only allow LAN access when services need it (KDE Connect, LocalSend).
+        # On public/hostile networks, LAN access is an attack surface.
+        ${
+          if (config.mySystem.kdeconnect.enable || config.mySystem.flatpak.enable) then
+            ''
+              $mullvad lan set allow
+            ''
+          else
+            ''
+              $mullvad lan set block
+            ''
+        }
       '';
     };
   };
