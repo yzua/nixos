@@ -32,6 +32,9 @@
       keyserver = "hkps://keys.openpgp.org";
       auto-key-locate = "wkd,dane,local";
       auto-key-retrieve = true;
+
+      # === Verification Hardening ===
+      trust-model = "tofu+pgp"; # Trust On First Use + PGP web-of-trust
     };
   };
 

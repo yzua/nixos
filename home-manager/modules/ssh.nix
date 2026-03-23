@@ -25,9 +25,13 @@ _:
           UpdateHostKeys = "yes";
           HashKnownHosts = "yes";
 
-          # Connection keepalive
+          # Connection keepalive + auto-close idle sessions
           ServerAliveInterval = "60";
           ServerAliveCountMax = "3";
+
+          # Timeout idle connections after 10 minutes (prevents stale session hijacking)
+          ConnectionAttempts = "3";
+          ConnectTimeout = "30";
         };
       };
 
