@@ -23,6 +23,7 @@ let
     {
       systemd.services."cleanup-${name}" = {
         inherit description;
+        wantedBy = [ ];
         serviceConfig = {
           Type = "oneshot";
           User = serviceUser;
@@ -64,23 +65,24 @@ in
       serviceUser ? user,
       removeEmptyDirs ? true,
     }:
-    mkCleanupService {
-      inherit name description serviceUser;
-      execStart = "${bash} -c \"${find} '${path}' -type f -mtime +${toString mtimeDays} -delete 2>/dev/null || true\"";
-      postCommand =
-        if removeEmptyDirs then
-          "${bash} -c \"${find} '${path}' -type d -empty -delete 2>/dev/null || true\""
-        else
-          null;
-    }
-    // mkCleanupTimerUnit {
-      inherit
-        name
-        description
-        calendar
-        delay
-        ;
-    };
+    lib.recursiveUpdate
+      (mkCleanupService {
+        inherit name description serviceUser;
+        execStart = "${bash} -c \"${find} '${path}' -type f -mtime +${toString mtimeDays} -delete 2>/dev/null || true\"";
+        postCommand =
+          if removeEmptyDirs then
+            "${bash} -c \"${find} '${path}' -type d -empty -delete 2>/dev/null || true\""
+          else
+            null;
+      })
+      (mkCleanupTimerUnit {
+        inherit
+          name
+          description
+          calendar
+          delay
+          ;
+      });
 
   mkCleanupTimer =
     {
@@ -92,21 +94,22 @@ in
       delay,
       serviceUser ? user,
     }:
-    mkCleanupService {
-      inherit
-        name
-        description
-        postCommand
-        serviceUser
-        ;
-      execStart = command;
-    }
-    // mkCleanupTimerUnit {
-      inherit
-        name
-        description
-        calendar
-        delay
-        ;
-    };
+    lib.recursiveUpdate
+      (mkCleanupService {
+        inherit
+          name
+          description
+          postCommand
+          serviceUser
+          ;
+        execStart = command;
+      })
+      (mkCleanupTimerUnit {
+        inherit
+          name
+          description
+          calendar
+          delay
+          ;
+      });
 }
