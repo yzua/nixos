@@ -27,10 +27,22 @@
       "rd.udev.log_level=3"
       "udev.log_priority=3"
       # SECURITY: shell_on_fail omitted — drops to root shell on failure
-      # SECURITY: Kernel hardening (no boot time cost)
+
+      # === Kernel Memory Hardening ===
       "page_alloc.shuffle=1" # ASLR for page allocator
       "randomize_kstack_offset=on" # Randomize kernel stack offset per syscall
       "vsyscall=none" # Disable legacy vsyscall (attack surface reduction)
+      "slab_nomerge" # Prevent slab cache merging (stops heap exploitation)
+      "init_on_alloc=1" # Zero memory on allocation (prevents info leaks)
+      "init_on_free=1" # Zero memory on free (prevents use-after-free data)
+      "module.sig_enforce=1" # Only load signed kernel modules
+      "lockdown=confidentiality" # Kernel lockdown: restrict /dev/mem, kexec, etc.
+
+      # === Suspend Hardening (desktop) ===
+      "mem_sleep_default=deep" # Prefer deep sleep (full S3) over s2idle
+
+      # === RNG Hardening ===
+      "random.trust_cpu=off" # Don't trust CPU RNG (RDRAND) — use entropy pool
     ];
     consoleLogLevel = 0;
     initrd.verbose = false;
