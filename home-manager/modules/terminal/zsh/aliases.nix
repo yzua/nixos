@@ -124,6 +124,10 @@
         cp = "cp -i";
 
         j = "just";
+
+        # Metadata scrubbing
+        scrub = "mat2 --inplace"; # Strip metadata from a single file
+        scrub-all = "find ~/Downloads ~/Desktop ~/Documents -maxdepth 3 -type f \\( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.pdf' -o -name '*.docx' -o -name '*.mp4' -o -name '*.mkv' \\) -exec mat2 --inplace {} \\; 2>/dev/null"; # Batch scrub
       }
       // devTemplateAliases;
     in

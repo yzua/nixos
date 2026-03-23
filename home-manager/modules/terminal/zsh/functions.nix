@@ -162,6 +162,81 @@
       rm -f "$layout_file"
     }
 
+    # === Anonymous git identity ===
+    # Make any repo anonymous — overrides global identity/signing with local config.
+    # Usage: cd <repo> && gitanon
+    #        gitanon --undo    # revert to global identity
+    gitanon() {
+      if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+        echo "Error: not inside a git repository" >&2
+        return 1
+      fi
+
+      if [[ "$1" == "--undo" || "$1" == "-u" ]]; then
+        git config --local --unset user.name 2>/dev/null
+        git config --local --unset user.email 2>/dev/null
+        git config --local --unset commit.gpgSign 2>/dev/null
+        git config --local --unset tag.gpgSign 2>/dev/null
+        git config --local --unset user.signingKey 2>/dev/null
+        git config --local --unset push.gpgSign 2>/dev/null
+        echo "✔ Restored global identity in $(basename "$(git rev-parse --show-toplevel)")"
+        return 0
+      fi
+
+      git config --local user.name "user"
+      git config --local user.email ""
+      git config --local commit.gpgSign false
+      git config --local tag.gpgSign false
+      git config --local push.gpgSign false
+      git config --local user.signingKey "" # empty overrides global key
+      echo "✔ Anonymous mode in $(basename "$(git rev-parse --show-toplevel)")"
+      echo "  Name:    $(git config user.name)"
+      echo "  Email:   (none)"
+      echo "  Signing: disabled"
+    }
+
+    # Shortcut: restore global identity (same as gitanon --undo)
+    gitback() {
+      gitanon --undo
+    }
+
+    # Show what git identity this repo is using
+    gitwhoami() {
+      if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+        echo "Error: not inside a git repository" >&2
+        return 1
+      fi
+
+      local name email sign key scope
+      name=$(git config user.name 2>/dev/null)
+      email=$(git config user.email 2>/dev/null)
+      sign=$(git config commit.gpgSign 2>/dev/null)
+      key=$(git config user.signingKey 2>/dev/null)
+
+      # Format display values
+      [[ -z "$name" ]] && name="(not set)"
+      [[ -z "$email" ]] && email="(none)"
+      [[ -z "$sign" ]] && sign="(global)"
+      [[ -z "$key" ]] && key="(none)"
+
+      # Detect if overrides are local or inherited
+      if git config --local user.name &>/dev/null; then
+        scope="local (override)"
+      else
+        scope="global (inherited)"
+      fi
+
+      local repo
+      repo=$(basename "$(git rev-parse --show-toplevel)")
+
+      echo "Repo:    $repo"
+      echo "Name:    $name"
+      echo "Email:   $email"
+      echo "Signing: $sign"
+      echo "Key:     $key"
+      echo "Source:  $scope"
+    }
+
     # === Environment setup ===
     export GPG_TTY=$(tty)
 
