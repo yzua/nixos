@@ -18,30 +18,37 @@
       "bridge"
       "br_netfilter"
       "ip_tables"
+      "iptable_filter"
+      "iptable_mangle"
+      "iptable_raw"
       "iptable_nat"
+      "xt_MASQUERADE"
+      "xt_comment"
+      "xt_connmark"
+      "xt_mark"
       "nf_nat"
       "xt_addrtype"
+      "overlay"
     ];
+
+    boot.kernel.sysctl = {
+      "net.bridge.bridge-nf-call-iptables" = true;
+      "net.bridge.bridge-nf-call-ip6tables" = true;
+      "net.ipv4.ip_forward" = true;
+    };
 
     virtualisation = {
       docker = {
         enable = true;
-        enableOnBoot = false;
+        enableOnBoot = true;
         rootless = {
-          enable = true;
-          setSocketVariable = true; # Set DOCKER_HOST for rootless socket
+          enable = false;
+          setSocketVariable = true;
         };
         daemon.settings = {
-          # Route container DNS through DNSCrypt-Proxy on host.
-          # NOTE: flaresolverr container tries to resolve "redis" (no redis running) —
-          # fix at container level, not here.
-          dns = [ "127.0.0.1" ];
+          dns = [ "172.17.0.1" ];
           ipv6 = false;
           iptables = true;
-          # SECURITY: Limit container capabilities
-          "no-new-privileges" = true;
-          # SECURITY: Default seccomp profile (blocks dangerous syscalls)
-          seccomp-profile = "";
         };
       };
 
@@ -76,6 +83,12 @@
     # Only enable GPU containers on desktop (Optimus laptops can't reliably passthrough)
     hardware.nvidia-container-toolkit.enable =
       config.mySystem.nvidia.enable && (config.mySystem.hostProfile == "desktop");
+
+    networking.firewall.trustedInterfaces = [ "docker0" ];
+
+    # Let Docker manage its own FORWARD/NAT chains.
+    # NixOS firewall blocks forwarded traffic by default — this breaks Docker bridges.
+    networking.firewall.filterForward = false;
 
     environment.systemPackages = with pkgsStable; [
       virt-manager

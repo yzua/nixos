@@ -11,7 +11,10 @@
       enable = true;
 
       settings = {
-        listen_addresses = [ "127.0.0.1:53" ];
+        listen_addresses = [
+          "127.0.0.1:53"
+          "172.17.0.1:53"
+        ];
 
         # Diversified resolvers — prevents single-provider compromise
         server_names = [
