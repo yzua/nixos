@@ -19,6 +19,14 @@ _:
       iptables -A OUTPUT -p udp --dport 137:138 -j DROP # NetBIOS
       iptables -A OUTPUT -p tcp --dport 139 -j DROP     # NetBIOS
       iptables -A OUTPUT -p tcp --dport 445 -j DROP     # SMB
+
+      # === Docker bridge forwarding ===
+      iptables -A FORWARD -i docker0 -j ACCEPT
+      iptables -A FORWARD -o docker0 -j ACCEPT
+      iptables -A FORWARD -i br-+ -j ACCEPT
+      iptables -A FORWARD -o br-+ -j ACCEPT
+      iptables -A INPUT -i docker0 -j ACCEPT
+      iptables -A INPUT -i br-+ -j ACCEPT
     '';
 
     # === nftables rules — evaluated AFTER iptables rules ===
