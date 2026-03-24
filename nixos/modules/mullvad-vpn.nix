@@ -89,10 +89,18 @@
         $mullvad obfuscation set mode auto
 
         # === Local Network ===
-        # SECURITY: Only allow LAN access when services need it (KDE Connect, LocalSend).
+        # SECURITY: Only allow LAN access when services need it (KDE Connect, LocalSend, Docker).
         # On public/hostile networks, LAN access is an attack surface.
+        # Docker requires LAN sharing: bridge traffic uses RFC1918 ranges that Mullvad
+        # lockdown mode would otherwise block, breaking container networking entirely.
         ${
-          if (config.mySystem.kdeconnect.enable || config.mySystem.flatpak.enable) then
+          if
+            (
+              config.mySystem.kdeconnect.enable
+              || config.mySystem.flatpak.enable
+              || config.mySystem.virtualisation.enable
+            )
+          then
             ''
               $mullvad lan set allow
             ''
