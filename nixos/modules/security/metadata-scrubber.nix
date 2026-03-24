@@ -1,6 +1,6 @@
 # System-wide automatic metadata scrubbing.
-# Watches user directories for new files and strips metadata using mat2/exiftool.
-# Covers: Downloads, Desktop, Documents, Pictures, Videos.
+# Watches Downloads and Desktop for new files and strips metadata using mat2/exiftool.
+# Full scrub of Documents/Pictures runs weekly via timer.
 {
   config,
   lib,
@@ -35,62 +35,16 @@
         ];
 
         script = ''
-          # Directories to watch (system-level only — user directories handled by user service)
-          WATCH_DIRS=""
-          SCRUB_LOG="/var/log/metadata-scrubber.log"
-
-          mkdir -p /var/log
-
-          strip_metadata() {
-            local file="$1"
-
-            # Skip if file doesn't exist or is a directory/symlink
-            [[ ! -f "$file" || -L "$file" ]] && return 0
-
-            # Skip Nix store files and system paths
-            [[ "$file" == /nix/store/* || "$file" == /run/* || "$file" == /proc/* ]] && return 0
-
-            local ext="''${file##*.}"
-            ext="$(echo "$ext" | tr '[:upper:]' '[:lower:]')"
-
-            case "$ext" in
-              # Images
-              jpg|jpeg|png|gif|webp|bmp|tiff|tif|heic|heif|avif|svg)
-                mat2 --inplace "$file" 2>/dev/null || true
-                ;;
-              # Documents
-              pdf|docx|xlsx|pptx|odt|ods|odp|doc|xls)
-                mat2 --inplace "$file" 2>/dev/null || true
-                ;;
-              # Video
-              mp4|mkv|avi|mov|webm|m4v)
-                mat2 --inplace "$file" 2>/dev/null || true
-                ;;
-              # Audio
-              mp3|flac|ogg|opus|m4a|wav|aac)
-                mat2 --inplace "$file" 2>/dev/null || true
-                ;;
-            esac
-
-            echo "$(date -Iseconds) | SCRUBBED | $file" >> "$SCRUB_LOG"
-          }
-
-          if [[ -n "$WATCH_DIRS" ]]; then
-            inotifywait -m -r -e close_write -e moved_to --format '%w%f' $WATCH_DIRS | \
-            while read -r file; do
-              strip_metadata "$file"
-            done
-          fi
+          # System-level scrubber: no system dirs to watch — exit cleanly.
+          # User directories are handled by the user-level service.
+          exit 0
         '';
 
         serviceConfig = {
-          Type = "simple";
-          Restart = "always";
-          RestartSec = 5;
+          Type = "oneshot";
           PrivateTmp = true;
           ProtectHome = true;
           ProtectSystem = "strict";
-          ReadWritePaths = [ "/var/log" ];
           NoNewPrivileges = true;
         };
       };
@@ -112,9 +66,6 @@
             WATCH_DIRS=(
               "$HOME/Downloads"
               "$HOME/Desktop"
-              "$HOME/Documents"
-              "$HOME/Pictures"
-              "$HOME/Videos"
             )
 
             # Create dirs if they don't exist
@@ -131,7 +82,7 @@
               # Skip if file doesn't exist, is a directory, or a symlink
               [[ ! -f "$file" || -L "$file" ]] && return 0
 
-              # Skip hidden files and dot directories
+              # Skip hidden files
               [[ "$(basename "$file")" == .* ]] && return 0
 
               # Skip common non-metadata-bearing formats
@@ -143,7 +94,7 @@
                 txt|md|nix|json|yaml|yml|toml|xml|html|css|js|ts|py|rs|go|c|h|cpp|sh|bash|zsh)
                   return 0
                   ;;
-                # Skip archives (mat2 handles these but they're slow and usually internal)
+                # Skip archives
                 zip|tar|gz|bz2|xz|7z|rar)
                   return 0
                   ;;
@@ -162,7 +113,7 @@
 
             echo "$(date -Iseconds) | STARTED | Watching: ''${WATCH_DIRS[*]}" >> "$SCRUB_LOG"
 
-            inotifywait -m -r -e close_write -e moved_to --format '%w%f' "''${WATCH_DIRS[@]}" | \
+            inotifywait -m --format '%w%f' "''${WATCH_DIRS[@]}" | \
             while read -r file; do
               # Small delay to ensure file is fully written
               sleep 0.5
@@ -172,17 +123,13 @@
 
           serviceConfig = {
             Type = "simple";
-            Restart = "always";
-            RestartSec = 5;
+            Restart = "on-failure";
+            RestartSec = 10;
 
-            # User services cannot reliably use mount-namespace hardening with
-            # writable paths inside $HOME on this setup. Keep lightweight
-            # hardening but avoid ProtectHome/ProtectSystem/ReadWritePaths,
-            # which caused boot-time namespace failures.
             PrivateTmp = true;
             NoNewPrivileges = true;
-            MemoryMax = "256M";
-            CPUQuota = "25%";
+            MemoryMax = "128M";
+            CPUQuota = "10%";
           };
         };
 
