@@ -37,6 +37,11 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    gitanon = {
+      url = "github:yzua/gitanon";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

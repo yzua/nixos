@@ -153,6 +153,26 @@
         "type": "github"
       }
     },
+    "gitanon": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774457715,
+        "narHash": "sha256-L+m0GNpqwbxu4Ia8RQPSUrcR5UYxGKJrpCX9MM2rlYc=",
+        "owner": "yzua",
+        "repo": "gitanon",
+        "rev": "03cd40b325f279215971057c74c615585720b364",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yzua",
+        "repo": "gitanon",
+        "type": "github"
+      }
+    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -473,6 +493,7 @@
     },
     "root": {
       "inputs": {
+        "gitanon": "gitanon",
         "home-manager": "home-manager",
         "niri": "niri",
         "nix-index-database": "nix-index-database",
