@@ -93,6 +93,10 @@ in
     # Defense layer 2/3: warn immediately if commit is unsigned.
     # Catches --no-gpg-sign bypass. post-commit always runs (even with --no-verify).
     post-commit = pkgs.writeShellScript "git-hook-post-commit" ''
+      if [[ "$(git config --bool --get mysystem.gitanon || echo false)" == "true" ]]; then
+        exit 0
+      fi
+
       if ! git verify-commit HEAD >/dev/null 2>&1; then
         echo ""
         echo "⚠ WARNING: Latest commit is NOT GPG-signed!"
@@ -110,6 +114,12 @@ in
 
       # Save stdin for chaining to repo-local hook
       input=$(cat)
+
+      if [[ "$(git config --bool --get mysystem.gitanon || echo false)" == "true" ]]; then
+        echo "⚠ Anonymous mode enabled: skipping GPG signature enforcement."
+        ${mkLocalHookPipe "pre-push"}
+        exit 0
+      fi
 
       while IFS= read -r line; do
         [[ -z "$line" ]] && continue

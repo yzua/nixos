@@ -175,10 +175,11 @@
       if [[ "$1" == "--undo" || "$1" == "-u" ]]; then
         git config --local --unset user.name 2>/dev/null
         git config --local --unset user.email 2>/dev/null
-        git config --local --unset commit.gpgSign 2>/dev/null
-        git config --local --unset tag.gpgSign 2>/dev/null
         git config --local --unset user.signingKey 2>/dev/null
-        git config --local --unset push.gpgSign 2>/dev/null
+        git config --local --unset mysystem.gitanon 2>/dev/null
+        git config --local commit.gpgSign true
+        git config --local tag.gpgSign true
+        git config --local push.gpgSign true
         echo "✔ Restored global identity in $(basename "$(git rev-parse --show-toplevel)")"
         return 0
       fi
@@ -189,6 +190,7 @@
       git config --local tag.gpgSign false
       git config --local push.gpgSign false
       git config --local user.signingKey "" # empty overrides global key
+      git config --local mysystem.gitanon true
       echo "✔ Anonymous mode in $(basename "$(git rev-parse --show-toplevel)")"
       echo "  Name:    $(git config user.name)"
       echo "  Email:   (none)"
