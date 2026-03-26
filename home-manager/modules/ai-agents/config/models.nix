@@ -125,7 +125,7 @@ in
     codex = {
       enable = true;
       useWrapper = true;
-      model = "gpt-5.3-codex";
+      model = "gpt-5.4";
       personality = "pragmatic";
       reasoningEffort = "medium";
       approvalPolicy = "on-request";

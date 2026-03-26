@@ -5,7 +5,7 @@ let
   opusModel = "anthropic/claude-opus-4-6";
   sonnetModel = "anthropic/claude-sonnet-4-6";
   haikuModel = "anthropic/claude-haiku-4-5";
-  gptModel = "openai/gpt-5.3-codex";
+  gptModel = "openai/gpt-5.4";
   geminiProModel = "google/gemini-2.5-pro";
   geminiFlashModel = "google/gemini-2.5-flash";
   mkCategory =

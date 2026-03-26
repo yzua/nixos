@@ -162,7 +162,7 @@ in
       enable = lib.mkEnableOption "Codex CLI configuration";
 
       useWrapper = mkBoolOption true "Use logging wrapper for Codex";
-      model = mkStrOption "gpt-5.3-codex" "Default model for Codex";
+      model = mkStrOption "gpt-5.4" "Default model for Codex";
 
       personality = lib.mkOption {
         type = lib.types.enum [

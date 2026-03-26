@@ -213,8 +213,8 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `hcx`                       | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                   |
 | `xcx`                       | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                             |
 | `cxu`                       | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex YOLO (unsafe explicit)                                          |
-| `locgpt`                    | `opencode_gpt --model openai/gpt-5.3-codex-spark`                  | OpenCode GPT low reasoning/speed variant                              |
-| `mocgpt`                    | `opencode_gpt --model openai/gpt-5.3-codex`                        | OpenCode GPT medium reasoning default                                 |
+| `locgpt`                    | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                              |
+| `mocgpt`                    | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                 |
 | `hocgpt`                    | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT high reasoning variant                                   |
 | `xocgpt`                    | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                             |
 | `ais`                       | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix |
@@ -345,7 +345,7 @@ Custom commands are currently disabled. To add your own OpenCode slash commands,
 
 | Setting                  | Value                          | Why                                                              |
 | ------------------------ | ------------------------------ | ---------------------------------------------------------------- |
-| Model                    | `gpt-5.3-codex`                | Current recommended Codex model                                  |
+| Model                    | `gpt-5.4`                      | Current recommended Codex model                                  |
 | Personality              | `pragmatic`                    | Direct, practical responses                                      |
 | Reasoning effort         | `medium`                       | Balanced speed/quality                                           |
 | Reasoning summary        | `concise`                      | Keeps reasoning visible without flooding the transcript          |
@@ -367,7 +367,7 @@ Trusted projects: `~/System`.
 | Agent             | Model                           | Purpose                                           |
 | ----------------- | ------------------------------- | ------------------------------------------------- |
 | sisyphus          | anthropic/claude-opus-4-6       | Primary orchestrator — delegates, verifies, ships |
-| hephaestus        | openai/gpt-5.3-codex            | Autonomous deep worker                            |
+| hephaestus        | openai/gpt-5.4                  | Autonomous deep worker                            |
 | oracle            | anthropic/claude-opus-4-6       | Read-only consultant for architecture/debugging   |
 | prometheus        | anthropic/claude-opus-4-6 (max) | Strategic planner with extended budget            |
 | metis             | anthropic/claude-opus-4-6       | Pre-planning analysis                             |
@@ -513,11 +513,11 @@ Uses a separate config directory (`~/.config/opencode-gpt/`) with models overrid
 
 | Agent             | GPT Model                   | Tier                             |
 | ----------------- | --------------------------- | -------------------------------- |
-| sisyphus          | openai/gpt-5.3-codex        | Heavy                            |
-| hephaestus        | openai/gpt-5.3-codex        | Heavy                            |
+| sisyphus          | openai/gpt-5.4              | Heavy                            |
+| hephaestus        | openai/gpt-5.4              | Heavy                            |
 | oracle            | openai/gpt-5.3              | Standard                         |
-| prometheus        | openai/gpt-5.3-codex        | Heavy                            |
-| metis             | openai/gpt-5.3-codex        | Heavy                            |
+| prometheus        | openai/gpt-5.4              | Heavy                            |
+| metis             | openai/gpt-5.4              | Heavy                            |
 | librarian         | openai/gpt-5.3              | Standard                         |
 | momus             | openai/gpt-5.3              | Standard                         |
 | atlas             | openai/gpt-5.3              | Standard                         |
@@ -528,7 +528,7 @@ Category overrides:
 
 | Category                                                         | Model                |
 | ---------------------------------------------------------------- | -------------------- |
-| visual-engineering, ultrabrain, deep, artistry, unspecified-high | openai/gpt-5.3-codex |
+| visual-engineering, ultrabrain, deep, artistry, unspecified-high | openai/gpt-5.4 |
 | unspecified-low, writing                                         | openai/gpt-5.3       |
 | quick                                                            | opencode/gpt-5-nano  |
 
@@ -536,7 +536,7 @@ Category overrides:
 
 | Model ID            | Use Case                             |
 | ------------------- | ------------------------------------ |
-| gpt-5.3-codex       | Primary coding and deep execution    |
+| gpt-5.4             | Primary coding and deep execution    |
 | gpt-5.3             | Analysis, planning, and review tasks |
 | opencode/gpt-5-nano | Fast low-cost exploration            |
 
@@ -679,10 +679,10 @@ Not all auth types work with btca CLI. Consumer subscription OAuth (Claude Max, 
 If you have ChatGPT Plus, the cheapest working setup:
 
 ```bash
-btca connect -g -p openai -m gpt-5.3-codex
+btca connect -g -p openai -m gpt-5.4
 ```
 
-This routes through the Codex endpoint (`chatgpt.com/backend-api/codex/responses`) which accepts ChatGPT OAuth. Models that work: `gpt-5.3-codex`, `gpt-5.3` and other Codex-compatible `gpt-5*` entries. Models that fail: `gpt-4o-mini`, `gpt-4o`, `gpt-5-nano` (route to `api.openai.com` which rejects ChatGPT OAuth).
+This routes through the Codex endpoint (`chatgpt.com/backend-api/codex/responses`) which accepts ChatGPT OAuth. Models that work: `gpt-5.4`, `gpt-5.3` and other Codex-compatible `gpt-5*` entries. Models that fail: `gpt-4o-mini`, `gpt-4o`, `gpt-5-nano` (route to `api.openai.com` which rejects ChatGPT OAuth).
 
 ### Config File
 
@@ -691,7 +691,7 @@ btca config lives at `~/.config/btca/btca.config.jsonc` (global) or `.btca/btca.
 ```jsonc
 {
   "provider": "openai",        // Provider ID
-  "model": "gpt-5.3-codex",   // Model for CLI queries
+  "model": "gpt-5.4",         // Model for CLI queries
   "resources": [ ... ],        // Registered repos/docs
   "providerTimeoutMs": 300000, // 5 min timeout
   "maxSteps": 40               // Max tool-use steps per query
@@ -704,7 +704,7 @@ btca config lives at `~/.config/btca/btca.config.jsonc` (global) or `.btca/btca.
 | ---------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------- |
 | `Provider "X" is not authenticated`                              | No credentials for that provider       | `opencode auth login` → select provider                          |
 | `Provider "X" is not connected`                                  | OAuth token expired or wrong auth type | Re-auth: `opencode auth login`                                   |
-| `model is not supported when using Codex with a ChatGPT account` | Non-Codex model with ChatGPT OAuth     | Use `gpt-5.3-codex` (or another Codex-compatible `gpt-5*` model) |
+| `model is not supported when using Codex with a ChatGPT account` | Non-Codex model with ChatGPT OAuth     | Use `gpt-5.4` (or another Codex-compatible `gpt-5*` model) |
 | `No payment method` (OpenCode Zen)                               | OpenCode Zen needs billing             | Add payment at opencode.ai or switch provider                    |
 | `API key not valid` (Google)                                     | Google account OAuth ≠ AI Studio key   | Get key from aistudio.google.com                                 |
 

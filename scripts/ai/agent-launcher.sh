@@ -219,16 +219,16 @@ execute_agent() {
 		;;
 	locgpt)
 		if [[ -z "$prompt" ]]; then
-			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.3-codex-spark
+			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.4-spark
 		else
-			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.3-codex-spark --prompt "$prompt"
+			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.4-spark --prompt "$prompt"
 		fi
 		;;
 	mocgpt)
 		if [[ -z "$prompt" ]]; then
-			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.3-codex
+			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.4
 		else
-			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.3-codex --prompt "$prompt"
+			exec env OPENCODE_CONFIG_DIR="$HOME/.config/opencode-gpt" opencode --model openai/gpt-5.4 --prompt "$prompt"
 		fi
 		;;
 	hocgpt)

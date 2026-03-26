@@ -20,8 +20,8 @@ let
   codexBase = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
 
   # GPT model tier aliases for opencode_gpt variants
-  gptLowModel = "openai/gpt-5.3-codex-spark";
-  gptMedModel = "openai/gpt-5.3-codex";
+  gptLowModel = "openai/gpt-5.4-spark";
+  gptMedModel = "openai/gpt-5.4";
   gptHighModel = "openai/gpt-5.4";
   gptXHighModel = "openai/gpt-5.1-codex-max";
 
