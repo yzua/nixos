@@ -37,6 +37,16 @@ in
         };
       };
 
+      chrome-devtools = {
+        enable = true;
+        command = "npx";
+        args = [
+          "-y"
+          "chrome-devtools-mcp@latest"
+          "--autoConnect"
+        ];
+      };
+
     };
 
     logging = {
