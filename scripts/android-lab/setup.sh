@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 # scripts/android-lab/setup.sh
-# Creates lab-avd (rooted google_apis), installs frida-server + MITM cert
-# Run ONCE, then use quick-start.sh for daily use
+# Creates a rooted Play-capable lab AVD and stages Frida + MITM assets.
+# Run once, then use quick-start.sh for daily use.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
 set -euo pipefail
 
-AVD_NAME="lab-avd"
+AVD_NAME="play-avd"
 SDK_ROOT="$HOME/Android/Sdk"
 IMG_PATH="system-images/android-34/google_apis/x86_64"
 ROOTAVD_DIR="/home/yz/Downloads/Telegram Desktop/rootAVD-master"
 
 log_info "=== Android Lab Setup ==="
+
+if [[ ! -f "$HOME/.mitmproxy/mitmproxy-ca-cert.pem" ]]; then
+	print_error "Missing mitmproxy CA certificate at $HOME/.mitmproxy/mitmproxy-ca-cert.pem"
+	exit 1
+fi
 
 # 1. Download google_apis image
 if [[ ! -d "$SDK_ROOT/$IMG_PATH" ]]; then
@@ -49,8 +54,9 @@ print_success "Booted!"
 
 # 4. Root with rootAVD
 log_info "[4/6] Rooting with Magisk via rootAVD..."
-cd "$ROOTAVD_DIR"
+pushd "$ROOTAVD_DIR" >/dev/null
 bash rootAVD.sh "system-images/android-34/google_apis/x86_64/ramdisk.img"
+popd >/dev/null
 
 log_info "Waiting for rootAVD to finish..."
 sleep 90
@@ -63,9 +69,7 @@ emulator -avd "$AVD_NAME" -no-window -no-audio -no-snapshot \
 adb wait-for-device
 while [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" != "1" ]]; do sleep 5; done
 
-# Configure Magisk auto-grant
-adb root
-sleep 2
+# Configure Magisk auto-grant for shell/adb
 adb shell 'su 0 sqlite3 /data/adb/magisk.db "INSERT OR REPLACE INTO policies (uid, policy, until, logging, notification) VALUES (2000, 2, 0, 1, 1);"' 2>/dev/null || true
 print_success "Root configured"
 
@@ -79,14 +83,14 @@ if [[ ! -f /tmp/frida-server ]]; then
 	chmod +x /tmp/frida-server
 fi
 adb push /tmp/frida-server /data/local/tmp/
-adb shell "su -c 'chmod 755 /data/local/tmp/frida-server'"
+adb shell "su 0 chmod 755 /data/local/tmp/frida-server"
 print_success "frida-server pushed"
 
 # 6. Install MITM cert via Magisk module
 log_info "[6/6] Installing MITM cert..."
 HASH=$(openssl x509 -inform PEM -subject_hash_old -in "$HOME/.mitmproxy/mitmproxy-ca-cert.pem" | head -1)
 adb push "$HOME/.mitmproxy/mitmproxy-ca-cert.pem" "/data/local/tmp/${HASH}.0"
-adb shell "su -c '
+adb shell "su 0 sh -c '
   mkdir -p /data/adb/modules/mitmproxy_cert/system/etc/security/cacerts
   cp /data/local/tmp/${HASH}.0 /data/adb/modules/mitmproxy_cert/system/etc/security/cacerts/
   chmod 644 /data/adb/modules/mitmproxy_cert/system/etc/security/cacerts/${HASH}.0
@@ -104,6 +108,6 @@ while [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" != "
 # Verify
 echo ""
 print_success "=== SETUP COMPLETE ==="
-echo "Root: $(adb shell 'su -c id' 2>/dev/null)"
-echo "Frida: $(adb shell 'su -c pgrep frida-server' 2>/dev/null || echo 'start with: adb shell su -c /data/local/tmp/frida-server')"
-echo "MITM cert: $(adb shell "ls /system/etc/security/cacerts/ | grep $HASH" 2>/dev/null || echo 'reboot needed')"
+echo "Root: $(adb shell 'su 0 id' 2>/dev/null)"
+echo "Frida: $(adb shell 'su 0 pgrep frida-server' 2>/dev/null || echo 'start with: adb shell "su 0 /data/local/tmp/frida-server &"')"
+echo "MITM asset: /data/local/tmp/${HASH}.0"

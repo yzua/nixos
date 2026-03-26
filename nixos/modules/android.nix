@@ -5,11 +5,12 @@
   pkgs,
   pkgsStable,
   lib,
+  user,
   ...
 }:
 
 let
-  sdkRoot = "/home/yz/Android/Sdk";
+  sdkRoot = "/home/${user}/Android/Sdk";
   # Libraries the SDK emulator needs from the host (not bundled)
   emulatorLibs = with pkgs; [
     libpulseaudio # libpulse.so.0
