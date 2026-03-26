@@ -73,6 +73,13 @@ in
         - Prefer `nix develop`, `nix-shell -p`, or `nix run nixpkgs#<pkg>`.
         - Respect split apply flows where present (for example user-level before system-level).
       - If not in Nix contexts, use the repository's native tooling and package manager.
+
+      ## Android reverse engineering workflow
+
+      - For Android dynamic analysis tasks, prefer a split workflow: `adb` for device control, `frida`/`objection` for runtime hooks, `mitmproxy` for HTTP(S) capture, and `apktool`/`jadx` for unpacking and patching.
+      - Prefer explicit proxy setup plus QUIC blocking over transparent proxying when you need reliable `mitmproxy` capture on Android emulators.
+      - Treat missing traffic as a triage problem: first verify proxy/cert/root, then test for certificate pinning, then check for native TLS, Cronet, or QUIC fallback.
+      - Keep ADB shell root syntax consistent on Magisk-based emulators: prefer `su 0 <cmd>` unless the target environment proves otherwise.
     '';
 
     inherit (skillDefs) skills omitSkills;
