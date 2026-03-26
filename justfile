@@ -56,6 +56,11 @@ home:
     @echo -e "\n➤ Switching Home-Manager…"
     nh home switch 'path:.' --configuration yz@desktop --backup-extension backup
 
+# Sync skills from GitHub to ~/.local/share/skills/
+skills-sync:
+    @echo -e "\n➤ Syncing skills from GitHub…"
+    @./scripts/skills-sync.sh
+
 # Switch NixOS generation
 nixos:
     @echo -e "\n➤ Rebuilding NixOS…"
