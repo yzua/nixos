@@ -86,6 +86,7 @@ let
     ghidra-bin
     jadx
     radare2
+    scrcpy
 
     # Rust development
     bacon
