@@ -2,6 +2,15 @@
 { pkgs, pkgsStable, ... }:
 
 let
+  curlImpersonateNoWcurl = pkgs.symlinkJoin {
+    name = "curl-impersonate-no-wcurl";
+    paths = [ pkgs.curl-impersonate ];
+    postBuild = ''
+      rm -f "$out/bin/wcurl"
+    '';
+    inherit (pkgs.curl-impersonate) meta;
+  };
+
   latest = with pkgs; [
     aider-chat # AI pair programming (fast-moving, needs latest)
     cargo
@@ -26,6 +35,7 @@ let
     repomix # Bundle repo into single file for AI context windows
     sccache # Shared compilation cache (Rust/C++)
     process-compose # Multi-service dev orchestrator
+    curlImpersonateNoWcurl # Browser-like TLS/HTTP2 fingerprints without wcurl collision
   ];
 
   stable = with pkgsStable; [
