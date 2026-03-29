@@ -1,6 +1,7 @@
 # Niri keybindings and custom scripts.
 
 {
+  config,
   constants,
   pkgs,
   pkgsStable,
@@ -68,10 +69,7 @@ in
       "Mod+Return".action.spawn = [
         "${constants.terminal}"
         "-e"
-        "${pkgs.zellij}/bin/zellij"
-        "attach"
-        "--create"
-        "main"
+        "${config.home.profileDirectory}/bin/zellij-main"
       ];
       "Mod+Shift+Return".action.spawn = [ "${constants.terminal}" ];
       "Mod+T".action.spawn = [

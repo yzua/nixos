@@ -1,6 +1,7 @@
 # Main Niri compositor settings.
 
 {
+  config,
   constants,
   pkgs,
   ...
@@ -96,10 +97,7 @@ in
         argv = [
           "${constants.terminal}"
           "-e"
-          "${pkgs.zellij}/bin/zellij"
-          "attach"
-          "--create"
-          "main"
+          "${config.home.profileDirectory}/bin/zellij-main"
         ];
       }
       { argv = [ "${pkgs.vesktop}/bin/vesktop" ]; }
