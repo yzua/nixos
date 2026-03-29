@@ -48,6 +48,7 @@
     ./gaming.nix # Steam, Lutris, Wine, MangoHud
     ./printing.nix # CUPS printing services
     ./android.nix # ADB and Fastboot support
+    ./web-re.nix # Web reverse engineering and security tools
     ./kdeconnect.nix # KDE Connect phone-desktop integration
     ./vnc.nix # VNC remote access (x11vnc, noVNC, websockify)
 
