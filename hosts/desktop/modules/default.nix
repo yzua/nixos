@@ -3,8 +3,9 @@ _: {
   # Better TTY console resolution and smoother VT switching on NVIDIA Wayland
   boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
 
-  # BFQ IO scheduler for SATA SSDs (better fairness for desktop multitasking)
+  # Use an SSD-friendly scheduler on flash storage and keep BFQ for rotational disks.
   services.udev.extraRules = ''
-    ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/scheduler}="bfq"
+    ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+    ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
   '';
 }
