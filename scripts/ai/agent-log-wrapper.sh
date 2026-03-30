@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
+
 if [[ $# -lt 2 ]]; then
-	echo "Usage: ai-agent-log-wrapper <agent-name> <command> [args...]" >&2
+	print_error "Usage: ai-agent-log-wrapper <agent-name> <command> [args...]"
 	exit 1
 fi
 
@@ -16,6 +20,7 @@ NOTIFY_ON_ERROR="${AI_AGENT_NOTIFY_ON_ERROR:-false}"
 
 mkdir -p "$LOG_DIR"
 
+log_info "Starting $AGENT_NAME: $*"
 echo "[$(date -Iseconds)] Starting $AGENT_NAME: $*" >>"$LOG_FILE"
 
 set +e
@@ -23,6 +28,7 @@ set +e
 EXIT_CODE=$?
 set -e
 
+log_info "$AGENT_NAME exited with code $EXIT_CODE"
 echo "[$(date -Iseconds)] $AGENT_NAME exited with code $EXIT_CODE" >>"$LOG_FILE"
 
 if [[ "$NOTIFY_ON_ERROR" == "true" && $EXIT_CODE -ne 0 ]]; then

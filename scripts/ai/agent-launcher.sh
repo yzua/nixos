@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
+
 # Ensure fzf inherits Home Manager theme when launched outside interactive shells.
 if [[ -z "${FZF_DEFAULT_OPTS:-}" ]] && [[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
 	# shellcheck disable=SC1091
@@ -18,7 +22,7 @@ BUILD_PERFORMANCE_PROMPT="${BUILD_PERFORMANCE_PROMPT:-}"
 MARKDOWN_SYNC_PROMPT="${MARKDOWN_SYNC_PROMPT:-}"
 
 if ! command -v fzf >/dev/null 2>&1; then
-	echo "Error: fzf is required" >&2
+	print_error "fzf is required"
 	exit 1
 fi
 
@@ -91,7 +95,7 @@ execute_claude_glm() {
 
 	key_file="${ZAI_API_KEY_FILE:-/run/secrets/zai_api_key}"
 	if [[ ! -f "$key_file" ]]; then
-		echo "Error: $key_file not found. Run 'just nixos' to decrypt secrets." >&2
+		print_error "$key_file not found. Run 'just nixos' to decrypt secrets."
 		exit 1
 	fi
 
@@ -260,7 +264,7 @@ execute_agent() {
 		fi
 		;;
 	*)
-		echo "Unsupported alias: $agent_alias" >&2
+		print_error "Unsupported alias: $agent_alias"
 		exit 1
 		;;
 	esac
@@ -382,7 +386,7 @@ while [[ $# -gt 0 ]]; do
 		exit 0
 		;;
 	*)
-		echo "Unknown argument: $1" >&2
+		print_error "Unknown argument: $1"
 		usage >&2
 		exit 1
 		;;

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
+
 # Ensure fzf inherits Home Manager theme when launched outside interactive shells.
 if [[ -z "${FZF_DEFAULT_OPTS:-}" ]] && [[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
 	# shellcheck disable=SC1091
@@ -12,17 +16,17 @@ if [[ -z "${FZF_DEFAULT_OPTS:-}" ]]; then
 fi
 
 if ! command -v fzf >/dev/null 2>&1; then
-	echo "Error: fzf is required" >&2
+	print_error "fzf is required"
 	exit 1
 fi
 
 if ! command -v jq >/dev/null 2>&1; then
-	echo "Error: jq is required" >&2
+	print_error "jq is required"
 	exit 1
 fi
 
 if ! command -v python3 >/dev/null 2>&1; then
-	echo "Error: python3 is required" >&2
+	print_error "python3 is required"
 	exit 1
 fi
 
@@ -437,7 +441,7 @@ collect_rows_for_tool() {
 		collect_gemini
 		;;
 	*)
-		echo "Unknown tool: $tool" >&2
+		print_error "Unknown tool: $tool"
 		exit 1
 		;;
 	esac
@@ -470,7 +474,7 @@ while [[ $# -gt 0 ]]; do
 	--tool)
 		shift
 		if [[ $# -eq 0 ]]; then
-			echo "Error: --tool requires a value" >&2
+			print_error "--tool requires a value"
 			exit 1
 		fi
 		tool="$1"
@@ -478,7 +482,7 @@ while [[ $# -gt 0 ]]; do
 	--section)
 		shift
 		if [[ $# -eq 0 ]]; then
-			echo "Error: --section requires a value" >&2
+			print_error "--section requires a value"
 			exit 1
 		fi
 		section="$1"
@@ -489,7 +493,7 @@ while [[ $# -gt 0 ]]; do
 		exit 0
 		;;
 	*)
-		echo "Unknown argument: $1" >&2
+		print_error "Unknown argument: $1"
 		usage >&2
 		exit 1
 		;;
@@ -511,7 +515,7 @@ trap 'rm -f "$tmp_rows" "$tmp_filtered"' EXIT
 collect_rows_for_tool "$tool" | dedupe_rows | sort -u >"$tmp_rows"
 
 if [[ ! -s "$tmp_rows" ]]; then
-	echo "No inventory data found for tool: $tool" >&2
+	print_error "No inventory data found for tool: $tool"
 	exit 1
 fi
 
@@ -530,7 +534,7 @@ while true; do
 	fi
 
 	if [[ ! -s "$tmp_filtered" ]]; then
-		echo "No entries found for tool=$tool section=$section" >&2
+		print_error "No entries found for tool=$tool section=$section"
 		if [[ "$section_locked" == "true" ]]; then
 			exit 1
 		fi
