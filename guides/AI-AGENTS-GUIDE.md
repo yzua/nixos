@@ -412,11 +412,11 @@ Uses a separate config directory (`~/.config/opencode-glm/`) with all models ove
 
 | Agent             | GLM Model                     | Tier                             |
 | ----------------- | ----------------------------- | -------------------------------- |
-| sisyphus          | zai-coding-plan/glm-5         | Heavy                            |
-| hephaestus        | zai-coding-plan/glm-5         | Heavy                            |
-| oracle            | zai-coding-plan/glm-5         | Heavy                            |
-| prometheus        | zai-coding-plan/glm-5         | Heavy                            |
-| metis             | zai-coding-plan/glm-5         | Heavy                            |
+| sisyphus          | zai-coding-plan/glm-5.1         | Heavy                            |
+| hephaestus        | zai-coding-plan/glm-5.1         | Heavy                            |
+| oracle            | zai-coding-plan/glm-5.1         | Heavy                            |
+| prometheus        | zai-coding-plan/glm-5.1         | Heavy                            |
+| metis             | zai-coding-plan/glm-5.1         | Heavy                            |
 | librarian         | zai-coding-plan/glm-4.7       | Standard                         |
 | momus             | zai-coding-plan/glm-4.7       | Standard                         |
 | atlas             | zai-coding-plan/glm-4.7       | Standard                         |
@@ -427,7 +427,7 @@ Category overrides:
 
 | Category                                                         | Model         |
 | ---------------------------------------------------------------- | ------------- |
-| visual-engineering, ultrabrain, deep, artistry, unspecified-high | glm-5         |
+| visual-engineering, ultrabrain, deep, artistry, unspecified-high | glm-5.1         |
 | unspecified-low, writing                                         | glm-4.7       |
 | quick                                                            | glm-4.7-flash |
 
@@ -441,8 +441,8 @@ Routes through Z.AI's Anthropic-compatible proxy (`https://api.z.ai/api/anthropi
 | `ANTHROPIC_BASE_URL`             | `https://api.z.ai/api/anthropic`  |
 | `API_TIMEOUT_MS`                 | `3000000` (50 min, per Z.AI docs) |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `glm-4.5-air`                     |
-| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5`                           |
-| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5`                           |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5.1`                           |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5.1`                           |
 
 Also passes `--dangerously-skip-permissions` for autonomous operation.
 
@@ -450,7 +450,7 @@ Also passes `--dangerously-skip-permissions` for autonomous operation.
 
 | Model ID      | Parameters            | Context | Use Case                    |
 | ------------- | --------------------- | ------- | --------------------------- |
-| glm-5         | 744B (40B active MoE) | 200K    | Flagship reasoning          |
+| glm-5.1         | 744B (40B active MoE) | 200K    | Flagship reasoning          |
 | glm-4.7       | —                     | —       | Previous gen, stable coding |
 | glm-4.7-flash | —                     | —       | Fast/cheap variant          |
 | glm-4.5-air   | —                     | —       | Lightest, haiku tier        |

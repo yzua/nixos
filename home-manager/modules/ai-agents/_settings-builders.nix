@@ -121,25 +121,25 @@ let
 
   # GLM-5 profile: Z.AI GLM models for cost-effective coding sessions.
   glmAgentModels = {
-    sisyphus = "zai-coding-plan/glm-5";
-    oracle = "zai-coding-plan/glm-5";
+    sisyphus = "zai-coding-plan/glm-5.1";
+    oracle = "zai-coding-plan/glm-5.1";
     librarian = "zai-coding-plan/glm-4.7";
     explore = "zai-coding-plan/glm-4.7-flash";
     # multimodal-looker keeps its original vision-capable model
-    prometheus = "zai-coding-plan/glm-5";
-    metis = "zai-coding-plan/glm-5";
+    prometheus = "zai-coding-plan/glm-5.1";
+    metis = "zai-coding-plan/glm-5.1";
     momus = "zai-coding-plan/glm-4.7";
     atlas = "zai-coding-plan/glm-4.7";
   };
 
   glmCategoryModels = {
-    "visual-engineering" = "zai-coding-plan/glm-5";
-    ultrabrain = "zai-coding-plan/glm-5";
-    deep = "zai-coding-plan/glm-5";
-    artistry = "zai-coding-plan/glm-5";
+    "visual-engineering" = "zai-coding-plan/glm-5.1";
+    ultrabrain = "zai-coding-plan/glm-5.1";
+    deep = "zai-coding-plan/glm-5.1";
+    artistry = "zai-coding-plan/glm-5.1";
     quick = "zai-coding-plan/glm-4.7-flash";
     "unspecified-low" = "zai-coding-plan/glm-4.7";
-    "unspecified-high" = "zai-coding-plan/glm-5";
+    "unspecified-high" = "zai-coding-plan/glm-5.1";
     writing = "zai-coding-plan/glm-4.7";
   };
 
@@ -259,12 +259,12 @@ let
   # Standard profiles — all follow the same pattern.
   profiles = {
     glm = mkProfileSettings {
-      model = "zai-coding-plan/glm-5";
+      model = "zai-coding-plan/glm-5.1";
       agentModels = glmAgentModels;
       categoryModels = glmCategoryModels;
       extraAgentOverrides = {
         hephaestus = {
-          model = "zai-coding-plan/glm-5";
+          model = "zai-coding-plan/glm-5.1";
         };
       };
     };
