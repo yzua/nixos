@@ -32,6 +32,7 @@ secrets/*.yaml.!backup
 *.swp
 *.swo
 .#*
+/android-re
 
 # PRIVACY: Sensitive file patterns (prevent accidental commit of secrets/keys)
 *.pem
