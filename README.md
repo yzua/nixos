@@ -60,6 +60,7 @@ just all   # modules -> pkgs -> lint -> format -> check -> nixos -> home
 | `just sops-view`          | View secrets (read-only)                             |
 | `just secrets-add KEY`    | Add a single secret (prompted securely)              |
 | `just security-audit`     | Systemd hardening + CVE scan                         |
+| `just skills-sync`        | Sync AI agent skills from GitHub                     |
 
 ---
 
@@ -109,8 +110,11 @@ Set `hostProfile` first, then override as needed:
 | `greetd.enable`              | Display manager                                 |
 | `waydroid.enable`            | Android emulation                               |
 | `auditLogging.enable`        | fail2ban logging                                |
+| `metadataScrubber.enable`    | Automatic metadata scrubbing (mat2/exiftool)   |
 | `kdeconnect.enable`          | KDE Connect phone integration                   |
 | `vnc.enable`                 | VNC remote access                               |
+| `secureBoot.enable`          | Secure Boot preparation with sbctl              |
+| `webRe.enable`               | Web reverse engineering and security tools      |
 
 ---
 
@@ -148,12 +152,15 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### Privacy & Network
 
-| Service   | Port | Purpose                      |
-| --------- | ---- | ---------------------------- |
-| Tor SOCKS | 9050 | SOCKS proxy                  |
-| Tor DNS   | 9053 | DNS over Tor                 |
-| I2PD      | \*   | I2P router (configurable)    |
-| Yggdrasil | —    | Mesh network (outbound only) |
+| Service        | Port | Purpose                      |
+| -------------- | ---- | ---------------------------- |
+| Tor SOCKS      | 9050 | SOCKS proxy                  |
+| Tor DNS        | 9053 | DNS over Tor                 |
+| I2PD Webconsole| 7070 | I2P router web UI            |
+| I2PD HTTP      | 4444 | I2P HTTP proxy               |
+| I2PD SOCKS     | 4447 | I2P SOCKS proxy              |
+| I2PD Transport | \*   | I2P transport (configurable) |
+| Yggdrasil      | —    | Mesh network (outbound only) |
 
 ### System Services & Features
 
@@ -175,6 +182,8 @@ All local, no cloud. Toggle via `mySystem.*`:
 | Cleanup timers                          | `mySystem.cleanup.enable`        | Downloads/cache retention jobs      |
 | Restic backup jobs                      | `mySystem.backup.enable`         | Scheduled backups with pruning      |
 | fail2ban/audit logging                  | `mySystem.auditLogging.enable`   | SSH/auth log monitoring             |
+| Secure Boot preparation                 | `mySystem.secureBoot.enable`     | sbctl for Secure Boot setup         |
+| Web RE/security tools                   | `mySystem.webRe.enable`          | Nuclei, Nikto, SQLMap, Nmap, etc.   |
 
 ### User-level (Home Manager)
 
