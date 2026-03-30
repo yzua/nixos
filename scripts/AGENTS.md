@@ -21,6 +21,7 @@ scripts/
 │   ├── agent-patterns.sh    # Error pattern detector across agent logs
 │   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
 │   └── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
+│   └── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
 ├── apps/
 │   └── browser-select.sh    # Browser profile selector (wofi menu)
 ├── build/
@@ -119,6 +120,7 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)       |
 | `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)      |
 | `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-inventory` wrapper)          |
+| `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                       |
 | `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                         |
 | `apps/browser-select.sh`                           | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper)            |
 | `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)                   |

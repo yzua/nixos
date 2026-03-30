@@ -59,7 +59,7 @@ home:
 # Sync skills from GitHub to ~/.local/share/skills/
 skills-sync:
     @echo -e "\n➤ Syncing skills from GitHub…"
-    @./scripts/skills-sync.sh
+    @./scripts/ai/skills-sync.sh
 
 # Switch NixOS generation
 nixos:
