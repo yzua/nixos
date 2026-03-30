@@ -25,6 +25,8 @@ modules/
 │   │   ├── default.nix      # Import hub
 │   │   ├── instructions.nix # Global instructions (imports _skills.nix)
 │   │   ├── _skills.nix      # Skill installations and omissions (not a module)
+│   │   ├── _claude-hooks.nix # Claude Code lifecycle hooks (not a module, imported by permissions)
+│   │   ├── _claude-permission-rules.nix # Claude allow/deny rules (not a module, imported by permissions)
 │   │   ├── mcp-servers.nix  # MCP server definitions + logging
 │   │   ├── permissions.nix  # Claude permissions, hooks, settings
 │   │   ├── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)

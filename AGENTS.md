@@ -21,32 +21,40 @@
 
 ### Validation (run before commits, in order)
 
-- `just modules`: Validate `default.nix` imports (fastest check).
-- `just pkgs`: Detect duplicate packages/conflicts.
-- `just lint`: Statix + Deadnix + Shellcheck + Markdownlint.
-- `just dead`: Deadnix only (subset of lint).
-- `just format`: `nixfmt-tree` via `nix fmt`.
-- `just check`: `nix flake check --no-build` (full evaluation without build).
+**Fastest to slowest (run incrementally until failure, then fix):**
+
+1. `just modules` - Validate `default.nix` imports match disk files (instant)
+2. `just pkgs` - Detect duplicate packages and program/module conflicts (fast)
+3. `just lint` - Full lint suite: Statix + Deadnix + Shellcheck + Markdownlint (fast)
+4. `just dead` - Deadnix only (subset of lint, for dead code detection)
+5. `just format` - `nixfmt-tree` via `nix fmt` (fast)
+6. `just check` - `nix flake check --no-build` (full evaluation without build, ~10s)
+
+**Running specific checks:**
+
+- Single file: `nix run nixpkgs#statix -- check path/to/file.nix`
+- Single script: `nix run nixpkgs#shellcheck path/to/script.sh`
+- Dead code: `nix run nixpkgs#deadnix -- --fail path/to/file.nix`
+- Inline Bash in Nix: `bash ./scripts/build/shellcheck-nix-inline.sh`
 
 ### Apply changes
 
-- `just home`: Home Manager switch (user-level, narrower blast radius).
-- `just nixos`: NixOS switch (system-level).
-- `just all`: Full pipeline: modules → pkgs → lint → format → check → nixos → home.
-- Manual iteration can still start with `just home`, but `just all` currently applies `nixos` before `home` because that is the exact order encoded in `justfile`.
+- `just home`: Home Manager switch (user-level, ~5s)
+- `just nixos`: NixOS switch (system-level, ~30s)
+- `just all`: Full pipeline: modules → pkgs → lint → format → check → nixos → home
 
 ### Other
 
-- `just update`: Update all flake inputs.
-- `just diff`: Diff current vs previous NixOS generation (`nvd`).
-- `just clean`: GC old generations + optimize store.
-- `just security-audit`: systemd unit hardening + vulnix CVE scan.
-- `just report [mode]`: System health report generator.
-- `just sops-view` / `just sops-edit` / `just secrets-add KEY`: Secrets management.
+- `just update`: Update all flake inputs
+- `just diff`: Diff current vs previous NixOS generation (`nvd`)
+- `just clean`: GC old generations + optimize store
+- `just security-audit`: systemd unit hardening + vulnix CVE scan
+- `just report [mode]`: System health report generator
+- `just sops-view` / `just sops-edit` / `just secrets-add KEY`: Secrets management
 
 ### No unit tests
 
-Escalation order: `just modules` (fastest) → `just check` (eval) → `just home` (user build) → `just nixos` (system build, last resort).
+Escalation: `just modules` (fastest) → `just check` (eval) → `just home` (user build) → `just nixos` (system build).
 
 ## Global Conventions
 
@@ -57,6 +65,28 @@ Escalation order: `just modules` (fastest) → `just check` (eval) → `just hom
 - **Helpers**: Prefix with `_` (e.g., `_lib.nix`). Manual imports only.
 - **Strictness**: `allowBroken = false` (enforced). No channels. No cloud dependencies.
 - **Constants**: Single source of truth in `shared/constants.nix`.
+
+### Import Patterns
+
+**Every directory must have a `default.nix` with explicit imports:**
+
+```nix
+{
+  imports = [
+    ./gaming.nix      # Steam, Lutris, Wine, MangoHud
+    ./nvidia.nix      # NVIDIA driver and CUDA
+  ];
+}
+```
+
+**Helper files (`_*.nix`) are NOT listed in default.nix:**
+
+```nix
+let myHelper = import ./_lib.nix { inherit lib; };
+in { ... }
+```
+
+**After adding/removing a `.nix` file:** Update parent `default.nix` imports, then run `just modules`.
 
 ## Code Style
 
@@ -83,15 +113,34 @@ Escalation order: `just modules` (fastest) → `just check` (eval) → `just hom
 ### Key conventions
 
 - **Formatter**: `nixfmt-tree` — never manually format, run `just format`.
-- **Imports**: every directory with `.nix` files must have `default.nix` listing all imports with inline comments.
-- **`_` prefix files**: Helper files like `_lib.nix` are imported manually by other modules — NOT listed in `default.nix`.
-- **inherit**: `{ inherit user; }` not `user = user;`.
-- **Conditionals**: `lib.mkIf` for conditional attr sets; bind local config with `cfg = config.mySystem.<feature>;`.
-- **mkOption**: always include `default`, `example`, and `description`.
-- **with pkgs**: only inside package lists (`environment.systemPackages = with pkgs; [...]`).
-- **mkDefault**: only in `host-defaults.nix` for profile-based defaults.
-- **mkForce**: reserved for security overrides only.
-- **Comments**: module starts with `# Purpose comment.`; inline comments for non-obvious values; section headers `# === Section Name ===` in large modules.
+- **Imports**: Every directory with `.nix` files must have `default.nix` with inline purpose comments.
+- **`_` prefix**: Helper files (`_lib.nix`) are imported manually — NOT listed in `default.nix`.
+- **inherit**: Use `{ inherit user; }` not `user = user;`.
+- **Conditionals**: `lib.mkIf` for conditional attr sets; bind config with `cfg = config.mySystem.<feature>;`.
+- **mkOption**: Always include `default`, `example`, and `description`.
+- **with pkgs**: Only inside package lists (`environment.systemPackages = with pkgs; [...]`).
+- **mkDefault**: Only in `host-defaults.nix` for profile-based defaults.
+- **mkForce**: Reserved for security overrides only.
+- **Comments**: Module starts with `# Purpose comment.`; inline comments for non-obvious values.
+
+### Naming Conventions
+
+- **Modules**: lowercase with hyphens (`gaming.nix`, `nvidia.nix`)
+- **Options**: camelCase (`enableGamemode`, `hostProfile`)
+- **Variables**: camelCase for local bindings (`cfg`, `githubEmailIncludes`)
+- **Constants**: camelCase in `constants.nix` (`terminal`, `editor`, `color.bg`)
+
+### Error Handling
+
+- **Assertions**: Use `validation.nix` for cross-module conflicts with format:
+  ```nix
+  assertions = [{
+    assertion = condition;
+    message = "Clear explanation and fix";
+  }];
+  ```
+- **Never use `allowBroken = true`**: Find alternative packages or fix upstream
+- **Fail fast**: Run `just modules` first to catch import errors
 
 ### Shell scripts
 
@@ -99,20 +148,38 @@ Escalation order: `just modules` (fastest) → `just check` (eval) → `just hom
 - Shared logging helpers in `scripts/lib/logging.sh` — source it instead of defining `log_info` locally.
 - Sourced library files (`scripts/lib/`) omit `set -euo pipefail` (inherited from caller).
 
-### After adding/removing a `.nix` file
+## Debugging and Common Fixes
 
-Update the parent `default.nix` imports list, then run `just modules`.
+| Symptom | Fix |
+|---|---|
+| Missing import error | Add file to parent `default.nix` imports list |
+| deadnix warning | Remove unused binding or prefix with `_` |
+| statix suggestion | Apply the suggested fix directly |
+| Module not found | Check path in `default.nix`, ensure file exists on disk |
+| Build fails after adding package | Run `just pkgs` to check for duplicates/conflicts |
+| Home Manager option not found | HM modules cannot use NixOS `config.*` — use `constants` or pass via `extraSpecialArgs` |
+| Secret not found | Run `just sops-view` to verify secret exists in `secrets/secrets.yaml` |
+
+### Validation Workflow
+
+1. After creating/editing a module: `just modules`
+2. After adding packages: `just pkgs`
+3. Before committing: `just lint`
+4. After formatting changes: `just format`
+5. Before applying: `just check`
+6. Safe deployment: `just home` (user-level)
+7. Full deployment: `just nixos` (system-level, requires sudo)
 
 ## Anti-Patterns (Forbidden)
 
 | Pattern | Reason |
 |---|---|
 | PulseAudio + PipeWire | Hard audio stack conflict (validated) |
-| Multiple power daemons (TLP + power-profiles-daemon) | Service conflicts (validated) |
+| Multiple power daemons | Service conflicts (validated) |
 | nouveau + NVIDIA proprietary | Driver conflict (validated) |
 | DNSCrypt-Proxy + systemd-resolved | DNS conflict (validated) |
 | `allowBroken = true` | Unstable packages; find alternative |
-| Avahi without explicit `allowInterfaces` | Security risk (validated) |
+| Avahi without `allowInterfaces` | Security risk (validated) |
 | Gaming without `hardware.graphics.enable` | Graphics drivers required (validated) |
 | `graphene-hardened` kernel | Crashes glycin/bwrap image loaders |
 | `auditd` with AppArmor | Kernel panic via `audit_log_subj_ctx` |
@@ -129,21 +196,19 @@ Update the parent `default.nix` imports list, then run `just modules`.
 - **AI Fleet**: `home-manager/modules/ai-agents/` (10-agent orchestration, embedded bash, best-effort skill sync in `activation.nix`).
 - **Observability**: `nixos/modules/prometheus-grafana/` (Loki, Grafana, Prometheus).
 
-## Common Fixes
-
-| Symptom | Fix |
-|---|---|
-| Missing import error | Add file to parent `default.nix` imports list |
-| deadnix warning | Remove unused binding or prefix with `_` |
-| statix suggestion | Apply the suggested fix directly |
-| Module not found | Check path in `default.nix`, ensure file exists on disk |
-
 ## Sub-AGENTS.md Files
 
 Detailed module-level guidance exists at:
-`nixos/modules/AGENTS.md`, `nixos/modules/security/AGENTS.md`,
-`home-manager/modules/AGENTS.md`, `home-manager/modules/niri/AGENTS.md`,
-`home-manager/modules/noctalia/AGENTS.md`, `home-manager/modules/apps/AGENTS.md`,
-`home-manager/modules/terminal/AGENTS.md`, `home-manager/modules/ai-agents/AGENTS.md`,
-`hosts/AGENTS.md`, `scripts/AGENTS.md`, `dev-shells/AGENTS.md`.
+`nixos/AGENTS.md`, `nixos/modules/AGENTS.md`, `nixos/modules/security/AGENTS.md`,
+`nixos/modules/cleanup/AGENTS.md`, `nixos/modules/glance/AGENTS.md`,
+`nixos/modules/prometheus-grafana/AGENTS.md`,
+`home-manager/AGENTS.md`, `home-manager/modules/AGENTS.md`,
+`home-manager/modules/niri/AGENTS.md`, `home-manager/modules/noctalia/AGENTS.md`,
+`home-manager/modules/apps/AGENTS.md`, `home-manager/modules/terminal/AGENTS.md`,
+`home-manager/modules/terminal/tools/AGENTS.md`, `home-manager/modules/ai-agents/AGENTS.md`,
+`home-manager/modules/neovim/AGENTS.md`, `home-manager/modules/languages/AGENTS.md`,
+`home-manager/packages/AGENTS.md`,
+`hosts/AGENTS.md`, `hosts/laptop/modules/AGENTS.md`,
+`scripts/AGENTS.md`, `scripts/system/AGENTS.md`,
+`dev-shells/AGENTS.md`.
 Read these when working in those areas.

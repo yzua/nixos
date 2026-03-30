@@ -66,7 +66,7 @@ Never define MCP servers per-agent. Define them once in `programs.aiAgents.mcpSe
 
 This module contains significant **embedded Bash logic** that bypasses standard Nix abstraction for performance and compatibility:
 
-- **`_claude-hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
+- **`config/_claude-hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
 - **`activation.nix`**: Complex sequential skill installation/removal logic with state-caching to prevent redundant network calls; skill sync failures are logged as warnings so Home Manager activation can continue.
 
 ### Validation Pipeline
