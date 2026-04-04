@@ -6,4 +6,5 @@
   social = "󰍡 social";
   media = "󰎆 media";
   vpn = "󰦝 vpn";
+  android = "󰀲 android";
 }

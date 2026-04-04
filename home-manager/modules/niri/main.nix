@@ -47,6 +47,9 @@ in
       "05-vpn" = {
         name = workspaceName.vpn; # nf-md-shield-lock
       };
+      "06-android" = {
+        name = workspaceName.android; # nf-md-android
+      };
     };
 
     environment = {

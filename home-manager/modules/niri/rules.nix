@@ -182,6 +182,13 @@
       (mkWorkspaceAppIdRule "^FreeTube$" ws.media { })
       (mkWorkspaceAppIdRule "^muffon$" ws.media { })
       (mkWorkspaceAppIdRule "^nuclear$" ws.media { })
+      {
+        matches = [ { title = "^android-re$"; } ];
+        open-on-workspace = ws.android;
+      }
+      (mkWorkspaceAppIdRule "^Emulator$" ws.android {
+        open-floating = true;
+      })
       (mkWorkspaceAppIdRule "^Mullvad VPN$" ws.vpn {
         open-floating = true;
       })
