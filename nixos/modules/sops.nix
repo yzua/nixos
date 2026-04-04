@@ -1,4 +1,5 @@
 # SOPS-Nix encrypted secrets management (age encryption).
+
 { inputs, user, ... }:
 
 {

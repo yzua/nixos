@@ -1,4 +1,5 @@
 # Static file templates for AI agent support files.
+
 {
   claudeAgents = {
     "nix-evaluator.md" = ''

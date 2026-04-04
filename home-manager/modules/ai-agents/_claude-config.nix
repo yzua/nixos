@@ -1,4 +1,5 @@
 # Claude configuration activation — generates ~/.claude/settings.json and ~/.mcp.json.
+
 {
   cfg,
   pkgs,

@@ -1,4 +1,5 @@
 # Bookmark groups for Glance dashboard.
+
 [
   {
     title = "AI";

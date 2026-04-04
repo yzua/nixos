@@ -1,4 +1,5 @@
 # Bootloader configuration (systemd-boot).
+
 { pkgsStable, ... }:
 {
   boot = {

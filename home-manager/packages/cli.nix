@@ -1,6 +1,7 @@
 # CLI tools for file management, text processing, and development.
 # NOTE: fzf and carapace are managed by programs.* modules.
 # NOTE: restic managed by services.restic
+
 {
   pkgs,
   inputs,

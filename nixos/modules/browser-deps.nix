@@ -1,4 +1,5 @@
 # Chromium browser, Puppeteer dependencies, and privacy flags.
+
 { pkgs, ... }:
 
 let

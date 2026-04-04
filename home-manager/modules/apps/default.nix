@@ -1,4 +1,5 @@
 # Application configuration modules.
+
 {
   imports = [
     ./desktop-entries.nix # Desktop entries and Element keyring wrapper script

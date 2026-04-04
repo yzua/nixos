@@ -1,4 +1,5 @@
 # KDE Connect for phone-desktop integration.
+
 {
   config,
   lib,

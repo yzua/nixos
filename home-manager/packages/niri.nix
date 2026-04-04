@@ -1,4 +1,5 @@
 # Niri compositor and Wayland utilities.
+
 { pkgs, ... }:
 
 {

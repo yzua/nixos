@@ -1,4 +1,5 @@
 # Helper for wrapping GUI binaries with Mesa EGL vendor override.
+
 { pkgs }:
 
 let

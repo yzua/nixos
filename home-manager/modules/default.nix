@@ -1,4 +1,5 @@
 # Home Manager modules aggregation.
+
 {
   imports = [
     # Desktop environment

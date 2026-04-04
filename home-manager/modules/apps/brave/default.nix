@@ -1,5 +1,6 @@
 # Brave browser with proxy and declarative extensions.
 # Uses Finland proxy - different from LibreWolf's Sweden. Never mix proxies.
+
 {
   constants,
   pkgs,

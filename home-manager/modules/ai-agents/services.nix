@@ -1,4 +1,5 @@
 # Zsh aliases, systemd user services/timers, and packages for AI agents.
+
 {
   config,
   lib,

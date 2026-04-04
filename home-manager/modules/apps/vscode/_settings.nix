@@ -1,4 +1,5 @@
 # VS Code baseline settings (written as mutable settings.json at activation).
+
 {
   constants,
   pkgs,

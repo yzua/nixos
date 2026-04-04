@@ -1,5 +1,6 @@
 # Skill installations and omissions for all AI agents.
 # Imported by config/instructions.nix.
+
 {
   skills = [
     # Repo-level installs (all skills from repo)

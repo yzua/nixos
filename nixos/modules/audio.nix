@@ -1,4 +1,5 @@
 # PipeWire audio stack (ALSA, PulseAudio compat, JACK, RNNoise).
+
 { pkgs, ... }:
 
 let

@@ -1,4 +1,5 @@
 # Type definition for programs.aiAgents.opencode.ohMyOpencode.agents entries.
+
 { lib, ... }:
 
 let

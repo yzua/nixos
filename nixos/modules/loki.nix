@@ -1,4 +1,5 @@
 # Loki log aggregation with Promtail (localhost:3100).
+
 { config, lib, ... }:
 
 let

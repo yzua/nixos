@@ -1,4 +1,5 @@
 # Nix flake for a Python virtual environment development template.
+
 {
   description = "Python venv development template";
 

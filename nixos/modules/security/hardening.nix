@@ -1,4 +1,5 @@
 # Kernel and system security hardening (sysctl, AppArmor, PAM, hidepid).
+
 { lib, ... }:
 
 {

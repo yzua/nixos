@@ -1,4 +1,5 @@
 # VS Code extensions (nixpkgs + marketplace).
+
 {
   pkgs,
   ...

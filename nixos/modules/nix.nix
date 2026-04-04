@@ -1,4 +1,5 @@
 # Nix package manager configuration (flakes, GC, binary caches, update notifications).
+
 {
   inputs,
   lib,

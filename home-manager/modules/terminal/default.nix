@@ -1,4 +1,5 @@
 # Terminal, shell, and CLI tool modules.
+
 {
   imports = [
     ./tools # CLI tools (bat, eza, git, atuin, btop, yazi, starship, etc.)

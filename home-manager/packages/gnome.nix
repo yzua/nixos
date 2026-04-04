@@ -1,4 +1,5 @@
 # GNOME utilities used with Niri (minimal set — GNOME desktop disabled).
+
 { pkgs, ... }:
 
 {

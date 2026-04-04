@@ -1,3 +1,5 @@
+# Niri layout configuration (gaps, columns, borders, focus)
+
 _: {
   programs.niri.settings.layout = {
     gaps = 3;

@@ -1,4 +1,5 @@
 # Custom prayer times indicator for the desktop bar.
+
 { pkgsStable, ... }:
 
 {

@@ -1,6 +1,7 @@
 # Network firewall and hostname leak prevention.
 # Kill switch handled by Mullvad lockdown mode (nftables), not iptables.
 # All rules use nftables for consistency with Mullvad and OpenSnitch.
+
 _:
 
 {

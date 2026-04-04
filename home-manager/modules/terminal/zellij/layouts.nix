@@ -1,6 +1,7 @@
 # Zellij layout definitions (default, dev, ai, monitoring).
 # deadnix false-positive: constants IS used in zjstatusConfig string interpolation.
 # deadnix: hide
+
 {
   config,
   constants,

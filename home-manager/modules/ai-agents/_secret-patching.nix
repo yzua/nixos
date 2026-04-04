@@ -1,4 +1,5 @@
 # Secret patching activation — injects API keys and tokens into agent configs.
+
 {
   cfg,
   pkgs,

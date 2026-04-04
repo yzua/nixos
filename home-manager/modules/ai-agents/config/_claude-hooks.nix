@@ -1,4 +1,5 @@
 # Lifecycle hook configuration for Claude Code.
+
 let
   mkFormatterHook =
     {

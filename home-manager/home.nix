@@ -1,4 +1,5 @@
 # Home Manager entry point.
+
 {
   homeStateVersion,
   user,

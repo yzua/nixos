@@ -1,4 +1,5 @@
 # X server for XWayland compatibility on Niri (Wayland).
+
 _:
 
 {

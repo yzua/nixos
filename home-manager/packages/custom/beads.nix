@@ -1,4 +1,5 @@
 # Beads (bd) — git-backed issue tracking for AI coding agents.
+
 { pkgs, ... }:
 
 let

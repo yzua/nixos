@@ -1,4 +1,5 @@
 # Automated restic backups with retention policy.
+
 {
   config,
   lib,

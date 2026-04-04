@@ -1,4 +1,5 @@
 # Laptop kernel params for backlight and NVIDIA framebuffer.
+
 _:
 
 {

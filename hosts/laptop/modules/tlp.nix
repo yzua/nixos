@@ -1,4 +1,5 @@
 # TLP power management for laptop.
+
 { config, lib, ... }:
 
 let

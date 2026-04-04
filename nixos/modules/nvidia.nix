@@ -1,4 +1,5 @@
 # NVIDIA GPU drivers, CUDA, and Wayland integration.
+
 {
   config,
   lib,

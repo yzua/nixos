@@ -1,4 +1,5 @@
 # Mullvad VPN with hardened tunnel settings.
+
 {
   config,
   lib,

@@ -1,4 +1,5 @@
 # Home file and XDG config file declarations for AI agents.
+
 {
   config,
   lib,

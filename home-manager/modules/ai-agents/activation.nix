@@ -1,4 +1,5 @@
 # Home Manager activation scripts for AI agent setup and secret patching.
+
 {
   config,
   lib,

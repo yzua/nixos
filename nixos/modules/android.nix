@@ -1,6 +1,7 @@
 # Android device and emulator support (ADB, Fastboot, Android Studio/AVD).
 # The SDK emulator binary (from Google) bundles its own Qt but needs system
 # libraries at load time. We wrap it with LD_LIBRARY_PATH.
+
 {
   pkgs,
   pkgsStable,

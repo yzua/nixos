@@ -1,4 +1,5 @@
 # Prometheus alerting rules for system health monitoring.
+
 [
   ''
     groups:

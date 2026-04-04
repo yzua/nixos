@@ -1,4 +1,5 @@
 # Neovim editor with LSP, completion, and modern plugins.
+
 { pkgs, ... }:
 
 let

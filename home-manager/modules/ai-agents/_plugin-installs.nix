@@ -1,4 +1,5 @@
 # Claude plugin installation — oh-my-claudecode and everything-claude-code.
+
 {
   cfg,
   config,

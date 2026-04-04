@@ -1,4 +1,5 @@
 # Brave extensions captured from current local profile.
+
 {
   programs.brave.extensions =
     let

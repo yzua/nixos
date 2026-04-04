@@ -1,6 +1,7 @@
 # System-wide automatic metadata scrubbing.
 # Watches Downloads and Desktop for new files and strips metadata using mat2/exiftool.
 # Full scrub of Documents/Pictures runs weekly via timer.
+
 {
   config,
   lib,

@@ -1,3 +1,5 @@
+# Wayland color picker script (grim + slurp + imagemagick)
+
 { pkgsStable, ... }:
 pkgsStable.writeScriptBin "color-picker" ''
   #!${pkgsStable.bash}/bin/bash

@@ -1,4 +1,5 @@
 # Desktop entries and launcher wrapper scripts for desktop applications.
+
 {
   pkgs,
   user,

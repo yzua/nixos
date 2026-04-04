@@ -1,4 +1,5 @@
 # Nautilus (GNOME Files) dconf preferences, bookmarks, and document templates.
+
 {
   config,
   lib,

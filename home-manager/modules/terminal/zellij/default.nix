@@ -1,4 +1,5 @@
 # Zellij terminal multiplexer.
+
 {
   imports = [
     ./plugins.nix # WASM plugin definitions and xdg.configFile entries

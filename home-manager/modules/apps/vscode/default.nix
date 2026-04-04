@@ -1,4 +1,5 @@
 # VS Code editor with declarative extensions and writable settings.
+
 {
   config,
   lib,

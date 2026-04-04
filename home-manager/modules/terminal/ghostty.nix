@@ -1,4 +1,5 @@
 # Ghostty terminal emulator configuration.
+
 {
   constants,
   lib,

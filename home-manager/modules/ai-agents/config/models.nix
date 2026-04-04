@@ -1,4 +1,5 @@
 # Model selections, provider registries, and per-agent tool configurations (OpenCode, Codex, Gemini).
+
 { config, constants, ... }:
 
 let

@@ -1,3 +1,5 @@
+# Book launcher script (find + wofi + zathura)
+
 { pkgsStable, ... }:
 pkgsStable.writeScriptBin "open_books" ''
   #!/usr/bin/env bash

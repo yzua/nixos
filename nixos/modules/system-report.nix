@@ -1,4 +1,5 @@
 # Unified system health reporting (hourly errors, daily full, weekly cleanup).
+
 {
   config,
   lib,

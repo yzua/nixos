@@ -1,5 +1,6 @@
 # Single source of truth for LibreWolf profile definitions.
 # Used by librewolf/default.nix (browser config) and desktop-entries.nix (launcher entries).
+
 { constants }:
 let
   inherit (constants.proxies.librewolf)

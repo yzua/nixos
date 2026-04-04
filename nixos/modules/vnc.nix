@@ -1,6 +1,7 @@
 # VNC remote access (x11vnc, noVNC, websockify).
 # SECURITY: x11vnc defaults to NO encryption. Always tunnel through SSH or use
 # the vnc-secure-startup launcher which forces localhost-only + SSH tunnel instructions.
+
 {
   config,
   lib,

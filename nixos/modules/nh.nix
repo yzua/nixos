@@ -1,4 +1,5 @@
 # Nix Helper (nh) build tool wrapper.
+
 { pkgsStable, user, ... }:
 
 {

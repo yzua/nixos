@@ -1,4 +1,5 @@
 # Cross-module conflict assertions and dependency validation.
+
 { config, lib, ... }:
 
 {

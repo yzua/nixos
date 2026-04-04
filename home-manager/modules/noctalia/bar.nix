@@ -1,3 +1,5 @@
+# Noctalia bar widget layout (left, center, right panels)
+
 { apiQuotaScript, ... }:
 
 let

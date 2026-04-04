@@ -1,4 +1,5 @@
 # OpenSnitch application firewall with per-app network logging.
+
 {
   config,
   lib,

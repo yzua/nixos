@@ -1,4 +1,5 @@
 # Shared option constructors for ai-agents modules.
+
 { lib }:
 let
   mkTypedOption =

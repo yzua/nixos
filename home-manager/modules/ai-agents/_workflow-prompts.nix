@@ -1,4 +1,5 @@
 # Workflow prompt constants used by AI agent shell aliases.
+
 {
   commitSplit = "Objective: transform current working tree into a minimal set of signed logical commits with zero unrelated changes. Workflow: 1) inspect git status, full diff, staged diff, and recent log style; 2) draft a commit plan with ordered commit scopes and rationale; 3) for each commit stage only relevant hunks and files, run targeted validation for touched files, then create signed commit with conventional message focused on intent; 4) re-run git status after each commit and continue until plan complete. Hard rules: never use git add ., never mix unrelated concerns, never commit secrets or generated noise, never rewrite history unless explicitly required. Output contract: show planned commit list before first commit, then report each created commit hash, message, and validation evidence.";
 

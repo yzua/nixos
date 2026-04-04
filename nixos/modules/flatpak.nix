@@ -1,5 +1,6 @@
 # Flatpak sandboxed application distribution with Flathub.
 # SECURITY: Default overrides restrict Flatpak apps to VPN tunnel and limit filesystem access.
+
 { config, lib, ... }:
 
 {

@@ -1,4 +1,5 @@
 # Automated file and cache cleanup services.
+
 { lib, ... }:
 {
   options.mySystem.cleanup.enable = lib.mkEnableOption "automated file and cache cleanup services";

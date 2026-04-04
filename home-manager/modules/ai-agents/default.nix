@@ -1,4 +1,5 @@
 # AI coding agents configuration (Claude Code, OpenCode, Codex, Gemini CLI).
+
 { ... }:
 {
   imports = [

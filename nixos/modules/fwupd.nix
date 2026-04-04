@@ -1,4 +1,5 @@
 # Firmware update daemon (fwupd/LVFS) for BIOS and device firmware updates.
+
 {
   config,
   lib,

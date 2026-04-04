@@ -1,4 +1,5 @@
 # ActivityWatch app usage tracking (Wayland, dashboard at localhost:5600).
+
 { pkgs, ... }:
 
 {

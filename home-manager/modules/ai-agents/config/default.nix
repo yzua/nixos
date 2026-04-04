@@ -1,4 +1,5 @@
 # Import hub for split AI agent configuration files.
+
 {
   imports = [
     ./instructions.nix # Global instructions and skills

@@ -1,3 +1,5 @@
+# Glance dashboard service health check endpoints
+
 let
   mkSite =
     {

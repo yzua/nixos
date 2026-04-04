@@ -1,4 +1,5 @@
 # mpv media player with Vim keybindings and stable rendering defaults.
+
 { constants, ... }:
 
 let

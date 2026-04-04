@@ -1,4 +1,5 @@
 # Sets hostname and stateVersion from flake arguments.
+
 {
   config,
   lib,

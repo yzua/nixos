@@ -12,6 +12,7 @@
 #   8. sudo sbctl sign -s /boot/EFI/nixos/<initrd>.efi
 #   9. Reboot, enter BIOS, enable Secure Boot in "Setup Mode"
 #  10. Verify: sudo mokutil --sb-state
+
 {
   config,
   lib,

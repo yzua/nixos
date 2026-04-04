@@ -1,4 +1,5 @@
 # Codex configuration activation — generates ~/.codex/config.toml.
+
 {
   cfg,
   pkgs,

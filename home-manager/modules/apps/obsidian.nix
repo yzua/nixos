@@ -1,4 +1,5 @@
 # Obsidian Markdown notes app with a ready-to-use default vault.
+
 {
   config,
   pkgs,

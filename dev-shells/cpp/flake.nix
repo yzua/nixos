@@ -1,4 +1,5 @@
 # Nix flake for a C/C++ development environment.
+
 {
   description = "C/C++ development template";
 

@@ -1,3 +1,5 @@
+# Netdata real-time system monitoring dashboard
+
 {
   config,
   lib,

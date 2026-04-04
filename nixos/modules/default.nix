@@ -1,4 +1,5 @@
 # NixOS modules aggregation.
+
 {
   imports = [
     # Core system

@@ -1,4 +1,5 @@
 # Stylix theming engine (Gruvbox dark, flat style).
+
 {
   constants,
   inputs,

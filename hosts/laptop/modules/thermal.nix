@@ -1,4 +1,5 @@
 # Intel thermal daemon for ThinkPad DPTF thermal zone management.
+
 _:
 
 {

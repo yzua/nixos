@@ -1,4 +1,5 @@
 # ThinkPad host-specific modules.
+
 {
   imports = [
     ./boot.nix # Kernel params (acpi_backlight)

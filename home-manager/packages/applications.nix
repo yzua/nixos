@@ -1,4 +1,5 @@
 # Desktop applications and theming packages.
+
 { pkgs, ... }:
 
 {

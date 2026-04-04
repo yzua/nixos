@@ -1,4 +1,5 @@
 # Nautilus (GNOME Files) with extensions, thumbnails, and automounting.
+
 {
   config,
   lib,

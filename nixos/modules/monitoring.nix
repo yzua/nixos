@@ -1,4 +1,5 @@
 # System monitoring (sensors, vnStat, bandwhich).
+
 { pkgsStable, ... }:
 
 {

@@ -1,4 +1,5 @@
 # NetworkManager with MAC randomization, DNS delegation, and DHCP leak prevention.
+
 { lib, ... }:
 
 {

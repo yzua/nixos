@@ -1,4 +1,5 @@
 # Niri window rules (floating, opacity, workspace assignments, positioning).
+
 { constants, ... }:
 {
   programs.niri.settings.window-rules =

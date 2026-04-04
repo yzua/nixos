@@ -1,3 +1,5 @@
+# Input device configuration (keyboard, mouse, touchpad, trackpoint)
+
 { constants, ... }:
 {
   programs.niri.settings.input = {

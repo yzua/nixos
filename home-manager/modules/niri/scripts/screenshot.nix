@@ -1,3 +1,5 @@
+# Screenshot annotation script (grim + slurp + swappy)
+
 { pkgsStable, ... }:
 pkgsStable.writeScriptBin "screenshot-annotate" ''
   #!${pkgsStable.bash}/bin/bash

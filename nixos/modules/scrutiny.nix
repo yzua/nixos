@@ -1,3 +1,5 @@
+# Scrutiny SMART disk health monitoring with InfluxDB retention
+
 {
   config,
   lib,

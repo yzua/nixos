@@ -1,4 +1,5 @@
 # Nix flake for a Go development environment.
+
 {
   description = "Go development template";
 

@@ -1,4 +1,5 @@
 # Weekly Lynis security audit timer and service.
+
 {
   lib,
   pkgsStable,

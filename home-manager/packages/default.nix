@@ -1,4 +1,5 @@
 # Home Manager package aggregation (each chunk sets home.packages).
+
 {
   imports = [
     ./applications.nix # Desktop apps and GTK theming

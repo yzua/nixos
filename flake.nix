@@ -1,4 +1,5 @@
 # Entry point: flake-based NixOS + Home Manager configuration.
+
 {
   description = "Personal NixOS configuration";
 

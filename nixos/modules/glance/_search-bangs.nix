@@ -1,4 +1,5 @@
 # Search bang shortcuts for Glance dashboard.
+
 [
   {
     title = "GitHub";

@@ -1,3 +1,5 @@
+# Noctalia Shell settings (theme, dock, wallpaper, OSD, control center)
+
 { constants, ... }:
 
 let

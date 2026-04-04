@@ -1,4 +1,5 @@
 # Claude Code permissions, lifecycle hooks, and extra settings.
+
 _:
 
 let

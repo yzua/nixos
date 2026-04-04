@@ -1,4 +1,5 @@
 # Shared OpenCode profile names and config paths.
+
 { config }:
 
 let

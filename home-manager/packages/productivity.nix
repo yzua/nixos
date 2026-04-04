@@ -1,4 +1,5 @@
 # Productivity tools for time tracking and focus management.
+
 { pkgs, ... }:
 
 {

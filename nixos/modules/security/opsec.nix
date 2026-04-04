@@ -1,4 +1,5 @@
 # Operational security (kexec, metadata stripping, zram, NTS time).
+
 { lib, ... }:
 
 {

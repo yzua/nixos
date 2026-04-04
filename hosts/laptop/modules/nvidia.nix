@@ -1,4 +1,5 @@
 # NVIDIA Optimus (hybrid graphics) for ThinkPad.
+
 { config, lib, ... }:
 
 let

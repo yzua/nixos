@@ -1,4 +1,5 @@
 # PC host-specific tuning (NVIDIA, IO, filesystem).
+
 _: {
   # Better TTY console resolution and smoother VT switching on NVIDIA Wayland
   boot.kernelParams = [ "nvidia_drm.fbdev=1" ];

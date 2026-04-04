@@ -1,4 +1,5 @@
 # Nix flake for a Rust development template using stable toolchain.
+
 {
   description = "Rust development template";
 

@@ -1,4 +1,5 @@
 # Alertmanager → ntfy.sh push notification bridge (localhost:8090).
+
 {
   config,
   lib,

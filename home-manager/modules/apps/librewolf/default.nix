@@ -1,5 +1,6 @@
 # LibreWolf browser with declarative baseline policies, multi-profile proxy setup, and extensions.
 # Each profile is fully isolated with its own proxy - never mix proxies.
+
 {
   pkgsStable,
   constants,

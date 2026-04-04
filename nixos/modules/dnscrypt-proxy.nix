@@ -1,4 +1,5 @@
 # Encrypted DNS via DNSCrypt-Proxy (DoH/DoT with DNSSEC) with ad/tracker blocking.
+
 { config, lib, ... }:
 
 {

@@ -1,4 +1,5 @@
 # XDG Desktop Portal packages and session variables.
+
 { pkgs, ... }:
 
 {

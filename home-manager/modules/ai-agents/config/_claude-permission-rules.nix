@@ -1,4 +1,5 @@
 # Allow and deny command/file patterns for Claude Code permissions.
+
 {
   allow = [
     "Bash(git *)"

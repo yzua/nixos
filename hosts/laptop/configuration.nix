@@ -1,4 +1,5 @@
 # Laptop: power management, NVIDIA Optimus, WiFi, bluetooth.
+
 { ... }:
 
 {

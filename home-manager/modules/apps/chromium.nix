@@ -1,4 +1,5 @@
 # Chromium launch wrapper with Wayland crash workaround.
+
 { pkgs, ... }:
 
 {

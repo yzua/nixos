@@ -1,4 +1,5 @@
 # GitHub CLI with declarative settings.
+
 {
   programs.gh = {
     enable = true;

@@ -1,4 +1,5 @@
 # Host inventory for flake system/home configuration generation.
+
 [
   {
     hostname = "desktop";

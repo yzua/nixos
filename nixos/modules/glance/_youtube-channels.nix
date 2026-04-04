@@ -1,3 +1,5 @@
+# YouTube channel subscriptions for Glance feed
+
 [
   # Fireship
   "UCsBjURrPoezykLs9EqgamOA"

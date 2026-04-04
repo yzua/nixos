@@ -1,5 +1,6 @@
 # Web reverse engineering and security assessment tools.
 # Static analysis of JS, dynamic API discovery, vulnerability scanning, CVE detection.
+
 {
   pkgs,
   lib,

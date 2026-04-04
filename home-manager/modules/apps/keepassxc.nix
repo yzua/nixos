@@ -1,6 +1,7 @@
 # KeePassXC password manager — desktop entry.
 # Native messaging host for browser integration is managed by KeePassXC itself
 # (Settings → Browser Integration) — NOT declaratively, to avoid read-only symlink conflicts.
+
 { pkgsStable, ... }:
 
 {

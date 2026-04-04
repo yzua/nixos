@@ -1,4 +1,5 @@
 # VS Code activation script (writes mutable settings.json).
+
 {
   lib,
   pkgs,

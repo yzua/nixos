@@ -1,4 +1,5 @@
 # User accounts, default shell, and group memberships.
+
 { pkgs, user, ... }:
 
 {
