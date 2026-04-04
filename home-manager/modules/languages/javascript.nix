@@ -8,7 +8,7 @@
 }:
 
 let
-  globalNpmPackages = [
+  bunGlobalPackages = [
     "@anthropic-ai/claude-code"
     "@google/gemini-cli"
     "@modelcontextprotocol/inspector"
@@ -18,6 +18,9 @@ let
     "skills"
     "agent-browser"
     "@playwright/cli"
+  ];
+  npmGlobalPackages = [
+    "t3"
   ];
   homeDir = config.home.homeDirectory;
   npmGlobalDir = "${homeDir}/.npm-global";
@@ -162,8 +165,19 @@ in
 
       $DRY_RUN_CMD ${pkgs.nodejs}/bin/npm config set prefix "$HOME/.npm-global"
 
-      echo "📦 Managing global npm packages with bun..."
-      $DRY_RUN_CMD ${pkgs.bun}/bin/bun add --global --cwd "$HOME" --no-summary ${lib.escapeShellArgs globalNpmPackages} || echo "❌ Failed to manage global npm packages"
+      echo "📦 Managing global JS packages with bun..."
+      $DRY_RUN_CMD ${pkgs.bun}/bin/bun add --global --cwd "$HOME" --no-summary ${lib.escapeShellArgs bunGlobalPackages} || echo "❌ Failed to manage Bun global packages"
+
+      # Remove Bun's t3 shim so the npm-managed binary can take precedence cleanly.
+      $DRY_RUN_CMD ${pkgs.bun}/bin/bun remove --global --cwd "$HOME" t3 >/dev/null 2>&1 || true
+
+      # t3 depends on node-pty, and Bun global installs currently miss its native binary.
+      echo "📦 Managing native Node CLI packages with npm..."
+      $DRY_RUN_CMD env \
+        PATH="${pkgs.nodejs}/bin:${pkgs.python3}/bin:${pkgs.gcc}/bin:${pkgs.gnumake}/bin:$PATH" \
+        PYTHON="${pkgs.python3}/bin/python3" \
+        ${pkgs.nodejs}/bin/npm install --global --prefix "$HOME/.npm-global" ${lib.escapeShellArgs npmGlobalPackages} || echo "❌ Failed to manage npm global packages"
+
       echo "✔ Global packages management completed"
     '';
   };
