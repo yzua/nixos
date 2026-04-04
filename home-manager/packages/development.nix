@@ -115,7 +115,7 @@ let
 in
 {
   home = {
-    packages = latest ++ stable;
+    packages = latest ++ stable ++ [ pkgs.objection ];
 
     sessionVariables = {
       RUSTC_WRAPPER = "sccache"; # Use sccache for faster Rust/C++ rebuilds
