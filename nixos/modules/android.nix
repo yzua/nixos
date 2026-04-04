@@ -21,6 +21,14 @@ let
   # Wrapper for the SDK emulator — provides missing shared libs at runtime
   emulatorWrapped = pkgs.writeShellScriptBin "emulator" ''
     export LD_LIBRARY_PATH="${lib.makeLibraryPath emulatorLibs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export QT_QPA_PLATFORM="''${QT_QPA_PLATFORM:-xcb}"
+    export LIBGL_ALWAYS_SOFTWARE="''${LIBGL_ALWAYS_SOFTWARE:-1}"
+    export __EGL_VENDOR_LIBRARY_FILENAMES="''${__EGL_VENDOR_LIBRARY_FILENAMES:-/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json}"
+    unset LIBVA_DRIVER_NAME
+    unset GBM_BACKEND
+    unset __GLX_VENDOR_LIBRARY_NAME
+    unset NVD_BACKEND
+    unset MOZ_ENABLE_WAYLAND
     exec ${sdkRoot}/emulator/emulator "$@"
   '';
 in
