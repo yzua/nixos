@@ -1,6 +1,6 @@
 # AI Agents Infrastructure
 
-High-density orchestration for Claude Code, OpenCode, Codex CLI, and Gemini CLI. This module manages a specialized 10-agent fleet with dynamic provider switching and secure secret injection.
+High-density orchestration for Claude Code, OpenCode, Codex CLI, and Gemini CLI. This module manages dynamic provider switching and secure secret injection.
 
 ---
 
@@ -23,26 +23,7 @@ The system follows a strict unidirectional flow:
 
 ### Profile-Driven Polymorphism
 
-The fleet is polymorphic. Switching the active profile (e.g., from `sonnet` to `glm`) re-maps every agent's model and variant (thinking level) across the entire fleet via `_settings-builders.nix`. This allows instant provider migration with zero configuration redundancy.
-
----
-
-## FLEET CONFIG
-
-The specialized 10-agent fleet is defined in `config/agents.nix` using the custom agent type in `_oh-my-opencode-agent-type.nix`.
-
-| Role                | Core Purpose                                                                   |
-| :------------------ | :----------------------------------------------------------------------------- |
-| `sisyphus`          | **Focused Executor**. Delegates tasks, verifies outputs, and handles shipping. |
-| `oracle`            | **Consultant**. Architecture review and deep debugging without write access.   |
-| `librarian`         | **Researcher**. Manages external documentation and OSS pattern searches.       |
-| `explore`           | **Code Map Navigator**. Fast contextual search and pattern extraction.         |
-| `multimodal-looker` | **Visual Analyst**. Interprets PDFs, UI screenshots, and diagrams.             |
-| `prometheus`        | **Strategist**. High-thinking planning with interactive Socratic interviewing. |
-| `metis`             | **Analyst**. Pre-planning requirement discovery and risk assessment.           |
-| `momus`             | **Critic**. Plan reviewer that validates clarity and execution safety.         |
-| `atlas`             | **Coordinator**. Manages multi-agent execution and dependency tracking.        |
-| `hephaestus`        | **Deep Worker**. Long-running autonomous tasks and heavy refactors.            |
+Profiles switch the primary model across all OpenCode config directories. Each profile (glm, gemini, gpt, openrouter, sonnet, zen) re-maps the model field via `_settings-builders.nix`, allowing instant provider migration with zero configuration redundancy.
 
 ---
 

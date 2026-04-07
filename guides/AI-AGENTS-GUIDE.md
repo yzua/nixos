@@ -86,7 +86,6 @@ This guide is verified against the live configuration sources in:
 
 - `home-manager/modules/ai-agents/` — options, builders, file generation, activation, services
 - `home-manager/modules/ai-agents/_plugin-installs.nix` — Agency and Impeccable clone/build/install flows
-- `home-manager/modules/terminal/zsh/functions.nix` — shell functions and wrappers (`claude_glm`, `opencode_*`, `aip`)
 - `home-manager/modules/niri/binds.nix` — compositor shortcuts referenced in workflow examples
 
 When this file conflicts with generated/runtime behavior, treat those Nix modules as source of truth.
@@ -113,12 +112,9 @@ No separate local index file is currently maintained. Use the tables in this gui
 
 ### Plugin Docs
 
-| Tech                   | Docs                                                        | GitHub                                               |
-| ---------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
-| oh-my-opencode         | <https://github.com/code-yeongyu/oh-my-opencode#readme>     | <https://github.com/code-yeongyu/oh-my-opencode>     |
-| oh-my-claudecode       | <https://github.com/Yeachan-Heo/oh-my-claudecode#readme>    | <https://github.com/Yeachan-Heo/oh-my-claudecode>    |
-| everything-claude-code | <https://github.com/affaan-m/everything-claude-code#readme> | <https://github.com/affaan-m/everything-claude-code> |
-| impeccable             | <https://github.com/pbakaus/impeccable#readme>              | <https://github.com/pbakaus/impeccable>              |
+| Tech       | Docs                                           | GitHub                                  |
+| ---------- | ---------------------------------------------- | --------------------------------------- |
+| impeccable | <https://github.com/pbakaus/impeccable#readme> | <https://github.com/pbakaus/impeccable> |
 
 ### MCP Server Docs
 
@@ -269,7 +265,7 @@ ai-agents/
 ├── default.nix              # Import hub (options, activation, files, services, log-analyzer, config)
 ├── options.nix              # All programs.aiAgents option definitions
 ├── _mcp-transforms.nix      # MCP server transform helpers (imported by builders)
-├── _settings-builders.nix   # Per-agent settings builders (imported by files.nix)
+├── _settings-builders.nix   # Per-agent settings builders (imported by files)
 ├── _opencode-profiles.nix   # OpenCode profile names and config paths
 ├── activation.nix           # Activation scripts (secret patching, config setup, plugin installs)
 ├── files.nix                # home.file + xdg.configFile declarations
@@ -277,7 +273,6 @@ ai-agents/
 ├── config.nix               # Pass-through to config/ subdirectory
 ├── config/
 │   ├── default.nix          # Import hub
-│   ├── agents.nix           # Oh-My-OpenCode agent definitions
 │   ├── instructions.nix     # Global instructions + skills
 │   ├── mcp-servers.nix      # MCP server definitions + logging
 │   ├── models.nix           # Model/provider registries (OpenCode, Codex, Gemini)
@@ -321,7 +316,6 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`
 | Theme       | `gruvbox`                   | Matches system theme                        |
 | Small model | `claude-haiku-4-5`          | Cheap model for titles, summaries           |
 | Compaction  | Auto + prune                | Remove old tool outputs, reserve 10k tokens |
-| Plugins     | oh-my-opencode              | Stable baseline plugin stack                |
 
 Custom commands are currently disabled. To add your own OpenCode slash commands, edit
 `home-manager/modules/ai-agents/config/models.nix` under
@@ -362,74 +356,13 @@ Custom commands are currently disabled. To add your own OpenCode slash commands,
 
 Trusted projects: `~/System`.
 
-## oh-my-opencode Agents (Default Profile)
-
-| Agent             | Model                           | Purpose                                           |
-| ----------------- | ------------------------------- | ------------------------------------------------- |
-| sisyphus          | anthropic/claude-opus-4-6       | Primary orchestrator — delegates, verifies, ships |
-| hephaestus        | openai/gpt-5.4                  | Autonomous deep worker                            |
-| oracle            | anthropic/claude-opus-4-6       | Read-only consultant for architecture/debugging   |
-| prometheus        | anthropic/claude-opus-4-6 (max) | Strategic planner with extended budget            |
-| metis             | anthropic/claude-opus-4-6       | Pre-planning analysis                             |
-| librarian         | anthropic/claude-sonnet-4-6     | Documentation and reference search                |
-| atlas             | anthropic/claude-sonnet-4-6     | Orchestrator/conductor for task execution         |
-| momus             | anthropic/claude-opus-4-6       | Plan reviewer and quality gate                    |
-| explore           | anthropic/claude-haiku-4-5      | Quick contextual grep                             |
-| multimodal-looker | anthropic/claude-sonnet-4-6     | Visual/multimodal analysis (default profile)      |
-
-### oh-my-opencode Category Models
-
-| Category           | Model                           | Use Case                                     |
-| ------------------ | ------------------------------- | -------------------------------------------- |
-| visual-engineering | google/gemini-2.5-pro           | Frontend, UI/UX, design, styling             |
-| ultrabrain         | anthropic/claude-opus-4-6       | Deep logical reasoning, complex architecture |
-| deep               | anthropic/claude-opus-4-6 (max) | Goal-oriented autonomous problem-solving     |
-| artistry           | google/gemini-2.5-pro           | Creative, unconventional approaches          |
-| quick              | anthropic/claude-haiku-4-5      | Trivial tasks, typo fixes                    |
-| unspecified-low    | anthropic/claude-sonnet-4-6     | General tasks, low effort                    |
-| unspecified-high   | anthropic/claude-opus-4-6 (max) | General tasks, high effort                   |
-| writing            | google/gemini-2.5-flash         | Documentation, prose                         |
-
-### oh-my-opencode Features
-
-| Feature                 | Value                               | Why                               |
-| ----------------------- | ----------------------------------- | --------------------------------- |
-| Tmux visual multi-agent | Enabled                             | See agents work in separate panes |
-| Stale task timeout      | 180s                                | Kill hung background tasks        |
-| Aggressive truncation   | Enabled                             | Save tokens on large outputs      |
-| Preemptive compaction   | Enabled                             | Compact before hitting limits     |
-| Disabled hooks          | agent-usage-reminder, startup-toast | Reduce noise                      |
-
----
-
 ## GLM-5 Profile (`opencode_glm` / `claude_glm`)
 
 Z.AI GLM-5 as primary model for cost-effective coding sessions. Two entry points:
 
 ### `opencode_glm` (`ocglm`) — OpenCode with GLM-5
 
-Uses a separate config directory (`~/.config/opencode-glm/`) with all models overridden to GLM variants. Reuses the same MCP servers, plugins, and permissions as the default profile.
-
-| Agent             | GLM Model                     | Tier                             |
-| ----------------- | ----------------------------- | -------------------------------- |
-| sisyphus          | zai-coding-plan/glm-5.1         | Heavy                            |
-| hephaestus        | zai-coding-plan/glm-5.1         | Heavy                            |
-| oracle            | zai-coding-plan/glm-5.1         | Heavy                            |
-| prometheus        | zai-coding-plan/glm-5.1         | Heavy                            |
-| metis             | zai-coding-plan/glm-5.1         | Heavy                            |
-| librarian         | zai-coding-plan/glm-4.7       | Standard                         |
-| momus             | zai-coding-plan/glm-4.7       | Standard                         |
-| atlas             | zai-coding-plan/glm-4.7       | Standard                         |
-| explore           | zai-coding-plan/glm-4.7-flash | Fast                             |
-| multimodal-looker | anthropic/claude-sonnet-4-6   | Inherited from base agent config |
-
-Category overrides:
-
-| Category                                                         | Model         |
-| ---------------------------------------------------------------- | ------------- |
-| visual-engineering, ultrabrain, deep, artistry, unspecified-high | glm-5.1         |
-| unspecified-low, writing                                         | glm-4.7       |
-| quick                                                            | glm-4.7-flash |
+Uses a separate config directory (`~/.config/opencode-glm/`) with the model overridden to GLM-5. Reuses the same MCP servers and permissions as the default profile.
 
 ### `claude_glm` (`clglm`) — Claude Code via Z.AI GLM-5
 
@@ -466,33 +399,7 @@ Google Gemini models as primary models for Gemini-native coding sessions.
 
 ### `opencode_gemini` (`ocgem`) — OpenCode with Gemini profile
 
-Uses a separate config directory (`~/.config/opencode-gemini/`) with models overridden to Gemini variants. Reuses the same MCP servers and permissions as the default profile.
-
-| Agent             | Gemini Model                | Variant | Tier                             |
-| ----------------- | --------------------------- | ------- | -------------------------------- |
-| sisyphus          | gemini-2.5-pro              | —       | Heavy                            |
-| hephaestus        | gemini-2.5-pro              | —       | Heavy                            |
-| oracle            | gemini-2.5-pro              | —       | Heavy                            |
-| prometheus        | gemini-2.5-pro              | high    | Heavy (max thinking)             |
-| metis             | gemini-2.5-pro              | —       | Heavy                            |
-| momus             | gemini-2.5-pro              | low     | Heavy (light thinking)           |
-| librarian         | gemini-2.5-flash            | medium  | Fast                             |
-| atlas             | gemini-2.5-flash            | medium  | Fast                             |
-| explore           | gemini-2.5-flash            | minimal | Fast (speed priority)            |
-| multimodal-looker | anthropic/claude-sonnet-4-6 | —       | Inherited from base agent config |
-
-Category overrides:
-
-| Category           | Model            | Variant |
-| ------------------ | ---------------- | ------- |
-| visual-engineering | gemini-2.5-pro   | —       |
-| ultrabrain         | gemini-2.5-pro   | high    |
-| deep               | gemini-2.5-pro   | high    |
-| artistry           | gemini-2.5-pro   | —       |
-| unspecified-high   | gemini-2.5-pro   | high    |
-| unspecified-low    | gemini-2.5-flash | medium  |
-| writing            | gemini-2.5-flash | medium  |
-| quick              | gemini-2.5-flash | minimal |
+Uses a separate config directory (`~/.config/opencode-gemini/`) with the model overridden to Gemini. Reuses the same MCP servers and permissions as the default profile.
 
 ### Gemini Model Reference
 
@@ -509,28 +416,7 @@ OpenAI GPT models as primary models for GPT-first coding sessions.
 
 ### `opencode_gpt` (`ocgpt`) — OpenCode with GPT profile
 
-Uses a separate config directory (`~/.config/opencode-gpt/`) with models overridden to GPT variants. Reuses the same MCP servers, plugins, and permissions as the default profile.
-
-| Agent             | GPT Model                   | Tier                             |
-| ----------------- | --------------------------- | -------------------------------- |
-| sisyphus          | openai/gpt-5.4              | Heavy                            |
-| hephaestus        | openai/gpt-5.4              | Heavy                            |
-| oracle            | openai/gpt-5.3              | Standard                         |
-| prometheus        | openai/gpt-5.4              | Heavy                            |
-| metis             | openai/gpt-5.4              | Heavy                            |
-| librarian         | openai/gpt-5.3              | Standard                         |
-| momus             | openai/gpt-5.3              | Standard                         |
-| atlas             | openai/gpt-5.3              | Standard                         |
-| explore           | opencode/gpt-5-nano         | Fast                             |
-| multimodal-looker | anthropic/claude-sonnet-4-6 | Inherited from base agent config |
-
-Category overrides:
-
-| Category                                                         | Model                |
-| ---------------------------------------------------------------- | -------------------- |
-| visual-engineering, ultrabrain, deep, artistry, unspecified-high | openai/gpt-5.4 |
-| unspecified-low, writing                                         | openai/gpt-5.3       |
-| quick                                                            | opencode/gpt-5-nano  |
+Uses a separate config directory (`~/.config/opencode-gpt/`) with the model overridden to GPT. Reuses the same MCP servers and permissions as the default profile.
 
 ### GPT Model Reference
 
@@ -550,40 +436,9 @@ OpenCode free-tier models as primary models for low-cost sessions.
 
 ### `opencode_zen` (`oczen`) — OpenCode with Zen free profile
 
-Uses a separate config directory (`~/.config/opencode-zen/`) with models overridden to Zen free variants. Reuses the same MCP servers, plugins, and permissions as the default profile.
+Uses a separate config directory (`~/.config/opencode-zen/`) with the model overridden to Zen free variants. Reuses the same MCP servers and permissions as the default profile.
 
-| Scope                                             | Model                         |
-| ------------------------------------------------- | ----------------------------- |
-| Primary/default                                   | `opencode/minimax-m2.5-free`  |
-| Fast lane (`explore`, `quick`, `unspecified-low`) | `opencode/mimo-v2-flash-free` |
-| Other agent/category overrides                    | `opencode/minimax-m2.5-free`  |
-
----
-
-## oh-my-claudecode (Claude Code Plugin)
-
-Installed automatically via activation script. Provides multi-agent orchestration.
-
-### Execution Modes
-
-| Mode       | Description                         |
-| ---------- | ----------------------------------- |
-| autopilot  | Default automation with safe pacing |
-| ultrawork  | Aggressive parallel execution       |
-| ralph      | Persistent execution until done     |
-| ultrapilot | High-agency automation              |
-| ecomode    | Token-efficient execution           |
-| swarm      | Multi-agent style execution         |
-| pipeline   | Sequential pipeline stages          |
-
-### Magic Keywords
-
-| Keyword         | Meaning                         |
-| --------------- | ------------------------------- |
-| ultrawork / ulw | Maximum parallelism             |
-| ralph           | Persistent execution until done |
-| eco             | Token-efficient mode            |
-| plan            | Planning interview              |
+Primary model: `opencode/minimax-m2.5-free`, fast lane: `opencode/mimo-v2-flash-free`.
 
 ---
 
@@ -817,8 +672,8 @@ Wrapper logs go to `~/.local/share/ai-agents/logs/`. Log cleanup runs weekly (30
 ```text
 Task is independent?  -> delegate or run in parallel
 Task is sequential?   -> keep in a single agent
-Need deep analysis?   -> route to prometheus or oracle
-Need fast scans?      -> route to explore or atlas
+Need deep analysis?   -> use opus model
+Need fast scans?      -> use haiku or flash model
 ```
 
 ### Agent Selection
@@ -830,7 +685,6 @@ GLM-5 coding          -> ocglm or clglm
 Gemini coding         -> ocgem
 GPT coding            -> ocgpt
 Quick prototype       -> cx (codex)
-Research + docs       -> gem (search grounding) or librarian agent
-Multi-file refactor   -> cl with oh-my-claudecode ultrawork mode
+Research + docs       -> gem (search grounding)
 Multi-agent parallel  -> aip cl oc gem "your task" (side-by-side in Zellij)
 ```

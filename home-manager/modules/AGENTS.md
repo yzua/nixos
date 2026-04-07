@@ -9,14 +9,13 @@ Most modules directly configure `programs.*`, `services.*`, `home.*`; `ai-agents
 
 ```
 modules/
-├── ai-agents/          # AI coding agent config (Claude Code, OpenCode, Codex, Gemini CLI, oh-my-opencode)
+├── ai-agents/          # AI coding agent config (Claude Code, OpenCode, Codex, Gemini CLI)
 │   ├── default.nix     # Import hub (options, activation, files, services, log-analyzer, config)
 │   ├── options.nix     # All programs.aiAgents option definitions
 │   ├── _mcp-transforms.nix  # MCP server transform helpers (not a module, imported by others)
 │   ├── _settings-builders.nix # Per-agent settings builders (not a module, imported by others)
 │   ├── _option-helpers.nix # Shared option constructors (not a module, imported by others)
 │   ├── _opencode-profiles.nix # OpenCode profile names and config paths (not a module)
-│   ├── _oh-my-opencode-agent-type.nix # Agent type definition (not a module, imported by options)
 │   ├── activation.nix  # Activation scripts (secret patching, config setup, plugin installs)
 │   ├── files.nix       # home.file + xdg.configFile declarations
 │   ├── services.nix    # Packages, zsh aliases, systemd user services/timers
@@ -29,8 +28,7 @@ modules/
 │   │   ├── _claude-permission-rules.nix # Claude allow/deny rules (not a module, imported by permissions)
 │   │   ├── mcp-servers.nix  # MCP server definitions + logging
 │   │   ├── permissions.nix  # Claude permissions, hooks, settings
-│   │   ├── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)
-│   │   └── agents.nix       # Oh-My-OpenCode agent definitions
+│   │   └── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)
 │   └── log-analyzer.nix # AI agent log analysis and dashboard
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
