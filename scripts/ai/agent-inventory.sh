@@ -290,23 +290,6 @@ collect_opencode() {
 			[[ -n "$provider" ]] || continue
 			row "opencode" "provider" "$provider" "configured" "$cfg"
 		done < <(json_keys "$cfg" '.provider // {} | keys[]')
-
-		local omo="$profile_dir/oh-my-opencode.json"
-		if [[ -f "$omo" ]]; then
-			while IFS= read -r agent; do
-				[[ -n "$agent" ]] || continue
-				local desc
-				desc="$(jq -r --arg k "$agent" '.agents[$k].description // "no description"' "$omo" 2>/dev/null || echo "no description")"
-				row "opencode" "agent" "$agent" "$desc" "$omo"
-			done < <(json_keys "$omo" '.agents // {} | keys[]')
-
-			while IFS= read -r category; do
-				[[ -n "$category" ]] || continue
-				local cat_model
-				cat_model="$(jq -r --arg k "$category" '.categories[$k].model // "n/a"' "$omo" 2>/dev/null || echo "n/a")"
-				row "opencode" "category" "$category" "$cat_model" "$omo"
-			done < <(json_keys "$omo" '.categories // {} | keys[]')
-		fi
 	done
 
 	list_agent_files_merged "opencode" "${agent_dirs[@]}"
