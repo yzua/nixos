@@ -33,8 +33,6 @@ in
         "opencode-antigravity-auth@latest"
       ];
 
-      ohMyOpencode.enable = false;
-
       extraSettings = {
         share = "disabled";
         autoupdate = true;

@@ -348,12 +348,10 @@ in
       # Real files (not symlinks) so plugins can modify them.
       setupClaudeConfig = claudeConfig;
 
-      # === Claude Plugin Installation + Everything Claude Code ===
+      # === Plugin Installation ===
       inherit (pluginInstalls)
         installImpeccable
         installAgencyAgents
-        installOhMyClaudeCode
-        installEverythingClaudeCode
         ;
     };
   };

@@ -19,7 +19,6 @@ let
     mkStrListOption
     mkNullOrStrOption
     ;
-  ohMyOpencodeAgentType = import ./_oh-my-opencode-agent-type.nix { inherit lib; };
 in
 {
   options.programs.aiAgents = {
@@ -133,29 +132,9 @@ in
       enable = lib.mkEnableOption "OpenCode configuration";
 
       model = mkStrOption "anthropic/claude-sonnet-4-6" "Default model for OpenCode";
-      plugins = mkStrListOption [ "oh-my-opencode" ] "OpenCode plugins to enable";
+      plugins = mkStrListOption [ ] "OpenCode plugins to enable";
       providers = mkAttrsOption { } "Provider configurations for OpenCode";
       extraSettings = mkAttrsOption { } "Additional OpenCode settings";
-
-      ohMyOpencode = {
-        enable = mkBoolOption true "Enable oh-my-opencode configuration";
-
-        agents = mkTypedOptionWith ohMyOpencodeAgentType { } "Agent configurations for oh-my-opencode" {
-          example = {
-            sisyphus = {
-              model = "anthropic/claude-opus-4-6";
-              prompt = "You are Sisyphus, the relentless worker...";
-              temperature = 0.7;
-              permission = {
-                edit = "allow";
-                bash = "allow";
-              };
-            };
-          };
-        };
-
-        extraSettings = mkAttrsOption { } "Additional oh-my-opencode settings";
-      };
     };
 
     # === Codex Options ===

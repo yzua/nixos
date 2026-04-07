@@ -6,7 +6,6 @@
     # Repo-level installs (all skills from repo)
     "obra/superpowers"
     "anthropics/skills"
-    "affaan-m/everything-claude-code"
     "alirezarezvani/claude-skills"
     "microsoft/playwright-cli"
 
@@ -20,16 +19,8 @@
       skill = "vercel-react-best-practices";
     }
     {
-      repo = "affaan-m/everything-claude-code";
-      skill = "backend-patterns";
-    }
-    {
       repo = "vercel-labs/agent-skills";
       skill = "vercel-composition-patterns";
-    }
-    {
-      repo = "affaan-m/everything-claude-code";
-      skill = "security-review";
     }
     {
       repo = "obra/superpowers";

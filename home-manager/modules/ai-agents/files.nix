@@ -17,19 +17,12 @@ let
   inherit (settingsBuilders)
     opencodeSettings
     geminiSettings
-    ohMyOpencodeSettings
     glmOpencodeSettings
-    glmOhMyOpencodeSettings
     geminiOpencodeSettings
-    geminiOhMyOpencodeSettings
     gptOpencodeSettings
-    gptOhMyOpencodeSettings
     openrouterOpencodeSettings
-    openrouterOhMyOpencodeSettings
     sonnetOpencodeSettings
-    sonnetOhMyOpencodeSettings
     zenOpencodeSettings
-    zenOhMyOpencodeSettings
     ;
 
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
@@ -139,16 +132,6 @@ let
     If no target is provided, apply it to the most relevant current UI surface.
   '';
 
-  ohMyOpencodeSettingsByProfile = {
-    opencode = ohMyOpencodeSettings;
-    "opencode-glm" = glmOhMyOpencodeSettings;
-    "opencode-gemini" = geminiOhMyOpencodeSettings;
-    "opencode-gpt" = gptOhMyOpencodeSettings;
-    "opencode-openrouter" = openrouterOhMyOpencodeSettings;
-    "opencode-sonnet" = sonnetOhMyOpencodeSettings;
-    "opencode-zen" = zenOhMyOpencodeSettings;
-  };
-
   opencodeConfigFiles = lib.foldl' (
     acc: name:
     acc
@@ -166,12 +149,6 @@ let
         force = true;
       };
     }
-    // (lib.optionalAttrs cfg.opencode.ohMyOpencode.enable {
-      "${name}/oh-my-opencode.json" = {
-        text = toJSON ohMyOpencodeSettingsByProfile.${name};
-        force = true;
-      };
-    })
   ) { } opencodeProfileNames;
 
   opencodeImpeccableCommandFiles =
