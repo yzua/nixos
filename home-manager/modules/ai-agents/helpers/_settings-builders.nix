@@ -10,8 +10,27 @@
 let
   cfg = config.programs.aiAgents;
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
+  formatterRegistry = import ../config/_formatters.nix;
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   sonnetModel = "anthropic/claude-sonnet-4-6";
+  opencodeFormatterSettings = builtins.listToAttrs (
+    map (formatter: {
+      name = formatter.tool;
+      value = {
+        command = lib.splitString " " formatter.command;
+        inherit (formatter) extensions;
+      };
+    }) formatterRegistry.formatters
+  );
+
+  mkOptionalOpencodeSetting =
+    key: value:
+    if builtins.isAttrs value then
+      lib.optionalAttrs (value != { }) { ${key} = value; }
+    else if builtins.isList value then
+      lib.optionalAttrs (value != [ ]) { ${key} = value; }
+    else
+      lib.optionalAttrs (value != null) { ${key} = value; };
 
   claudeSettings = {
     inherit (cfg.claude) model permissions hooks;
@@ -46,6 +65,17 @@ let
       "result/**"
     ];
   }
+  // (mkOptionalOpencodeSetting "permission" cfg.opencode.permission)
+  // (mkOptionalOpencodeSetting "agent" cfg.opencode.agent)
+  // (mkOptionalOpencodeSetting "command" cfg.opencode.command)
+  // (mkOptionalOpencodeSetting "lsp" cfg.opencode.lsp)
+  // (mkOptionalOpencodeSetting "formatter" (
+    if cfg.opencode.formatter == { } then opencodeFormatterSettings else cfg.opencode.formatter
+  ))
+  // (mkOptionalOpencodeSetting "experimental" cfg.opencode.experimental)
+  // (mkOptionalOpencodeSetting "default_agent" cfg.opencode.defaultAgent)
+  // (mkOptionalOpencodeSetting "enabled_providers" cfg.opencode.enabledProviders)
+  // (mkOptionalOpencodeSetting "disabled_providers" cfg.opencode.disabledProviders)
   // (lib.optionalAttrs (cfg.globalInstructions != "") { instructions = [ cfg.globalInstructions ]; })
   // (lib.optionalAttrs (cfg.opencode.extraSettings != { }) cfg.opencode.extraSettings);
 

@@ -82,6 +82,10 @@ in
         ''
       ));
 
+      home.sessionVariables = lib.mkIf cfg.opencode.enable {
+        OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
+      };
+
       programs.zsh.shellAliases = shellAliases;
       programs.bash.shellAliases = shellAliases;
 

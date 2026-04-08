@@ -134,6 +134,21 @@ in
       model = mkStrOption "anthropic/claude-sonnet-4-6" "Default model for OpenCode";
       plugins = mkStrListOption [ ] "OpenCode plugins to enable";
       providers = mkAttrsOption { } "Provider configurations for OpenCode";
+      permission =
+        mkTypedOption (lib.types.either lib.types.str lib.types.attrs) { }
+          "OpenCode permission policy";
+      agent = mkAttrsOption { } "OpenCode agent definitions";
+      command = mkAttrsOption { } "OpenCode slash command definitions";
+      lsp =
+        mkTypedOption (lib.types.either lib.types.bool lib.types.attrs) { }
+          "OpenCode LSP server configuration";
+      formatter =
+        mkTypedOption (lib.types.either lib.types.bool lib.types.attrs) { }
+          "OpenCode formatter configuration";
+      experimental = mkAttrsOption { } "OpenCode experimental feature flags";
+      defaultAgent = mkNullOrStrOption null "Default primary agent for OpenCode";
+      enabledProviders = mkStrListOption [ ] "Only enable these OpenCode providers";
+      disabledProviders = mkStrListOption [ ] "Disable these auto-loaded OpenCode providers";
       extraSettings = mkAttrsOption { } "Additional OpenCode settings";
     };
 
@@ -143,6 +158,8 @@ in
 
       useWrapper = mkBoolOption true "Use logging wrapper for Codex";
       model = mkStrOption "gpt-5.4" "Default model for Codex";
+      sandboxMode = mkStrOption "workspace-write" "Default sandbox mode for Codex";
+      enableSearch = mkBoolOption false "Enable native Codex web search by default";
 
       personality = lib.mkOption {
         type = lib.types.enum [
@@ -179,6 +196,112 @@ in
       };
 
       trustedProjects = mkStrListOption [ ] "Paths to projects with trust_level = trusted";
+
+      features = mkTypedOption (lib.types.attrsOf lib.types.bool) { } "Feature flags for Codex";
+
+      profiles = mkTypedOption (lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            model = mkNullOrStrOption null "Profile-specific model override";
+            personality = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "none"
+                  "friendly"
+                  "pragmatic"
+                ]
+              );
+              default = null;
+              description = "Profile-specific personality override";
+            };
+            reasoningEffort = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "none"
+                  "minimal"
+                  "low"
+                  "medium"
+                  "high"
+                  "xhigh"
+                ]
+              );
+              default = null;
+              description = "Profile-specific reasoning effort";
+            };
+            approvalPolicy = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "untrusted"
+                  "on-failure"
+                  "on-request"
+                  "never"
+                ]
+              );
+              default = null;
+              description = "Profile-specific approval policy";
+            };
+            sandboxMode = mkNullOrStrOption null "Profile-specific sandbox mode";
+            enableSearch = mkBoolOption false "Enable native Codex web search for this profile";
+            developerInstructions = lib.mkOption {
+              type = lib.types.lines;
+              default = "";
+              description = "Additional developer instructions for the profile";
+            };
+            extraToml = lib.mkOption {
+              type = lib.types.lines;
+              default = "";
+              description = "Extra TOML appended inside this profile";
+            };
+          };
+        }
+      )) { } "Named Codex config profiles";
+
+      customAgents = mkTypedOption (lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            description = mkStrOption "" "Human-facing description for when to use this custom Codex agent";
+            developerInstructions = lib.mkOption {
+              type = lib.types.lines;
+              default = "";
+              description = "Developer instructions for the custom Codex agent";
+            };
+            model = mkNullOrStrOption null "Agent-specific model override";
+            reasoningEffort = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "none"
+                  "minimal"
+                  "low"
+                  "medium"
+                  "high"
+                  "xhigh"
+                ]
+              );
+              default = null;
+              description = "Agent-specific reasoning effort";
+            };
+            approvalPolicy = lib.mkOption {
+              type = lib.types.nullOr (
+                lib.types.enum [
+                  "untrusted"
+                  "on-failure"
+                  "on-request"
+                  "never"
+                ]
+              );
+              default = null;
+              description = "Agent-specific approval policy";
+            };
+            sandboxMode = mkNullOrStrOption null "Agent-specific sandbox mode";
+            enableSearch = mkBoolOption false "Enable native Codex web search for this agent";
+            extraToml = lib.mkOption {
+              type = lib.types.lines;
+              default = "";
+              description = "Extra TOML appended to the custom agent file";
+            };
+          };
+        }
+      )) { } "Custom Codex agents written to ~/.codex/agents/*.toml";
 
       extraToml = lib.mkOption {
         type = lib.types.lines;
