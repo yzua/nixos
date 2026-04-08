@@ -44,9 +44,9 @@ lib.mkIf cfg.claude.enable (
     echo "✓ Claude .mcp.json configured"
 
     ${lib.optionalString (cfg.globalInstructions != "") ''
-        CLAUDE_MD="$HOME/.claude/CLAUDE.md"
-        cp "${claudeInstructionsFile}" "$CLAUDE_MD"
-        echo "✓ Claude CLAUDE.md configured"
+      CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+      cp "${claudeInstructionsFile}" "$CLAUDE_MD"
+      echo "✓ Claude CLAUDE.md configured"
     ''}
   ''
 )

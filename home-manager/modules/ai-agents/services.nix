@@ -33,6 +33,35 @@ let
     };
     Install.WantedBy = [ "timers.target" ];
   };
+
+  mkCliAutoupdateScript =
+    {
+      binary,
+      npmPackage,
+      label,
+    }:
+    pkgs.writeShellScript "${binary}-autoupdate" ''
+      if ! command -v ${binary} >/dev/null 2>&1; then
+        exit 0
+      fi
+
+      binary_path="$(readlink -f "$(command -v ${binary})")"
+
+      if [[ "$binary_path" == *"/.bun/install/global/"* ]]; then
+        ${pkgs.bun}/bin/bun install -g ${npmPackage}@latest
+      elif [[ "$binary_path" == *"/.npm-global/"* ]]; then
+        ${pkgs.nodejs}/bin/npm install -g ${npmPackage}@latest
+      elif command -v bun >/dev/null 2>&1; then
+        bun install -g ${npmPackage}@latest
+      elif command -v npm >/dev/null 2>&1; then
+        npm install -g ${npmPackage}@latest
+      else
+        echo "No supported package manager found for ${label} auto-update"
+        exit 1
+      fi
+
+      echo "Updated ${label}"
+    '';
 in
 {
   config = lib.mkIf cfg.enable (
@@ -121,16 +150,39 @@ in
             };
           };
 
+          claude-autoupdate = {
+            Unit.Description = "Auto-update Claude Code CLI";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${mkCliAutoupdateScript {
+                binary = "claude";
+                npmPackage = "@anthropic-ai/claude-code";
+                label = "Claude Code CLI";
+              }}";
+            };
+          };
+
           codex-autoupdate = {
             Unit.Description = "Auto-update Codex CLI";
             Service = {
               Type = "oneshot";
-              ExecStart = "${pkgs.writeShellScript "codex-autoupdate" ''
-                if command -v codex >/dev/null 2>&1; then
-                  bun install -g @openai/codex@latest
-                  echo "Updated Codex CLI"
-                fi
-              ''}";
+              ExecStart = "${mkCliAutoupdateScript {
+                binary = "codex";
+                npmPackage = "@openai/codex";
+                label = "Codex CLI";
+              }}";
+            };
+          };
+
+          gemini-autoupdate = {
+            Unit.Description = "Auto-update Gemini CLI";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${mkCliAutoupdateScript {
+                binary = "gemini";
+                npmPackage = "@google/gemini-cli";
+                label = "Gemini CLI";
+              }}";
             };
           };
         };
@@ -138,7 +190,9 @@ in
         timers = {
           ai-agent-log-cleanup = mkWeeklyTimer "Weekly AI agent log cleanup";
           opencode-db-vacuum = mkWeeklyTimer "Weekly OpenCode database vacuum";
+          claude-autoupdate = mkWeeklyTimer "Weekly Claude Code CLI auto-update";
           codex-autoupdate = mkWeeklyTimer "Weekly Codex CLI auto-update";
+          gemini-autoupdate = mkWeeklyTimer "Weekly Gemini CLI auto-update";
         };
       };
     }

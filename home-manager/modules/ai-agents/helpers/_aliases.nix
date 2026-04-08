@@ -60,7 +60,28 @@ let
     }
     {
       alias = "gem";
-      command = "gemini --yolo";
+      command = "gemini";
+      workflowPromptMode = "positional";
+    }
+    {
+      alias = "gemu";
+      command = "gemini --approval-mode=yolo";
+      workflowPromptMode = "positional";
+    }
+    {
+      alias = "gemy";
+      command = "gemini --approval-mode=yolo";
+      workflowPromptMode = "positional";
+    }
+    {
+      alias = "gemp";
+      command = "gemini --approval-mode=plan";
+      workflowPromptMode = "positional";
+    }
+    {
+      alias = "gemw";
+      command = "gemini --worktree";
+      workflowPromptMode = "positional";
     }
     {
       alias = "cx";

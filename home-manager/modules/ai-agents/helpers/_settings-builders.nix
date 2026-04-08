@@ -81,7 +81,6 @@ let
 
   geminiSettings = {
     mcpServers = geminiMcpServers;
-    inherit (cfg.gemini) theme sandboxMode;
   }
   // (lib.optionalAttrs (cfg.globalInstructions != "") {
     systemInstruction = cfg.globalInstructions;

@@ -97,9 +97,118 @@
       Include concrete file references and recommended fixes.
       """
     '';
+    "repo-recon.toml" = ''
+      description = "Map the codebase before changing anything"
+      prompt = """
+      Perform static repository reconnaissance.
+
+      Focus on:
+      - entrypoints
+      - important modules and ownership boundaries
+      - data flow and integration points
+      - risky areas and likely side effects
+
+      Distinguish verified facts from inference and cite file paths.
+      """
+    '';
+    "artifact-triage.toml" = ''
+      description = "Static reverse-engineering triage for artifacts and suspicious files"
+      prompt = """
+      Perform static reverse-engineering triage.
+
+      Prioritize:
+      - strings, symbols, imports, endpoints, persistence
+      - auth material, config formats, trust boundaries
+      - what can be concluded statically without executing samples
+
+      Report verified facts first, then constrained inference.
+      """
+    '';
+    "security-sweep.toml" = ''
+      description = "Review the current repo or diff for security issues"
+      prompt = """
+      Run a focused security review.
+
+      Prioritize:
+      - secrets exposure
+      - command injection / shell hazards
+      - unsafe file operations
+      - auth and permission regressions
+      - dependency and network trust issues
+
+      Classify findings by severity and include file references.
+      """
+    '';
+    "plan-change.toml" = ''
+      description = "Research first and propose an implementation plan"
+      prompt = """
+      Research the request in read-only mode first.
+
+      Then produce:
+      - the root cause or current architecture
+      - the smallest safe implementation strategy
+      - validation steps
+
+      Do not start editing until the plan is explicit.
+      """
+    '';
   };
 
   geminiSkills = {
+    "implementation-engineer/SKILL.md" = ''
+      ---
+      name: implementation-engineer
+      description: Implement minimal, high-leverage code and configuration changes with repo-native validation. Use for focused coding, config updates, and bug fixes after the target area is understood.
+      ---
+
+      # Implementation Engineer
+
+      Prefer the smallest correct change.
+      Match existing patterns.
+      Validate with the narrowest relevant checks before finishing.
+      Avoid unrelated refactors.
+    '';
+
+    "static-recon/SKILL.md" = ''
+      ---
+      name: static-recon
+      description: Perform static reverse-engineering triage for binaries, scripts, configs, protocols, and suspicious artifacts without mutating them. Use for RE, malware triage, protocol mapping, and evidence gathering.
+      ---
+
+      # Static Recon
+
+      Prefer non-mutating inspection.
+      Focus on strings, symbols, imports, endpoints, config formats, persistence, startup flow, and trust boundaries.
+      Separate verified facts from inference.
+      Do not execute samples unless explicitly requested.
+    '';
+
+    "protocol-triage/SKILL.md" = ''
+      ---
+      name: protocol-triage
+      description: Inspect protocols, endpoints, auth flows, serialized data, and on-disk config/state for evidence-driven RE and security analysis. Use for traffic, API, and storage triage.
+      ---
+
+      # Protocol Triage
+
+      Focus on request formats, headers, auth material, local caches, schemas, and persistence.
+      Highlight attack surface and trust boundaries.
+      Prefer concrete evidence over architecture guesses.
+    '';
+
+    "security-reviewer/SKILL.md" = ''
+      ---
+      name: security-reviewer
+      description: Review changes or artifacts for concrete security issues, exploitability, and missing hardening steps. Use for diffs, configs, RE artifacts, and toolchain review.
+      ---
+
+      # Security Reviewer
+
+      Prioritize real vulnerabilities, behavior regressions, dangerous defaults, and secrets handling.
+      Include exact file references when possible.
+      Report impact and the smallest practical mitigation.
+    '';
+
     "code-reviewer/SKILL.md" = ''
       ---
       name: code-reviewer
@@ -172,6 +281,179 @@
       - Never commit secrets, .env files, or credentials
       - Always run project lint/test before creating PR
       - Draft PR if work is incomplete
+    '';
+  };
+
+  geminiPolicies = {
+    "00-allow-research.toml" = ''
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "git status"
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "git diff"
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "git log"
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "git show"
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "rg "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "fd "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "find "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "ls"
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "sed "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "cat "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "jq "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "file "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "strings "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "readelf "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "objdump "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "nm "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "sqlite3 "
+      decision = "allow"
+      priority = 100
+      modes = ["plan"]
+    '';
+
+    "10-deny-destructive.toml" = ''
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "rm -rf /"
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "rm -rf ~"
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "git reset --hard"
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "git clean -fdx"
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "dd "
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "mkfs"
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "shutdown"
+      decision = "deny"
+      priority = 900
+
+      [[rule]]
+      toolName = "run_shell_command"
+      commandPrefix = "reboot"
+      decision = "deny"
+      priority = 900
     '';
   };
 }

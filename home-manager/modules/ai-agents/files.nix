@@ -214,6 +214,7 @@ in
         }
         // (mkTextFiles ".gemini/commands" fileTemplates.geminiCommands)
         // (mkTextFiles ".gemini/skills" fileTemplates.geminiSkills)
+        // (mkTextFiles ".gemini/policies" fileTemplates.geminiPolicies)
       ))
     ];
 

@@ -204,8 +204,12 @@ lib.mkIf (cfg.skills != [ ]) (
     if [[ -d "$HOME/.agents/skills" ]]; then
       disabled_dir="$HOME/.agents/skills.disabled-by-home-manager"
       if [[ ! -e "$disabled_dir" ]]; then
-        echo "🧹 Disabling shared ~/.agents/skills tree to prevent OpenCode duplicate-skill spam"
+        echo "🧹 Disabling shared ~/.agents/skills tree to prevent Gemini/OpenCode duplicate-skill spam"
         mv "$HOME/.agents/skills" "$disabled_dir"
+      else
+        extra_disabled_dir="$disabled_dir.$(date +%s)"
+        echo "🧹 Disabling additional shared ~/.agents/skills tree at $extra_disabled_dir"
+        mv "$HOME/.agents/skills" "$extra_disabled_dir"
       fi
     fi
 

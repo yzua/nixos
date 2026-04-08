@@ -22,14 +22,16 @@ let
       }
       // extraConfig
     );
+  geminiSandboxEnabled = config.programs.aiAgents.gemini.sandboxMode != "none";
 in
 {
   programs.aiAgents.gemini = {
     enable = true;
     theme = "Gruvbox";
-    sandboxMode = "cautious";
+    sandboxMode = "none";
 
     extraSettings = {
+      policyPaths = [ "$HOME/.gemini/policies" ];
       # --- Core Features ---
       codeExecution = true;
       searchGrounding = true;
@@ -47,11 +49,12 @@ in
         allowed = [
           "context7"
           "github"
+        ];
+        excluded = [
+          "chrome-devtools"
           "web-search-prime"
           "web-reader"
           "zread"
-        ];
-        excluded = [
         ];
       };
       # --- Context Settings ---
@@ -61,18 +64,23 @@ in
           "AGENTS.md"
         ];
         importFormat = "markdown";
+        discoveryMaxDirs = 300;
+        loadMemoryFromIncludeDirectories = true;
         fileFiltering = {
           respectGitIgnore = true;
           respectGeminiIgnore = true;
           enableRecursiveFileSearch = true;
+          enableFuzzySearch = true;
         };
       };
       # --- General Settings ---
       general = {
         vimMode = true;
+        defaultApprovalMode = "auto_edit";
         enableAutoUpdate = true;
         enableAutoUpdateNotification = true;
         checkpointing.enabled = false; # NixOS: simple-git .env() strips PATH → git ENOENT (upstream bug)
+        plan.modelRouting = true;
         sessionRetention = {
           enabled = true;
           maxAge = "30d";
@@ -91,46 +99,84 @@ in
           Gruvbox = {
             name = "Gruvbox";
             type = "custom";
-            Background = constants.color.bg_soft;
-            Foreground = constants.color.fg0;
-            LightBlue = constants.color.blue;
-            AccentBlue = constants.color.blue_dim;
-            AccentPurple = constants.color.purple_dim;
-            AccentCyan = constants.color.aqua;
-            AccentGreen = constants.color.green;
-            AccentYellow = constants.color.yellow;
-            AccentRed = constants.color.red;
-            Comment = constants.color.gray;
-            Gray = constants.color.gray_dim;
-            DiffAdded = constants.color.green;
-            DiffRemoved = constants.color.red;
+            background = {
+              primary = constants.color.bg_soft;
+              diff = {
+                added = constants.color.bg0;
+                removed = constants.color.bg1;
+              };
+            };
+            text = {
+              primary = constants.color.fg0;
+              secondary = constants.color.gray;
+              link = constants.color.blue;
+              accent = constants.color.purple_dim;
+            };
+            border = {
+              default = constants.color.fg_dark;
+              focused = constants.color.blue;
+            };
+            status = {
+              success = constants.color.green;
+              warning = constants.color.yellow;
+              error = constants.color.red;
+            };
+            ui = {
+              comment = constants.color.gray;
+              symbol = constants.color.aqua;
+              gradient = [
+                constants.color.red
+                constants.color.orange
+                constants.color.yellow
+              ];
+            };
           };
         };
-        theme = "Gruvbox";
+        inherit (config.programs.aiAgents.gemini) theme;
       };
       # --- Experimental Features ---
       experimental = {
         enableAgents = true;
+        worktrees = true;
+      };
+      skills.enabled = true;
+      agents = {
+        overrides = {
+          codebase_investigator = {
+            enabled = true;
+            modelConfig.model = "gemini-3-pro-preview";
+            runConfig.maxTurns = 50;
+          };
+        };
       };
       # --- Model Aliases ---
       modelConfigs = {
         customAliases = {
+          auto = mkModelAlias "auto" { };
           fast = mkModelAlias "gemini-2.5-flash-lite" {
             temperature = 0;
             maxOutputTokens = 8192;
           };
+          flash = mkModelAlias "gemini-2.5-flash" {
+            temperature = 0;
+            maxOutputTokens = 16384;
+          };
           deep = mkThinkingAlias "gemini-3-pro-preview" "HIGH" { };
-          code = mkThinkingAlias "gemini-2.5-pro" "HIGH" {
+          code = mkThinkingAlias "gemini-3-pro-preview" "HIGH" {
             maxOutputTokens = 65536;
           };
         };
       };
       # --- Tool Settings ---
       tools = {
-        approvalMode = "auto_edit";
+        sandbox = geminiSandboxEnabled;
+        sandboxNetworkAccess = false;
+        shell.showColor = true;
+        useRipgrep = true;
       };
-      # --- Model Compression ---
+      # --- Model Defaults And Compression ---
       model = {
+        name = "gemini-3-pro-preview";
         compressionThreshold = 0.75; # Wait until 75% full before compressing (was 0.5)
       };
       # --- Hooks ---
