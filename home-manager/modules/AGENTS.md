@@ -32,15 +32,20 @@ modules/
 │   │   ├── codex-setup.nix  # Codex CLI config file writes
 │   │   └── plugins.nix      # Plugin/skill install scripts (impeccable, agency-agents)
 │   └── config/         # Split configuration values
-│       ├── default.nix      # Import hub
+│       ├── default.nix      # Import hub (claude + models + flat files)
 │       ├── instructions.nix # Global instructions (imports _skills.nix)
 │       ├── _skills.nix      # Skill installations and omissions (not a module)
-│       ├── _claude-hooks.nix # Claude Code lifecycle hooks (not a module, imported by permissions)
-│       ├── _claude-permission-rules.nix # Claude allow/deny rules (not a module, imported by permissions)
 │       ├── _formatters.nix  # Formatter registry for auto-formatting hooks (not a module)
 │       ├── mcp-servers.nix  # MCP server definitions + logging
-│       ├── permissions.nix  # Claude permissions, hooks, settings
-│       └── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)
+│       ├── claude/          # Claude Code configuration
+│       │   ├── default.nix  # Permissions, hooks, settings (import hub)
+│       │   ├── _hooks.nix   # Claude Code lifecycle hooks (not a module)
+│       │   └── _permission-rules.nix # Claude allow/deny rules (not a module)
+│       └── models/          # Model/provider registries
+│           ├── default.nix  # Import hub + shared toggles (agencyAgents, impeccable)
+│           ├── codex.nix    # Codex CLI model config
+│           ├── gemini.nix   # Gemini CLI model config + mkModelAlias/mkThinkingAlias
+│           └── opencode.nix # OpenCode model config (owns all let bindings)
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
 │   ├── chromium.nix    # Chromium launch wrapper with Wayland crash workaround
@@ -132,7 +137,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-11 domain chunks + 2 custom chunks: `applications`, `cli`, `development`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/prayer`.
+12 domain chunks + 2 custom chunks: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/prayer`.
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 
@@ -209,6 +214,7 @@ More detailed module-level guidance exists at:
 - `ai-agents/AGENTS.md` — Multi-agent architecture, profile variants, activation, hooks
 - `neovim/AGENTS.md` — Neovim module boundaries, Lua/plugin wiring patterns
 - `terminal/AGENTS.md` — Shell, multiplexer, CLI tools, one-per-tool pattern
+- `terminal/tools/AGENTS.md` — CLI tools (atuin, bat, fzf, gh, git, lazygit, yazi, etc.)
 - `niri/AGENTS.md` — Compositor keybindings, workspaces, window rules
 - `noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
 - `apps/AGENTS.md` — Application configs, subdirectory modules (VS Code, Brave)

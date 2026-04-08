@@ -69,12 +69,17 @@ ai-agents/
     ├── default.nix          # Import hub
     ├── instructions.nix     # Global instructions (imports _skills.nix)
     ├── _skills.nix          # Skill installations and omissions
-    ├── _claude-hooks.nix    # Claude Code lifecycle hooks
-    ├── _claude-permission-rules.nix # Claude allow/deny rules
-    ├── _formatters.nix      # Formatter registry for auto-formatting hooks
+    ├── _formatters.nix      # Formatter registry for auto-formatting hooks (shared by claude + gemini)
     ├── mcp-servers.nix      # MCP server definitions + logging
-    ├── permissions.nix      # Claude permissions, hooks, settings
-    └── models.nix           # Model/provider registries (OpenCode, Codex, Gemini)
+    ├── claude/              # Claude Code configuration
+    │   ├── default.nix      # Import hub (permissions, hooks, settings)
+    │   ├── _hooks.nix       # Claude Code lifecycle hooks (imports ../_formatters.nix)
+    │   └── _permission-rules.nix # Claude allow/deny rules
+    └── models/              # Model/provider registries
+        ├── default.nix      # Import hub + shared toggles (agencyAgents, impeccable)
+        ├── codex.nix        # Codex CLI configuration
+        ├── gemini.nix       # Gemini CLI configuration (imports ../_formatters.nix)
+        └── opencode.nix      # OpenCode configuration (agents, LSP, providers)
 ```
 
 ---
@@ -107,7 +112,7 @@ The `activation/` directory is a submodule with its own `default.nix`. Individua
 
 This module contains significant **embedded Bash logic** that bypasses standard Nix abstraction for performance and compatibility:
 
-- **`config/_claude-hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
+- **`config/claude/_hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
 - **`activation/default.nix`**: Complex sequential skill installation/removal logic with state-caching to prevent redundant network calls; skill sync failures are logged as warnings so Home Manager activation can continue. Also handles mirroring Claude skills into `~/.codex/skills` and disabling the shared `~/.agents/skills` tree to prevent OpenCode duplicate-skill spam.
 
 ### Validation Pipeline

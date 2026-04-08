@@ -20,7 +20,7 @@ scripts/
 │   ├── agent-analyze.sh     # Log analyzer CLI (stats/errors/sessions/search/tail/report)
 │   ├── agent-patterns.sh    # Error pattern detector across agent logs
 │   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
-│   └── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
+│   ├── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
 │   └── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
 ├── apps/
 │   └── browser-select.sh    # Browser profile selector (wofi menu)
