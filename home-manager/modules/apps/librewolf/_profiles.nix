@@ -22,7 +22,6 @@ in
     path = "personal.default";
     proxyHost = personal;
     homepage = "http://127.0.0.1:8082/search";
-    extraSettings = { };
   }
   {
     name = "work";
@@ -33,7 +32,6 @@ in
     path = "work.default";
     proxyHost = work;
     homepage = "about:blank";
-    extraSettings = { };
   }
   {
     name = "banking";
@@ -44,7 +42,6 @@ in
     path = "banking.default";
     proxyHost = banking;
     homepage = "about:blank";
-    extraSettings = { };
   }
   {
     name = "shopping";
@@ -55,7 +52,6 @@ in
     path = "shopping.default";
     proxyHost = shopping;
     homepage = "about:blank";
-    extraSettings = { };
   }
   {
     name = "illegal";
@@ -66,7 +62,6 @@ in
     path = "illegal.default";
     proxyHost = illegal;
     homepage = "about:blank";
-    extraSettings = { };
   }
   {
     name = "i2pd";
