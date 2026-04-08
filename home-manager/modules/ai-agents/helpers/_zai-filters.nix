@@ -5,10 +5,10 @@
 #   - claude:   .mcpServers["<key>"], type "http"
 #   - gemini:   .mcpServers["<key>"], type "http", extra command/args fields
 
-{ lib }:
+{ lib, constants }:
 
 let
-  zai = import ./_zai-services.nix;
+  zai = import ./_zai-services.nix { inherit constants; };
 
   mkServiceEntries =
     {

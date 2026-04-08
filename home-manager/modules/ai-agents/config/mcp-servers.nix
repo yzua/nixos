@@ -1,12 +1,14 @@
 # MCP server definitions and logging configuration.
 
-{ config, ... }:
+{ config, constants, ... }:
 
 let
+  zai = import ../helpers/_zai-services.nix { inherit constants; };
+
   mkZaiRemoteMcp = path: {
     enable = true;
     type = "remote";
-    url = "https://api.z.ai/api/mcp/${path}/mcp";
+    url = "${zai.baseUrl}/${path}/mcp";
     headers = {
       Authorization = "Bearer {env:ZAI_API_KEY}";
     };

@@ -1,7 +1,9 @@
 # Z.AI MCP service registry — single source of truth for service names and base URL.
 
+{ constants }:
+
 let
-  baseUrl = "https://api.z.ai/api/mcp";
+  baseUrl = "${constants.services.zai.apiRoot}/mcp";
 in
 rec {
   inherit baseUrl;
