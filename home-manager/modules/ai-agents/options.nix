@@ -10,7 +10,6 @@ let
   opt = import ./helpers/_option-helpers.nix { inherit lib; };
   inherit (opt)
     mkTypedOption
-    mkTypedOptionWith
     mkStrOption
     mkBoolOption
     mkIntOption
@@ -19,6 +18,29 @@ let
     mkStrListOption
     mkNullOrStrOption
     ;
+
+  # Shared Codex enum types — used by top-level, profiles, and customAgents options.
+  codexPersonalityType = lib.types.enum [
+    "none"
+    "friendly"
+    "pragmatic"
+  ];
+  codexReasoningEffortType = lib.types.enum [
+    "none"
+    "minimal"
+    "low"
+    "medium"
+    "high"
+    "xhigh"
+  ];
+  codexApprovalPolicyType = lib.types.enum [
+    "untrusted"
+    "on-failure"
+    "on-request"
+    "never"
+  ];
+  codexReasoningEffortNullable = lib.types.nullOr codexReasoningEffortType;
+  codexApprovalPolicyNullable = lib.types.nullOr codexApprovalPolicyType;
 in
 {
   options.programs.aiAgents = {
@@ -156,41 +178,25 @@ in
     codex = {
       enable = lib.mkEnableOption "Codex CLI configuration";
 
-      useWrapper = mkBoolOption true "Use logging wrapper for Codex";
+      useWrapper = mkBoolOption true "Use logging wrapper for Codex"; # TODO: not yet consumed by activation/settings
       model = mkStrOption "gpt-5.4" "Default model for Codex";
       sandboxMode = mkStrOption "workspace-write" "Default sandbox mode for Codex";
-      enableSearch = mkBoolOption false "Enable native Codex web search by default";
+      enableSearch = mkBoolOption false "Enable native Codex web search by default"; # consumed only at top-level; profile/customAgent enableSearch are no-ops
 
       personality = lib.mkOption {
-        type = lib.types.enum [
-          "none"
-          "friendly"
-          "pragmatic"
-        ];
+        type = codexPersonalityType;
         default = "pragmatic";
         description = "Model personality";
       };
 
       reasoningEffort = lib.mkOption {
-        type = lib.types.enum [
-          "none"
-          "minimal"
-          "low"
-          "medium"
-          "high"
-          "xhigh"
-        ];
+        type = codexReasoningEffortType;
         default = "medium";
         description = "Reasoning effort level";
       };
 
       approvalPolicy = lib.mkOption {
-        type = lib.types.enum [
-          "untrusted"
-          "on-failure"
-          "on-request"
-          "never"
-        ];
+        type = codexApprovalPolicyType;
         default = "on-request";
         description = "Command approval policy";
       };
@@ -204,44 +210,22 @@ in
           options = {
             model = mkNullOrStrOption null "Profile-specific model override";
             personality = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "none"
-                  "friendly"
-                  "pragmatic"
-                ]
-              );
+              type = lib.types.nullOr codexPersonalityType;
               default = null;
               description = "Profile-specific personality override";
             };
             reasoningEffort = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "none"
-                  "minimal"
-                  "low"
-                  "medium"
-                  "high"
-                  "xhigh"
-                ]
-              );
+              type = codexReasoningEffortNullable;
               default = null;
               description = "Profile-specific reasoning effort";
             };
             approvalPolicy = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "untrusted"
-                  "on-failure"
-                  "on-request"
-                  "never"
-                ]
-              );
+              type = codexApprovalPolicyNullable;
               default = null;
               description = "Profile-specific approval policy";
             };
             sandboxMode = mkNullOrStrOption null "Profile-specific sandbox mode";
-            enableSearch = mkBoolOption false "Enable native Codex web search for this profile";
+            enableSearch = mkBoolOption false "Enable native Codex web search for this profile"; # TODO: not consumed by activation/settings
             developerInstructions = lib.mkOption {
               type = lib.types.lines;
               default = "";
@@ -267,33 +251,17 @@ in
             };
             model = mkNullOrStrOption null "Agent-specific model override";
             reasoningEffort = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "none"
-                  "minimal"
-                  "low"
-                  "medium"
-                  "high"
-                  "xhigh"
-                ]
-              );
+              type = codexReasoningEffortNullable;
               default = null;
               description = "Agent-specific reasoning effort";
             };
             approvalPolicy = lib.mkOption {
-              type = lib.types.nullOr (
-                lib.types.enum [
-                  "untrusted"
-                  "on-failure"
-                  "on-request"
-                  "never"
-                ]
-              );
+              type = codexApprovalPolicyNullable;
               default = null;
               description = "Agent-specific approval policy";
             };
             sandboxMode = mkNullOrStrOption null "Agent-specific sandbox mode";
-            enableSearch = mkBoolOption false "Enable native Codex web search for this agent";
+            enableSearch = mkBoolOption false "Enable native Codex web search for this agent"; # TODO: not consumed by activation/settings
             extraToml = lib.mkOption {
               type = lib.types.lines;
               default = "";
