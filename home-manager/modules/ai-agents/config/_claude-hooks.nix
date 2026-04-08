@@ -59,14 +59,47 @@ let
         )
       ];
     };
+
+  mkPassthroughHook =
+    {
+      body,
+      timeout ? null,
+      runInBackground ? false,
+    }:
+    let
+      bgAttrs = if runInBackground then { run_in_background = true; } else { };
+      toAttrs = if timeout != null then { inherit timeout; } else { };
+    in
+    {
+      hooks = [
+        (
+          {
+            type = "command";
+            command = ''
+              INPUT=$(cat)
+              ${body}
+              echo "$INPUT"
+            '';
+          }
+          // bgAttrs
+          // toAttrs
+        )
+      ];
+    };
 in
 {
   # --- PreToolUse Hooks ---
   PreToolUse = [
     (mkBashHook {
       body = ''
-        if echo "$COMMAND" | grep -Eq '(rm -rf|DROP|DELETE FROM|truncate)'; then
-          echo "⚠️  DESTRUCTIVE COMMAND DETECTED" >&2
+        if echo "$COMMAND" | grep -Eq '(^|[[:space:]])(sudo[[:space:]]+)?(rm[[:space:]]+-rf[[:space:]]+/( |$)|rm[[:space:]]+-rf[[:space:]]+/\*|mkfs|dd[[:space:]]+if=|shutdown|reboot|poweroff)'; then
+          echo "[Hook] BLOCKED: system-destructive command detected" >&2
+          echo "[Hook] Run it manually outside Claude if you truly intend it." >&2
+          exit 2
+        fi
+
+        if echo "$COMMAND" | grep -Eq '(^|[[:space:]])(DROP|DELETE FROM|truncate)([[:space:]]|$)'; then
+          echo "[Hook] WARNING: destructive database command detected" >&2
         fi
       '';
     })
@@ -92,16 +125,14 @@ in
     (mkBashHook {
       body = ''
         if echo "$COMMAND" | grep -Eq '(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)'; then
-          echo "[Hook] BLOCKED: Dev server must run in tmux for log access" >&2
-          echo "[Hook] Use: tmux new-session -d -s dev \"npm run dev\"" >&2
-          echo "[Hook] Then: tmux attach -t dev" >&2
-          exit 2
+          echo "[Hook] Long-running dev server detected; tmux is recommended for log persistence" >&2
+          echo "[Hook] Example: tmux new-session -d -s dev \"''${COMMAND}\"" >&2
         fi
       '';
     })
     (mkBashHook {
       body = ''
-        if [ -z "$TMUX" ] && echo "$COMMAND" | grep -Eq '(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo build|make|docker|pytest|vitest|playwright)'; then
+        if [ -z "$TMUX" ] && echo "$COMMAND" | grep -Eq '(npm (install|test)|pnpm (install|test)|yarn (install|test)?|bun (install|test)|cargo (build|test|check)|make|docker|pytest|vitest|playwright|just (check|lint|format|home|nixos|all))'; then
           echo "[Hook] Consider running in tmux for session persistence" >&2
           echo "[Hook] tmux new -s dev  |  tmux attach -t dev" >&2
         fi
@@ -121,6 +152,25 @@ in
           echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
           exit 2
         fi
+      '';
+    })
+  ];
+
+  PermissionRequest = [
+    (mkPassthroughHook {
+      body = ''
+        TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // .tool // "unknown"')
+        DECISION_HINT=$(echo "$INPUT" | jq -r '.permission_mode // .mode // "unknown"')
+        echo "[Hook] Permission request: $TOOL_NAME (mode: $DECISION_HINT)" >&2
+      '';
+    })
+  ];
+
+  PermissionDenied = [
+    (mkPassthroughHook {
+      body = ''
+        TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // .tool // "unknown"')
+        echo "[Hook] Permission denied: $TOOL_NAME" >&2
       '';
     })
   ];
@@ -149,6 +199,20 @@ in
           command = ''
             reason=$(cat | jq -r '.stop_reason // "completed"')
             notify-send -i dialog-information "Claude Code" "Task $reason" 2>/dev/null || true
+          '';
+        }
+      ];
+    }
+  ];
+
+  StopFailure = [
+    {
+      hooks = [
+        {
+          type = "command";
+          command = ''
+            reason=$(cat | jq -r '.stop_reason // .reason // "failed"')
+            notify-send -i dialog-error "Claude Code" "Task $reason" 2>/dev/null || true
           '';
         }
       ];
@@ -290,6 +354,16 @@ in
     }
   ];
 
+  SubagentStop = [
+    (mkPassthroughHook {
+      body = ''
+        AGENT_NAME=$(echo "$INPUT" | jq -r '.agent_name // .agent // "unknown"')
+        STATUS=$(echo "$INPUT" | jq -r '.status // .stop_reason // "completed"')
+        echo "[Hook] Subagent finished: $AGENT_NAME ($STATUS)" >&2
+      '';
+    })
+  ];
+
   # --- PreCompact Hook ---
   PreCompact = [
     {
@@ -306,5 +380,16 @@ in
         }
       ];
     }
+  ];
+
+  PostCompact = [
+    (mkPassthroughHook {
+      body = ''
+        SESSION_DIR="$HOME/.claude/session-state"
+        mkdir -p "$SESSION_DIR"
+        date -Iseconds > "$SESSION_DIR/last-post-compact.txt"
+        echo "[Hook] Context compaction completed" >&2
+      '';
+    })
   ];
 }

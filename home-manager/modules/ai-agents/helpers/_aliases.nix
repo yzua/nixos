@@ -35,7 +35,7 @@ let
   aiAgentAliasSpecs = [
     {
       alias = "cl";
-      command = "claude --dangerously-skip-permissions";
+      command = "claude";
       workflowPromptMode = "positional";
     }
     {
@@ -50,12 +50,12 @@ let
     }
     {
       alias = "ocl";
-      command = "claude --dangerously-skip-permissions --model opus";
+      command = "claude --model opus";
       workflowPromptMode = "positional";
     }
     {
       alias = "hcl";
-      command = "claude --dangerously-skip-permissions --model haiku";
+      command = "claude --model haiku";
       workflowPromptMode = "positional";
     }
     {

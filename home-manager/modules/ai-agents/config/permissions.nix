@@ -14,11 +14,6 @@ in
 
       env = {
         EDITOR = "nvim";
-        CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-        MAX_MCP_OUTPUT_TOKENS = "50000"; # Default 10k; raised for large codebases
-        MCP_TIMEOUT = "30000"; # Default 10s; raised for npx cold starts
-        ENABLE_TOOL_SEARCH = "auto:5"; # Auto-search when >5 tools match; faster with 12+ MCPs
-        ENABLE_CLAUDEAI_MCP_SERVERS = "false"; # Keep MCP surface declarative via ~/.mcp.json
       };
 
       permissions = claudePermissionRules;
@@ -28,14 +23,12 @@ in
       extraSettings = {
         cleanupPeriodDays = 14;
         respectGitignore = true;
+        defaultMode = "bypassPermissions";
+        skipDangerousModePermissionPrompt = true;
         alwaysThinkingEnabled = true;
         autoMemoryEnabled = true;
         includeGitInstructions = false;
-        showTurnDuration = true;
-        teammateMode = "in-process";
-        spinnerTipsEnabled = true;
         autoUpdatesChannel = "latest";
-        prefersReducedMotion = false;
         attribution = {
           commit = "";
           pr = "";
