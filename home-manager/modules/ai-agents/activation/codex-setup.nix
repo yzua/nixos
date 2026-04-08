@@ -74,20 +74,76 @@ lib.mkIf cfg.codex.enable (
       [projects."${path}"]
       trust_level = "trusted"
     '') cfg.codex.trustedProjects;
+    featuresToml = lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (name: enabled: "${name} = ${lib.boolToString enabled}") cfg.codex.features
+    );
+    renderProfile =
+      name: profile:
+      let
+        lines =
+          lib.optional (profile.model != null) ''model = "${profile.model}"''
+          ++ lib.optional (profile.personality != null) ''personality = "${profile.personality}"''
+          ++ lib.optional (
+            profile.reasoningEffort != null
+          ) ''model_reasoning_effort = "${profile.reasoningEffort}"''
+          ++ lib.optional (profile.approvalPolicy != null) ''approval_policy = "${profile.approvalPolicy}"''
+          ++ lib.optional (profile.sandboxMode != null) ''sandbox_mode = "${profile.sandboxMode}"''
+          ++ lib.optional (profile.developerInstructions != "") ''
+            developer_instructions = """
+            ${profile.developerInstructions}
+            """
+          ''
+          ++ lib.optional (profile.extraToml != "") profile.extraToml;
+      in
+      ''
+        [profiles.${name}]
+        ${lib.concatStringsSep "\n" lines}
+      '';
+    profilesToml = lib.concatStringsSep "\n\n" (lib.mapAttrsToList renderProfile cfg.codex.profiles);
+    renderCustomAgent =
+      name: agent:
+      let
+        lines = [
+          ''name = "${name}"''
+          ''description = "${agent.description}"''
+        ]
+        ++ lib.optional (agent.model != null) ''model = "${agent.model}"''
+        ++ lib.optional (
+          agent.reasoningEffort != null
+        ) ''model_reasoning_effort = "${agent.reasoningEffort}"''
+        ++ lib.optional (agent.approvalPolicy != null) ''approval_policy = "${agent.approvalPolicy}"''
+        ++ lib.optional (agent.sandboxMode != null) ''sandbox_mode = "${agent.sandboxMode}"''
+        ++ [
+          ''
+            developer_instructions = """
+            ${agent.developerInstructions}
+            """
+          ''
+        ]
+        ++ lib.optional (agent.extraToml != "") agent.extraToml;
+      in
+      ''
+        cat > "$HOME/.codex/agents/${name}.toml" << 'CODEX_AGENT_EOF'
+        ${lib.concatStringsSep "\n" lines}
+        CODEX_AGENT_EOF
+        ${pkgs.gnused}/bin/sed -i 's/^        //' "$HOME/.codex/agents/${name}.toml"
+      '';
+    customAgentsWrite = lib.concatStringsSep "\n" (
+      lib.mapAttrsToList renderCustomAgent cfg.codex.customAgents
+    );
   in
   lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "$HOME/.codex"
+    mkdir -p "$HOME/.codex" "$HOME/.codex/agents"
     cat > "$HOME/.codex/config.toml" << 'CODEX_EOF'
     personality = "${cfg.codex.personality}"
     model = "${cfg.codex.model}"
     model_reasoning_effort = "${cfg.codex.reasoningEffort}"
     model_reasoning_summary = "concise"
     approval_policy = "${cfg.codex.approvalPolicy}"
+    sandbox_mode = "${cfg.codex.sandboxMode}"
     allow_login_shell = false
     check_for_update_on_startup = true
     suppress_unstable_features_warning = true
-
-    web_search = "cached"
 
     notify = ["${codexNotifyScript}"]
 
@@ -108,27 +164,23 @@ lib.mkIf cfg.codex.enable (
     persistence = "save-all"
     max_bytes = 52428800
 
-    [profiles.quick]
-    model_reasoning_effort = "low"
+    [features]
+    ${featuresToml}
 
-    [profiles.deep]
-    model_reasoning_effort = "xhigh"
-    approval_policy = "on-request"
-
-    [profiles.safe]
-    approval_policy = "untrusted"
-    sandbox_mode = "read-only"
+    ${mcpToml}
+    ${projectsToml}
+    ${profilesToml}
 
     [shell_environment_policy]
     inherit = "core"
     include_only = ["PATH", "HOME", "USER", "SHELL", "TERM", "EDITOR", "VISUAL", "LANG", "LC_ALL", "PWD"]
-    exclude = ["AWS_*", "AZURE_*", "GCP_*", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
+    exclude = ["AWS_*", "AZURE_*", "GCP_*", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"]
 
-    ${mcpToml}
-    ${projectsToml}
     ${cfg.codex.extraToml}
     CODEX_EOF
     ${pkgs.gnused}/bin/sed -i 's/^          //' "$HOME/.codex/config.toml"
+    find "$HOME/.codex/agents" -maxdepth 1 -type f -name '*.toml' -delete
+    ${customAgentsWrite}
     echo "✓ Codex config.toml configured"
   ''
 )

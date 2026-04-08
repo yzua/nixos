@@ -292,6 +292,18 @@ in
                 mv "$HOME/.agents/skills" "$disabled_dir"
               fi
             fi
+
+            if [[ -d "$HOME/.claude/skills" ]]; then
+              mkdir -p "$HOME/.codex/skills"
+              find "$HOME/.codex/skills" -mindepth 1 -maxdepth 1 -type l -delete
+              shopt -s nullglob
+              for skill_dir in "$HOME/.claude/skills"/*; do
+                [[ -d "$skill_dir" ]] || continue
+                ln -sfn "$skill_dir" "$HOME/.codex/skills/$(basename "$skill_dir")"
+              done
+              shopt -u nullglob
+              echo "✓ Mirrored Claude skills into ~/.codex/skills"
+            fi
           ''
         );
 
