@@ -15,5 +15,6 @@
     ./chromium.nix # Chromium launch wrapper with Wayland crash workaround
     ./librewolf # LibreWolf browser with declarative profile settings and policies
     ./obsidian.nix # Obsidian Markdown notes app defaults
+    ./metadata-scrubber.nix # Automatic metadata scrubbing (inotifywait watcher + weekly full scrub)
   ];
 }
