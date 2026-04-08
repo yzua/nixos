@@ -23,7 +23,7 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 
 ## Workspaces
 
-5 named workspaces (ordered by sort key):
+6 named workspaces (ordered by sort key):
 
 | Key          | Name    | Typical Apps                 |
 | ------------ | ------- | ---------------------------- |
@@ -32,8 +32,9 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | `03-social`  | social  | Telegram, Vesktop            |
 | `04-media`   | media   | YouTube Music, FreeTube      |
 | `05-vpn`     | vpn     | Mullvad VPN                  |
+| `06-android` | android | Android tools                |
 
-Dynamic workspaces 6-9 available via `Mod+6` through `Mod+9`.
+Dynamic workspaces 7-9 available via `Mod+7` through `Mod+9`.
 Window rules in `rules.nix` assign apps to workspaces by `app-id` regex.
 
 ---

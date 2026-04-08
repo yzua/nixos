@@ -16,6 +16,14 @@ modules/
 │   ├── _settings-builders.nix # Per-agent settings builders (not a module, imported by others)
 │   ├── _option-helpers.nix # Shared option constructors (not a module, imported by others)
 │   ├── _opencode-profiles.nix # OpenCode profile names and config paths (not a module)
+│   ├── _claude-config.nix # Claude Code config assembly (not a module, imported by files)
+│   ├── _codex-config.nix # Codex CLI config assembly (not a module, imported by files)
+│   ├── _file-templates.nix # Config file templates (not a module, imported by files)
+│   ├── _plugin-installs.nix # Plugin/skill install scripts (not a module, imported by activation)
+│   ├── _secret-patching.nix # Secret injection helpers (not a module, imported by activation)
+│   ├── _workflow-prompts.nix # Workflow prompt definitions (not a module, imported by config)
+│   ├── _zai-filters.nix # Z.AI MCP jq filter generation (not a module, imported by _mcp-transforms)
+│   ├── _zai-services.nix # Z.AI MCP service registry (not a module, imported by _zai-filters)
 │   ├── activation.nix  # Activation scripts (secret patching, config setup, plugin installs)
 │   ├── files.nix       # home.file + xdg.configFile declarations
 │   ├── services.nix    # Packages, zsh aliases, systemd user services/timers
@@ -26,6 +34,7 @@ modules/
 │   │   ├── _skills.nix      # Skill installations and omissions (not a module)
 │   │   ├── _claude-hooks.nix # Claude Code lifecycle hooks (not a module, imported by permissions)
 │   │   ├── _claude-permission-rules.nix # Claude allow/deny rules (not a module, imported by permissions)
+│   │   ├── _formatters.nix  # Formatter registry for auto-formatting hooks (not a module)
 │   │   ├── mcp-servers.nix  # MCP server definitions + logging
 │   │   ├── permissions.nix  # Claude permissions, hooks, settings
 │   │   └── models.nix       # Model/provider registries (OpenCode, Codex, Gemini)

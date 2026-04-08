@@ -150,15 +150,15 @@ in { ... }
 
 ## Debugging and Common Fixes
 
-| Symptom | Fix |
-|---|---|
-| Missing import error | Add file to parent `default.nix` imports list |
-| deadnix warning | Remove unused binding or prefix with `_` |
-| statix suggestion | Apply the suggested fix directly |
-| Module not found | Check path in `default.nix`, ensure file exists on disk |
-| Build fails after adding package | Run `just pkgs` to check for duplicates/conflicts |
-| Home Manager option not found | HM modules cannot use NixOS `config.*` — use `constants` or pass via `extraSpecialArgs` |
-| Secret not found | Run `just sops-view` to verify secret exists in `secrets/secrets.yaml` |
+| Symptom                          | Fix                                                                                     |
+| -------------------------------- | --------------------------------------------------------------------------------------- |
+| Missing import error             | Add file to parent `default.nix` imports list                                           |
+| deadnix warning                  | Remove unused binding or prefix with `_`                                                |
+| statix suggestion                | Apply the suggested fix directly                                                        |
+| Module not found                 | Check path in `default.nix`, ensure file exists on disk                                 |
+| Build fails after adding package | Run `just pkgs` to check for duplicates/conflicts                                       |
+| Home Manager option not found    | HM modules cannot use NixOS `config.*` — use `constants` or pass via `extraSpecialArgs` |
+| Secret not found                 | Run `just sops-view` to verify secret exists in `secrets/secrets.yaml`                  |
 
 ### Validation Workflow
 
@@ -172,20 +172,20 @@ in { ... }
 
 ## Anti-Patterns (Forbidden)
 
-| Pattern | Reason |
-|---|---|
-| PulseAudio + PipeWire | Hard audio stack conflict (validated) |
-| Multiple power daemons | Service conflicts (validated) |
-| nouveau + NVIDIA proprietary | Driver conflict (validated) |
-| DNSCrypt-Proxy + systemd-resolved | DNS conflict (validated) |
-| `allowBroken = true` | Unstable packages; find alternative |
-| Avahi without `allowInterfaces` | Security risk (validated) |
+| Pattern                                   | Reason                                |
+| ----------------------------------------- | ------------------------------------- |
+| PulseAudio + PipeWire                     | Hard audio stack conflict (validated) |
+| Multiple power daemons                    | Service conflicts (validated)         |
+| nouveau + NVIDIA proprietary              | Driver conflict (validated)           |
+| DNSCrypt-Proxy + systemd-resolved         | DNS conflict (validated)              |
+| `allowBroken = true`                      | Unstable packages; find alternative   |
+| Avahi without `allowInterfaces`           | Security risk (validated)             |
 | Gaming without `hardware.graphics.enable` | Graphics drivers required (validated) |
-| `graphene-hardened` kernel | Crashes glycin/bwrap image loaders |
-| `auditd` with AppArmor | Kernel panic via `audit_log_subj_ctx` |
-| `mkForce` outside security hardening | Use `mkDefault`/`mkOverride` instead |
-| Manual formatting | Always use `just format` |
-| Channels | Use flake inputs only |
+| `graphene-hardened` kernel                | Crashes glycin/bwrap image loaders    |
+| `auditd` with AppArmor                    | Kernel panic via `audit_log_subj_ctx` |
+| `mkForce` outside security hardening      | Use `mkDefault`/`mkOverride` instead  |
+| Manual formatting                         | Always use `just format`              |
+| Channels                                  | Use flake inputs only                 |
 
 ## Code Map (Entry Points)
 

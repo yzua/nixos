@@ -39,28 +39,28 @@ just all   # modules -> pkgs -> lint -> format -> check -> nixos -> home
 
 ## Commands
 
-| Command                   | Description                                          |
-| ------------------------- | ---------------------------------------------------- |
+| Command                   | Description                                                                  |
+| ------------------------- | ---------------------------------------------------------------------------- |
 | `just all`                | Full pipeline: `modules -> pkgs -> lint -> format -> check -> nixos -> home` |
-| `just home`               | Apply Home Manager (user-level, safe)                |
-| `just nixos`              | Apply NixOS (system-level)                           |
-| `just modules`            | Validate import structure                            |
-| `just pkgs`               | Check for duplicate packages                         |
-| `just lint`               | statix + deadnix + shellcheck + markdownlint         |
-| `just dead`               | deadnix only (subset of lint)                        |
-| `just format`             | nixfmt-tree                                          |
-| `just check`              | `nix flake check --no-build`                         |
-| `just diff`               | Diff current vs previous NixOS generation            |
-| `just report [mode]`      | Generate system health report                        |
-| `just report-view [type]` | View latest system report                            |
-| `just update`             | Update flake inputs                                  |
-| `just clean`              | GC + optimize store                                  |
-| `just install-hooks`      | Install repo-local pre-commit/pre-push hooks         |
-| `just sops-edit`          | Edit encrypted secrets                               |
-| `just sops-view`          | View secrets (read-only)                             |
-| `just secrets-add KEY`    | Add a single secret (prompted securely)              |
-| `just security-audit`     | Systemd hardening + CVE scan                         |
-| `just skills-sync`        | Sync AI agent skills from GitHub                     |
+| `just home`               | Apply Home Manager (user-level, safe)                                        |
+| `just nixos`              | Apply NixOS (system-level)                                                   |
+| `just modules`            | Validate import structure                                                    |
+| `just pkgs`               | Check for duplicate packages                                                 |
+| `just lint`               | statix + deadnix + shellcheck + markdownlint                                 |
+| `just dead`               | deadnix only (subset of lint)                                                |
+| `just format`             | nixfmt-tree                                                                  |
+| `just check`              | `nix flake check --no-build`                                                 |
+| `just diff`               | Diff current vs previous NixOS generation                                    |
+| `just report [mode]`      | Generate system health report                                                |
+| `just report-view [type]` | View latest system report                                                    |
+| `just update`             | Update flake inputs                                                          |
+| `just clean`              | GC + optimize store                                                          |
+| `just install-hooks`      | Install repo-local pre-commit/pre-push hooks                                 |
+| `just sops-edit`          | Edit encrypted secrets                                                       |
+| `just sops-view`          | View secrets (read-only)                                                     |
+| `just secrets-add KEY`    | Add a single secret (prompted securely)                                      |
+| `just security-audit`     | Systemd hardening + CVE scan                                                 |
+| `just skills-sync`        | Sync AI agent skills from GitHub                                             |
 
 ---
 
@@ -110,11 +110,12 @@ Set `hostProfile` first, then override as needed:
 | `greetd.enable`              | Display manager                                 |
 | `waydroid.enable`            | Android emulation                               |
 | `auditLogging.enable`        | fail2ban logging                                |
-| `metadataScrubber.enable`    | Automatic metadata scrubbing (mat2/exiftool)   |
+| `metadataScrubber.enable`    | Automatic metadata scrubbing (mat2/exiftool)    |
 | `kdeconnect.enable`          | KDE Connect phone integration                   |
 | `vnc.enable`                 | VNC remote access                               |
 | `secureBoot.enable`          | Secure Boot preparation with sbctl              |
 | `webRe.enable`               | Web reverse engineering and security tools      |
+| android                      | ADB, Fastboot, Android Studio (always-on)       |
 
 ---
 
@@ -152,15 +153,15 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### Privacy & Network
 
-| Service        | Port | Purpose                      |
-| -------------- | ---- | ---------------------------- |
-| Tor SOCKS      | 9050 | SOCKS proxy                  |
-| Tor DNS        | 9053 | DNS over Tor                 |
-| I2PD Webconsole| 7070 | I2P router web UI            |
-| I2PD HTTP      | 4444 | I2P HTTP proxy               |
-| I2PD SOCKS     | 4447 | I2P SOCKS proxy              |
-| I2PD Transport | \*   | I2P transport (configurable) |
-| Yggdrasil      | —    | Mesh network (outbound only) |
+| Service         | Port | Purpose                      |
+| --------------- | ---- | ---------------------------- |
+| Tor SOCKS       | 9050 | SOCKS proxy                  |
+| Tor DNS         | 9053 | DNS over Tor                 |
+| I2PD Webconsole | 7070 | I2P router web UI            |
+| I2PD HTTP       | 4444 | I2P HTTP proxy               |
+| I2PD SOCKS      | 4447 | I2P SOCKS proxy              |
+| I2PD Transport  | \*   | I2P transport (configurable) |
+| Yggdrasil       | —    | Mesh network (outbound only) |
 
 ### System Services & Features
 
