@@ -21,7 +21,7 @@
 
   config = lib.mkIf config.mySystem.backup.enable {
     sops.secrets.restic-password = {
-      sopsFile = ../../secrets/secrets.yaml;
+      sopsFile = ../secrets/secrets.yaml;
     };
 
     services.restic.backups.home = {

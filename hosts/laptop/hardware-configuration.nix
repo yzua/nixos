@@ -37,7 +37,7 @@
     ];
   };
 
-  # Disk swap disabled — zram swap configured in nixos/modules/security/opsec.nix
+  # Disk swap disabled — zram swap configured in nixos-modules/security/opsec.nix
   swapDevices = [ ];
 
   # NetworkManager handles networking

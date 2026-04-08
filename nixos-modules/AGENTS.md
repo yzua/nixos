@@ -51,9 +51,9 @@ Files that start with an underscore are internal helpers. `_lib.nix` is a common
 
 Follow these steps to add a new capability:
 
-1. **Create the file**: Make a new module like `nixos/modules/new-feature.nix`.
+1. **Create the file**: Make a new module like `nixos-modules/new-feature.nix`.
 2. **Add options**: Define a `mySystem.new-feature.enable` toggle.
-3. **Update the hub**: Register the file in `nixos/modules/default.nix`.
+3. **Update the hub**: Register the file in `nixos-modules/default.nix`.
 4. **Define defaults**: Update `host-defaults.nix` if the feature should be on by default.
 5. **Enforce safety**: Add assertions to `validation.nix` if there are conflicts with other modules.
 6. **Verify work**: Run `just check` to make sure the evaluation passes.

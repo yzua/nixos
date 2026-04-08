@@ -107,7 +107,7 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `build/modules-check.sh`                           | `justfile` (`just modules`)                                                           |
 | `build/packages-check.sh`                          | `justfile` (`just pkgs`)                                                              |
 | `build/shellcheck-nix-inline.sh`                   | `justfile` (`just lint`)                                                              |
-| `system/report/system-report.sh`                   | `nixos/modules/system-report.nix` (wrapped with `writeShellApplication`)              |
+| `system/report/system-report.sh`                   | `nixos-modules/system-report.nix` (wrapped with `writeShellApplication`)              |
 | `system/report/report-collectors.sh`               | Sourced by `system-report.sh` (loads module files)                                    |
 | `system/report/report-collectors-core.sh`          | Sourced by `system/report/report-collectors.sh`                                       |
 | `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                       |

@@ -98,7 +98,7 @@ Every host `configuration.nix` follows the same structure:
     ./hardware-configuration.nix  # Auto-generated
     ./local-packages.nix          # Host packages
     ../common-host-info.nix       # Enables hostInfo
-    ../../nixos/modules           # Shared modules
+    ../../nixos-modules           # Shared modules
     ./modules                     # Host-specific modules
   ];
 

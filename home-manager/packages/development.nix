@@ -89,7 +89,7 @@ let
     heaptrack # Heap memory profiler (allocation tracking + GUI)
     tokio-console # Real-time async Rust (tokio) diagnostics
 
-    # Reverse engineering (android-tools provided by nixos/modules/android.nix)
+    # Reverse engineering (android-tools provided by nixos-modules/android.nix)
     apktool
     binwalk
     cutter

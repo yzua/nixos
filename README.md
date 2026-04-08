@@ -201,7 +201,7 @@ All local, no cloud. Toggle via `mySystem.*`:
 flake.nix                     # Entry point
 shared/constants.nix          # User identity, terminal, editor, fonts
 hosts/<hostname>/             # Per-host config + hardware modules
-nixos/modules/                # Shared system modules (50+)
+nixos-modules/                # Shared system modules (50+)
 home-manager/                 # User-level modules + packages
 scripts/                      # Utility scripts
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)

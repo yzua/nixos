@@ -22,7 +22,7 @@ trap cleanup EXIT
 SCAN_DIRS=(
 	"home-manager/packages"
 	"home-manager/modules"
-	"nixos/modules"
+	"nixos-modules"
 	"hosts"
 )
 

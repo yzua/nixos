@@ -79,7 +79,7 @@ imports = [
 ```
 
 **Critical**: The `niri` flake input does NOT follow nixpkgs (mesa compatibility). See `flake.nix` comment.
-The system-level `nixos/modules/niri.nix` applies `inputs.niri.overlays.niri` for `pkgs.niri-stable`.
+The system-level `nixos-modules/niri.nix` applies `inputs.niri.overlays.niri` for `pkgs.niri-stable`.
 
 ---
 

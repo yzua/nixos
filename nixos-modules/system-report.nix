@@ -53,11 +53,11 @@ let
     pkgs.symlinkJoin {
       name = "system-report-scripts";
       paths = [
-        (mkScript "report-helpers.sh" ../../scripts/system/report/report-helpers.sh)
-        (mkScript "report-collectors.sh" ../../scripts/system/report/report-collectors.sh)
-        (mkScript "report-collectors-core.sh" ../../scripts/system/report/report-collectors-core.sh)
-        (mkScript "report-collectors-observability.sh" ../../scripts/system/report/report-collectors-observability.sh)
-        (mkScript "report-collectors-security.sh" ../../scripts/system/report/report-collectors-security.sh)
+        (mkScript "report-helpers.sh" ../scripts/system/report/report-helpers.sh)
+        (mkScript "report-collectors.sh" ../scripts/system/report/report-collectors.sh)
+        (mkScript "report-collectors-core.sh" ../scripts/system/report/report-collectors-core.sh)
+        (mkScript "report-collectors-observability.sh" ../scripts/system/report/report-collectors-observability.sh)
+        (mkScript "report-collectors-security.sh" ../scripts/system/report/report-collectors-security.sh)
       ];
     };
 
@@ -83,7 +83,7 @@ let
       ]
       ++ lib.optionals config.services.vnstat.enable [ pkgs.vnstat ]
       ++ lib.optionals config.mySystem.auditLogging.enable [ pkgs.fail2ban ];
-    text = featureFlagExports + "\n" + builtins.readFile ../../scripts/system/report/system-report.sh;
+    text = featureFlagExports + "\n" + builtins.readFile ../scripts/system/report/system-report.sh;
   };
 
 in

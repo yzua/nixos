@@ -60,7 +60,7 @@
     network-manager-applet.enable = true;
     gnome-keyring.enable = true; # Provides org.freedesktop.secrets for Electron/Element
     # easyeffects disabled: 8.0.9 crashes (SIGSEGV in lilv_world_load_plugin_classes)
-    # RNNoise noise cancellation is handled by PipeWire filter-chain in nixos/modules/audio.nix
+    # RNNoise noise cancellation is handled by PipeWire filter-chain in nixos-modules/audio.nix
   };
 
   # Stylix sets GTK theme but not dconf color-scheme key — without this,

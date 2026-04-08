@@ -71,7 +71,7 @@ just secrets-add KEY    # Add single secret (prompts securely for value)
 ```text
 flake.nix
   ├─ hosts/<hostname>/configuration.nix     # Per-host: hardware, mySystem.* options
-  │    ├─ nixos/modules/default.nix          # Shared NixOS modules and sub-module directories
+  │    ├─ nixos-modules/default.nix          # Shared NixOS modules and sub-module directories
   │    └─ hosts/<hostname>/modules/          # Host-specific hardware modules
   ├─ home-manager/home.nix                   # HM entry point (standalone)
   │    ├─ home-manager/modules/default.nix   # User-level modules
@@ -79,7 +79,7 @@ flake.nix
   └─ dev-shells/                             # Per-language dev environments (standalone flakes)
 ```
 
-### NixOS modules (`nixos/modules/`)
+### NixOS modules (`nixos-modules/`)
 
 - Custom options live under `mySystem.*` namespace (e.g., `mySystem.gaming.enable`)
 - Enable-guard pattern: `config = lib.mkIf config.mySystem.<feature>.enable { ... };`
@@ -98,8 +98,8 @@ flake.nix
 
 More detailed module-level guidance exists at:
 
-- `nixos/modules/AGENTS.md` — NixOS module categories, option patterns, validation deps
-- `nixos/modules/security/AGENTS.md` — Hardening values, sysctl, blacklisted kernel modules, disabled features with rationale
+- `nixos-modules/AGENTS.md` — NixOS module categories, option patterns, validation deps
+- `nixos-modules/security/AGENTS.md` — Hardening values, sysctl, blacklisted kernel modules, disabled features with rationale
 - `home-manager/modules/AGENTS.md` — HM module hierarchy, theming, config patterns
 - `home-manager/modules/niri/AGENTS.md` — Niri compositor binds, scripts, Noctalia coupling
 - `home-manager/modules/noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
@@ -192,21 +192,21 @@ Update the parent `default.nix` imports list, then run `just modules`.
 | `auditd` with AppArmor                    | Kernel panic via `audit_log_subj_ctx`                                                |
 | `mkForce` outside security hardening      | Use `mkDefault`/`mkOverride` instead; `mkForce` reserved for security overrides only |
 
-"Validated" = enforced by assertions in `nixos/modules/validation.nix`.
+"Validated" = enforced by assertions in `nixos-modules/validation.nix`.
 
 ## Where to Look
 
 | Task                           | Location                                                |
 | ------------------------------ | ------------------------------------------------------- |
-| Add system service/feature     | `nixos/modules/*.nix` (use `mySystem.*` option pattern) |
+| Add system service/feature     | `nixos-modules/*.nix` (use `mySystem.*` option pattern) |
 | Add user package               | `home-manager/packages/*.nix` (pick domain chunk)       |
 | Configure program (dotfiles)   | `home-manager/modules/` (`programs.*` pattern)          |
 | Niri compositor settings       | `home-manager/modules/niri/`                            |
 | Noctalia Shell (bar, launcher) | `home-manager/modules/noctalia/`                        |
 | AI agent configuration         | `home-manager/modules/ai-agents/`                       |
 | Per-host feature toggle        | `hosts/<hostname>/configuration.nix` (set `mySystem.*`) |
-| Cross-module validation        | `nixos/modules/validation.nix`                          |
-| Profile defaults               | `nixos/modules/host-defaults.nix`                       |
+| Cross-module validation        | `nixos-modules/validation.nix`                          |
+| Profile defaults               | `nixos-modules/host-defaults.nix`                       |
 | Shared constants               | `shared/constants.nix`                                  |
 | Secrets                        | `secrets/secrets.yaml` (edit with `just sops-edit`)     |
 | Utility scripts                | `scripts/` (ai, browser, build, lib, sops, system)      |

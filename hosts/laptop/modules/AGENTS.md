@@ -1,6 +1,6 @@
 # Laptop Host Modules
 
-ThinkPad-specific hardware modules layered on top of shared `nixos/modules` defaults.
+ThinkPad-specific hardware modules layered on top of shared `nixos-modules` defaults.
 Use this directory only for laptop-only behavior (power, thermals, Optimus, kernel params).
 
 ---
@@ -29,15 +29,15 @@ Use this directory only for laptop-only behavior (power, thermals, Optimus, kern
 
 ## Coordination Rules
 
-- Cross-module conflicts are enforced in `nixos/modules/validation.nix` (power daemon conflicts, driver constraints).
-- Shared defaults belong in `nixos/modules/host-defaults.nix`; this directory should only override laptop deltas.
+- Cross-module conflicts are enforced in `nixos-modules/validation.nix` (power daemon conflicts, driver constraints).
+- Shared defaults belong in `nixos-modules/host-defaults.nix`; this directory should only override laptop deltas.
 - Host-level values are set in `hosts/laptop/configuration.nix` and consumed here.
 
 ---
 
 ## Anti-Patterns
 
-- Moving shared behavior from `nixos/modules` into this host-specific subtree.
+- Moving shared behavior from `nixos-modules` into this host-specific subtree.
 - Enabling both TLP and `power-profiles-daemon`.
 - Hardcoding PCI bus IDs in unrelated files instead of `mySystem.nvidia.*` options.
 - Editing `hardware-configuration.nix` to implement policy logic.
