@@ -9,7 +9,7 @@
 }:
 
 let
-  helpers = import ./_systemd-timer-helpers.nix { inherit lib; };
+  helpers = import ../helpers/_systemd-helpers.nix { inherit lib; };
   inherit (helpers) mkOneshotService mkPersistentTimer;
 
   aideConf = pkgs.writeText "aide.conf" ''
