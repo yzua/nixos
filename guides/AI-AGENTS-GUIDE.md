@@ -191,7 +191,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 | Alias/Function              | What It Runs                                                       | Notes                                                                 |
 | --------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `cl`                        | `claude`                                                           | Claude Code safe default                                              |
+| `cl`                        | `claude --dangerously-skip-permissions`                            | Claude Code safe default (skip-permissions)                           |
 | `ocl`                       | `claude --dangerously-skip-permissions --model opus`               | Claude Code forced Opus model                                         |
 | `hcl`                       | `claude --dangerously-skip-permissions --model haiku`              | Claude Code forced Haiku model                                        |
 | `clu`                       | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                    |
@@ -203,7 +203,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `ocs`                       | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                          |
 | `oczen`                     | `opencode_zen`                                                     | OpenCode with Zen free profile                                        |
 | `gem`                       | `gemini --yolo`                                                    | Gemini CLI YOLO (default)                                             |
-| `cx`                        | `codex --no-alt-screen`                                            | Codex safe default                                                    |
+| `cx`                        | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex safe default (skip-approvals)                                   |
 | `lcx`                       | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                    |
 | `mcx`                       | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                 |
 | `hcx`                       | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                   |
@@ -221,7 +221,8 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `opencode_gemini` (`ocgem`) | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`       |
 | `opencode_gpt` (`ocgpt`)    | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`          |
 | `opencode_sonnet` (`ocs`)   | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`       |
-| `opencode_zen` (`oczen`)    | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`          |
+| `opencode_zen` (`oczen`)    | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`       |
+| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                | Function: loads OpenRouter key from sops, sets config dir            |
 | `occm`                      | `opencode --prompt '<review/split/sign prompt>'`                   | Review current git changes and commit logically with `git commit -S`  |
 | `ocbp`                      | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas |
 | `cprf`                      | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`)    |
@@ -229,7 +230,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 ### Aliases vs Functions
 
 - **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `ais`, `ait`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
-- **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
+- **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 
 ### Interactive Selector (`ais`)
 
@@ -266,7 +267,16 @@ ai-agents/
 ├── options.nix              # All programs.aiAgents option definitions
 ├── _mcp-transforms.nix      # MCP server transform helpers (imported by builders)
 ├── _settings-builders.nix   # Per-agent settings builders (imported by files)
+├── _option-helpers.nix      # Shared option constructors (imported by others)
 ├── _opencode-profiles.nix   # OpenCode profile names and config paths
+├── _claude-config.nix       # Claude Code config assembly (imported by files)
+├── _codex-config.nix        # Codex CLI config assembly (imported by files)
+├── _file-templates.nix      # Config file templates (imported by files)
+├── _plugin-installs.nix     # Plugin/skill install scripts (imported by activation)
+├── _secret-patching.nix     # Secret injection helpers (imported by activation)
+├── _workflow-prompts.nix    # Workflow prompt definitions (imported by config)
+├── _zai-filters.nix         # Z.AI MCP jq filter generation (imported by _mcp-transforms)
+├── _zai-services.nix        # Z.AI MCP service registry (imported by _zai-filters)
 ├── activation.nix           # Activation scripts (secret patching, config setup, plugin installs)
 ├── files.nix                # home.file + xdg.configFile declarations
 ├── services.nix             # Packages, zsh aliases, systemd user services/timers
@@ -274,6 +284,10 @@ ai-agents/
 ├── config/
 │   ├── default.nix          # Import hub
 │   ├── instructions.nix     # Global instructions + skills
+│   ├── _skills.nix          # Skill installations and omissions (imported by instructions)
+│   ├── _claude-hooks.nix    # Claude Code lifecycle hooks (imported by permissions)
+│   ├── _claude-permission-rules.nix # Claude allow/deny rules (imported by permissions)
+│   ├── _formatters.nix      # Formatter registry for auto-formatting hooks (imported by permissions)
 │   ├── mcp-servers.nix      # MCP server definitions + logging
 │   ├── models.nix           # Model/provider registries (OpenCode, Codex, Gemini)
 │   └── permissions.nix      # Claude permissions, hooks, settings
@@ -313,7 +327,6 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`
 | Setting     | Value                       | Why                                         |
 | ----------- | --------------------------- | ------------------------------------------- |
 | Model       | `anthropic/claude-opus-4-6` | Primary coding model                        |
-| Theme       | `gruvbox`                   | Matches system theme                        |
 | Small model | `claude-haiku-4-5`          | Cheap model for titles, summaries           |
 | Compaction  | Auto + prune                | Remove old tool outputs, reserve 10k tokens |
 
@@ -337,22 +350,16 @@ Custom commands are currently disabled. To add your own OpenCode slash commands,
 
 ### Codex
 
-| Setting                  | Value                          | Why                                                              |
-| ------------------------ | ------------------------------ | ---------------------------------------------------------------- |
-| Model                    | `gpt-5.4`                      | Current recommended Codex model                                  |
-| Personality              | `pragmatic`                    | Direct, practical responses                                      |
-| Reasoning effort         | `medium`                       | Balanced speed/quality                                           |
-| Reasoning summary        | `concise`                      | Keeps reasoning visible without flooding the transcript          |
-| Approval policy          | `on-request`                   | Good autonomy/safety balance for local coding                    |
-| Web search               | `cached`                       | Safer default than live fetch while keeping research utility     |
-| Login shell              | Disabled                       | Reduces shell-profile side effects and accidental env leakage    |
-| Update check             | Enabled                        | Current generated config sets startup update checks              |
-| History                  | `save-all`                     | Persistent session history                                       |
-| Feature: multi_agent     | Enabled                        | Turns on Codex sub-agent workflows                               |
-| Feature: child_agents_md | Enabled                        | Adds AGENTS scope guidance even when no local AGENTS file exists |
-| Agent thread cap         | `4`                            | Enables parallelism without overloading the main session         |
-| Profiles                 | nix, review, quick, deep, safe | Context-switching presets                                        |
-| Shell env policy         | `core`                         | Exclude secrets/tokens from env                                  |
+| Setting                  | Value        | Why                                                              |
+| ------------------------ | ------------ | ---------------------------------------------------------------- |
+| Model                    | `gpt-5.4`    | Current recommended Codex model                                  |
+| Personality              | `pragmatic`  | Direct, practical responses                                      |
+| Reasoning effort         | `medium`     | Balanced speed/quality                                           |
+| Approval policy          | `on-request` | Good autonomy/safety balance for local coding                    |
+| Feature: multi_agent     | Enabled      | Turns on Codex sub-agent workflows                               |
+| Feature: child_agents_md | Enabled      | Adds AGENTS scope guidance even when no local AGENTS file exists |
+| Agent thread cap         | `4`          | Enables parallelism without overloading the main session         |
+| Profiles                 | nix, review  | Context-switching presets                                        |
 
 Trusted projects: `~/System`.
 
@@ -374,8 +381,8 @@ Routes through Z.AI's Anthropic-compatible proxy (`https://api.z.ai/api/anthropi
 | `ANTHROPIC_BASE_URL`             | `https://api.z.ai/api/anthropic`  |
 | `API_TIMEOUT_MS`                 | `3000000` (50 min, per Z.AI docs) |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `glm-4.5-air`                     |
-| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5.1`                           |
-| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5.1`                           |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5.1`                         |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5.1`                         |
 
 Also passes `--dangerously-skip-permissions` for autonomous operation.
 
@@ -383,7 +390,7 @@ Also passes `--dangerously-skip-permissions` for autonomous operation.
 
 | Model ID      | Parameters            | Context | Use Case                    |
 | ------------- | --------------------- | ------- | --------------------------- |
-| glm-5.1         | 744B (40B active MoE) | 200K    | Flagship reasoning          |
+| glm-5.1       | 744B (40B active MoE) | 200K    | Flagship reasoning          |
 | glm-4.7       | —                     | —       | Previous gen, stable coding |
 | glm-4.7-flash | —                     | —       | Fast/cheap variant          |
 | glm-4.5-air   | —                     | —       | Lightest, haiku tier        |
@@ -446,14 +453,14 @@ Primary model: `opencode/minimax-m2.5-free`, fast lane: `opencode/mimo-v2-flash-
 
 Defined in `home-manager/modules/ai-agents/config/mcp-servers.nix`, then transformed per-agent and shared across Claude Code, OpenCode, Gemini CLI, and Codex.
 
-| Server           | Purpose                               | Status                                       |
-| ---------------- | ------------------------------------- | -------------------------------------------- |
-| context7         | Library documentation context         | Enabled (all agents)                         |
-| zai-mcp-server   | Z.AI tools (key injected from sops)   | Enabled (all agents)                         |
-| github           | GitHub API (issues, PRs, code search) | Enabled (all agents)                         |
-| web-search-prime | Web search via Z.AI                   | Defined + auth headers patched at activation |
-| web-reader       | Read web pages via Z.AI               | Injected at activation                       |
-| zread            | Document reader via Z.AI              | Injected (Claude/OpenCode/Gemini)            |
+| Server           | Purpose                               | Status                                         |
+| ---------------- | ------------------------------------- | ---------------------------------------------- |
+| context7         | Library documentation context         | Enabled (all agents)                           |
+| github           | GitHub API (issues, PRs, code search) | Enabled (all agents)                           |
+| web-search-prime | Web search via Z.AI                   | Remote MCP, auth headers patched at activation |
+| web-reader       | Read web pages via Z.AI               | Remote MCP, auth headers patched at activation |
+| zread            | Document/issue reader via Z.AI        | Remote MCP, auth headers patched at activation |
+| chrome-devtools  | Browser DevTools automation           | Enabled (all agents)                           |
 
 Remote MCP servers are injected into all 4 agents by `patchAiAgentSecrets` using the sops-decrypted Z.AI API key.
 
@@ -555,13 +562,13 @@ btca config lives at `~/.config/btca/btca.config.jsonc` (global) or `.btca/btca.
 
 ### Troubleshooting
 
-| Error                                                            | Cause                                  | Fix                                                              |
-| ---------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------- |
-| `Provider "X" is not authenticated`                              | No credentials for that provider       | `opencode auth login` → select provider                          |
-| `Provider "X" is not connected`                                  | OAuth token expired or wrong auth type | Re-auth: `opencode auth login`                                   |
+| Error                                                            | Cause                                  | Fix                                                        |
+| ---------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| `Provider "X" is not authenticated`                              | No credentials for that provider       | `opencode auth login` → select provider                    |
+| `Provider "X" is not connected`                                  | OAuth token expired or wrong auth type | Re-auth: `opencode auth login`                             |
 | `model is not supported when using Codex with a ChatGPT account` | Non-Codex model with ChatGPT OAuth     | Use `gpt-5.4` (or another Codex-compatible `gpt-5*` model) |
-| `No payment method` (OpenCode Zen)                               | OpenCode Zen needs billing             | Add payment at opencode.ai or switch provider                    |
-| `API key not valid` (Google)                                     | Google account OAuth ≠ AI Studio key   | Get key from aistudio.google.com                                 |
+| `No payment method` (OpenCode Zen)                               | OpenCode Zen needs billing             | Add payment at opencode.ai or switch provider              |
+| `API key not valid` (Google)                                     | Google account OAuth ≠ AI Studio key   | Get key from aistudio.google.com                           |
 
 Check status anytime: `btca status` (shows provider, model, auth state, resources).
 
@@ -598,7 +605,8 @@ API keys are managed via sops-nix (age-encrypted). The Z.AI API key lives at `/r
 | `opencode_gemini` (`ocgem`) | OpenCode with Gemini profile (separate config dir)           |
 | `opencode_gpt` (`ocgpt`)    | OpenCode with GPT profile (separate config dir)              |
 | `opencode_sonnet` (`ocs`)   | OpenCode with Sonnet profile (separate config dir)           |
-| `opencode_zen` (`oczen`)    | OpenCode with Zen free profile (separate config dir)         |
+| `opencode_zen` (`oczen`)    | OpenCode with Zen free profile (separate config dir)           |
+| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile (loads key from sops)      |
 
 All sops functions use `_load_zai_key()` which reads `/run/secrets/zai_api_key`. If the file is missing, run `just nixos` to decrypt secrets.
 

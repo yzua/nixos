@@ -6,16 +6,16 @@
 
 ## Available Templates
 
-| Template       | Directory       | Key Tools                                                  |
-| -------------- | --------------- | ---------------------------------------------------------- |
-| `python-venv`  | `python-venv/`  | venv, ruff, black, isort, pytest, jupyter, django, fastapi |
-| `rust-stable`  | `rust-stable/`  | cargo, rustc, clippy, rustfmt, cargo-audit                 |
-| `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy           |
-| `nodejs`       | `nodejs/`       | node, pnpm, yarn, typescript, prettier, eslint             |
-| `bun`          | `bun/`          | bun, typescript, biome                                     |
-| `deno`         | `deno/`         | deno                                                       |
-| `go`           | `go/`           | go, gopls, golangci-lint, gofumpt, delve, air, protobuf    |
-| `cpp`          | `cpp/`          | gcc, cmake, gnumake, clang-tools, gdb, valgrind, cppcheck  |
+| Template       | Directory       | Key Tools                                                                                                                      |
+| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `python-venv`  | `python-venv/`  | venv, ruff, black, isort, pytest, jupyter, django, fastapi, numpy, pandas, scipy, scikit-learn, boto3, ansible, sphinx, mkdocs |
+| `rust-stable`  | `rust-stable/`  | cargo, rustc, clippy, rustfmt, pkg-config, cargo-audit                                                                         |
+| `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy, rustfmt, pkg-config                                                          |
+| `nodejs`       | `nodejs/`       | node, pnpm, yarn, typescript, typescript-language-server, prettier, eslint                                                     |
+| `bun`          | `bun/`          | bun, typescript, typescript-language-server, biome                                                                             |
+| `deno`         | `deno/`         | deno                                                                                                                           |
+| `go`           | `go/`           | go, gopls, golangci-lint, gofumpt, golines, delve, gotests, go-tools, air, protobuf, protoc-gen-go, protoc-gen-go-grpc         |
+| `cpp`          | `cpp/`          | gcc, cmake, gnumake, pkg-config, clang-tools, gdb, valgrind, cppcheck                                                          |
 
 ---
 

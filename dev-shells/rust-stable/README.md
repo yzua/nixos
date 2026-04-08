@@ -16,6 +16,11 @@ nix flake init -t "/home/yz/System/dev-shells#rust-stable"
 - `nix build` : builds the Rust project. Outputs the binary to `./result/bin/<name>`
 - `nix run`: runs the Rust program.
 
+## Included tools
+
+- `cargo`, `rustc`, `clippy`, `rustfmt`, `pkg-config`
+- `cargo-audit` (when Cargo.lock exists)
+
 ## Reference
 
 1. [wiki/Flakes](https://nixos.wiki/wiki/Flakes)

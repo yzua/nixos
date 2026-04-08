@@ -100,7 +100,33 @@ Inside Telescope:
 
 ## LSP Features (IntelliSense)
 
-Your setup has language servers for TypeScript, Rust, Zig, Lua, and Nix (configured in Neovim with `vim.lsp.enable`). Additional LSP servers for Bash, YAML, Svelte, Markdown, and TOML are installed system-wide for other editors. They provide the same features you're used to from VSCode:
+Your setup has language servers configured via `vim.lsp.enable` in `lua/lsp.lua`. Enabled servers:
+
+| Language      | Server                  |
+| ------------- | ----------------------- |
+| TypeScript/JS | `ts_ls`                 |
+| Rust          | `rust_analyzer`         |
+| Zig           | `zls`                   |
+| Lua           | `lua_ls`                |
+| Nix           | `nixd`                  |
+| Go            | `gopls`                 |
+| Python        | `pyright`               |
+| Bash          | `bashls`                |
+| YAML          | `yamlls`                |
+| TOML          | `taplo`                 |
+| Markdown      | `marksman`              |
+| Svelte        | `svelte`                |
+| HTML          | `html`                  |
+| CSS           | `cssls`                 |
+| JSON          | `jsonls`                |
+| ESLint        | `eslint`                |
+| Emmet         | `emmet_language_server` |
+| TailwindCSS   | `tailwindcss`           |
+| Dockerfile    | `dockerls`              |
+| GraphQL       | `graphql`               |
+| C/C++         | `clangd`                |
+
+They provide the same features you're used to from VSCode:
 
 | Key         | What It Does               | VSCode Equivalent        |
 | ----------- | -------------------------- | ------------------------ |
@@ -208,6 +234,7 @@ Async linting runs automatically on save and insert-leave. Linters are configure
 | Nix                   | statix        |
 | Bash/Shell            | shellcheck    |
 | Markdown              | markdownlint  |
+| C/C++                 | cppcheck      |
 
 Lint errors appear as diagnostics in the gutter and can be navigated with `[d` / `]d`.
 

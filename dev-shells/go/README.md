@@ -17,7 +17,7 @@ nix flake init -t "/home/yz/System/dev-shells#go"
 
 ## Included tools
 
-- `go`, `gopls`, `golangci-lint`, `gofumpt`
+- `go`, `gopls`, `golangci-lint`, `gofumpt`, `golines`
 - `delve`, `air`, `gotests`, `go-tools`
 - `protobuf`, `protoc-gen-go`, `protoc-gen-go-grpc`
 

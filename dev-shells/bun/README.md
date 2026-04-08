@@ -12,6 +12,10 @@ nix flake init -t "/home/yz/System/dev-shells#bun"
 
 - `nix develop`: opens up a `bash` shell with the required packages
 
+## Included tools
+
+- `bun`, `typescript`, `typescript-language-server`, `biome`
+
 ## Reference
 
 1. [wiki/Flakes](https://nixos.wiki/wiki/Flakes)

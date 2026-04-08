@@ -22,7 +22,7 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 ## Your Workspaces
 
-Five named workspaces are preconfigured, each with auto-launching apps:
+Six named workspaces are preconfigured, each with auto-launching apps:
 
 | #   | Workspace | Apps (auto-start)           | Access    |
 | --- | --------- | --------------------------- | --------- |
@@ -31,8 +31,9 @@ Five named workspaces are preconfigured, each with auto-launching apps:
 | 3   | 󰍡 social  | Vesktop (Discord), Telegram | `Super+3` |
 | 4   | 󰎆 media   | Music/Video players         | `Super+4` |
 | 5   | 󰦝 vpn     | Mullvad VPN, KeePassXC      | `Super+5` |
+| 6   | 󰀲 android | Android tools               | `Super+6` |
 
-Workspaces 6–9 are available as unnamed extras (`Super+6` through `Super+9`).
+Workspaces 7–9 are available as unnamed extras (`Super+7` through `Super+9`).
 
 Apps are assigned to workspaces via window rules — when Brave opens, it goes to browser workspace automatically. You never have to manually place them.
 
@@ -48,7 +49,7 @@ Learn these first. Everything else can wait.
 | 2   | `Super+D`            | Open app launcher (Noctalia)   | Launch any app              |
 | 3   | `Super+Q`            | Close focused window           | Done with a window          |
 | 4   | `Super+Left/Right`   | Focus column left/right        | Navigate between windows    |
-| 5   | `Super+1–5`          | Switch to workspace            | Jump to a workspace         |
+| 5   | `Super+1–6`          | Switch to workspace            | Jump to a workspace         |
 | 6   | `Super+F`            | Toggle floating                | Pull a window out of tiling |
 | 7   | `Super+M`            | Maximize column                | Make column fill the screen |
 | 8   | `Super+V`            | Clipboard history              | Paste from history          |
@@ -412,15 +413,22 @@ These apps open floating instead of tiled:
 
 These launch automatically when Niri starts:
 
-| Service                     | Purpose                                      |
-| --------------------------- | -------------------------------------------- |
-| xwayland-satellite          | X11 app compatibility (Java Swing, etc.)     |
-| noctalia-shell              | Bar, launcher, notifications, wallpaper, OSD |
-| mullvad-vpn                 | VPN client                                   |
-| wl-paste (text) + cliphist  | Clipboard history for text                   |
-| wl-paste (image) + cliphist | Clipboard history for images                 |
-| wl-clip-persist             | Keep clipboard after app closes              |
-| swayidle                    | Idle management (dim → lock → DPMS)          |
+| Service                     | Purpose                                      | Source               |
+| --------------------------- | -------------------------------------------- | -------------------- |
+| xwayland-satellite          | X11 app compatibility (Java Swing, etc.)     | spawn-at-startup     |
+| polkit-gnome                | Authentication agent dialog                  | spawn-at-startup     |
+| noctalia-shell              | Bar, launcher, notifications, wallpaper, OSD | spawn-at-startup     |
+| KeePassXC                   | Password manager + SSH agent                 | spawn-at-startup     |
+| mullvad-vpn                 | VPN client                                   | spawn-at-startup     |
+| wl-paste (text) + cliphist  | Clipboard history for text                   | spawn-at-startup     |
+| wl-paste (image) + cliphist | Clipboard history for images                 | spawn-at-startup     |
+| wl-clip-persist             | Keep clipboard after app closes              | spawn-at-startup     |
+| LibreWolf (personal)        | Browser with personal profile                | spawn-at-startup     |
+| VS Code                     | Code editor                                  | spawn-at-startup     |
+| Ghostty + Zellij            | Terminal with multiplexer                    | spawn-at-startup     |
+| Vesktop (Discord)           | Discord client                               | spawn-at-startup     |
+| Telegram                    | Messaging                                    | spawn-at-startup     |
+| swayidle                    | Idle management (dim → lock → DPMS)          | systemd user service |
 
 ---
 
@@ -629,15 +637,15 @@ Column 2 holds two windows stacked vertically (merged with `Super+Comma`/`Super+
 
 ## Configuration Files
 
-| File                                    | What It Controls                                                |
-| --------------------------------------- | --------------------------------------------------------------- |
-| `home-manager/modules/niri/main.nix`    | Workspaces, autostart, environment, animations                  |
-| `home-manager/modules/niri/binds.nix`   | All keybindings and imported helper scripts                     |
-| `home-manager/modules/niri/input.nix`   | Keyboard, mouse, touchpad, trackpoint                           |
-| `home-manager/modules/niri/layout.nix`  | Gaps, columns, focus behavior                                   |
-| `home-manager/modules/niri/rules.nix`   | Window rules, opacity, floating, workspace assignment           |
-| `home-manager/modules/niri/idle.nix`    | Idle timeouts (dim → lock → DPMS)                               |
-| `home-manager/modules/niri/lock.nix`    | Swaylock fallback configuration                                 |
-| `home-manager/modules/niri/default.nix` | Module imports and Niri flake integration                       |
+| File                                    | What It Controls                                      |
+| --------------------------------------- | ----------------------------------------------------- |
+| `home-manager/modules/niri/main.nix`    | Workspaces, autostart, environment, animations        |
+| `home-manager/modules/niri/binds.nix`   | All keybindings and imported helper scripts           |
+| `home-manager/modules/niri/input.nix`   | Keyboard, mouse, touchpad, trackpoint                 |
+| `home-manager/modules/niri/layout.nix`  | Gaps, columns, focus behavior                         |
+| `home-manager/modules/niri/rules.nix`   | Window rules, opacity, floating, workspace assignment |
+| `home-manager/modules/niri/idle.nix`    | Idle timeouts (dim → lock → DPMS)                     |
+| `home-manager/modules/niri/lock.nix`    | Swaylock fallback configuration                       |
+| `home-manager/modules/niri/default.nix` | Module imports and Niri flake integration             |
 
 To apply changes after editing: `just home` (rebuilds Home Manager configuration).
