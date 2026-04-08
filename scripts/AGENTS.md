@@ -9,7 +9,6 @@ Repository Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `
 ```
 scripts/
 ├── ai/
-│   ├── ask.sh              # Z.ai API client (GLM-4.5-air/GLM-5, clipboard support)
 │   ├── api-quota/
 │   │   ├── api-quota.sh         # Noctalia bar widget entrypoint (orchestration + output)
 │   │   ├── api-quota-helpers.sh # Shared formatting/cache/time helper functions
@@ -115,7 +114,7 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                         |
 | `ai/api-quota/api-quota.sh`                        | `home-manager/modules/noctalia/default.nix` (bar widget)                              |
 | `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper)           |
-| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/_mcp-transforms.nix` (`ai-agent-log-wrapper` wrapper) |
+| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)        |
 | `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)        |
 | `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)       |
 | `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)      |
