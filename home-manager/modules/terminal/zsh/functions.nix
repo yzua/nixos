@@ -38,7 +38,7 @@
     claude_glm() {
       local key; key="$(_load_zai_key)" || return 1
       ANTHROPIC_AUTH_TOKEN="$key" \
-      ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+      ANTHROPIC_BASE_URL="${constants.services.zai.apiRoot}/anthropic" \
       API_TIMEOUT_MS="3000000" \
       ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5-turbo" \
       ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \

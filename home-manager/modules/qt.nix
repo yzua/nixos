@@ -20,8 +20,8 @@
         style = "kvantum";
       };
       Fonts = {
-        fixed = "\"${constants.font.mono},11\"";
-        general = "\"Noto Sans,11\"";
+        fixed = "\"${constants.font.mono},${toString constants.font.sizeApplications}\"";
+        general = "\"Noto Sans,${toString constants.font.sizeApplications}\"";
       };
     };
     qt6ctSettings = {
@@ -32,8 +32,8 @@
         style = "kvantum";
       };
       Fonts = {
-        fixed = "\"${constants.font.mono},11\"";
-        general = "\"Noto Sans,11\"";
+        fixed = "\"${constants.font.mono},${toString constants.font.sizeApplications}\"";
+        general = "\"Noto Sans,${toString constants.font.sizeApplications}\"";
       };
     };
   };

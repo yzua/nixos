@@ -79,11 +79,11 @@
 
       sizes =
         let
-          inherit (constants.font) size;
+          inherit (constants.font) size sizeApplications;
         in
         {
           terminal = size;
-          applications = 11;
+          applications = sizeApplications;
         };
     };
 

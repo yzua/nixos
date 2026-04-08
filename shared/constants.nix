@@ -30,7 +30,9 @@
   # Fonts
   font = {
     mono = "JetBrains Mono";
+    monoNerd = "JetBrainsMono Nerd Font";
     size = 13;
+    sizeApplications = 11;
   };
 
   # Theme (Gruvbox)
@@ -101,5 +103,12 @@
     };
     # I2P local daemon
     i2pd = "127.0.0.1"; # Local I2P daemon (port 4447)
+  };
+
+  # External service API endpoints.
+  services = {
+    zai = {
+      apiRoot = "https://api.z.ai/api"; # Z.AI API root (Anthropic-compatible + MCP)
+    };
   };
 }

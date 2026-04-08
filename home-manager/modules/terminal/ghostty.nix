@@ -16,10 +16,10 @@
     enableBashIntegration = true;
 
     settings = {
-      font-family = "JetBrainsMono Nerd Font";
-      font-family-bold = "JetBrainsMono Nerd Font";
-      font-family-italic = "JetBrainsMono Nerd Font";
-      font-family-bold-italic = "JetBrainsMono Nerd Font";
+      font-family = constants.font.monoNerd;
+      font-family-bold = constants.font.monoNerd;
+      font-family-italic = constants.font.monoNerd;
+      font-family-bold-italic = constants.font.monoNerd;
       font-size = lib.mkForce constants.font.size;
       font-thicken = true;
       adjust-cell-height = "0%";
@@ -30,7 +30,7 @@
       window-padding-y = 8;
       window-padding-balance = true;
       window-decoration = false; # Niri handles decorations
-      window-title-font-family = "JetBrainsMono Nerd Font";
+      window-title-font-family = constants.font.monoNerd;
       gtk-single-instance = true;
 
       cursor-style = "block";
