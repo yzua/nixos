@@ -318,6 +318,7 @@ in
       inherit (pluginInstalls)
         installImpeccable
         installAgencyAgents
+        cleanupDisabledAgencyAgents
         ;
     };
   };

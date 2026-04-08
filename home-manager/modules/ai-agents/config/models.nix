@@ -97,7 +97,7 @@ let
 in
 {
   programs.aiAgents = {
-    agencyAgents.enable = true;
+    agencyAgents.enable = false;
     impeccable.enable = true;
 
     # === OpenCode Configuration ===
