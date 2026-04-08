@@ -11,7 +11,7 @@ tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 awk_script="$tmp_dir/extract.awk"
-cat > "$awk_script" <<'AWK'
+cat >"$awk_script" <<'AWK'
 function count_char(str, ch,    i, n) {
   n = 0
   for (i = 1; i <= length(str); i++) {
@@ -184,18 +184,20 @@ END {
 AWK
 
 mapfile -t extracted_scripts < <(
-  rg --files -g '*.nix' . | while IFS= read -r file; do
-    awk -v tmpdir="$tmp_dir" -v src="$file" -f "$awk_script" "$file"
-  done
+	rg --files -g '*.nix' . | while IFS= read -r file; do
+		awk -v tmpdir="$tmp_dir" -v src="$file" -f "$awk_script" "$file"
+	done
 )
 
-if (( ${#extracted_scripts[@]} == 0 )); then
-  print_info "No inline writeShellScript blocks found."
-  exit 0
+if ((${#extracted_scripts[@]} == 0)); then
+	print_info "No inline writeShellScript blocks found."
+	exit 0
 fi
 
-printf '%s\0' "${extracted_scripts[@]}" | xargs -0 -r nix run nixpkgs#shellcheck -- \
-  -s bash \
-  -S error \
-  -e SC1114,SC1128,SC2239
+shellcheck_bin="$(command -v shellcheck 2>/dev/null || echo "nix run nixpkgs#shellcheck --")"
+# shellcheck disable=SC2086
+printf '%s\0' "${extracted_scripts[@]}" | xargs -0 -r ${shellcheck_bin} \
+	-s bash \
+	-S error \
+	-e SC1114,SC1128,SC2239
 print_success "Inline Nix shell scripts passed! (${#extracted_scripts[@]} blocks)"

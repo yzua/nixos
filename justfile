@@ -14,25 +14,53 @@ format:
     @nix fmt
     @echo "✔ Formatting passed!"
 
-# Lint all .nix files, bash scripts, and markdown docs
+# Lint all .nix files, bash scripts, and markdown docs (parallel)
 lint:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    rc=0
+
+    # Run all three lint groups in parallel
+    {{JUST}} _lint-nix > /tmp/lint-nix.log 2>&1 & pid_nix=$!
+    {{JUST}} _lint-shell > /tmp/lint-shell.log 2>&1 & pid_shell=$!
+    {{JUST}} _lint-markdown > /tmp/lint-markdown.log 2>&1 & pid_md=$!
+
+    wait $pid_nix || rc=$?
+    cat /tmp/lint-nix.log
+    wait $pid_shell || rc=$?
+    cat /tmp/lint-shell.log
+    wait $pid_md || rc=$?
+    cat /tmp/lint-markdown.log
+
+    if [ $rc -ne 0 ]; then exit $rc; fi
+    echo "✔ All linting passed!"
+
+# Lint Nix files (statix + deadnix)
+_lint-nix:
     @echo -e "\n➤ Linting Nix files…"
-    @\time -f "⏱ Completed in %E" nix run nixpkgs#statix -- check --ignore '.git/**'
+    @\time -f "⏱ Statix in %E" statix check --ignore '.git/**' . || nix run nixpkgs#statix -- check --ignore '.git/**'
+    @echo -e "\n➤ Checking for dead Nix code…"
+    @\time -f "⏱ Deadnix in %E" deadnix --fail --exclude ./home-manager/modules/terminal/zellij.nix . || nix run nixpkgs#deadnix -- --fail --exclude ./home-manager/modules/terminal/zellij.nix .
     @echo "✔ Nix linting passed!"
-    @{{JUST}} dead
+
+# Lint shell scripts (shellcheck + inline)
+_lint-shell:
     @echo -e "\n➤ Checking Bash scripts…"
-    @\time -f "⏱ Completed in %E" find . -name "*.sh" -not -path "./.git/*" -exec nix run nixpkgs#shellcheck -- {} +
+    @\time -f "⏱ ShellCheck in %E" find . -name "*.sh" -not -path "./.git/*" -exec shellcheck {} + || find . -name "*.sh" -not -path "./.git/*" -exec nix run nixpkgs#shellcheck -- {} +
     @echo "✔ ShellCheck passed!"
     @echo -e "\n➤ Checking inline Nix shell scripts…"
-    @\time -f "⏱ Completed in %E" bash ./scripts/build/shellcheck-nix-inline.sh
+    @\time -f "⏱ Inline scripts in %E" bash ./scripts/build/shellcheck-nix-inline.sh
+
+# Lint markdown files
+_lint-markdown:
     @echo -e "\n➤ Linting Markdown files…"
-    @\time -f "⏱ Completed in %E" find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 | xargs -0 -r nix run nixpkgs#markdownlint-cli --
+    @\time -f "⏱ Markdownlint in %E" find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 | xargs -0 -r markdownlint || find . -name "*.md" -not -path "./.git/*" -not -path "*/node_modules/*" -print0 | xargs -0 -r nix run nixpkgs#markdownlint-cli --
     @echo "✔ Markdown linting passed!"
 
 # Scan for unused code in .nix files
 dead:
     @echo -e "\n➤ Checking for dead Nix code…"
-    @\time -f "⏱ Completed in %E" nix run nixpkgs#deadnix -- --fail --exclude ./home-manager/modules/terminal/zellij.nix .
+    @\time -f "⏱ Completed in %E" deadnix --fail --exclude ./home-manager/modules/terminal/zellij.nix . || nix run nixpkgs#deadnix -- --fail --exclude ./home-manager/modules/terminal/zellij.nix .
     @echo "✔ Deadnix check passed!"
 
 # Run nix flake check
@@ -66,17 +94,34 @@ nixos:
     @echo -e "\n➤ Rebuilding NixOS…"
     nh os switch 'path:.' --hostname desktop
 
-# All of the above, in order
+# All of the above, in order (fast checks parallel, then build steps)
 all:
-    @echo -e "\n➤ Running full pipeline…"
-    {{JUST}} modules
-    {{JUST}} pkgs
-    {{JUST}} lint
-    {{JUST}} format
-    {{JUST}} check
-    {{JUST}} nixos
-    {{JUST}} home
-    @echo -e "✔ All done!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    JUST="{{JUST}}"
+    rc=0
+
+    echo -e "\n➤ Running full pipeline…"
+
+    # Phase 1: Fast checks in parallel (modules, pkgs, lint)
+    $JUST modules > /tmp/pipeline-modules.log 2>&1 & pid_mod=$!
+    $JUST pkgs > /tmp/pipeline-pkgs.log 2>&1 & pid_pkgs=$!
+    $JUST lint > /tmp/pipeline-lint.log 2>&1 & pid_lint=$!
+
+    wait $pid_mod || { rc=$?; echo "✗ modules failed"; }
+    cat /tmp/pipeline-modules.log
+    wait $pid_pkgs || { rc=$?; echo "✗ pkgs failed"; }
+    cat /tmp/pipeline-pkgs.log
+    wait $pid_lint || { rc=$?; echo "✗ lint failed"; }
+    cat /tmp/pipeline-lint.log
+    if [ $rc -ne 0 ]; then exit $rc; fi
+
+    # Phase 2: Sequential (format depends on lint, check evaluates everything)
+    $JUST format
+    $JUST check
+    $JUST nixos
+    $JUST home
+    echo -e "✔ All done!"
 
 # Generate system health report
 report mode="full":

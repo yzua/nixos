@@ -53,7 +53,8 @@ let
     unset MOZ_ENABLE_WAYLAND
     exec ${sdkRoot}/emulator/emulator "$@"
   '';
-  buildToolsWrapped = tool:
+  buildToolsWrapped =
+    tool:
     pkgs.writeShellScriptBin tool ''
       build_tools_dir="$(find ${sdkBuildToolsDir} -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -V | tail -n1)"
       if [[ -z "$build_tools_dir" || ! -x "$build_tools_dir/${tool}" ]]; then

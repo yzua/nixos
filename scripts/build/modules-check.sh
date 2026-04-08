@@ -37,23 +37,25 @@ parse_imports() {
 			return n
 		}
 
-		function extract_nix_paths(line,    remaining, path) {
+		function extract_nix_paths(line,    remaining, path, start) {
 			remaining = line
-			while (match(remaining, /\.\/[[:alnum:]_./-]+\.nix/)) {
-				path = substr(remaining, RSTART + 2, RLENGTH - 2)
+			while (match(remaining, /\.\.\/[[:alnum:]_./-]+\.nix|\.\/[[:alnum:]_./-]+\.nix/)) {
+				start = RSTART
+				path = substr(remaining, start, RLENGTH)
 				print path
-				remaining = substr(remaining, RSTART + RLENGTH)
+				remaining = substr(remaining, start + RLENGTH)
 			}
 		}
 
-		function extract_directory_imports(line,    remaining, path) {
+		function extract_directory_imports(line,    remaining, path, start) {
 			remaining = line
-			while (match(remaining, /\.\/[[:alnum:]_./-]+/)) {
-				path = substr(remaining, RSTART + 2, RLENGTH - 2)
+			while (match(remaining, /\.\.\/[[:alnum:]_./-]+|\.\/[[:alnum:]_./-]+/)) {
+				start = RSTART
+				path = substr(remaining, start, RLENGTH)
 				if (path !~ /\.nix$/) {
 					print path
 				}
-				remaining = substr(remaining, RSTART + RLENGTH)
+				remaining = substr(remaining, start + RLENGTH)
 			}
 		}
 
@@ -128,7 +130,8 @@ collect_unique_nonempty_lines() {
 validate_import_path() {
 	local dir="$1"
 	local import_path="$2"
-	local resolved_path="${dir}/${import_path}"
+	local resolved_path
+	resolved_path="$(cd "$dir" 2>/dev/null && realpath -m "$import_path" 2>/dev/null || echo "${dir}/${import_path}")"
 
 	if [[ -f "$resolved_path" ]]; then
 		return 0
@@ -185,6 +188,9 @@ main() {
 		for import_path in "${unique_imports[@]}"; do
 			if [[ -z "${imported_set[$import_path]:-}" ]]; then
 				imported_set["$import_path"]=1
+				local basename
+				basename="${import_path##*/}"
+				imported_set["$basename"]=1
 			fi
 		done
 

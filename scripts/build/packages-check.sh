@@ -131,28 +131,21 @@ extract_programs() {
 	local file="$1"
 	local relfile="${file#./}"
 
-	# programs.XXX.enable = true or programs.XXX = {
 	grep -oE 'programs\.[a-zA-Z0-9_-]+' "$file" 2>/dev/null |
-		sed 's/programs\.//' |
-		sort -u |
-		while read -r prog; do
-			printf 'PROG\t%s\t%s\n' "$prog" "$relfile"
-		done \
+		sed 's/programs\./PROG\t/' |
+		awk -F'\t' '!seen[$0]++' |
+		awk "{print \$0\"\t${relfile}\"}" \
 			>>"${TMP_DIR}/programs.txt" 2>/dev/null || true
 }
 
-# Extract service modules
 extract_services() {
 	local file="$1"
 	local relfile="${file#./}"
 
-	# services.XXX.enable = true or services.XXX = {
 	grep -oE 'services\.[a-zA-Z0-9_-]+' "$file" 2>/dev/null |
-		sed 's/services\.//' |
-		sort -u |
-		while read -r svc; do
-			printf 'SVC\t%s\t%s\n' "$svc" "$relfile"
-		done \
+		sed 's/services\./SVC\t/' |
+		awk -F'\t' '!seen[$0]++' |
+		awk "{print \$0\"\t${relfile}\"}" \
 			>>"${TMP_DIR}/services.txt" 2>/dev/null || true
 }
 
