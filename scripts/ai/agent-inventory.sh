@@ -343,6 +343,7 @@ collect_claude() {
 
 collect_codex() {
 	local cfg="$HOME/.codex/config.toml"
+	local agents_dir="$HOME/.codex/agents"
 	if [[ -f "$cfg" ]]; then
 		python3 - "$cfg" <<'PY'
 import pathlib
@@ -375,6 +376,23 @@ PY
 
 	list_skill_dirs_merged "codex" "$HOME/.codex/skills" "$HOME/.codex/skills/.system" "$HOME/.agents/skills" "$PWD/.agents/skills"
 	list_command_files "$HOME/.codex/commands" "codex"
+	if [[ -d "$agents_dir" ]]; then
+		python3 - "$agents_dir" <<'PY'
+import pathlib
+import sys
+import tomllib
+
+agents_dir = pathlib.Path(sys.argv[1])
+for agent_file in sorted(agents_dir.glob("*.toml")):
+    try:
+        data = tomllib.loads(agent_file.read_text(encoding="utf-8"))
+    except Exception:
+        continue
+    name = str(data.get("name", agent_file.stem))
+    desc = str(data.get("description", "custom agent"))
+    print(f"codex\tagent\t{name}\t{desc}\t{agent_file}")
+PY
+	fi
 }
 
 collect_gemini() {

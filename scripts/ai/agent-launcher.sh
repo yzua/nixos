@@ -167,30 +167,30 @@ execute_agent() {
 		;;
 	lcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="low"'
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="low"'
 		else
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="low"' "$prompt"
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="low"' "$prompt"
 		fi
 		;;
 	mcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="medium"'
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="medium"'
 		else
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="medium"' "$prompt"
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="medium"' "$prompt"
 		fi
 		;;
 	hcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="high"'
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="high"'
 		else
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="high"' "$prompt"
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="high"' "$prompt"
 		fi
 		;;
 	xcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="xhigh"'
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="xhigh"'
 		else
-			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="xhigh"' "$prompt"
+			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="xhigh"' "$prompt"
 		fi
 		;;
 	oc)
@@ -365,7 +365,12 @@ run_sectioned_mode() {
 		esac
 		;;
 	"Codex")
-		agent_alias="$(pick_codex_effort_alias)" || return 1
+		mode_choice="$(pick "Codex Mode" default yolo)"
+		case "$mode_choice" in
+		default) agent_alias="$(pick_codex_effort_alias)" || return 1 ;;
+		yolo) agent_alias="cxu" ;;
+		"") return 1 ;;
+		esac
 		;;
 	"Gemini")
 		agent_alias="gem"

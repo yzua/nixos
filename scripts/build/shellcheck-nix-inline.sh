@@ -184,9 +184,7 @@ END {
 AWK
 
 mapfile -t extracted_scripts < <(
-	rg --files -g '*.nix' . | while IFS= read -r file; do
-		awk -v tmpdir="$tmp_dir" -v src="$file" -f "$awk_script" "$file"
-	done
+	rg --files -g '*.nix' . | xargs -d '\n' -P4 -I{} awk -v tmpdir="$tmp_dir" -v src="{}" -f "$awk_script" "{}"
 )
 
 if ((${#extracted_scripts[@]} == 0)); then
