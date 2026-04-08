@@ -8,7 +8,7 @@ set -euo pipefail
 
 # Configuration
 API_URL="https://api.z.ai/api/coding/paas/v4"
-DEFAULT_MODEL="glm-4.5-air"
+DEFAULT_MODEL="glm-5-turbo"
 DEEP_MODEL="glm-5.1"
 API_KEY_FILE="/run/secrets/zai_api_key"
 

@@ -419,7 +419,7 @@ Routes through Z.AI's Anthropic-compatible proxy (`https://api.z.ai/api/anthropi
 | `ANTHROPIC_AUTH_TOKEN`           | Z.AI API key (from sops)          |
 | `ANTHROPIC_BASE_URL`             | `https://api.z.ai/api/anthropic`  |
 | `API_TIMEOUT_MS`                 | `3000000` (50 min, per Z.AI docs) |
-| `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `glm-4.5-air`                     |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `glm-5-turbo`                     |
 | `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5.1`                         |
 | `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5.1`                         |
 
@@ -432,7 +432,7 @@ Also passes `--dangerously-skip-permissions` for autonomous operation.
 | glm-5.1       | 744B (40B active MoE) | 200K    | Flagship reasoning          |
 | glm-4.7       | —                     | —       | Previous gen, stable coding |
 | glm-4.7-flash | —                     | —       | Fast/cheap variant          |
-| glm-4.5-air   | —                     | —       | Lightest, haiku tier        |
+| glm-5-turbo   | —                     | —       | Fast reasoning, haiku tier  |
 | glm-4.6v      | —                     | —       | Vision variant              |
 
 Provider prefixes: `zai-coding-plan/` (premium), `zai/` (standard), `opencode/` (free tier).
