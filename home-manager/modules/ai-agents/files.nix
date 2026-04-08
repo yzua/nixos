@@ -12,8 +12,8 @@ let
 
   inherit (builtins) toJSON;
 
-  fileTemplates = import ./_file-templates.nix;
-  settingsBuilders = import ./_settings-builders.nix { inherit config lib pkgs; };
+  fileTemplates = import ./helpers/_file-templates.nix;
+  settingsBuilders = import ./helpers/_settings-builders.nix { inherit config lib pkgs; };
   inherit (settingsBuilders)
     opencodeSettings
     geminiSettings
@@ -25,7 +25,7 @@ let
     zenOpencodeSettings
     ;
 
-  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+  opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   opencodeProfileNames = opencodeProfiles.names;
 
   opencodeSettingsByProfile = {

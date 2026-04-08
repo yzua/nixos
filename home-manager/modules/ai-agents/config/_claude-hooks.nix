@@ -1,6 +1,8 @@
 # Lifecycle hook configuration for Claude Code.
 
 let
+  formatterRegistry = import ./_formatters.nix;
+
   mkFormatterHook =
     {
       tool,
@@ -172,71 +174,7 @@ in
   ];
 
   # --- PostToolUse Hooks (Auto-Format + Analysis) ---
-  PostToolUse = [
-    (mkFormatterHook {
-      tool = "biome";
-      extensions = [
-        "js"
-        "jsx"
-        "ts"
-        "tsx"
-        "mjs"
-        "cjs"
-        "json"
-        "jsonc"
-        "css"
-        "scss"
-        "less"
-        "graphql"
-        "gql"
-      ];
-      command = "biome check --write";
-    })
-    (mkFormatterHook {
-      tool = "rustfmt";
-      extensions = [ "rs" ];
-      command = "rustfmt";
-    })
-    (mkFormatterHook {
-      tool = "zig";
-      extensions = [
-        "zig"
-        "zon"
-      ];
-      command = "zig fmt";
-    })
-    (mkFormatterHook {
-      tool = "gofmt";
-      extensions = [ "go" ];
-      command = "gofmt -w";
-    })
-    (mkFormatterHook {
-      tool = "nixfmt";
-      extensions = [ "nix" ];
-      command = "nixfmt";
-    })
-    (mkFormatterHook {
-      tool = "ruff";
-      extensions = [
-        "py"
-        "pyi"
-      ];
-      command = "ruff format";
-    })
-    (mkFormatterHook {
-      tool = "prettier";
-      extensions = [
-        "md"
-        "mdx"
-        "yaml"
-        "yml"
-        "html"
-        "vue"
-        "svelte"
-        "astro"
-      ];
-      command = "prettier --write";
-    })
+  PostToolUse = formatterRegistry.mkClaudeFormatterHooks mkFormatterHook ++ [
     {
       matcher = "Bash";
       hooks = [

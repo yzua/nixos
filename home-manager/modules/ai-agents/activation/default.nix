@@ -12,75 +12,18 @@ let
 
   inherit (builtins) toJSON;
 
-  mcpTransforms = import ./_mcp-transforms.nix { inherit config lib pkgs; };
+  mcpTransforms = import ../helpers/_mcp-transforms.nix { inherit config lib pkgs; };
   inherit (mcpTransforms) sharedMcpServers claudeMcpServers;
 
-  settingsBuilders = import ./_settings-builders.nix { inherit config lib pkgs; };
+  settingsBuilders = import ../helpers/_settings-builders.nix { inherit config lib pkgs; };
   inherit (settingsBuilders) claudeSettings;
 
-  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+  opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
   opencodeConfigPaths = map opencodeProfiles.configPath opencodeProfiles.names;
   opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
-  opencodeZaiFilter = ''
-    (if .mcp["zai-mcp-server"] != null then .mcp["zai-mcp-server"].environment.Z_AI_API_KEY = $key else . end) |
-    .mcp["web-search-prime"] = {
-      type: "remote",
-      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-      headers: { Authorization: ("Bearer " + $key) }
-    } |
-    .mcp["web-reader"] = {
-      type: "remote",
-      url: "https://api.z.ai/api/mcp/web_reader/mcp",
-      headers: { Authorization: ("Bearer " + $key) }
-    } |
-    .mcp["zread"] = {
-      type: "remote",
-      url: "https://api.z.ai/api/mcp/zread/mcp",
-      headers: { Authorization: ("Bearer " + $key) }
-    }
-  '';
-  claudeZaiFilter = ''
-    (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
-    .mcpServers["web-search-prime"] = {
-      type: "http",
-      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-      headers: { Authorization: ("Bearer " + $key) }
-    } |
-    .mcpServers["web-reader"] = {
-      type: "http",
-      url: "https://api.z.ai/api/mcp/web_reader/mcp",
-      headers: { Authorization: ("Bearer " + $key) }
-    } |
-    .mcpServers["zread"] = {
-      type: "http",
-      url: "https://api.z.ai/api/mcp/zread/mcp",
-      headers: { Authorization: ("Bearer " + $key) }
-    }
-  '';
-  geminiZaiFilter = ''
-    (if .mcpServers["zai-mcp-server"] != null then .mcpServers["zai-mcp-server"].env.Z_AI_API_KEY = $key else . end) |
-    .mcpServers["web-search-prime"] = {
-      command: "echo",
-      args: [],
-      url: "https://api.z.ai/api/mcp/web_search_prime/mcp",
-      headers: { Authorization: ("Bearer " + $key) },
-      type: "http"
-    } |
-    .mcpServers["web-reader"] = {
-      command: "echo",
-      args: [],
-      url: "https://api.z.ai/api/mcp/web_reader/mcp",
-      headers: { Authorization: ("Bearer " + $key) },
-      type: "http"
-    } |
-    .mcpServers["zread"] = {
-      command: "echo",
-      args: [],
-      url: "https://api.z.ai/api/mcp/zread/mcp",
-      headers: { Authorization: ("Bearer " + $key) },
-      type: "http"
-    }
-  '';
+
+  zaiFilters = import ../helpers/_zai-filters.nix { inherit lib; };
+  inherit (zaiFilters) opencodeZaiFilter claudeZaiFilter geminiZaiFilter;
   githubPlaceholderFilter = ''
     walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
   '';
@@ -89,7 +32,8 @@ let
   '';
 
   # Import helper modules
-  secretPatching = import ./_secret-patching.nix {
+  # modules-check: manual-helper ./secrets.nix ./codex-setup.nix ./claude-setup.nix ./plugins.nix
+  secretPatching = import ./secrets.nix {
     inherit
       cfg
       pkgs
@@ -102,7 +46,7 @@ let
       openrouterPlaceholderFilter
       ;
   };
-  codexConfig = import ./_codex-config.nix {
+  codexConfig = import ./codex-setup.nix {
     inherit
       cfg
       pkgs
@@ -110,7 +54,7 @@ let
       sharedMcpServers
       ;
   };
-  claudeConfig = import ./_claude-config.nix {
+  claudeConfig = import ./claude-setup.nix {
     inherit
       cfg
       pkgs
@@ -120,7 +64,7 @@ let
       claudeMcpServers
       ;
   };
-  pluginInstalls = import ./_plugin-installs.nix {
+  pluginInstalls = import ./plugins.nix {
     inherit
       cfg
       config
@@ -135,6 +79,16 @@ in
       # === Secret Patching ===
       # Runs after all config writers so keys can be injected last.
       patchAiAgentSecrets = secretPatching;
+
+      # Remove nested example assets that some skill packs ship under ~/.agents/skills.
+      # Codex scans for SKILL.md recursively and warns on these non-skill sample files.
+      sanitizeInstalledSkills = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        sample_skill="$HOME/.agents/skills/engineering-advanced-skills/skill-tester/assets/sample-skill/SKILL.md"
+        if [[ -f "$sample_skill" ]]; then
+          rm -f "$sample_skill"
+          echo "✓ Removed nested sample SKILL.md from installed skills"
+        fi
+      '';
 
       # === Skill Installation ===
       installAgentSkills =

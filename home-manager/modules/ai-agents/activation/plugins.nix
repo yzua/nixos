@@ -8,7 +8,7 @@
 }:
 
 let
-  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
+  opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
 
   mkGitClone =
     {

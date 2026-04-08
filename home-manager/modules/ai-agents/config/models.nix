@@ -145,6 +145,7 @@ in
         description = "Long-running command, build, and polling monitor with concise status updates."
 
         [features]
+        apps = false
         multi_agent = true
         child_agents_md = true
 
@@ -290,13 +291,7 @@ in
                     "FILE_PATH=$(echo \"$INPUT\" | jq -r '.arguments.path // \"\"');"
                     "if [ -n \"$FILE_PATH\" ]; then"
                     "case \"$FILE_PATH\" in"
-                    "*.nix) command -v nixfmt >/dev/null 2>&1 && nixfmt \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.json|*.jsonc|*.css|*.scss|*.less|*.graphql|*.gql) command -v biome >/dev/null 2>&1 && biome check --write \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.rs) command -v rustfmt >/dev/null 2>&1 && rustfmt \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.go) command -v gofmt >/dev/null 2>&1 && gofmt -w \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.py|*.pyi) command -v ruff >/dev/null 2>&1 && ruff format \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.zig|*.zon) command -v zig >/dev/null 2>&1 && zig fmt \"$FILE_PATH\" 2>/dev/null ;;"
-                    "*.md|*.mdx|*.yaml|*.yml|*.html|*.vue|*.svelte|*.astro) command -v prettier >/dev/null 2>&1 && prettier --write \"$FILE_PATH\" 2>/dev/null ;;"
+                    (import ./_formatters.nix).geminiCaseBranches
                     "esac;"
                     "fi;"
                     "echo \"$INPUT\""

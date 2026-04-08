@@ -7,7 +7,7 @@
 }:
 
 let
-  opt = import ./_option-helpers.nix { inherit lib; };
+  opt = import ./helpers/_option-helpers.nix { inherit lib; };
   inherit (opt)
     mkTypedOption
     mkTypedOptionWith
