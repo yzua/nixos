@@ -15,7 +15,7 @@ terminal/
 │   ├── default.nix  # Import hub
 │   ├── config.nix   # Keybinds, UI, behavior
 │   ├── layouts.nix  # Layouts (default, dev, ai, monitoring)
-│   └── plugins.nix  # WASM plugins (zjstatus, autolock, monocle, room, harpoon)
+│   └── plugins.nix  # WASM plugins (zjstatus, autolock, monocle, room, harpoon, forgot, multitask)
 ├── direnv.nix       # Per-directory environments (nix-direnv)
 ├── scripts.nix      # Custom script wrappers (currently `nvidia-fans`)
 ├── shell.nix        # Nix shell integration and dev tools

@@ -8,7 +8,7 @@
 
 | Template       | Directory       | Key Tools                                                                                                                      |
 | -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `python-venv`  | `python-venv/`  | venv, ruff, black, isort, pytest, jupyter, django, fastapi, numpy, pandas, scipy, scikit-learn, boto3, ansible, sphinx, mkdocs |
+| `python-venv`  | `python-venv/`  | venv, ruff, black, isort, flake8, mypy, bandit, safety, vulture, pytest, coverage, jupyter, django, flask, fastapi, numpy, pandas, matplotlib, scipy, scikit-learn, sqlalchemy, boto3, docker, ansible, sphinx, mkdocs — see README for full list |
 | `rust-stable`  | `rust-stable/`  | cargo, rustc, clippy, rustfmt, pkg-config, cargo-audit                                                                         |
 | `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy, rustfmt, pkg-config                                                          |
 | `nodejs`       | `nodejs/`       | node, pnpm, yarn, typescript, typescript-language-server, prettier, eslint                                                     |
@@ -66,13 +66,14 @@ All dev-shell flakes follow the same structure:
 
 ## Validation
 
+Dev shells are independent flakes — validate each with:
+
 ```bash
-just modules
-just pkgs
-just lint
-just format
-just check
+cd dev-shells/<lang> && nix flake check    # check flake evaluates
+cd dev-shells/<lang> && nix develop         # test shell enters
 ```
+
+Main-flake validation (`just modules`, `just pkgs`, etc.) does NOT apply here.
 
 ---
 

@@ -115,7 +115,7 @@ Set `hostProfile` first, then override as needed:
 | `vnc.enable`                 | VNC remote access                               |
 | `secureBoot.enable`          | Secure Boot preparation with sbctl              |
 | `webRe.enable`               | Web reverse engineering and security tools      |
-| android                      | ADB, Fastboot, Android Studio (always-on)       |
+| android (unconditional)      | ADB, Fastboot, Android Studio (no toggle)       |
 
 ---
 

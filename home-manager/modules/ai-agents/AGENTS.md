@@ -16,14 +16,66 @@ The system follows a strict unidirectional flow:
 
 1. **Options** (`options.nix`): Defines the `programs.aiAgents.*` namespace.
 2. **Config Hub** (`config/`): Domain-specific values for models, prompts, and permissions.
-3. **Settings Builders** (`_settings-builders.nix`): Implements **Profile-Driven Polymorphism**.
-4. **MCP Transforms** (`_mcp-transforms.nix`): **Unified MCP Abstraction** converts shared server definitions into agent-specific schemas (Claude stdio vs OpenCode remote vs Gemini HTTP).
-5. **File Generation** (`files.nix`): Declares configuration files in XDG paths.
-6. **Activation Logic** (`activation.nix`): Handles late-stage secret injection, best-effort skill management, and state caching.
+3. **Helpers** (`helpers/`): Shared logic imported by config, activation, and files modules.
+4. **File Generation** (`files.nix`): Declares configuration files in XDG paths.
+5. **Activation Logic** (`activation/`): Handles late-stage secret injection, config setup, best-effort skill management, and state caching.
+6. **Services** (`services.nix`): Packages, zsh aliases, and systemd user services/timers.
+7. **Log Analyzer** (`log-analyzer.nix`): AI agent log analysis and dashboard.
 
 ### Profile-Driven Polymorphism
 
-Profiles switch the primary model across all OpenCode config directories. Each profile (glm, gemini, gpt, openrouter, sonnet, zen) re-maps the model field via `_settings-builders.nix`, allowing instant provider migration with zero configuration redundancy.
+Profiles switch the primary model across all OpenCode config directories. Each profile re-maps the model field via `helpers/_settings-builders.nix`, allowing instant provider migration with zero configuration redundancy.
+
+Seven OpenCode profiles are defined in `helpers/_opencode-profiles.nix`:
+
+| Profile Directory    | Provider/Model                       |
+| -------------------- | ------------------------------------ |
+| `opencode`           | Default (from `programs.aiAgents.opencode.model`) |
+| `opencode-glm`       | Z.AI GLM-5.1                         |
+| `opencode-gemini`    | Google Gemini 3.1 Pro                |
+| `opencode-gpt`       | OpenAI GPT-5.4                       |
+| `opencode-openrouter`| OpenRouter Hunter Alpha              |
+| `opencode-sonnet`    | Anthropic Claude Sonnet 4.6          |
+| `opencode-zen`       | MiniMax M2.5 Free                    |
+
+---
+
+## DIRECTORY STRUCTURE
+
+```
+ai-agents/
+├── default.nix              # Import hub (options, activation, files, services, log-analyzer, config)
+├── options.nix              # All programs.aiAgents option definitions
+├── files.nix                # home.file + xdg.configFile declarations
+├── services.nix             # Packages, zsh aliases, systemd user services/timers
+├── log-analyzer.nix         # AI agent log analysis and dashboard
+├── helpers/                 # Shared logic (not modules, imported by others)
+│   ├── _settings-builders.nix   # Per-agent settings + profile variant overrides
+│   ├── _mcp-transforms.nix      # Unified MCP abstraction (shared → agent-specific schemas)
+│   ├── _option-helpers.nix      # Shared option constructors
+│   ├── _opencode-profiles.nix   # OpenCode profile names and config paths
+│   ├── _aliases.nix             # Zsh alias generation for agent launchers/workflows
+│   ├── _file-templates.nix      # Config file templates
+│   ├── _workflow-prompts.nix    # Workflow prompt definitions
+│   ├── _zai-services.nix        # Z.AI MCP service registry
+│   └── _zai-filters.nix         # Z.AI MCP jq filter generation
+├── activation/              # Home Manager activation scripts
+│   ├── default.nix          # Aggregation: wires all activation steps
+│   ├── secrets.nix          # Secret patching (placeholder → real key injection)
+│   ├── claude-setup.nix     # Claude Code config file writes
+│   ├── codex-setup.nix      # Codex CLI config file writes
+│   └── plugins.nix          # Plugin/skill install scripts (impeccable, agency-agents)
+└── config/                  # Split configuration values
+    ├── default.nix          # Import hub
+    ├── instructions.nix     # Global instructions (imports _skills.nix)
+    ├── _skills.nix          # Skill installations and omissions
+    ├── _claude-hooks.nix    # Claude Code lifecycle hooks
+    ├── _claude-permission-rules.nix # Claude allow/deny rules
+    ├── _formatters.nix      # Formatter registry for auto-formatting hooks
+    ├── mcp-servers.nix      # MCP server definitions + logging
+    ├── permissions.nix      # Claude permissions, hooks, settings
+    └── models.nix           # Model/provider registries (OpenCode, Codex, Gemini)
+```
 
 ---
 
@@ -31,9 +83,9 @@ Profiles switch the primary model across all OpenCode config directories. Each p
 
 Secure secret injection is handled during the Home Manager activation phase to prevent sensitive keys from entering the Nix store.
 
-1. **Placeholders**: Config files are written with unique placeholders (e.g., `__GITHUB_TOKEN_PLACEHOLDER__`).
+1. **Placeholders**: Config files are written with unique placeholders (e.g., `__GITHUB_TOKEN_PLACEHOLDER__`, `__OPENROUTER_API_KEY_PLACEHOLDER__`).
 2. **DAG Patching**: The `patchAiAgentSecrets` script runs as a DAG entry after `writeBoundary`.
-3. **Injection**: It uses `jq` for JSON files and `sed` for TOML/Markdown, reading keys directly from `/run/secrets/` or `gh` CLI and overwriting the placeholders in-place.
+3. **Injection**: It uses `jq` with walk filters for JSON files, reading keys directly from `/run/secrets/` or `gh` CLI and overwriting the placeholders in-place.
 
 ---
 
@@ -41,14 +93,22 @@ Secure secret injection is handled during the Home Manager activation phase to p
 
 ### Unified MCP Abstraction
 
-Never define MCP servers per-agent. Define them once in `programs.aiAgents.mcpServers`. The `_mcp-transforms.nix` logic automatically generates the correct transport configuration for every supported agent.
+Never define MCP servers per-agent. Define them once in `programs.aiAgents.mcpServers`. The `helpers/_mcp-transforms.nix` logic automatically generates the correct transport configuration for every supported agent.
+
+### Helper File Rules
+
+All `helpers/_*.nix` files are plain Nix expressions (not modules). They are imported with `import ../helpers/<name>.nix { ... }` by the modules that need them. They are never listed in import hubs.
+
+### Activation File Rules
+
+The `activation/` directory is a submodule with its own `default.nix`. Individual files (`secrets.nix`, `claude-setup.nix`, `codex-setup.nix`, `plugins.nix`) are helpers imported by `activation/default.nix` — not listed in the top-level `ai-agents/default.nix` import hub.
 
 ### Complexity Hotspots (WARNING)
 
 This module contains significant **embedded Bash logic** that bypasses standard Nix abstraction for performance and compatibility:
 
 - **`config/_claude-hooks.nix`**: Heavy use of `jq` and `grep` within Claude Code lifecycle hooks for auto-formatting and destructive command detection.
-- **`activation.nix`**: Complex sequential skill installation/removal logic with state-caching to prevent redundant network calls; skill sync failures are logged as warnings so Home Manager activation can continue.
+- **`activation/default.nix`**: Complex sequential skill installation/removal logic with state-caching to prevent redundant network calls; skill sync failures are logged as warnings so Home Manager activation can continue. Also handles mirroring Claude skills into `~/.codex/skills` and disabling the shared `~/.agents/skills` tree to prevent OpenCode duplicate-skill spam.
 
 ### Validation Pipeline
 

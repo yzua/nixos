@@ -10,7 +10,7 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | File          | Configures                            | Key Details                                                                                    |
 | ------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `default.nix` | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 7 local modules |
-| `main.nix`    | Workspaces, autostart, environment    | 5 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC                                  |
+| `main.nix`    | Workspaces, autostart, environment    | 6 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC                                  |
 | `binds.nix`   | Keybindings                           | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/`                        |
 | `input.nix`   | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp`                               |
 | `layout.nix`  | Gaps, columns, borders                | 3px gaps, 3 preset widths (1/3, 1/2, 2/3), focus-ring disabled (Stylix border instead)         |
@@ -27,7 +27,7 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 
 | Key          | Name    | Typical Apps                 |
 | ------------ | ------- | ---------------------------- |
-| `01-browser` | browser | Brave                        |
+| `01-browser` | browser | LibreWolf (personal), Brave  |
 | `02-code`    | editor  | configured editor, terminals |
 | `03-social`  | social  | Telegram, Vesktop            |
 | `04-media`   | media   | YouTube Music, FreeTube      |
