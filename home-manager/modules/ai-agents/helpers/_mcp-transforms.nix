@@ -1,9 +1,8 @@
-# MCP server transformation functions and agent log wrapper.
+# MCP server transformation functions.
 
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -71,12 +70,6 @@ let
       // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
   };
 
-  agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
-    AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
-      AI_AGENT_NOTIFY_ON_ERROR=${if cfg.logging.notifyOnError then "true" else "false"} \
-      exec ${config.home.homeDirectory}/System/scripts/ai/agent-log-wrapper.sh "$@"
-  '';
-
 in
 {
   inherit
@@ -84,6 +77,5 @@ in
     claudeMcpServers
     opencodeMcpServers
     geminiMcpServers
-    agentLogWrapper
     ;
 }

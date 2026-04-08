@@ -9,8 +9,12 @@
 
 let
   cfg = config.programs.aiAgents;
-  mcpTransforms = import ./helpers/_mcp-transforms.nix { inherit config lib pkgs; };
-  inherit (mcpTransforms) agentLogWrapper;
+
+  agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
+    AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
+      AI_AGENT_NOTIFY_ON_ERROR=${if cfg.logging.notifyOnError then "true" else "false"} \
+      exec ${config.home.homeDirectory}/System/scripts/ai/agent-log-wrapper.sh "$@"
+  '';
 
   aliasLib = import ./helpers/_aliases.nix { inherit config lib pkgs; };
   inherit (aliasLib) aiAliases aiAgentLauncher aiAgentInventory;

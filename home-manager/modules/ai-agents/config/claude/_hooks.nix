@@ -19,7 +19,7 @@ let
             file_path=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
             if [ -n "$file_path" ] && command -v ${tool} >/dev/null 2>&1; then
               case "$file_path" in
-                ${builtins.concatStringsSep "|" (map (e: "*.${e}") extensions)} ;;
+                ${builtins.concatStringsSep "|" (map (e: "*.${e}") extensions)}) ;;
                 *) echo "$INPUT"; exit 0 ;;
               esac
               ${command} "$file_path" 2>&1 | head -3 >&2

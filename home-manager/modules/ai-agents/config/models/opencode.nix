@@ -43,25 +43,7 @@ let
     "git ls-files*"
   ];
   yoloPermission = "allow";
-  planningPermission = {
-    read = "allow";
-    edit = "deny";
-    glob = "allow";
-    grep = "allow";
-    list = "allow";
-    bash = readOnlyBashPatterns;
-    task = "allow";
-    todowrite = "allow";
-    question = "allow";
-    webfetch = "allow";
-    websearch = "allow";
-    codesearch = "allow";
-    lsp = "allow";
-    external_directory = "deny";
-    doom_loop = "deny";
-    skill = "allow";
-  };
-  reviewPermission = {
+  readOnlyPermission = {
     read = "allow";
     edit = "deny";
     glob = "allow";
@@ -130,7 +112,7 @@ in
         description = "Primary planning agent for specs, decomposition, and research-backed execution plans.";
         mode = "primary";
         steps = 8;
-        permission = planningPermission;
+        permission = readOnlyPermission;
         prompt = ''
           Produce implementation plans that are decision-complete before execution starts.
           Clarify goal, constraints, validation path, interfaces, and rollout risks.
@@ -155,7 +137,7 @@ in
         mode = "subagent";
         color = "warning";
         steps = 12;
-        permission = reviewPermission;
+        permission = readOnlyPermission;
         prompt = ''
           Review code and configuration changes for correctness first.
           Prioritize concrete bugs, behavioral regressions, security issues, and missing validation.
