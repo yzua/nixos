@@ -4,7 +4,7 @@
   imports = [
     ./instructions.nix # Global instructions and skills
     ./mcp-servers.nix # MCP server definitions and logging
-    ./permissions.nix # Claude permissions, hooks, and settings
-    ./models.nix # Model/provider registries (OpenCode, Codex, Gemini)
+    ./models # Model/provider registries (OpenCode, Codex, Gemini)
+    ./claude # Claude Code permissions, hooks, and settings
   ];
 }

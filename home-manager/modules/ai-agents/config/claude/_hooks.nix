@@ -1,7 +1,7 @@
 # Lifecycle hook configuration for Claude Code.
 
 let
-  formatterRegistry = import ./_formatters.nix;
+  formatterRegistry = import ../_formatters.nix;
 
   mkFormatterHook =
     {

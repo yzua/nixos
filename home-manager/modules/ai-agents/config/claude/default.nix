@@ -1,10 +1,10 @@
-# Claude Code permissions, lifecycle hooks, and extra settings.
+# Claude Code configuration: permissions, lifecycle hooks, and extra settings.
 
 _:
 
 let
-  claudePermissionRules = import ./_claude-permission-rules.nix;
-  claudeHooks = import ./_claude-hooks.nix;
+  claudePermissionRules = import ./_permission-rules.nix;
+  claudeHooks = import ./_hooks.nix;
 in
 {
   programs.aiAgents = {
