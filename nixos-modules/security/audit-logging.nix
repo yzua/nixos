@@ -1,6 +1,7 @@
 # Fail2ban intrusion prevention and audit analysis tools.
 
 {
+  pkgsStable,
   config,
   lib,
   ...
@@ -12,6 +13,8 @@
   };
 
   config = lib.mkIf config.mySystem.auditLogging.enable {
+    environment.systemPackages = [ pkgsStable.audit ];
+
     services.fail2ban = {
       enable = true;
       maxretry = 5;

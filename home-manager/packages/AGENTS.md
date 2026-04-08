@@ -16,6 +16,7 @@ Package declarations for `home.packages`. This directory is chunked by domain an
 - `applications.nix` — Desktop apps + GTK/theme package extras
 - `cli.nix` — CLI toolchain
 - `development.nix` — Dev tooling and databases
+- `lsp-servers.nix` — Language servers for editors (shared across languages)
 - `gnome.nix` — Minimal GNOME utilities for Niri workflow
 - `multimedia.nix` — Media tools
 - `networking.nix` — Network analysis and diagnostics

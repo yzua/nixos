@@ -1,6 +1,7 @@
 # Weekly AIDE file integrity monitoring.
 
 {
+  config,
   lib,
   pkgs,
   user,
@@ -61,17 +62,25 @@ let
   '';
 in
 {
-  systemd = {
-    timers.aide-check = mkPersistentTimer {
-      description = "Weekly AIDE file integrity check";
-      onCalendar = "weekly";
-      randomizedDelaySec = "2h";
-      unit = "aide-check.service";
-    };
+  options.mySystem.aide = {
+    enable = lib.mkEnableOption "AIDE file integrity monitoring";
+  };
 
-    services.aide-check = mkOneshotService {
-      description = "Run AIDE file integrity check";
-      execStart = aideCheckScript;
+  config = lib.mkIf config.mySystem.aide.enable {
+    environment.systemPackages = [ pkgs.aide ];
+
+    systemd = {
+      timers.aide-check = mkPersistentTimer {
+        description = "Weekly AIDE file integrity check";
+        onCalendar = "weekly";
+        randomizedDelaySec = "2h";
+        unit = "aide-check.service";
+      };
+
+      services.aide-check = mkOneshotService {
+        description = "Run AIDE file integrity check";
+        execStart = aideCheckScript;
+      };
     };
   };
 }

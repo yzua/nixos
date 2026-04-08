@@ -20,6 +20,8 @@
     # inotifywait watches directories; mat2/exiftool do the actual stripping
     environment.systemPackages = [
       pkgsStable.inotify-tools
+      pkgsStable.mat2
+      pkgsStable.exiftool
     ];
 
     systemd = {

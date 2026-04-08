@@ -7,6 +7,7 @@
     ./custom/beads.nix # Beads git-backed issue tracker (bd CLI)
     ./custom/prayer.nix # Custom prayer times indicator
     ./development.nix # Dev tools, databases, reverse engineering
+    ./lsp-servers.nix # Language servers for editors
     ./gnome.nix # Minimal GNOME utilities for Niri
     ./multimedia.nix # Media playback and processing
     ./networking.nix # Network analysis, monitoring, security

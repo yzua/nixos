@@ -32,7 +32,7 @@ Register in `hosts/_inventory.nix`:
 Deploy:
 
 ```bash
-just all   # modules -> pkgs -> lint -> format -> check -> nixos -> home
+just all   # modules, pkgs, lint (parallel) -> format -> check -> nixos -> home
 ```
 
 ---
@@ -41,20 +41,20 @@ just all   # modules -> pkgs -> lint -> format -> check -> nixos -> home
 
 | Command                   | Description                                                                  |
 | ------------------------- | ---------------------------------------------------------------------------- |
-| `just all`                | Full pipeline: `modules -> pkgs -> lint -> format -> check -> nixos -> home` |
+| `just all`                | Full pipeline: `modules`, `pkgs`, `lint` in parallel; then `format -> check -> nixos -> home` |
 | `just home`               | Apply Home Manager (user-level, safe)                                        |
 | `just nixos`              | Apply NixOS (system-level)                                                   |
 | `just modules`            | Validate import structure                                                    |
-| `just pkgs`               | Check for duplicate packages                                                 |
+| `just pkgs`               | Check for duplicate packages and program/module ownership conflicts          |
 | `just lint`               | statix + deadnix + shellcheck + markdownlint                                 |
 | `just dead`               | deadnix only (subset of lint)                                                |
-| `just format`             | nixfmt-tree                                                                  |
+| `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                  |
 | `just check`              | `nix flake check --no-build`                                                 |
 | `just diff`               | Diff current vs previous NixOS generation                                    |
 | `just report [mode]`      | Generate system health report                                                |
 | `just report-view [type]` | View latest system report                                                    |
 | `just update`             | Update flake inputs                                                          |
-| `just clean`              | GC + optimize store                                                          |
+| `just clean`              | `nh clean` + HM generation expiry + store optimise                           |
 | `just install-hooks`      | Install repo-local pre-commit/pre-push hooks                                 |
 | `just sops-edit`          | Edit encrypted secrets                                                       |
 | `just sops-view`          | View secrets (read-only)                                                     |

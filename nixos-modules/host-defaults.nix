@@ -52,6 +52,7 @@ in
       systemReport.enable = mkDefaultTrue;
       auditLogging.enable = mkDefaultTrue; # fail2ban does NOT conflict with AppArmor (only auditd does)
       metadataScrubber.enable = mkDefaultTrue; # Auto-strip metadata from user files
+      aide.enable = mkDefaultTrue; # Weekly AIDE file integrity monitoring
       secureBoot.enable = mkDefaultTrue; # Secure Boot preparation with sbctl
       vnc.enable = mkDefaultFalse; # On-demand remote access
 

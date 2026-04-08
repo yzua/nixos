@@ -1,13 +1,13 @@
 # Desktop entries and launcher wrapper scripts for desktop applications.
 
 {
+  constants,
   pkgs,
   user,
   ...
 }:
 
 let
-  constants = import ../../../shared/constants.nix;
 
   mkDesktopEntry =
     {

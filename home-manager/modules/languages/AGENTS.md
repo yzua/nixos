@@ -13,7 +13,6 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 | `go.nix`          | Go runtime, aliases, GOPATH/GOBIN/session settings, Go tooling packages                    |
 | `javascript.nix`  | Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper, global package bootstrap       |
 | `python.nix`      | Python toolchain, uv/poetry aliases, env/session vars, managed `.pythonrc`, workspace dirs |
-| `lsp-servers.nix` | Shared language servers and markdown tooling                                               |
 | `mise.nix`        | Runtime manager configuration and shim path                                                |
 
 ---
@@ -33,7 +32,7 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 - Add a Go tool or alias: `go.nix`
 - Add JS/TS tooling or Playwright wrapper behavior: `javascript.nix`
 - Add Python tooling or REPL defaults: `python.nix`
-- Add/adjust shared LSPs: `lsp-servers.nix`
+- Add/adjust shared LSPs: `packages/lsp-servers.nix` (in the packages domain, not modules)
 - Runtime manager behavior (shims/telemetry/flags): `mise.nix`
 
 ---

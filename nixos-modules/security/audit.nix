@@ -19,6 +19,8 @@ let
 in
 
 {
+  environment.systemPackages = [ pkgsStable.lynis ];
+
   systemd = {
     timers.security-audit = mkPersistentTimer {
       description = "Weekly security audit";
