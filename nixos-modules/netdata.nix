@@ -9,7 +9,7 @@
 }:
 
 let
-  hardening = import ./helpers/_systemd-hardening.nix { inherit lib; };
+  hardening = import ./helpers/_systemd-helpers.nix { inherit lib; };
 in
 {
   options.mySystem.netdata = {

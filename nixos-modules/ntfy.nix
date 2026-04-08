@@ -10,7 +10,7 @@
 
 let
   cfg = config.mySystem.ntfy;
-  inherit (import ./helpers/_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
 
   # Config template for alertmanager-ntfy bridge.
   # Topic placeholder is replaced at runtime from sops secret.

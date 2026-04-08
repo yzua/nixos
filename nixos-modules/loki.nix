@@ -3,7 +3,7 @@
 { config, lib, ... }:
 
 let
-  inherit (import ./helpers/_systemd-hardening.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
 in
 {
   options.mySystem.loki = {
