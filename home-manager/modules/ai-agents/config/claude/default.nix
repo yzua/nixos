@@ -14,6 +14,7 @@ in
 
       env = {
         EDITOR = "nvim";
+        CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS = "1";
       };
 
       permissions = claudePermissionRules;

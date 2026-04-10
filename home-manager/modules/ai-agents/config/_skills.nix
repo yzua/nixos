@@ -1,5 +1,5 @@
 # Skill installations and omissions for all AI agents.
-# Imported by config/instructions.nix.
+# Imported by config/defaults.nix.
 
 {
   skills = [
