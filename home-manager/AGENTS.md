@@ -19,7 +19,7 @@ Top-level user configuration boundary. `home.nix` is the entrypoint and composes
 ## Where To Look
 
 - Configure an application/tool: `home-manager/modules/`
-- Add language toolchain behavior: `home-manager/modules/languages/`
+- Add language toolchain behavior: `home-manager/modules/programming-languages/`
 - Add or tune shell/CLI tooling: `home-manager/modules/terminal/`
 - Add package(s) by domain: `home-manager/packages/<domain>.nix`
 - Update user-level defaults/session vars: `home-manager/home.nix`
@@ -40,7 +40,7 @@ Top-level user configuration boundary. `home.nix` is the entrypoint and composes
 
 - Putting system-level policy or hardware decisions in Home Manager modules.
 - Defining new custom HM option namespaces outside `modules/ai-agents/`.
-- Duplicating aliases/config between `modules/languages/` and `modules/terminal/`.
+- Duplicating aliases/config between `modules/programming-languages/` and `modules/terminal/`.
 - Splitting a single package into multiple domain chunks without clear ownership.
 
 ---

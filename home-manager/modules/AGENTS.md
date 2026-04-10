@@ -95,7 +95,7 @@ modules/
 │   ├── default.nix     # Plugin declarations, treesitter, Lua config loading
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)
 │   └── plugins/        # Plugin-specific configs (wakatime)
-├── languages/          # Language tooling (Go, JS, Python, Mise)
+├── programming-languages/ # Language tooling (Go, JS, Python, Mise)
 │   ├── go.nix          # Go toolchain, env vars, and aliases
 │   ├── javascript.nix  # JS/TS tooling, LSP servers, and aliases
 │   ├── python.nix      # Python tooling, LSP servers, and aliases
