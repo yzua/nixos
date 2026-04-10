@@ -49,8 +49,6 @@ in
         allowed = [
           "context7"
           "github"
-        ];
-        excluded = [
           "chrome-devtools"
           "web-search-prime"
           "web-reader"
