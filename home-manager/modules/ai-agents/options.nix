@@ -101,6 +101,44 @@ in
       enable = mkBoolOption false "Install pbakaus/impeccable skills for Claude and OpenCode";
     };
 
+    everythingClaudeCode = {
+      enable = mkBoolOption false "Install a curated Everything Claude Code subset for Claude, Codex, and OpenCode";
+
+      claude = {
+        enable = mkBoolOption true "Install curated Everything Claude Code assets for Claude Code";
+        commands = mkStrListOption [
+          "add-language-rules"
+          "database-migration"
+          "feature-development"
+        ] "Claude command files to install from Everything Claude Code";
+        installSkillPack = mkBoolOption true "Install the upstream Everything Claude Code Claude skill pack";
+      };
+
+      codex = {
+        enable = mkBoolOption true "Install curated Everything Claude Code assets for Codex";
+        agents = mkStrListOption [
+          "docs-researcher"
+          "explorer"
+          "reviewer"
+        ] "Codex agent files to install from Everything Claude Code";
+      };
+
+      opencode = {
+        enable = mkBoolOption true "Install curated Everything Claude Code assets for OpenCode";
+        commands = mkStrListOption [
+          "plan"
+          "code-review"
+          "verify"
+          "tdd"
+        ] "OpenCode command files to install from Everything Claude Code";
+        installInstructions = mkBoolOption true "Install the upstream OpenCode instruction bundle from Everything Claude Code";
+      };
+
+      gemini = {
+        enable = mkBoolOption false "Reserved for future Gemini-specific Everything Claude Code integration";
+      };
+    };
+
     mcpServers = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule {
