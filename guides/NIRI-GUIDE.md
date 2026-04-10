@@ -390,9 +390,9 @@ These apps open floating instead of tiled:
 
 ### Mouse
 
-- **Acceleration**: Flat (no acceleration, 1:1 movement)
+- **Acceleration**: Flat (mouse/trackpoint), Adaptive (touchpad)
 - **Focus follows mouse**: Enabled (hover to focus, no scroll stealing)
-- **Warp to focus**: Mouse teleports to newly focused window
+- **Warp to focus**: Disabled (mouse stays in place on focus change)
 
 ---
 

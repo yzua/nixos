@@ -24,5 +24,5 @@ nix flake init -t "/home/yz/System/dev-shells#rust-stable"
 ## Reference
 
 1. [wiki/Flakes](https://nixos.wiki/wiki/Flakes)
-2. [Fenix](https://github.com/nix-community/fenix) - used for managing Rust toolchains (read the `makeRustPlatform` example)
+2. [Nixpkgs Rust support](https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md) - uses `pkgs.rustPlatform` from nixpkgs
 3. [rust-section of language frameworks](https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md#cargo-features-cargo-features) - optional (use it for extending the template)

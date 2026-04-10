@@ -230,47 +230,47 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Quick Reference
 
-| Alias/Function                 | What It Runs                                                       | Notes                                                                 |
-| ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `cl`                           | `claude`                                                           | Claude Code default                                                   |
-| `ocl`                          | `claude --model opus`                                              | Claude Code forced Opus model                                         |
-| `hcl`                          | `claude --model haiku`                                             | Claude Code forced Haiku model                                        |
-| `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                    |
-| `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                           |
-| `oc`                           | `opencode`                                                         | Default OpenCode                                                      |
-| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile                                           |
-| `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                          |
-| `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                             |
-| `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                          |
-| `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                        |
-| `gem`                          | `gemini`                                                           | Gemini CLI balanced default                                           |
-| `gemu`                         | `gemini --approval-mode=yolo`                                      | Gemini CLI explicit YOLO                                              |
-| `gemy`                         | `gemini --approval-mode=yolo`                                      | Same as `gemu`                                                        |
-| `gemp`                         | `gemini --approval-mode=plan`                                      | Gemini CLI explicit plan mode                                         |
-| `gemw`                         | `gemini --worktree`                                                | Gemini CLI in isolated git worktree                                   |
-| `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                           |
-| `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                    |
-| `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                 |
-| `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                   |
-| `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                             |
-| `cxu`                          | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex YOLO (unsafe explicit)                                          |
-| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                              |
-| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                 |
-| `hocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT high reasoning variant                                   |
-| `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                             |
-| `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix |
-| `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries          |
-| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt          |
-| `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                |
-| `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`          |
-| `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`       |
-| `opencode_gpt` (`ocgpt`)       | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`          |
-| `opencode_sonnet` (`ocs`)      | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`       |
-| `opencode_zen` (`oczen`)       | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`          |
-| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                   | Function: loads OpenRouter key from sops, sets config dir             |
-| `occm`                         | `opencode --prompt '<review/split/sign prompt>'`                   | Review current git changes and commit logically with `git commit -S`  |
-| `ocbp`                         | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas |
-| `cprf`                         | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`)    |
+| Alias/Function                 | What It Runs                                                       | Notes                                                                     |
+| ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `cl`                           | `claude`                                                           | Claude Code default                                                       |
+| `ocl`                          | `claude --model opus`                                              | Claude Code forced Opus model                                             |
+| `hcl`                          | `claude --model haiku`                                             | Claude Code forced Haiku model                                            |
+| `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                        |
+| `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                               |
+| `oc`                           | `opencode`                                                         | Default OpenCode                                                          |
+| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile                                               |
+| `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                              |
+| `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                 |
+| `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                              |
+| `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                            |
+| `gem`                          | `gemini`                                                           | Gemini CLI balanced default                                               |
+| `gemu`                         | `gemini --approval-mode=yolo`                                      | Gemini CLI explicit YOLO                                                  |
+| `gemy`                         | `gemini --approval-mode=yolo`                                      | Same as `gemu`                                                            |
+| `gemp`                         | `gemini --approval-mode=plan`                                      | Gemini CLI explicit plan mode                                             |
+| `gemw`                         | `gemini --worktree`                                                | Gemini CLI in isolated git worktree                                       |
+| `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                               |
+| `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                        |
+| `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                     |
+| `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                       |
+| `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                 |
+| `cxu`                          | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex YOLO (unsafe explicit)                                              |
+| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                  |
+| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                     |
+| `hocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT high reasoning variant                                       |
+| `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                 |
+| `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix     |
+| `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries              |
+| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt              |
+| `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                    |
+| `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`              |
+| `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`           |
+| `opencode_gpt` (`ocgpt`)       | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`              |
+| `opencode_sonnet` (`ocs`)      | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`           |
+| `opencode_zen` (`oczen`)       | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`              |
+| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                   | Function: loads OpenRouter key from sops, sets config dir                 |
+| `occm`                         | `opencode --prompt '<commit-split prompt>'`                        | Split-stage current git changes into logical commits with `git commit -S` |
+| `ocbp`                         | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas     |
+| `cprf`                         | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`)        |
 
 ### Aliases vs Functions
 
@@ -363,18 +363,15 @@ ai-agents/
 
 ### Claude Code
 
-| Setting            | Value            | Why                                                     |
-| ------------------ | ---------------- | ------------------------------------------------------- |
-| Model              | `opus`           | Best quality for primary coding                         |
-| Extended thinking  | Always on        | Better reasoning by default                             |
-| Auto memory        | Enabled          | Preserve useful project learnings across sessions       |
-| Tool search        | `auto:5`         | Auto-search when >5 tools match (faster with many MCPs) |
-| Git instructions   | Disabled         | Avoid duplicate git workflow guidance from Anthropic    |
-| Agent team display | `in-process`     | Safer default than forcing tmux-specific pane behavior  |
-| Auto-updates       | `latest` channel | Fastest release track                                   |
-| Cleanup            | 14 days          | Auto-delete old sessions                                |
-| Attribution        | Disabled         | No auto-attribution in commits/PRs                      |
-| Turn duration      | Shown            | "Cooked for Xm Ys" feedback                             |
+| Setting           | Value            | Why                                                  |
+| ----------------- | ---------------- | ---------------------------------------------------- |
+| Model             | `opus`           | Best quality for primary coding                      |
+| Extended thinking | Always on        | Better reasoning by default                          |
+| Auto memory       | Enabled          | Preserve useful project learnings across sessions    |
+| Git instructions  | Disabled         | Avoid duplicate git workflow guidance from Anthropic |
+| Auto-updates      | `latest` channel | Fastest release track                                |
+| Cleanup           | 14 days          | Auto-delete old sessions                             |
+| Attribution       | Disabled         | No auto-attribution in commits/PRs                   |
 
 Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`, `docker`, etc. Deny: `rm -rf /`, `rm -rf ~`, disk operations (`dd`, `mkfs`), `.env` files, `./secrets/`, SSH keys.
 
@@ -417,7 +414,7 @@ The repo now models these through first-class OpenCode options in `programs.aiAg
 | Default approval mode       | `auto_edit`                                       | Balanced default for coding without full YOLO              |
 | Theme                       | `Gruvbox`                                         | Matches system theme                                       |
 | Vim mode                    | Enabled                                           | Consistent with Neovim workflow                            |
-| Auto-update                 | Disabled                                          | Avoid in-session npm auto-update prompts and churn         |
+| Auto-update                 | Enabled                                           | Auto-update via npm; notifications enabled                 |
 | Session retention           | 30 days                                           | Auto-cleanup old sessions                                  |
 | Checkpointing               | Disabled                                          | Disabled in config due upstream PATH/env bug               |
 | Privacy/telemetry           | Disabled                                          | Privacy-conscious                                          |
@@ -449,7 +446,7 @@ Generated Gemini local assets:
 Operational notes:
 
 - Shared `~/.agents/skills` is moved aside by Home Manager activation so Gemini does not discover conflicting generic skills such as `init` or `resume`.
-- Gemini auto-update is disabled in settings to prevent the interactive npm upgrade banner during normal sessions.
+- Gemini auto-update is enabled in settings (`enableAutoUpdate = true`).
 
 ### Codex
 

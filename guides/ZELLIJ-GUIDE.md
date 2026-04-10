@@ -25,17 +25,17 @@ Home Manager enables Zellij itself, but `programs.zellij.enableZshIntegration` i
 
 Zellij is modal, like Vim. The current mode is shown in the bottom-left of the status bar (colored label). Most of your time is spent in **Normal** mode.
 
-| Mode        | Color  | How to Enter                | What It Does                           |
-| ----------- | ------ | --------------------------- | -------------------------------------- |
-| **Normal**  | Gray   | `Esc` from any mode         | Default. All Alt shortcuts work here   |
-| **Locked**  | Yellow | `Ctrl g`                    | Passes all keys to the running program |
-| **Scroll**  | Green  | `Ctrl s`                    | Navigate scrollback with Vim keys      |
-| **Search**  | Purple | `/` or `s` from Scroll mode | Search through scrollback              |
-| **Session** | Red    | `Ctrl o`                    | Session management (detach/quit)       |
-| **Resize**  | Orange | (default bindings)          | Resize panes                           |
-| **Pane**    | Green  | (default bindings)          | Pane management                        |
-| **Tab**     | Blue   | (default bindings)          | Tab management                         |
-| **Move**    | Gold   | (default bindings)          | Move panes around                      |
+| Mode        | Color        | How to Enter                | What It Does                           |
+| ----------- | ------------ | --------------------------- | -------------------------------------- |
+| **Normal**  | None         | `Esc` from any mode         | Default. All Alt shortcuts work here   |
+| **Locked**  | Yellow (dim) | `Ctrl g`                    | Passes all keys to the running program |
+| **Scroll**  | Aqua         | `Ctrl s`                    | Navigate scrollback with Vim keys      |
+| **Search**  | Purple       | `/` or `s` from Scroll mode | Search through scrollback              |
+| **Session** | Red          | `Ctrl o`                    | Session management (detach/quit)       |
+| **Resize**  | Orange       | (default bindings)          | Resize panes                           |
+| **Pane**    | Green        | (default bindings)          | Pane management                        |
+| **Tab**     | Blue         | (default bindings)          | Tab management                         |
+| **Move**    | Gold         | (default bindings)          | Move panes around                      |
 
 **Auto-lock**: The `zellij-autolock` plugin automatically switches to Locked mode when you're inside `nvim`, `vim`, `git`, `fzf`, `zoxide`, `atuin`, or `lazygit`. It switches back when you exit.
 
