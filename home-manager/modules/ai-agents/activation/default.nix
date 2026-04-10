@@ -113,7 +113,9 @@ in
       inherit (pluginInstalls)
         installImpeccable
         installAgencyAgents
+        installEverythingClaudeCode
         cleanupDisabledAgencyAgents
+        cleanupDisabledEverythingClaudeCode
         ;
     };
   };

@@ -9,6 +9,7 @@
 
 let
   opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
+  eccCfg = cfg.everythingClaudeCode;
 
   mkGitClone =
     {
@@ -136,6 +137,77 @@ in
     ''
   );
 
+  installEverythingClaudeCode = lib.mkIf eccCfg.enable (
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      # Keep ECC intentionally curated here instead of emulating upstream install.sh.
+      # This repo wants declarative, low-risk agent assets without broad hooks,
+      # MCP imports, or other impure setup side effects.
+      ${mkGitClone {
+        name = "everything-claude-code";
+        url = "https://github.com/affaan-m/everything-claude-code.git";
+        dir = "$HOME/.local/share/everything-claude-code";
+        var = "ECC_DIR";
+      }}
+
+      copy_ecc_file() {
+        local src="$1"
+        local dst="$2"
+
+        [[ -f "$src" ]] || return 0
+        mkdir -p "$(dirname "$dst")"
+        cp -f "$src" "$dst"
+      }
+
+      copy_ecc_dir() {
+        local src="$1"
+        local dst="$2"
+
+        [[ -d "$src" ]] || return 0
+        rm -rf "$dst"
+        mkdir -p "$(dirname "$dst")"
+        cp -r "$src" "$dst"
+      }
+
+      if [[ -d "$ECC_DIR" && "${if cfg.claude.enable then "1" else "0"}" == "1" && "${
+        if eccCfg.claude.enable then "1" else "0"
+      }" == "1" ]]; then
+        ${lib.optionalString eccCfg.claude.installSkillPack ''
+          copy_ecc_dir "$ECC_DIR/.claude/skills/everything-claude-code" "$HOME/.claude/skills/everything-claude-code"
+        ''}
+        ${lib.concatMapStringsSep "\n" (name: ''
+          copy_ecc_file "$ECC_DIR/.claude/commands/${name}.md" "$HOME/.claude/commands/ecc-${name}.md"
+        '') eccCfg.claude.commands}
+        echo "✓ Everything Claude Code installed for Claude Code"
+      fi
+
+      if [[ -d "$ECC_DIR" && "${if cfg.codex.enable then "1" else "0"}" == "1" && "${
+        if eccCfg.codex.enable then "1" else "0"
+      }" == "1" ]]; then
+        mkdir -p "$HOME/.codex/agents"
+        ${lib.concatMapStringsSep "\n" (name: ''
+          copy_ecc_file "$ECC_DIR/.codex/agents/${name}.toml" "$HOME/.codex/agents/ecc-${name}.toml"
+        '') eccCfg.codex.agents}
+        echo "✓ Everything Claude Code installed for Codex"
+      fi
+
+      if [[ -d "$ECC_DIR" && "${if cfg.opencode.enable then "1" else "0"}" == "1" && "${
+        if eccCfg.opencode.enable then "1" else "0"
+      }" == "1" ]]; then
+        for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfiles.names)}; do
+          commands_dir="$HOME/.config/$profile/commands"
+          mkdir -p "$commands_dir"
+          ${lib.concatMapStringsSep "\n" (name: ''
+            copy_ecc_file "$ECC_DIR/.opencode/commands/${name}.md" "$commands_dir/ecc-${name}.md"
+          '') eccCfg.opencode.commands}
+          ${lib.optionalString eccCfg.opencode.installInstructions ''
+            copy_ecc_file "$ECC_DIR/.opencode/instructions/INSTRUCTIONS.md" "$HOME/.config/$profile/instructions/everything-claude-code.md"
+          ''}
+        done
+        echo "✓ Everything Claude Code installed for OpenCode"
+      fi
+    ''
+  );
+
   cleanupDisabledAgencyAgents = lib.mkIf (!cfg.agencyAgents.enable) (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       AGENCY_DIR="$HOME/.local/share/agency-agents"
@@ -166,6 +238,19 @@ in
       if [[ -d "$HOME/.config/opencode/agents" ]]; then
         rm -f "$HOME/.config/opencode/agents/"*.md 2>/dev/null || true
       fi
+    ''
+  );
+
+  cleanupDisabledEverythingClaudeCode = lib.mkIf (!eccCfg.enable) (
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      rm -rf "$HOME/.claude/skills/everything-claude-code"
+      rm -f "$HOME/.claude/commands/ecc-"*.md 2>/dev/null || true
+      rm -f "$HOME/.codex/agents/ecc-"*.toml 2>/dev/null || true
+      for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfiles.names)}; do
+        rm -f "$HOME/.config/$profile/commands/ecc-"*.md 2>/dev/null || true
+        rm -f "$HOME/.config/$profile/instructions/everything-claude-code.md" 2>/dev/null || true
+      done
+      rm -rf "$HOME/.local/share/everything-claude-code"
     ''
   );
 }
