@@ -5,8 +5,10 @@
 {
   home.packages = with pkgs; [
     (bottles.override { removeWarningPopup = true; })
+    code-cursor-fhs
     element-desktop
     imv
+    kiro-fhs
     localsend
     libreoffice-qt6-fresh
     sqlitebrowser

@@ -13,7 +13,7 @@
 
     # Development
     ./ai-agents # AI coding agents (Claude Code, OpenCode, Codex, Gemini)
-    ./languages # Language tooling (Go, JS/TS, Python)
+    ./programming-languages # Language tooling (Go, JS/TS, Python)
     ./neovim # Neovim editor with LSP and plugins
 
     # Applications
