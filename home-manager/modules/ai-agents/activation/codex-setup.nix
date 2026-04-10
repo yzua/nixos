@@ -179,7 +179,7 @@ lib.mkIf cfg.codex.enable (
     ${cfg.codex.extraToml}
     CODEX_EOF
     ${pkgs.gnused}/bin/sed -i 's/^          //' "$HOME/.codex/config.toml"
-    find "$HOME/.codex/agents" -maxdepth 1 -type f -name '*.toml' -delete
+    find "$HOME/.codex/agents" -maxdepth 1 -type f -name '*.toml' ! -name 'ecc-*.toml' -delete
     ${customAgentsWrite}
     echo "✓ Codex config.toml configured"
   ''
