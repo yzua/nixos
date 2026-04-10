@@ -186,6 +186,22 @@ in
         mkdir -p "$HOME/.codex/agents"
         ${lib.concatMapStringsSep "\n" (name: ''
           copy_ecc_file "$ECC_DIR/.codex/agents/${name}.toml" "$HOME/.codex/agents/ecc-${name}.toml"
+          if [[ -f "$HOME/.codex/agents/ecc-${name}.toml" ]] && ! ${pkgs.gnugrep}/bin/grep -Eq '^name\s*=\s*".+"' "$HOME/.codex/agents/ecc-${name}.toml"; then
+            tmp_file="$HOME/.codex/agents/.ecc-${name}.toml.tmp"
+            {
+              printf 'name = "ecc-${name}"\n'
+              cat "$HOME/.codex/agents/ecc-${name}.toml"
+            } > "$tmp_file"
+            mv "$tmp_file" "$HOME/.codex/agents/ecc-${name}.toml"
+          fi
+          if [[ -f "$HOME/.codex/agents/ecc-${name}.toml" ]] && ! ${pkgs.gnugrep}/bin/grep -Eq '^description\s*=\s*".+"' "$HOME/.codex/agents/ecc-${name}.toml"; then
+            tmp_file="$HOME/.codex/agents/.ecc-${name}.toml.tmp"
+            {
+              printf 'description = "Everything Claude Code imported agent: ${name}"\n'
+              cat "$HOME/.codex/agents/ecc-${name}.toml"
+            } > "$tmp_file"
+            mv "$tmp_file" "$HOME/.codex/agents/ecc-${name}.toml"
+          fi
         '') eccCfg.codex.agents}
         echo "✓ Everything Claude Code installed for Codex"
       fi
