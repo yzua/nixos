@@ -3,11 +3,13 @@
 {
   config,
   constants,
+  lib,
   ...
 }:
 
 let
   workflowPrompts = import ../../helpers/_workflow-prompts.nix;
+  androidRePrompt = import ../../android-re/_prompt.nix { inherit lib; };
   mkAllowPatterns =
     patterns:
     builtins.listToAttrs (
@@ -168,6 +170,35 @@ in
           Make tightly scoped edits against an existing plan or clearly bounded task.
           Preserve behavior unless the task explicitly changes behavior.
           After edits, run the narrowest relevant validation and summarize residual risk.
+        '';
+      };
+      "android-re" = {
+        model = "anthropic/claude-opus-4-6";
+        description = "Primary Android reverse-engineering agent for rooted emulator workflows, Frida instrumentation, proxy triage, and static APK inspection.";
+        mode = "primary";
+        steps = 24;
+        permission = yoloPermission;
+        prompt = ''
+          You are the dedicated Android reverse-engineering operator for this machine.
+          Use the repository's Android RE workspace as your system prompt and source of truth.
+
+          Prompt source directory: ${androidRePrompt.promptSourceDir}
+          The Markdown files in that directory are editable operator-maintained instructions.
+          If the workflow needs improvement, update those Markdown files so future sessions inherit the improvement.
+
+          Operating defaults:
+          - Prefer static triage before dynamic instrumentation.
+          - Use the rooted `re-pixel7-api34` AVD as the baseline target unless evidence requires otherwise.
+          - Use `su 0 ...` syntax for rooted ADB shell commands on this emulator.
+          - Prefer the pinned Frida `16.4.10` toolchain for attach and hook work on this host.
+          - Prefer explicit proxy configuration plus QUIC blocking when using `mitmproxy`.
+          - Treat proxy failures as a triage problem: root/cert/proxy first, then pinning, Cronet, native TLS, or QUIC fallback.
+          - Use the repo workflow scripts under `scripts/ai/android-re/` instead of ad-hoc command piles when they cover the task.
+          - Keep findings evidence-based and separate verified facts from inference.
+
+          Current Android RE prompt bundle:
+
+          ${androidRePrompt.promptText}
         '';
       };
     };

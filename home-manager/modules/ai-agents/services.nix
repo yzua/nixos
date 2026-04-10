@@ -15,6 +15,51 @@ let
       AI_AGENT_NOTIFY_ON_ERROR=${if cfg.logging.notifyOnError then "true" else "false"} \
       exec ${config.home.homeDirectory}/System/scripts/ai/agent-log-wrapper.sh "$@"
   '';
+  androidReLaunchers =
+    let
+      launcherScript = "${config.home.homeDirectory}/System/scripts/ai/android-re/opencode-android-re.sh";
+      promptSourceDir = "${config.home.homeDirectory}/System/home-manager/modules/ai-agents/android-re/prompts";
+      mkAndroidReLauncher =
+        {
+          name,
+          profile,
+        }:
+        pkgs.writeShellScriptBin name ''
+          ANDROID_RE_PROMPT_SOURCE_DIR=${lib.escapeShellArg promptSourceDir} \
+            ANDROID_RE_OPENCODE_PROFILE=${lib.escapeShellArg profile} \
+            exec ${launcherScript} "$@"
+        '';
+    in
+    map mkAndroidReLauncher [
+      {
+        name = "ocare";
+        profile = "default";
+      }
+      {
+        name = "ocglmare";
+        profile = "glm";
+      }
+      {
+        name = "ocgemare";
+        profile = "gemini";
+      }
+      {
+        name = "ocgptare";
+        profile = "gpt";
+      }
+      {
+        name = "ocorare";
+        profile = "openrouter";
+      }
+      {
+        name = "ocsare";
+        profile = "sonnet";
+      }
+      {
+        name = "oczenare";
+        profile = "zen";
+      }
+    ];
 
   aliasLib = import ./helpers/_aliases.nix { inherit config lib pkgs; };
   inherit (aliasLib) aiAliases aiAgentLauncher aiAgentInventory;
@@ -108,6 +153,7 @@ in
         aiAgentInventory
         pkgs.bubblewrap
       ]
+      ++ androidReLaunchers
       ++ (lib.optional cfg.logging.enable (
         pkgs.writeShellScriptBin "ai-agent-log-cleanup" ''
           ${logCleanupCommand}
