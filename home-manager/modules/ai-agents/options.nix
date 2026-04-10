@@ -178,10 +178,12 @@ in
     codex = {
       enable = lib.mkEnableOption "Codex CLI configuration";
 
-      useWrapper = mkBoolOption true "Use logging wrapper for Codex"; # TODO: not yet consumed by activation/settings
+      # Compatibility option: kept for stable API surface; currently not consumed.
+      useWrapper = mkBoolOption true "Use logging wrapper for Codex";
       model = mkStrOption "gpt-5.4" "Default model for Codex";
       sandboxMode = mkStrOption "workspace-write" "Default sandbox mode for Codex";
-      enableSearch = mkBoolOption false "Enable native Codex web search by default"; # consumed only at top-level; profile/customAgent enableSearch are no-ops
+      # Active only at top-level codex settings.
+      enableSearch = mkBoolOption false "Enable native Codex web search by default";
 
       personality = lib.mkOption {
         type = codexPersonalityType;
@@ -225,7 +227,8 @@ in
               description = "Profile-specific approval policy";
             };
             sandboxMode = mkNullOrStrOption null "Profile-specific sandbox mode";
-            enableSearch = mkBoolOption false "Enable native Codex web search for this profile"; # TODO: not consumed by activation/settings
+            # Compatibility option: retained for future profile-level support.
+            enableSearch = mkBoolOption false "Enable native Codex web search for this profile";
             developerInstructions = lib.mkOption {
               type = lib.types.lines;
               default = "";
@@ -261,7 +264,8 @@ in
               description = "Agent-specific approval policy";
             };
             sandboxMode = mkNullOrStrOption null "Agent-specific sandbox mode";
-            enableSearch = mkBoolOption false "Enable native Codex web search for this agent"; # TODO: not consumed by activation/settings
+            # Compatibility option: retained for future custom-agent-level support.
+            enableSearch = mkBoolOption false "Enable native Codex web search for this agent";
             extraToml = lib.mkOption {
               type = lib.types.lines;
               default = "";

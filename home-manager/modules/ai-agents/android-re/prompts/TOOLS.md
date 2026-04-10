@@ -70,18 +70,18 @@ At the time this workspace was written, these were not found in PATH:
 ### High value
 
 1. `dex2jar`
-Reason: alternate DEX conversion path when JADX output is awkward or partial.
+   Reason: alternate DEX conversion path when JADX output is awkward or partial.
 
 ### Nice to have
 
 1. `mobsf`
-Reason: broad static triage and reporting.
+   Reason: broad static triage and reporting.
 
 2. `rizin`
-Reason: alternative native analysis workflow to `radare2`.
+   Reason: alternative native analysis workflow to `radare2`.
 
 3. `burpsuite`
-Reason: second interception path with familiar repeater/intruder style workflows.
+   Reason: second interception path with familiar repeater/intruder style workflows.
 
 ## Suggested Nix Changes
 
@@ -89,7 +89,7 @@ If you want these managed declaratively, the likely places are:
 
 - `home-manager/packages/development.nix` for RE tooling
 - `home-manager/packages/cli.nix` for CLI and proxy tooling
-- `nixos/modules/android.nix` for system-level Android SDK integration
+- `nixos-modules/android.nix` for system-level Android SDK integration
 
 ## Important Constraints
 

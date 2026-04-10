@@ -28,15 +28,15 @@ Profiles switch the primary model across all OpenCode config directories. Each p
 
 Seven OpenCode profiles are defined in `helpers/_opencode-profiles.nix`:
 
-| Profile Directory    | Provider/Model                       |
-| -------------------- | ------------------------------------ |
-| `opencode`           | Default (from `programs.aiAgents.opencode.model`) |
-| `opencode-glm`       | Z.AI GLM-5.1                         |
-| `opencode-gemini`    | Google Gemini 3.1 Pro                |
-| `opencode-gpt`       | OpenAI GPT-5.4                       |
-| `opencode-openrouter`| OpenRouter Hunter Alpha              |
-| `opencode-sonnet`    | Anthropic Claude Sonnet 4.6          |
-| `opencode-zen`       | MiniMax M2.5 Free                    |
+| Profile Directory     | Provider/Model                                    |
+| --------------------- | ------------------------------------------------- |
+| `opencode`            | Default (from `programs.aiAgents.opencode.model`) |
+| `opencode-glm`        | Z.AI GLM-5.1                                      |
+| `opencode-gemini`     | Google Gemini 3.1 Pro                             |
+| `opencode-gpt`        | OpenAI GPT-5.4                                    |
+| `opencode-openrouter` | OpenRouter Hunter Alpha                           |
+| `opencode-sonnet`     | Anthropic Claude Sonnet 4.6                       |
+| `opencode-zen`        | MiniMax M2.5 Free                                 |
 
 ---
 
@@ -64,10 +64,11 @@ ai-agents/
 │   ├── secrets.nix          # Secret patching (placeholder → real key injection)
 │   ├── claude-setup.nix     # Claude Code config file writes
 │   ├── codex-setup.nix      # Codex CLI config file writes
-│   └── plugins.nix          # Plugin/skill install scripts (impeccable, agency-agents)
+│   ├── plugins.nix          # Plugin/skill install scripts (impeccable, agency-agents)
+│   └── skills.nix           # Skill installations and omissions
 └── config/                  # Split configuration values
     ├── default.nix          # Import hub
-    ├── instructions.nix     # Global instructions (imports _skills.nix)
+    ├── defaults.nix         # Default values for agent options
     ├── _skills.nix          # Skill installations and omissions
     ├── _formatters.nix      # Formatter registry for auto-formatting hooks (shared by claude + gemini)
     ├── mcp-servers.nix      # MCP server definitions + logging
