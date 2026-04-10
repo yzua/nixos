@@ -119,6 +119,9 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)       |
 | `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)      |
 | `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-inventory` wrapper)          |
+| `ai/android-re/opencode-android-re.sh`             | `home-manager/modules/ai-agents/services.nix` (`oc*are` RE launcher wrappers)         |
+| `ai/android-re/re-avd.sh`                          | `scripts/ai/android-re/opencode-android-re.sh` and manual Android RE workflow usage   |
+| `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                       |
 | `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                       |
 | `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                         |
 | `apps/browser-select.sh`                           | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper)            |
