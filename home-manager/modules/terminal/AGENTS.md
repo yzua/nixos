@@ -26,7 +26,7 @@ terminal/
 │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   └── local-vars.nix # Local shell variables
 └── tools/           # CLI tools — one .nix file per tool
-    ├── default.nix  # Import hub (15 tool entries including `git/`)
+    ├── default.nix  # Import hub (16 tool entries including `git/`)
     ├── atuin.nix    # Shell history (fuzzy, secrets filter, sync disabled)
     ├── bat.nix      # Syntax-highlighting cat
     ├── btop.nix     # System monitor (GPU support)

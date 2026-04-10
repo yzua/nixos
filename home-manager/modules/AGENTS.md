@@ -30,10 +30,14 @@ modules/
 │   │   ├── secrets.nix      # Secret patching (placeholder → real key injection)
 │   │   ├── claude-setup.nix # Claude Code config file writes
 │   │   ├── codex-setup.nix  # Codex CLI config file writes
-│   │   └── plugins.nix      # Plugin/skill install scripts (impeccable, agency-agents)
+│   │   ├── plugins.nix      # Plugin install scripts (impeccable, agency-agents)
+│   │   └── skills.nix       # Skill installations and omissions
+│   ├── android-re/     # Android RE workflow prompts and config
+│   │   └── _prompt.nix # Prompt templates (not a module, imported by services)
 │   └── config/         # Split configuration values
 │       ├── default.nix      # Import hub (claude + models + flat files)
-│       ├── instructions.nix # Global instructions (imports _skills.nix)
+│       ├── defaults.nix     # Default values for agent options
+│       ├── global-instructions.md # Global instructions text (not a module)
 │       ├── _skills.nix      # Skill installations and omissions (not a module)
 │       ├── _formatters.nix  # Formatter registry for auto-formatting hooks (not a module)
 │       ├── mcp-servers.nix  # MCP server definitions + logging
@@ -67,7 +71,8 @@ modules/
 │   │   └── extensions.nix   # Declarative extension groups (privacy, dev tools, YouTube/social)
 │   └── librewolf/      # LibreWolf browser (multi-profile SOCKS5 proxy)
 │       ├── default.nix      # Import hub: programs.librewolf with policies + profiles
-│       └── _profiles.nix    # Profile definitions (not a module, imported by desktop-entries.nix)
+│       ├── _profiles.nix    # Profile definitions (not a module, imported by desktop-entries.nix)
+│       └── _extensions.nix  # Extension declarations (not a module, imported by default.nix)
 ├── niri/               # Niri compositor (scrollable tiling Wayland)
 │   ├── default.nix     # Import hub
 │   ├── main.nix        # Compositor settings (autostart, workspaces, environment, animations)
@@ -90,11 +95,10 @@ modules/
 │   ├── default.nix     # Plugin declarations, treesitter, Lua config loading
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)
 │   └── plugins/        # Plugin-specific configs (wakatime)
-├── languages/          # Language tooling (Go, JS, Python, LSP servers, Mise)
+├── languages/          # Language tooling (Go, JS, Python, Mise)
 │   ├── go.nix          # Go toolchain, env vars, and aliases
 │   ├── javascript.nix  # JS/TS tooling, LSP servers, and aliases
 │   ├── python.nix      # Python tooling, LSP servers, and aliases
-│   ├── lsp-servers.nix # Language servers for editors
 │   └── mise.nix        # Mise polyglot runtime manager
 ├── terminal/           # Shell, terminal, and CLI tools
 │   ├── ghostty.nix     # Ghostty terminal emulator
@@ -112,7 +116,7 @@ modules/
 │   │   ├── config.nix  # Zsh settings and initialization
 │   │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   │   └── local-vars.nix # Local shell variables
-│   └── tools/          # CLI tools (atuin, bat, btop, carapace, cava, eza, fzf, gh, git, htop, lazygit, mpv, starship, yazi, zathura, zoxide)
+│   └── tools/          # CLI tools (atuin, bat, btop, cava, carapace, eza, fzf, gh, git, htop, lazygit, mpv, starship, yazi, zathura, zoxide — 16 entries)
 │       └── git/        # Git (identity from constants, GPG signing, aliases, hooks)
 │           ├── default.nix # Import hub
 │           ├── config.nix  # Git settings, aliases, includes

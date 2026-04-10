@@ -1,6 +1,6 @@
 # System Security Hardening
 
-6 always-on sub-modules plus 3 guarded modules (`audit-logging.nix`, `metadata-scrubber.nix`, `aide.nix`). Split from monolithic `security.nix` for maintainability. Each submodule owns its own packages in `environment.systemPackages`.
+5 always-on sub-modules plus 3 guarded modules (`audit-logging.nix`, `metadata-scrubber.nix`, `aide.nix`). Split from monolithic `security.nix` for maintainability. Each submodule owns its own packages in `environment.systemPackages`.
 
 Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable security features outside this directory.
 
@@ -8,16 +8,16 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 
 ## Module Map
 
-| File                | Purpose                                                                                                 | Guarded?                       |
-| ------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `hardening.nix`     | Kernel sysctl, AppArmor, PAM core dumps, sudo, hidepid=2, coredump                                      | Always-on                      |
-| `firewall.nix`      | nftables firewall, LLMNR/NetBIOS/SMB hostname leak prevention                                           | Always-on                      |
-| `services.nix`      | dbus-broker and journald hardening                                                                       | Always-on                      |
-| `audit.nix`         | Weekly Lynis security audit timer + service (owns `lynis` package)                                      | Always-on                      |
-| `audit-logging.nix` | fail2ban intrusion prevention (5 retries, 1h ban, exponential backoff, owns `audit` package)            | `mySystem.auditLogging.enable` |
-| `metadata-scrubber.nix` | Automatic metadata scrubbing for user files (owns `mat2`, `exiftool`, `inotify-tools`)             | `mySystem.metadataScrubber.enable` |
-| `opsec.nix`         | kexec disable, zram swap, Chrony NTS                                                                     | Always-on                      |
-| `aide.nix`          | AIDE file integrity monitoring (weekly scan, owns `aide` package)                                        | `mySystem.aide.enable`         |
+| File                    | Purpose                                                                                      | Guarded?                           |
+| ----------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `hardening.nix`         | Kernel sysctl, AppArmor, PAM core dumps, sudo, hidepid=2, coredump                           | Always-on                          |
+| `firewall.nix`          | nftables firewall, LLMNR/NetBIOS/SMB hostname leak prevention                                | Always-on                          |
+| `services.nix`          | dbus-broker and journald hardening                                                           | Always-on                          |
+| `audit.nix`             | Weekly Lynis security audit timer + service (owns `lynis` package)                           | Always-on                          |
+| `audit-logging.nix`     | fail2ban intrusion prevention (5 retries, 1h ban, exponential backoff, owns `audit` package) | `mySystem.auditLogging.enable`     |
+| `metadata-scrubber.nix` | Automatic metadata scrubbing for user files (owns `mat2`, `exiftool`, `inotify-tools`)       | `mySystem.metadataScrubber.enable` |
+| `opsec.nix`             | kexec disable, zram swap, Chrony NTS                                                         | Always-on                          |
+| `aide.nix`              | AIDE file integrity monitoring (weekly scan, owns `aide` package)                            | `mySystem.aide.enable`             |
 
 ---
 

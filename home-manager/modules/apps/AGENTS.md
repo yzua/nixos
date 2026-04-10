@@ -1,24 +1,25 @@
 # Application Configurations
 
-10 root app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
+11 root app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
 
 ## App Map
 
-| File                  | App                        | Config Pattern                                   |
-| --------------------- | -------------------------- | ------------------------------------------------ |
-| `activitywatch.nix`   | ActivityWatch              | `services.activitywatch` (Wayland watcher setup) |
-| `chromium.nix`        | Chromium                   | Launch wrapper with Wayland crash workaround     |
-| `desktop-entries.nix` | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries`               |
-| `keepassxc.nix`       | KeePassXC                  | Desktop entry                                    |
-| `nautilus.nix`        | GNOME Files                | `dconf.settings` (preferences)                   |
-| `nixcord.nix`         | Discord (Vesktop)          | `programs.nixcord` (Vencord declarative plugins) |
-| `obs.nix`             | OBS Studio                 | `programs.obs-studio` + CUDA + plugins           |
-| `obsidian.nix`        | Obsidian                   | Desktop entry + default vault registration       |
-| `opensnitch-ui.nix`   | OpenSnitch                 | `services.opensnitch-ui` enablement              |
-| `syncthing.nix`       | Syncthing                  | `services.syncthing` (local file sync)           |
+| File                    | App                        | Config Pattern                                     |
+| ----------------------- | -------------------------- | -------------------------------------------------- |
+| `activitywatch.nix`     | ActivityWatch              | `services.activitywatch` (Wayland watcher setup)   |
+| `chromium.nix`          | Chromium                   | Launch wrapper with Wayland crash workaround       |
+| `desktop-entries.nix`   | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries`                 |
+| `keepassxc.nix`         | KeePassXC                  | Desktop entry                                      |
+| `nautilus.nix`          | GNOME Files                | `dconf.settings` (preferences)                     |
+| `nixcord.nix`           | Discord (Vesktop)          | `programs.nixcord` (Vencord declarative plugins)   |
+| `obs.nix`               | OBS Studio                 | `programs.obs-studio` + CUDA + plugins             |
+| `obsidian.nix`          | Obsidian                   | Desktop entry + default vault registration         |
+| `opensnitch-ui.nix`     | OpenSnitch                 | `services.opensnitch-ui` enablement                |
+| `syncthing.nix`         | Syncthing                  | `services.syncthing` (local file sync)             |
+| `metadata-scrubber.nix` | Metadata scrubber          | inotifywait watcher + weekly full scrub via `mat2` |
 
 ## Subdirectory Modules
 
@@ -35,17 +36,18 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 
 ### `brave/` (2 files)
 
-| File             | Purpose                                                  |
-| ---------------- | -------------------------------------------------------- |
-| `default.nix`    | Import hub: `programs.chromium` with Brave package       |
+| File             | Purpose                                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------- |
+| `default.nix`    | Import hub: `programs.chromium` with Brave package                                      |
 | `extensions.nix` | Declarative extensions grouped by GitHub, privacy/security, web dev, and YouTube/social |
 
-### `librewolf/` (2 files)
+### `librewolf/` (3 files)
 
-| File          | Purpose                                                                    |
-| ------------- | -------------------------------------------------------------------------- |
-| `default.nix` | `programs.librewolf` with declarative policies + profile settings (SOCKS5) |
-| `_profiles.nix` | Single source of truth for 6 browser profiles (name, proxy, homepage) |
+| File              | Purpose                                                                    |
+| ----------------- | -------------------------------------------------------------------------- |
+| `default.nix`     | `programs.librewolf` with declarative policies + profile settings (SOCKS5) |
+| `_profiles.nix`   | Single source of truth for 6 browser profiles (name, proxy, homepage)      |
+| `_extensions.nix` | Extension declarations (not a module, imported by default.nix)             |
 
 ---
 
