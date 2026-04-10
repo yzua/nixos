@@ -103,7 +103,7 @@ let
     };
 
     gemini = mkProfileSettings {
-      model = "google/antigravity-gemini-3.1-pro";
+      model = "google/gemini-3-pro-preview";
     };
 
     gpt = mkProfileSettings {
