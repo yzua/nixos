@@ -20,7 +20,11 @@ scripts/
 │   ├── agent-patterns.sh    # Error pattern detector across agent logs
 │   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
 │   ├── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
-│   └── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
+│   ├── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
+│   └── android-re/
+│       ├── re-avd.sh        # Android emulator management (AVD create/start/snapshot)
+│       ├── re-avd-test.sh   # Unit tests for re-avd.sh
+│       └── re-static.sh     # Android static analysis workflow
 ├── apps/
 │   └── browser-select.sh    # Browser profile selector (wofi menu)
 ├── build/
@@ -101,28 +105,27 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 
 ## Nix Integration Table
 
-| Script                                             | Referenced By                                                                         |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `build/modules-check.sh`                           | `justfile` (`just modules`)                                                           |
-| `build/packages-check.sh`                          | `justfile` (`just pkgs`)                                                              |
-| `build/shellcheck-nix-inline.sh`                   | `justfile` (`just lint`)                                                              |
-| `system/report/system-report.sh`                   | `nixos-modules/system-report.nix` (wrapped with `writeShellApplication`)              |
-| `system/report/report-collectors.sh`               | Sourced by `system-report.sh` (loads module files)                                    |
-| `system/report/report-collectors-core.sh`          | Sourced by `system/report/report-collectors.sh`                                       |
-| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                       |
-| `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                       |
-| `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                         |
-| `ai/api-quota/api-quota.sh`                        | `home-manager/modules/noctalia/default.nix` (bar widget)                              |
-| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper)           |
-| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)        |
-| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)        |
-| `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)       |
-| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)      |
-| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-inventory` wrapper)          |
-| `ai/android-re/opencode-android-re.sh`             | `home-manager/modules/ai-agents/services.nix` (`oc*are` RE launcher wrappers)         |
-| `ai/android-re/re-avd.sh`                          | `scripts/ai/android-re/opencode-android-re.sh` and manual Android RE workflow usage   |
-| `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                       |
-| `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                       |
-| `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                         |
-| `apps/browser-select.sh`                           | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper)            |
-| `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)                   |
+| Script                                             | Referenced By                                                                    |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `build/modules-check.sh`                           | `justfile` (`just modules`)                                                      |
+| `build/packages-check.sh`                          | `justfile` (`just pkgs`)                                                         |
+| `build/shellcheck-nix-inline.sh`                   | `justfile` (`just lint`)                                                         |
+| `system/report/system-report.sh`                   | `nixos-modules/system-report.nix` (wrapped with `writeShellApplication`)         |
+| `system/report/report-collectors.sh`               | Sourced by `system-report.sh` (loads module files)                               |
+| `system/report/report-collectors-core.sh`          | Sourced by `system/report/report-collectors.sh`                                  |
+| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                  |
+| `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                  |
+| `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                    |
+| `ai/api-quota/api-quota.sh`                        | `home-manager/modules/noctalia/default.nix` (bar widget)                         |
+| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper)      |
+| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)   |
+| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)   |
+| `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)  |
+| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper) |
+| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-inventory` wrapper)     |
+| `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/services.nix` (RE launcher wrapper)              |
+| `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                 |
+| `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                  |
+| `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                    |
+| `apps/browser-select.sh`                           | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper)       |
+| `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)              |

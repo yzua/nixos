@@ -27,7 +27,6 @@ Operator-owned scripts stay outside this prompt bundle:
 
 - `scripts/ai/android-re/re-avd.sh`: emulator and dynamic-analysis helper
 - `scripts/ai/android-re/re-static.sh`: static-analysis helper
-- `scripts/ai/android-re/opencode-android-re.sh`: launcher backend used by `oc*are`
 
 ## Primary Entry Points
 

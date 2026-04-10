@@ -67,7 +67,6 @@ The `oc*are` commands start the Android RE baseline and open Ghostty running Ope
 - `home-manager/modules/ai-agents/android-re/prompts/TROUBLESHOOTING.md`: failure modes and recovery steps
 - `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, and cert helper
 - `scripts/ai/android-re/re-static.sh`: static APK analysis helper
-- `scripts/ai/android-re/opencode-android-re.sh`: OpenCode Android RE launcher backend used by `oc*are`
 
 ## Important Findings
 
