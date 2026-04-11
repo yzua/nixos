@@ -13,7 +13,7 @@ fi
 AGENT_NAME="$1"
 shift
 
-LOG_DIR="${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agent-logs}"
+LOG_DIR="${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agents/logs}"
 LOG_FILE="$LOG_DIR/$AGENT_NAME-$(date +%Y-%m-%d).log"
 ERROR_LOG="$LOG_DIR/$AGENT_NAME-errors-$(date +%Y-%m-%d).log"
 NOTIFY_ON_ERROR="${AI_AGENT_NOTIFY_ON_ERROR:-false}"

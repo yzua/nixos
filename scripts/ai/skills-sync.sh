@@ -40,6 +40,12 @@ echo "Syncing ${#SKILLS[@]} skills to $SKILLS_DIR..."
 
 success=0
 failed=0
+current_tmpdir=""
+
+cleanup_tmpdir() {
+	[[ -n "${current_tmpdir:-}" ]] && rm -rf "$current_tmpdir"
+}
+trap cleanup_tmpdir EXIT
 
 for entry in "${SKILLS[@]}"; do
 	IFS='|' read -r repo skill_path skill_name <<<"$entry"
@@ -48,6 +54,7 @@ for entry in "${SKILLS[@]}"; do
 	echo -n "  → $skill_name: "
 
 	tmpdir=$(mktemp -d)
+	current_tmpdir="$tmpdir"
 
 	# Clone the repo
 	if ! git clone --quiet --depth 1 --filter=blob:none --sparse "https://github.com/$repo.git" "$tmpdir/repo" 2>/dev/null; then
@@ -94,6 +101,7 @@ for entry in "${SKILLS[@]}"; do
 	fi
 
 	rm -rf "$tmpdir"
+	current_tmpdir=""
 done
 
 echo ""

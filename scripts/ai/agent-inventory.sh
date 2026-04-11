@@ -4,16 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
-
-# Ensure fzf inherits Home Manager theme when launched outside interactive shells.
-if [[ -z "${FZF_DEFAULT_OPTS:-}" ]] && [[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
-	# shellcheck disable=SC1091
-	source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-fi
-
-if [[ -z "${FZF_DEFAULT_OPTS:-}" ]]; then
-	export FZF_DEFAULT_OPTS="--color=fg:#ebdbb2,bg:#32302f,hl:#fabd2f,fg+:#ebdbb2,bg+:#3c3836,hl+:#fabd2f,info:#8ec07c,prompt:#83a598,pointer:#fe8019,marker:#b8bb26,spinner:#d3869b,header:#928374,border:#504945,gutter:#282828"
-fi
+# shellcheck source=scripts/lib/fzf-theme.sh
+source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
 
 if ! command -v fzf >/dev/null 2>&1; then
 	print_error "fzf is required"
@@ -541,6 +533,11 @@ while true; do
 		fi
 		section=""
 		continue
+	fi
+
+	if [[ "$section_locked" == "true" ]]; then
+		sanitize <"$tmp_filtered"
+		exit 0
 	fi
 
 	selected="$({
