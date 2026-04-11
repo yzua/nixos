@@ -89,7 +89,7 @@ Item {
                 root._rawResponse = stdout.text.trim();
                 root.parseResponse(root._rawResponse);
             } catch (e) {
-                Logger.e("model-usage/zai", "Parse failed:", e);
+                console.log("model-usage/zai", "Parse failed:", e);
                 root.usageStatusText = "Bad response";
                 root.ready = true;
             }

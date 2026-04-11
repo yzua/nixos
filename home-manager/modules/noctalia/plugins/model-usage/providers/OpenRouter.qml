@@ -73,7 +73,7 @@ Item {
             if (xhr.readyState !== XMLHttpRequest.DONE)
                 return;
             if (xhr.status !== 200) {
-                Logger.e("model-usage/openrouter", "Key info request failed (status " + xhr.status + ")");
+                console.log("model-usage/openrouter", "Key info request failed (status " + xhr.status + ")");
                 return;
             }
 
@@ -103,7 +103,7 @@ Item {
                 root.tierLabel = info.is_free_tier ? "Free" : "Paid";
                 root.ready = true;
             } catch (e) {
-                Logger.e("model-usage/openrouter", "Failed to parse key info:", e);
+                console.log("model-usage/openrouter", "Failed to parse key info:", e);
             }
         };
 

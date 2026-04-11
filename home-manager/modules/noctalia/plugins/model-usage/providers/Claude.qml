@@ -61,7 +61,7 @@ Item {
         onLoaded: root.parseStats(text())
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound)
-                Logger.e("model-usage/claude", "stats-cache.json not found at", statsFile.path);
+                console.log("model-usage/claude", "stats-cache.json not found at", statsFile.path);
         }
     }
 
@@ -73,7 +73,7 @@ Item {
         onLoaded: root.parseHistory(text())
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound)
-                Logger.e("model-usage/claude", "history.jsonl not found");
+                console.log("model-usage/claude", "history.jsonl not found");
         }
     }
 
@@ -85,7 +85,7 @@ Item {
         onLoaded: root.parseCredentials(text())
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound)
-                Logger.e("model-usage/claude", "credentials.json not found at", credentialsFile.path);
+                console.log("model-usage/claude", "credentials.json not found at", credentialsFile.path);
         }
     }
 
@@ -126,7 +126,7 @@ Item {
             root.totalSessions = data.totalSessions ?? 0;
             root.ready = true;
         } catch (e) {
-            Logger.e("model-usage/claude", "Failed to parse stats-cache.json:", e);
+            console.log("model-usage/claude", "Failed to parse stats-cache.json:", e);
         }
     }
 
@@ -158,7 +158,7 @@ Item {
             root.todaySessions = Object.keys(sessions).length;
             root.ready = true;
         } catch (e) {
-            Logger.e("model-usage/claude", "Failed to parse history.jsonl:", e);
+            console.log("model-usage/claude", "Failed to parse history.jsonl:", e);
         }
     }
 
@@ -193,7 +193,7 @@ Item {
                 root.clearAuthoritativeRateLimits();
             }
         } catch (e) {
-            Logger.e("model-usage/claude", "Failed to parse credentials.json:", e);
+            console.log("model-usage/claude", "Failed to parse credentials.json:", e);
             root.usageStatusText = "Waiting for auth";
             root.clearAuthoritativeRateLimits();
         }
@@ -334,7 +334,7 @@ Item {
                         return;
                     }
                 } catch (e) {
-                    Logger.e("model-usage/claude", "Failed to parse oauth usage response:", e);
+                    console.log("model-usage/claude", "Failed to parse oauth usage response:", e);
                 }
             }
 
@@ -345,7 +345,7 @@ Item {
             }
 
             const body = xhr.responseText ? String(xhr.responseText).slice(0, 220) : "";
-            Logger.e("model-usage/claude", "OAuth usage probe failed (status " + xhr.status + ")" + (body ? " body=" + body : ""));
+            console.log("model-usage/claude", "OAuth usage probe failed (status " + xhr.status + ")" + (body ? " body=" + body : ""));
             root.clearAuthoritativeRateLimits();
         };
         xhr.send();

@@ -51,7 +51,7 @@ Item {
                     root.ghToken = token;
                     root.fetchUsage();
                 } else {
-                    Logger.e("model-usage/copilot", "gh auth token returned empty");
+                    console.log("model-usage/copilot", "gh auth token returned empty");
                     root.usageStatusText = "No token";
                     root.ready = false;
                     root.clearRateLimits();
@@ -60,7 +60,7 @@ Item {
         }
         onExited: (code, status) => {
             if (code !== 0) {
-                Logger.e("model-usage/copilot", "gh auth token failed (exit " + code + ")");
+                console.log("model-usage/copilot", "gh auth token failed (exit " + code + ")");
                 root.usageStatusText = "Not authenticated";
                 root.ready = false;
                 root.clearRateLimits();
@@ -103,12 +103,12 @@ Item {
                 root.ghToken = "";
                 root.tierLabel = "";
                 root.clearRateLimits();
-                Logger.e("model-usage/copilot", "Auth failed (status " + xhr.status + ")");
+                console.log("model-usage/copilot", "Auth failed (status " + xhr.status + ")");
                 return;
             }
 
             if (xhr.status < 200 || xhr.status >= 300) {
-                Logger.e("model-usage/copilot", "Usage request failed (status " + xhr.status + ")");
+                console.log("model-usage/copilot", "Usage request failed (status " + xhr.status + ")");
                 root.ready = false;
                 root.clearRateLimits();
                 return;
@@ -120,7 +120,7 @@ Item {
                 root.usageStatusText = "";
                 root.ready = true;
             } catch (e) {
-                Logger.e("model-usage/copilot", "Failed to parse usage response:", e);
+                console.log("model-usage/copilot", "Failed to parse usage response:", e);
             }
         };
 
