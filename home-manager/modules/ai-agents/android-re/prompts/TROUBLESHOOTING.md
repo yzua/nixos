@@ -6,6 +6,14 @@ Check:
 
 ```bash
 adb devices -l
+bash scripts/ai/android-re/re-avd.sh status
+# If launched via oc*are, check the background boot log:
+tail -f ~/Downloads/android-re-tools/re-avd-start.log
+```
+
+If needed, start manually:
+
+```bash
 bash scripts/ai/android-re/re-avd.sh start
 ```
 
@@ -94,39 +102,78 @@ Check:
 ```bash
 bash scripts/ai/android-re/re-avd.sh frida-start
 frida-ps -U
-adb shell 'cat /data/local/tmp/frida.log'
+adb shell "su 0 sh -c 'ps -A | grep frida'"
+```
+
+Check server log:
+
+```bash
+adb shell "su 0 sh -c 'tail -30 /data/local/tmp/frida.log'"
 ```
 
 Common causes:
 
 - wrong Frida server version for host tools
 - wrong ABI
-- old server process still bound
+- old server process still bound to port 27042
 
 Fix:
 
-- replace the server binary with the matching host version
-- restart it
-
-Important emulator note:
-
-- `frida-ps -U` success does not guarantee `attach` works
-- use the system Frida `17.5.1` toolchain with the matching server binary at `~/Downloads/android-re-tools/frida/`
-- the isolated `16.4.10` client venv is broken (missing python3.11) — do not use it
-
-Known working commands:
-
 ```bash
+# Kill any stale server
+adb shell "su 0 sh -c 'pkill -x frida-server-17.5.1'"
+sleep 1
+
+# Restart via re-avd.sh
 bash scripts/ai/android-re/re-avd.sh frida-start
-frida-ps -U
-frida -U -p <pid> -q -e 'Process.id'
+
+# Verify version match
+frida --version
+adb shell "su 0 sh -c '/data/local/tmp/frida-server-17.5.1 --version'"
+# Both should print 17.5.1
 ```
 
-If attach still fails with `connection closed`:
+## Frida Attach Fails Or Times Out
 
-- verify you are using the system `frida` (v17.5.1), not the broken v16 venv
-- verify the server is the `17.5.1` binary at `/data/local/tmp/frida-server-17.5.1`
-- check for version mismatch: `frida --version` on host vs `adb shell 'su 0 /data/local/tmp/frida-server-17.5.1 --version'`
+```bash
+# Try by PID instead of name
+frida-ps -U | grep com.example.target
+frida -U -p <pid>
+
+# Try spawn mode (fresh start with injection)
+frida -U -f com.example.target -l hook.js --no-pause
+
+# Try emulated realm (for ARM translation)
+frida -U -n com.example.target --realm=emulated
+```
+
+If `frida -U` hangs:
+
+```bash
+# Verify server is actually running
+adb shell "su 0 sh -c 'ps -A | grep frida'"
+# If not running, restart it:
+bash scripts/ai/android-re/re-avd.sh frida-start
+```
+
+If attach returns "unexpectedly timed out":
+
+- Heavy processes (Chrome, system_server) may timeout on first attach — retry once
+- Try a lighter target or use `-f` spawn mode
+- Check if the app has anti-Frida detection running
+
+## Frida Works But `frida-ps -U` Is Empty
+
+```bash
+# Verify USB connection
+adb devices -l
+
+# Restart adb and frida
+adb kill-server && adb start-server
+sleep 2
+bash scripts/ai/android-re/re-avd.sh frida-start
+frida-ps -U
+```
 
 ## Root Checker Says The Device Is Not Rooted
 
@@ -161,33 +208,109 @@ If missing, recreate it and reboot.
 
 ## `mitmproxy` Does Not See Traffic
 
-Check explicit proxy:
+### Step 1: Verify proxy is set on device
 
 ```bash
 adb shell settings get global http_proxy
+# Expected when enabled: 10.0.2.2:8084
+# If :0 or null, proxy is not set
 ```
 
-Expected on default startup:
+### Step 2: Verify mitmdump is listening
 
-- `:0`
+```bash
+ss -ltnH '( sport = :8084 )'
+# Should show a listener. If empty, mitmdump is not running.
+```
 
-Set it when you want interception:
+### Step 3: Restart mitmdump if needed
+
+```bash
+tmux send-keys -t android-re:mitm C-c
+sleep 1
+tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 --set flow_detail=2" Enter
+```
+
+### Step 4: Force-stop and restart the target app
+
+The app may have cached connections from before proxy was enabled:
+
+```bash
+adb shell am force-stop com.example.target
+adb shell monkey -p com.example.target -c android.intent.category.LAUNCHER 1
+```
+
+### Step 5: Check if QUIC bypass is blocked
+
+Some apps use QUIC (UDP/443) which bypasses HTTP proxy:
+
+```bash
+adb shell "su 0 iptables -L OUTPUT -n | grep 443"
+# Should show REJECT rule for udp dpt:443
+```
+
+If missing, apply:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh proxy-set 10.0.2.2:8084 --block-quic
 ```
 
-If still empty:
-
-- app may ignore global proxy
-- app may use QUIC or Cronet
-- app may pin certificates
-
-If the app still fails while proxy is set, check both logs:
+### Step 6: Check the mitmproxy pane for errors
 
 ```bash
-tail -f ~/Downloads/android-re-tools/emulator-runtime.log
-adb logcat -b all -v threadtime
+tmux capture-pane -t android-re:mitm -p -S -40
+```
+
+Look for:
+- `Client TLS handshake failed` → certificate pinning (app doesn't trust mitmproxy CA)
+- `client disconnected` → app retrying or rejecting the connection
+- `connection refused` → mitmdump not running or wrong port
+
+### Step 7: If still no traffic
+
+- App may use a hardcoded proxy or direct IP (ignore system proxy settings)
+- App may use Cronet or a custom HTTP client that ignores system proxy
+- Check logcat for network errors: `tmux capture-pane -t android-re:logcat -p -S -40`
+- Try `mitmproxy` in transparent mode or use iptables-based redirection (advanced)
+
+## All Traffic Shows "Client TLS Handshake Failed"
+
+This means the app does NOT trust the mitmproxy CA certificate. Debug:
+
+```bash
+# 1. Verify CA is in system cert store
+bash scripts/ai/android-re/re-avd.sh cert-check
+
+# 2. Verify conscrypt bind mount is active
+adb shell "su 0 mountpoint /apex/com.android.conscrypt/cacerts"
+# Should print: /apex/com.android.conscrypt/cacerts is a mountpoint
+
+# 3. If mount is missing, re-sync the CA
+bash scripts/ai/android-re/re-avd.sh start
+# Or manually:
+bash scripts/ai/android-re/re-avd.sh cert-check
+```
+
+If cert is installed but app still fails:
+- App uses certificate pinning — check static analysis for `CertificatePinner`, `TrustManager`, or native pinning
+- App may pin specific public keys, not just CAs
+- Use Frida to bypass pinning (see WORKFLOW.md hooking patterns)
+
+### Google domains always fail
+
+Chrome pins certificates for `*.google.com` domains. This is expected and cannot be bypassed by CA injection alone. Non-Google sites should decrypt fine.
+
+## mitmproxy Shows Traffic But Responses Are Errors
+
+```bash
+# Read the full request/response cycle
+tmux capture-pane -t android-re:mitm -p -S -100 | grep -A5 '<< HTTP'
+
+# Common patterns:
+# 403/401 → App needs auth, token expired, or device binding
+# 400 → Malformed request, missing headers, wrong API version
+# 403 + "request blocked" → WAF/bot detection, may need user-agent or device spoofing
+# Connection reset → Server-side anti-MITM detection
 ```
 
 ## App Detects The Emulator

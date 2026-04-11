@@ -20,13 +20,19 @@ Purpose-built workspace for Android emulator testing, reverse engineering, Frida
 
 ## First Commands To Run
 
-Before touching an app, run:
+Before touching an app, verify the RE baseline is up:
 
 ```bash
-bash scripts/ai/android-re/re-avd.sh doctor
-bash scripts/ai/android-re/re-avd.sh start
 bash scripts/ai/android-re/re-avd.sh status
 ```
+
+If the emulator is not running, start it:
+
+```bash
+bash scripts/ai/android-re/re-avd.sh start
+```
+
+Note: when launched via `oc*are` aliases, the emulator starts in the background and OpenCode opens immediately. The agent must verify the emulator is ready with `re-avd.sh status` or `adb wait-for-device` before proceeding with dynamic analysis. Check the boot log at `~/Downloads/android-re-tools/re-avd-start.log`.
 
 Preferred operator entrypoints:
 
@@ -63,9 +69,12 @@ The `oc*are` commands start the Android RE baseline and open Ghostty running Ope
 
 ## Key Files
 
+All paths relative to repo root (`/home/yz/System`):
+
+- `home-manager/modules/ai-agents/android-re/prompts/AGENTS.md`: this file — quick rules for RE sessions
 - `home-manager/modules/ai-agents/android-re/prompts/README.md`: operator guide and workflow map
 - `home-manager/modules/ai-agents/android-re/prompts/WORKFLOW.md`: detailed static + dynamic RE flow
-- `home-manager/modules/ai-agents/android-re/prompts/TOOLS.md`: installed tools, missing tools, and recommendations
+- `home-manager/modules/ai-agents/android-re/prompts/TOOLS.md`: tool reference, tmux usage, mitmproxy/Frida practical guides
 - `home-manager/modules/ai-agents/android-re/prompts/TROUBLESHOOTING.md`: failure modes and recovery steps
 - `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, cert, and spoofing helper
 - `scripts/ai/android-re/re-static.sh`: static APK analysis helper
@@ -74,7 +83,7 @@ The `oc*are` commands start the Android RE baseline and open Ghostty running Ope
 
 ## agent-device Skill
 
-The `agent-device` skill is installed and should be loaded before any device UI interaction. Core workflow:
+You MUST load the `agent-device` skill before any device UI interaction. The skill provides the canonical command reference. Core workflow:
 
 1. `agent-device open <app> --platform android` — launch an app
 2. `agent-device snapshot -i` — get interactive elements with stable refs

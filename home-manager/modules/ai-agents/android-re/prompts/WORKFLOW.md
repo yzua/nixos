@@ -30,15 +30,18 @@ Check for:
 
 ## 2. Boot The Emulator
 
-Run:
+If launched via `oc*are`, the emulator starts in the background automatically. Check readiness:
+
+```bash
+bash scripts/ai/android-re/re-avd.sh status
+# Or check the background boot log:
+tail -f ~/Downloads/android-re-tools/re-avd-start.log
+```
+
+If starting manually:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh start
-```
-
-Then verify:
-
-```bash
 bash scripts/ai/android-re/re-avd.sh status
 ```
 
@@ -140,12 +143,7 @@ Default recommendation for this emulator:
 - do not rely on the default `~/.mitmproxy` CA
 - use the custom CA under `~/Downloads/android-re-tools/custom-ca/`
 - use the verified listener on `8084`
-
-Start the proxy:
-
-```bash
-mitmdump --set confdir="$HOME/Downloads/android-re-tools/custom-ca" --listen-host 0.0.0.0 --listen-port 8084
-```
+- `mitmdump` is already running in tmux window `android-re:mitm` after `re-avd.sh start`
 
 Point the emulator at the host proxy:
 
@@ -169,16 +167,48 @@ Verify proxy state:
 
 ```bash
 adb shell settings get global http_proxy
+# Expected: 10.0.2.2:8084
 ```
-
-Expected:
-
-- `10.0.2.2:8084`
 
 Clear it when done:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh proxy-clear
+```
+
+### Reading live traffic captures
+
+After the app is running and generating traffic, read the mitmproxy pane:
+
+```bash
+# Get all captured URLs (deduplicated)
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -oP '(?:GET|POST|PUT|DELETE) https?://[^ ]+' | sort -u
+
+# Get all POST requests with response codes
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -E '(POST https|<< HTTP)'
+
+# Look for auth tokens and API keys
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -iE 'authorization|bearer|x-api-key|token'
+
+# Look for specific domains
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -i 'api.example.com'
+```
+
+### Restarting mitmdump with different verbosity
+
+```bash
+# Stop current capture
+tmux send-keys -t android-re:mitm C-c
+sleep 1
+
+# Verbose mode (shows full headers and response bodies)
+tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 --set flow_detail=3" Enter
+
+# Filter to specific domain only
+tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 --set flow_detail=2 '~d api.example.com'" Enter
+
+# Save to file for later analysis
+tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 -w /tmp/capture.flow" Enter
 ```
 
 ## 5b. Navigate And Exercise The App With agent-device
@@ -220,24 +250,70 @@ Start or restart Frida server:
 bash scripts/ai/android-re/re-avd.sh frida-start
 ```
 
-In another shell:
+Verify it's running:
 
 ```bash
-frida-ps -U
+frida-ps -U | head -10
 ```
 
 Attach to app:
 
 ```bash
+# Interactive REPL (good for exploration)
 frida -U -n com.example.target
-frida -U -p <pid>
-frida -U -p <pid> -l hook.js -q
+
+# One-shot script with -q (quiet, non-interactive)
+# NOTE: Frida 17.x does NOT have --no-pause
+frida -U -n com.example.target -q -e 'console.log("attached to " + Process.id)'
+
+# Load a script file
+frida -U -n com.example.target -l hook.js -q
+
+# Spawn mode (injects before app code runs — best for bypass hooks)
+frida -U -f com.example.target -l hook.js --no-pause
 ```
 
 For translated or emulated code paths, try:
 
 ```bash
 frida -U -n com.example.target --realm=emulated
+```
+
+### Running Frida in tmux frida pane
+
+For long-running hook sessions, use the tmux frida pane:
+
+```bash
+# Start a Frida session in the frida tmux pane
+tmux send-keys -t android-re:frida "frida -U -n com.example.target" Enter
+
+# Wait for attach, then send hook code
+sleep 3
+tmux send-keys -t android-re:frida 'Java.perform(function(){ console.log("hooks loaded"); })' Enter
+
+# Read the output
+tmux capture-pane -t android-re:frida -p -S -40
+```
+
+### Quick recon hooks
+
+```bash
+# What does the app see for device identity?
+frida -U -n com.example.target -q -e '
+var B = Java.use("android.os.Build");
+console.log("MODEL=" + B.MODEL.value + " HW=" + B.HARDWARE.value + " MFG=" + B.MANUFACTURER.value);
+'
+
+# Log all Java URL connections
+frida -U -n com.example.target -q -e '
+Java.perform(function(){
+  var URL = Java.use("java.net.URL");
+  URL.$init.overload("java.lang.String").implementation = function(u){
+    console.log("[URL] " + u);
+    return this.$init(u);
+  };
+});
+'
 ```
 
 ## 7. Hooking Patterns

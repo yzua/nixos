@@ -54,10 +54,11 @@ Available profile launchers:
 
 Each launcher:
 
-- boots the emulator and applies device spoofing via `scripts/ai/android-re/re-avd.sh start`
+- boots the emulator in the background via `scripts/ai/android-re/re-avd.sh start` (non-blocking — the OpenCode session opens immediately while the emulator boots)
+- the boot log is at `~/Downloads/android-re-tools/re-avd-start.log`; monitor with `tail -f`
+- the agent should verify readiness with `bash scripts/ai/android-re/re-avd.sh status` or `adb wait-for-device` before interacting with the emulator
 - builds a prompt from every root-level Markdown file in this directory
 - opens Ghostty running OpenCode on the `android-re` agent with the chosen profile
-- points the session at this prompt source directory so the agent knows where to improve its own instructions
 
 ## Focused Manual Commands
 
