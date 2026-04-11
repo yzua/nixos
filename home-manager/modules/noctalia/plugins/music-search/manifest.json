@@ -1,0 +1,65 @@
+{
+  "id": "music-search",
+  "name": "Music Search",
+  "version": "1.2.1",
+  "minNoctaliaVersion": "4.6.6",
+  "author": "kevichi7",
+  "license": "MIT",
+  "repository": "https://github.com/noctalia-dev/noctalia-plugins",
+  "description": "Search YouTube, play audio in the background with mpv, and save favorites into a persistent library.",
+  "tags": [
+    "Bar",
+    "Panel",
+    "Launcher",
+    "Audio",
+    "Music"
+  ],
+  "entryPoints": {
+    "main": "Main.qml",
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml",
+    "launcherProvider": "LauncherProvider.qml",
+    "settings": "Settings.qml"
+  },
+  "dependencies": {
+    "plugins": []
+  },
+  "metadata": {
+    "commandPrefix": "music-search",
+    "defaultSettings": {
+      "previewMetadataMode": "always",
+      "showUploaderMetadata": true,
+      "showAlbumMetadata": true,
+      "showDurationMetadata": true,
+      "showRatingMetadata": true,
+      "showTagMetadata": true,
+      "showPlayStatsMetadata": true,
+      "showStatusMetadata": true,
+      "showPreviewChips": true,
+      "previewThumbnailSize": "comfortable",
+      "showHomeRecent": true,
+      "showHomeTop": true,
+      "showHomeTags": true,
+      "showHomeArtists": true,
+      "showHomePlaylists": true,
+      "defaultPanelTab": "search",
+      "defaultPanelLibrarySection": "tracks",
+      "panelDensity": "balanced",
+      "showPanelHeader": true,
+      "showPanelNowPlaying": true,
+      "showPanelPlaybackProgress": true,
+      "showPanelProviderChips": true,
+      "showPanelRecentTracks": true,
+      "showPanelSearchHelper": true,
+      "showPanelPreview": true,
+      "previewPaneWidth": 0,
+      "showPanelUrlActions": true,
+      "showPanelSpeedControls": true,
+      "showPanelQueueControls": true,
+      "showPanelStatusBanner": true,
+      "showBarHoverTrackTitle": true,
+      "autoSaveMp3AfterPlayback": false,
+      "ytPlayerClient": "android"
+    }
+  }
+}

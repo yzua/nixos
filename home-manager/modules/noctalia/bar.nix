@@ -59,7 +59,16 @@ in
           hidePassive = true;
         }
         {
-          id = "plugin:ai-quota";
+          id = "plugin:model-usage";
+        }
+        {
+          id = "plugin:keybind-cheatsheet";
+        }
+        {
+          id = "plugin:mawaqit";
+        }
+        {
+          id = "plugin:music-search";
         }
         (mkWidget "NotificationHistory")
         (mkOnHoverWidget "Microphone")
