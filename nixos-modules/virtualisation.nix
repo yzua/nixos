@@ -18,11 +18,8 @@
       "kvm" # intel/amd modules auto-detected
       "bridge"
       "br_netfilter"
-      "ip_tables"
-      "iptable_filter"
-      "iptable_mangle"
-      "iptable_raw"
-      "iptable_nat"
+      # ip_tables/iptable_* removed — not available as modules in kernel 6.18.
+      # iptables-nft compat layer translates calls to nf_tables automatically.
       "xt_MASQUERADE"
       "xt_comment"
       "xt_connmark"
@@ -94,6 +91,7 @@
     environment.systemPackages = with pkgsStable; [
       virt-manager
       nvidia-container-toolkit
+      nftables # Docker needs nft for old rule cleanup
     ];
   };
 }

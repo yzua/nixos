@@ -41,11 +41,33 @@ in
         "plugin:logs-management"."enabled" = "no";
         "plugin:charts.d"."enabled" = "no";
         "plugin:python.d"."enabled" = "no";
+        "plugin:apps"."enabled" = "no"; # Needs CAP_SYS_PTRACE — blocked by NoNewPrivileges hardening
+        "plugin:debugfs"."enabled" = "no"; # Needs capabilities — blocked by hardening
+        "plugin:systemd-journal"."enabled" = "no"; # Needs capabilities — blocked by hardening
+        "plugin:network-viewer"."enabled" = "no"; # Needs capabilities — blocked by hardening
       };
 
       enableAnalyticsReporting = false;
 
       configDir = {
+        # Disable go.d collectors that auto-detect but can't connect
+        "go.d/redis.conf" = pkgs.writeText "netdata-go-redis.conf" ''
+          autodetection_retry: 0
+          jobs: []
+        '';
+        "go.d/docker.conf" = pkgs.writeText "netdata-go-docker.conf" ''
+          autodetection_retry: 0
+          jobs: []
+        '';
+        "go.d/postgres.conf" = pkgs.writeText "netdata-go-postgres.conf" ''
+          autodetection_retry: 0
+          jobs: []
+        '';
+        "go.d/prometheus.conf" = pkgs.writeText "netdata-go-prometheus.conf" ''
+          autodetection_retry: 0
+          jobs: []
+        '';
+
         "health.d/timex.conf" = pkgs.writeText "netdata-timex.conf" ''
                 alarm: system_clock_sync_state
                    on: system.clock_sync_state
