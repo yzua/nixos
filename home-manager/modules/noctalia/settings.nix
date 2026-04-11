@@ -1,6 +1,12 @@
 # Noctalia Shell settings (theme, dock, wallpaper, OSD, control center)
 
-{ constants, ... }:
+{
+  config,
+  constants,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   mkControlCenterCard = id: enabled: {
@@ -11,12 +17,12 @@ in
 {
   programs.noctalia-shell.settings = {
     colorSchemes = {
-      predefinedScheme = "Gruvbox";
+      predefinedScheme = "GruvboxAlt";
       darkMode = true;
     };
 
     location = {
-      name = "UTC+3";
+      name = "";
       use12hourFormat = true;
     };
 
@@ -132,4 +138,17 @@ in
       ];
     };
   };
+
+  home.activation.patchNoctaliaLocation = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SETTINGS_FILE="$HOME/.config/noctalia/settings.json"
+    LOCATION_SECRET="/run/secrets/noctalia_location"
+    if [ -f "$LOCATION_SECRET" ] && [ -L "$SETTINGS_FILE" ]; then
+      LOCATION=$(cat "$LOCATION_SECRET")
+      TMPFILE=$(mktemp)
+      ${pkgs.jq}/bin/jq --arg loc "$LOCATION" '.location.name = $loc' "$SETTINGS_FILE" > "$TMPFILE"
+      # Replace the Nix store symlink with a mutable real file
+      rm -f "$SETTINGS_FILE"
+      mv "$TMPFILE" "$SETTINGS_FILE"
+    fi
+  '';
 }

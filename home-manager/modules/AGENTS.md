@@ -95,7 +95,7 @@ modules/
 │       ├── color-picker.nix  # Wayland color picker (grim + slurp + imagemagick)
 │       ├── open-books.nix    # Book launcher (find + wofi + zathura)
 │       └── screenshot.nix    # Screenshot annotator (grim + slurp + swappy)
-├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD)
+├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD, GruvboxAlt colorscheme)
 │   ├── default.nix     # Import hub, apiQuotaScript, status-notifier-watcher
 │   ├── bar.nix         # Bar widgets (left, center, right panels)
 │   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)

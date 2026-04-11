@@ -1,7 +1,7 @@
 # Noctalia Shell
 
 Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, control center.
-3 modules. **Stylix-exempt** — manages own theming (colors set explicitly in `settings.nix`).
+3 modules + custom color scheme. **Stylix-exempt** — manages own theming (colors set explicitly in `settings.nix` and `colorschemes/GruvboxAlt.json`).
 
 ---
 
@@ -11,7 +11,7 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 | -------------- | ------------ | --------------------------------------------------------------------------------------------------------------------- |
 | `default.nix`  | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings; defines `apiQuotaScript`, `status-notifier-watcher` |
 | `bar.nix`      | Bar widgets  | Left (workspaces, window title), center (clock, media), right (system tray, monitoring, power)                        |
-| `settings.nix` | Shell config | Theme colors (Gruvbox, hardcoded), dock, wallpaper, OSD, control center, hooks                                        |
+| `settings.nix` | Shell config | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks |
 
 ---
 
@@ -28,14 +28,17 @@ Used for launcher, clipboard, notifications, session menu, and related shell act
 
 ## Theming (Stylix-Exempt)
 
-Noctalia ignores Stylix auto-theming. Colors are hardcoded Gruvbox values in `settings.nix`:
+Noctalia ignores Stylix auto-theming. Colors come from a custom GruvboxAlt color scheme:
 
-- Background: `#282828` / `#32302f`
-- Foreground: `#ebdbb2`
-- Accent: `#458588` (blue)
-- Borders/highlights use Gruvbox palette directly
+- Scheme file: `colorschemes/GruvboxAlt.json` (placed at `~/.config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json`)
+- Selected via `predefinedScheme = "GruvboxAlt"` in `settings.nix`
+- Background: `#282828` / `#3c3836`
+- Foreground: `#ebdbb2` / `#fbf1c7`
+- Outline: `#57514e`
+- Hover/Accent: `#83a598`
+- QML plugin files use the same palette via hardcoded color properties
 
-When Stylix base16 scheme changes, Noctalia colors must be updated **manually** in `settings.nix`.
+When the scheme changes, update `colorschemes/GruvboxAlt.json`, the QML plugin colors, and `shared/constants.nix` (if accent colors shift).
 
 ---
 

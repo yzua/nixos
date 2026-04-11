@@ -8,17 +8,6 @@
 }:
 
 let
-  apiQuotaScript = "bash ${../../../scripts/ai/api-quota}/api-quota.sh";
-  apiQuotaPlugin = pkgs.runCommandLocal "noctalia-ai-quota-plugin" { } ''
-    mkdir -p "$out"
-    cp -r ${./plugins/ai-quota}/. "$out/"
-    substituteInPlace \
-      "$out/Main.qml" \
-      "$out/BarWidget.qml" \
-      "$out/QuotaPanel.qml" \
-      "$out/Panel.qml" \
-      --replace-fail "@API_QUOTA_SCRIPT@" "${apiQuotaScript}"
-  '';
   pluginsJson = builtins.toJSON {
     version = 2;
     sources = [
@@ -29,7 +18,19 @@ let
       }
     ];
     states = {
-      "ai-quota" = {
+      "model-usage" = {
+        enabled = true;
+        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+      };
+      "keybind-cheatsheet" = {
+        enabled = true;
+        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+      };
+      "mawaqit" = {
+        enabled = true;
+        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+      };
+      "music-search" = {
         enabled = true;
         sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
       };
@@ -48,8 +49,16 @@ in
 
   programs.noctalia-shell.enable = true;
 
+  # Allow the activation script to overwrite the mutable settings.json
+  # (patched at activation time by the sops location injector)
+  xdg.configFile."noctalia/settings.json".force = true;
+
   home.file = {
-    ".config/noctalia/plugins/ai-quota".source = apiQuotaPlugin;
+    ".config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json".source = ./colorschemes/GruvboxAlt.json;
+    ".config/noctalia/plugins/model-usage".source = ./plugins/model-usage;
+    ".config/noctalia/plugins/keybind-cheatsheet".source = ./plugins/keybind-cheatsheet;
+    ".config/noctalia/plugins/mawaqit".source = ./plugins/mawaqit;
+    ".config/noctalia/plugins/music-search".source = ./plugins/music-search;
     ".config/noctalia/plugins.json".text = pluginsJson;
   };
 }
