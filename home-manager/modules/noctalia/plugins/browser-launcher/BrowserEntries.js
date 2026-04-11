@@ -7,7 +7,7 @@ function entries(home) {
       name: "Brave",
       description: "Brave with Finland proxy",
       launcher: home + "/.local/bin/brave-proxy",
-      icon: "brand-brave"
+      icon: "world"
     },
     {
       id: "librewolf-banking",
