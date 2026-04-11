@@ -184,7 +184,7 @@
       (mkWorkspaceAppIdRule "^muffon$" ws.media { })
       (mkWorkspaceAppIdRule "^nuclear$" ws.media { })
       {
-        matches = [ { title = "^android-re($|-)"; } ];
+        matches = [ { title = "^android-re"; } ];
         open-on-workspace = ws.android;
       }
       (mkWorkspaceAppIdRule "^Emulator$" ws.android {
