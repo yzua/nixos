@@ -7,10 +7,15 @@
 # The android-re agent's system prompt already contains the full RE prompt bundle
 # (AGENTS.md, WORKFLOW.md, TOOLS.md, TROUBLESHOOTING.md, README.md) injected at Nix eval time.
 # No need to pass them again via --prompt.
+#
+# If no emulator is running, `re-avd.sh start` is launched in the background so the
+# agent session opens immediately instead of blocking on the full boot chain.
+# The agent can monitor progress with `re-avd.sh status` or `adb wait-for-device`.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROFILE="${ANDROID_RE_OPENCODE_PROFILE:-default}"
+START_LOG="${START_LOG:-${HOME}/Downloads/android-re-tools/re-avd-start.log}"
 
 # Resolve config directory for the chosen profile
 if [[ "${PROFILE}" == "default" ]]; then
@@ -25,10 +30,15 @@ if command -v niri >/dev/null 2>&1 && niri msg version >/dev/null 2>&1; then
 	[[ -n "${ws_ref}" ]] && niri msg action focus-workspace "${ws_ref}" >/dev/null 2>&1 || true
 fi
 
-# Boot the emulator baseline if nothing is running
+# Boot the emulator baseline if nothing is running.
+# Run start in background so the OpenCode session opens immediately;
+# the agent can check readiness with `re-avd.sh status` or `adb wait-for-device`.
 if ! adb devices 2>/dev/null | grep -q '^emulator-'; then
-	echo "No emulator running — starting Android RE baseline..."
-	bash "${SCRIPT_DIR}/re-avd.sh" start
+	echo "No emulator running — starting Android RE baseline in background (log: ${START_LOG})"
+	nohup bash "${SCRIPT_DIR}/re-avd.sh" start >"${START_LOG}" 2>&1 &
+	START_PID=$!
+	echo "re-avd.sh start PID: ${START_PID}"
+	echo "Monitor with: tail -f ${START_LOG}"
 else
 	echo "Emulator already running — checking status..."
 	bash "${SCRIPT_DIR}/re-avd.sh" status
