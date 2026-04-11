@@ -1,0 +1,15 @@
+{
+  "id": "ai-quota",
+  "name": "AI Quota",
+  "version": "1.0.0",
+  "author": "yz",
+  "description": "Operator-focused AI quota dashboard for Codex, Claude, and Z.ai.",
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "panel": "QuotaPanel.qml"
+  },
+  "metadata": {
+    "icon": "activity",
+    "showIcon": false
+  }
+}

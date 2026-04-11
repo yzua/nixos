@@ -1,6 +1,6 @@
 # Noctalia bar widget layout (left, center, right panels)
 
-{ apiQuotaScript, ... }:
+_:
 
 let
   mkWidget = id: { inherit id; };
@@ -59,14 +59,7 @@ in
           hidePassive = true;
         }
         {
-          id = "CustomButton";
-          icon = "activity";
-          showIcon = true;
-          hideMode = "alwaysExpanded";
-          parseJson = true;
-          textCommand = "${apiQuotaScript}";
-          textIntervalMs = 300000;
-          leftClickUpdateText = true;
+          id = "plugin:ai-quota";
         }
         (mkWidget "NotificationHistory")
         (mkOnHoverWidget "Microphone")
