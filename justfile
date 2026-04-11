@@ -40,7 +40,7 @@ _lint-nix:
     @echo -e "\n➤ Linting Nix files…"
     @\time -f "⏱ Statix in %E" statix check --ignore '.git/**' . || nix run nixpkgs#statix -- check --ignore '.git/**'
     @echo -e "\n➤ Checking for dead Nix code…"
-    @\time -f "⏱ Deadnix in %E" deadnix --fail --exclude ./home-manager/modules/terminal/zellij.nix . || nix run nixpkgs#deadnix -- --fail --exclude ./home-manager/modules/terminal/zellij.nix .
+    @\time -f "⏱ Deadnix in %E" deadnix --fail . || nix run nixpkgs#deadnix -- --fail .
     @echo "✔ Nix linting passed!"
 
 # Lint shell scripts (shellcheck + inline)
@@ -60,7 +60,7 @@ _lint-markdown:
 # Scan for unused code in .nix files
 dead:
     @echo -e "\n➤ Checking for dead Nix code…"
-    @\time -f "⏱ Completed in %E" deadnix --fail --exclude ./home-manager/modules/terminal/zellij.nix . || nix run nixpkgs#deadnix -- --fail --exclude ./home-manager/modules/terminal/zellij.nix .
+    @\time -f "⏱ Completed in %E" deadnix --fail . || nix run nixpkgs#deadnix -- --fail .
     @echo "✔ Deadnix check passed!"
 
 # Run nix flake check
@@ -82,7 +82,7 @@ pkgs:
 # Switch Home-Manager generation
 home:
     @echo -e "\n➤ Switching Home-Manager…"
-    nh home switch 'path:.' --configuration yz@desktop --backup-extension backup
+    home-manager switch --flake path:.#yz@desktop -b backup
 
 # Sync skills from GitHub to ~/.local/share/skills/
 skills-sync:
@@ -136,9 +136,31 @@ diff:
     @echo -e "\n➤ Diffing NixOS generations…"
     nvd diff $(ls -dv /nix/var/nix/profiles/system-*-link | tail -2)
 
-# Update all flake inputs
+# Update all flake inputs (runs pre-check, updates, then post-check)
 update:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	JUST="{{JUST}}"
+	echo -e "\n➤ Pre-update health check…"
+	$JUST check
+	echo -e "\n➤ Updating flake inputs…"
 	nix flake update
+	echo -e "\n➤ Post-update verification…"
+	$JUST check
+	echo -e "✔ Update complete!"
+
+# Full upgrade pipeline: update inputs → build NixOS → build Home Manager → verify
+upgrade:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	JUST="{{JUST}}"
+	echo -e "\n➤ Full system upgrade…"
+	$JUST update
+	$JUST nixos
+	$JUST home
+	echo -e "\n➤ Post-upgrade health check…"
+	$JUST security-audit
+	echo -e "✔ Full upgrade complete!"
 
 # Clean up build artifacts and caches
 clean:
