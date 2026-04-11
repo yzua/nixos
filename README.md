@@ -68,61 +68,63 @@ just all   # modules, pkgs, lint (parallel) -> format -> check -> nixos -> home
 
 Set `hostProfile` first, then override as needed:
 
-| Option                       | Description                                     |
-| ---------------------------- | ----------------------------------------------- |
-| `hostProfile`                | `"desktop"` or `"laptop"` — sets defaults below |
-| `hostInfo.enable`            | Hostname + stateVersion from flake args         |
-| `nvidia.enable`              | NVIDIA drivers, CUDA, Wayland                   |
-| `fwupd.enable`               | Firmware updates (LVFS)                         |
-| `gaming.enable`              | Steam, Lutris, Wine, MangoHud                   |
-| `gaming.enableGamemode`      | Feral GameMode daemon                           |
-| `gaming.enableGamescope`     | Gamescope compositor                            |
-| `bluetooth.enable`           | Bluetooth services                              |
-| `bluetooth.powerOnBoot`      | Auto-power Bluetooth adapter on boot            |
-| `mullvadVpn.enable`          | Mullvad VPN                                     |
-| `tor.enable`                 | Tor SOCKS proxy (port 9050)                     |
-| `i2pd.enable`                | I2P anonymous network router                    |
-| `i2pd.port`                  | I2P transport port (used with firewall opening) |
-| `i2pd.openFirewall`          | Open firewall for I2P transport port            |
-| `i2pd.notransit`             | Disable transit tunnel participation            |
-| `i2pd.bandwidth`             | Optional I2P bandwidth cap (KB/s)               |
-| `yggdrasil.enable`           | Yggdrasil mesh network                          |
-| `dnscryptProxy.enable`       | Encrypted DNS with DNSSEC                       |
-| `virtualisation.enable`      | Docker, libvirt/QEMU                            |
-| `flatpak.enable`             | Flatpak + Flathub                               |
-| `printing.enable`            | CUPS                                            |
-| `nautilus.enable`            | GNOME Files                                     |
-| `nixLd.enable`               | Dynamic linker for non-Nix binaries             |
-| `cleanup.enable`             | Automated cleanup timers                        |
-| `backup.enable`              | Restic backups (requires sops secret)           |
-| `backup.repository`          | Restic repository target path                   |
-| `netdata.enable`             | System monitoring (port 19999)                  |
-| `scrutiny.enable`            | Disk health (port 8080)                         |
-| `glance.enable`              | Dashboard (port 8082)                           |
-| `opensnitch.enable`          | Application firewall                            |
-| `ntfy.enable`                | Alertmanager → ntfy.sh notifications            |
-| `ntfy.port`                  | Local ntfy bridge listener port                 |
-| `observability.enable`       | Prometheus + Grafana (ports 9090, 3001)         |
-| `loki.enable`                | Log aggregation with Promtail                   |
-| `systemReport.enable`        | Unified health reporting                        |
-| `systemReport.outputDir`     | System report output directory                  |
-| `systemReport.retentionDays` | System report retention window (days)           |
-| `greetd.enable`              | Display manager                                 |
-| `waydroid.enable`            | Android emulation                               |
-| `auditLogging.enable`        | fail2ban logging                                |
-| `aide.enable`                | AIDE file integrity monitoring (default: on)    |
-| `metadataScrubber.enable`    | Automatic metadata scrubbing (mat2/exiftool)    |
-| `kdeconnect.enable`          | KDE Connect phone integration                   |
-| `vnc.enable`                 | VNC remote access                               |
-| `secureBoot.enable`          | Secure Boot preparation with sbctl              |
-| `webRe.enable`               | Web reverse engineering and security tools      |
-| android (unconditional)      | ADB, Fastboot, Android Studio (no toggle)       |
+| Option                       | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| `hostProfile`                | `"desktop"` or `"laptop"` — sets defaults below              |
+| `hostInfo.enable`            | Hostname + stateVersion from flake args                      |
+| `nvidia.enable`              | NVIDIA drivers, CUDA, Wayland                                |
+| `fwupd.enable`               | Firmware updates (LVFS)                                      |
+| `gaming.enable`              | Steam, Lutris, Wine, MangoHud                                |
+| `gaming.enableGamemode`      | Feral GameMode daemon                                        |
+| `gaming.enableGamescope`     | Gamescope compositor                                         |
+| `bluetooth.enable`           | Bluetooth services                                           |
+| `bluetooth.powerOnBoot`      | Auto-power Bluetooth adapter on boot                         |
+| `mullvadVpn.enable`          | Mullvad VPN                                                  |
+| `tor.enable`                 | Tor SOCKS proxy (port 9050)                                  |
+| `i2pd.enable`                | I2P anonymous network router                                 |
+| `i2pd.port`                  | I2P transport port (used with firewall opening)              |
+| `i2pd.openFirewall`          | Open firewall for I2P transport port                         |
+| `i2pd.notransit`             | Disable transit tunnel participation                         |
+| `i2pd.bandwidth`             | Optional I2P bandwidth cap (KB/s)                            |
+| `yggdrasil.enable`           | Yggdrasil mesh network                                       |
+| `dnscryptProxy.enable`       | Encrypted DNS with DNSSEC                                    |
+| `virtualisation.enable`      | Docker, libvirt/QEMU                                         |
+| `flatpak.enable`             | Flatpak + Flathub                                            |
+| `printing.enable`            | CUPS                                                         |
+| `nautilus.enable`            | GNOME Files                                                  |
+| `nixLd.enable`               | Dynamic linker for non-Nix binaries                          |
+| `cleanup.enable`             | Automated cleanup timers                                     |
+| `backup.enable`              | Restic backups (requires sops secret)                        |
+| `backup.repository`          | Restic repository target path                                |
+| `netdata.enable`             | System monitoring (port 19999)                               |
+| `scrutiny.enable`            | Disk health (port 8080)                                      |
+| `glance.enable`              | Dashboard (port 8082)                                        |
+| `opensnitch.enable`          | Application firewall                                         |
+| `ntfy.enable`                | Alertmanager → ntfy.sh notifications                         |
+| `ntfy.port`                  | Local ntfy bridge listener port                              |
+| `observability.enable`       | Prometheus + Alertmanager + Grafana (ports 9090, 9093, 3001) |
+| `loki.enable`                | Log aggregation with Promtail                                |
+| `systemReport.enable`        | Unified health reporting                                     |
+| `systemReport.outputDir`     | System report output directory                               |
+| `systemReport.retentionDays` | System report retention window (days)                        |
+| `greetd.enable`              | Display manager                                              |
+| `waydroid.enable`            | Android emulation                                            |
+| `auditLogging.enable`        | fail2ban logging                                             |
+| `aide.enable`                | AIDE file integrity monitoring (default: on)                 |
+| `metadataScrubber.enable`    | Automatic metadata scrubbing (mat2/exiftool)                 |
+| `kdeconnect.enable`          | KDE Connect phone integration                                |
+| `vnc.enable`                 | VNC remote access                                            |
+| `secureBoot.enable`          | Secure Boot preparation with sbctl                           |
+| `webRe.enable`               | Web reverse engineering and security tools                   |
+| android (unconditional)      | ADB, Fastboot, Android Studio (no toggle)                    |
 
 ---
 
 ## Security
 
-Always-on: kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, AIDE file integrity, metadata scrubbing, firewall hostname leak prevention, Chrony with NTS.
+Always-on: kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
+
+On by default (toggleable): AIDE file integrity, metadata scrubbing.
 
 Toggleable: Mullvad VPN, Tor, Yggdrasil, DNSCrypt, OpenSnitch, fail2ban.
 

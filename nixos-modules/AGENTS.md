@@ -10,6 +10,7 @@ The module system follows a strict layout:
 
 - **default.nix**: The central hub. It imports every module and directory in this path.
 - **host-defaults.nix**: Sets profile defaults. It handles common settings for desktops and laptops.
+- **host-info.nix**: Hostname and state version management from flake arguments.
 - **validation.nix**: The safety layer. It uses assertions to stop conflicting services.
 - **Feature Modules**: Single files like `gaming.nix` or `nvidia.nix` that manage specific subsystems.
 - **Sub-module Directories**: Paths like `security/` or `cleanup/` that have their own internal hubs.
@@ -37,7 +38,7 @@ The `default.nix` file is the master registry. Every new module must be listed t
 
 ### Helper Files
 
-Files that start with an underscore are internal helpers. `_lib.nix` is a common example. These are not added to the central hub. You must import them manually in the files that need their logic.
+Files that start with an underscore are internal helpers. For example, `cleanup/_lib.nix` exposes timer constructors. These are not added to the central hub. You must import them manually in the files that need their logic.
 
 ## ANTI-PATTERNS
 
@@ -75,12 +76,14 @@ We use `host-defaults.nix` to reduce boilerplate. Setting `mySystem.hostProfile`
 
 Modules are grouped into these namespaces:
 
-- **Core**: Boot, nix, users, timezone, i18n, environment, stability.
+- **Core**: Boot, nix, users, timezone, i18n, environment, stability, hostname.
 - **Hardware**: GPU, audio, bluetooth, input, power, firmware updates.
 - **Desktop**: Niri, greetd, xserver, portals, file manager.
-- **Networking**: NetworkManager, encrypted DNS, VPNs, Tor, mesh networks.
-- **Security**: Hardening, application firewall, secrets.
-- **Apps**: Gaming, flatpak, printing, android, phone sync, remote access.
-- **Virtualization**: Docker, VMs, android containers.
+- **Networking**: NetworkManager, encrypted DNS, VPNs, Tor, I2P, mesh networks.
+- **Security**: Hardening, application firewall, secure boot, secrets.
+- **Apps**: Gaming, flatpak, printing, android, web RE tools, browser deps, phone sync, remote access.
+- **Virtualization**: Docker, VMs, android containers, dynamic linker.
+- **Notifications**: Alertmanager → ntfy.sh push bridge.
 - **Observability**: Metrics, dashboards, logs, health reports, alerts.
-- **Maintenance**: Cleanup timers, backups.
+- **Boot optimization**: Deferred service startup.
+- **Maintenance**: Cleanup timers, backups, Nix Helper.
