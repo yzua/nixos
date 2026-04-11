@@ -55,12 +55,12 @@ resolve_frida_ps_bin() {
 
 frida_host_probe() {
 	resolve_frida_ps_bin
-	# Enumerate processes — fast when server is up (sub-second).
-	# Use timeout -k to guarantee SIGKILL if frida-ps hangs on USB transport.
-	local rc=0
-	timeout -k 3 "${FRIDA_WAIT_TIMEOUT}" "${FRIDA_PS_BIN}" -U >/dev/null 2>&1 || rc=$?
-	# rc 0 = server up and listing succeeded; rc 124/137 = timeout/kill = server not ready
-	((rc == 0))
+	# Check that frida-ps actually lists processes (not just exits 0 with empty output).
+	# frida-ps -U returns exit 0 even when the server is down (just prints nothing).
+	# Count lines — a working server lists 50+ processes.
+	local lines
+	lines="$(timeout -k 3 "${FRIDA_WAIT_TIMEOUT}" "${FRIDA_PS_BIN}" -U 2>/dev/null | wc -l)" || lines=0
+	((lines > 5))
 }
 
 log_frida_failure_context() {
@@ -215,7 +215,7 @@ mitm_listener_ready() {
 }
 
 mitm_command() {
-	printf 'mitmdump --set confdir=%q --listen-host %q --listen-port %q' "${MITM_CONF_DIR}" "${MITM_HOST}" "${MITM_PORT}"
+	printf 'mitmdump --set confdir=%q --listen-host %q --listen-port %q --set ssl_insecure=true --set flow_detail=2' "${MITM_CONF_DIR}" "${MITM_HOST}" "${MITM_PORT}"
 }
 
 resolve_re_workspace_ref() {
