@@ -38,7 +38,6 @@
       gtk.extraCss = ''
         * {
           border-radius: 0;
-          -gtk-outline-radius: 0;
           box-shadow: none;
         }
       '';

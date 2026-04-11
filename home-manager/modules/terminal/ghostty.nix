@@ -24,7 +24,7 @@
       font-thicken = true;
       adjust-cell-height = "0%";
 
-      theme = "Gruvbox Dark"; # Fallback; Stylix handles theming
+      # theme is managed by Stylix (stylix.targets.ghostty.enable = true)
 
       window-padding-x = 8;
       window-padding-y = 8;
