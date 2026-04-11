@@ -24,14 +24,14 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 Six named workspaces are preconfigured, each with auto-launching apps:
 
-| #   | Workspace | Apps (auto-start)           | Access    |
-| --- | --------- | --------------------------- | --------- |
-| 1   | 󰖟 browser | LibreWolf (personal)        | `Super+1` |
-| 2   | 󰨞 editor  | VSCode, Ghostty (+Zellij)   | `Super+2` |
-| 3   | 󰍡 social  | Vesktop (Discord), Telegram | `Super+3` |
-| 4   | 󰎆 media   | Music/Video players         | `Super+4` |
-| 5   | 󰦝 vpn     | Mullvad VPN, KeePassXC      | `Super+5` |
-| 6   | 󰀲 android | Android tools               | `Super+6` |
+| #   | Workspace | Apps (auto-start)            | Access    |
+| --- | --------- | ---------------------------- | --------- |
+| 1   | 󰖟 browser | LibreWolf (personal)         | `Super+1` |
+| 2   | 󰨞 editor  | VSCode, Ghostty (+Zellij)    | `Super+2` |
+| 3   | 󰍡 social  | Vesktop (Discord), Telegram  | `Super+3` |
+| 4   | 󰎆 media   | Music/Video players          | `Super+4` |
+| 5   | 󰦝 vpn     | Mullvad VPN, KeePassXC       | `Super+5` |
+| 6   | 󰀲 android | Android tools (window rules) | `Super+6` |
 
 Workspaces 7–9 are available as unnamed extras (`Super+7` through `Super+9`).
 
@@ -340,7 +340,7 @@ These apps open floating instead of tiled:
 
 | App               | Workspace | Width         |
 | ----------------- | --------- | ------------- |
-| Brave             | 󰖟 browser | Full width    |
+| LibreWolf         | 󰖟 browser | Full width    |
 | VSCode            | 󰨞 editor  | Default (50%) |
 | Ghostty           | 󰨞 editor  | Default (50%) |
 | Vesktop (Discord) | 󰍡 social  | Default (50%) |
@@ -353,13 +353,13 @@ These apps open floating instead of tiled:
 
 ### Visual Rules
 
-| Rule                 | Target                   | Effect                              |
-| -------------------- | ------------------------ | ----------------------------------- |
-| Corner radius (0px)  | All windows              | Square corners, clipped to geometry |
-| Transparency (92%)   | Ghostty, kitty, foot     | Slight see-through for terminals    |
-| Inactive dim (95%)   | All inactive windows     | Subtle dimming to highlight focus   |
-| Shadows              | Floating windows         | Drop shadow on floating windows     |
-| Scroll factor (0.75) | Brave, Firefox, Chromium | Slower scroll speed in browsers     |
+| Rule                 | Target                              | Effect                              |
+| -------------------- | ----------------------------------- | ----------------------------------- |
+| Corner radius (0px)  | All windows                         | Square corners, clipped to geometry |
+| Transparency (92%)   | Ghostty, kitty, foot                | Slight see-through for terminals    |
+| Inactive dim (95%)   | All inactive windows                | Subtle dimming to highlight focus   |
+| Shadows              | Floating windows                    | Drop shadow on floating windows     |
+| Scroll factor (0.75) | LibreWolf, Brave, Firefox, Chromium | Slower scroll speed in browsers     |
 
 ### Special Rules
 

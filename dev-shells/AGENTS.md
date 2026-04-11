@@ -6,16 +6,16 @@
 
 ## Available Templates
 
-| Template       | Directory       | Key Tools                                                                                                                      |
-| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Template       | Directory       | Key Tools                                                                                                                                                                                                                                         |
+| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `python-venv`  | `python-venv/`  | venv, ruff, black, isort, flake8, mypy, bandit, safety, vulture, pytest, coverage, jupyter, django, flask, fastapi, numpy, pandas, matplotlib, scipy, scikit-learn, sqlalchemy, boto3, docker, ansible, sphinx, mkdocs — see README for full list |
-| `rust-stable`  | `rust-stable/`  | cargo, rustc, clippy, rustfmt, pkg-config, cargo-audit                                                                         |
-| `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy, rustfmt, pkg-config                                                          |
-| `nodejs`       | `nodejs/`       | node, pnpm, yarn, typescript, typescript-language-server, prettier, eslint                                                     |
-| `bun`          | `bun/`          | bun, typescript, typescript-language-server, biome                                                                             |
-| `deno`         | `deno/`         | deno                                                                                                                           |
-| `go`           | `go/`           | go, gopls, golangci-lint, gofumpt, golines, delve, gotests, go-tools, air, protobuf, protoc-gen-go, protoc-gen-go-grpc         |
-| `cpp`          | `cpp/`          | gcc, cmake, gnumake, pkg-config, clang-tools, gdb, valgrind, cppcheck                                                          |
+| `rust-stable`  | `rust-stable/`  | cargo, rustc, clippy, rustfmt, pkg-config, cargo-audit                                                                                                                                                                                            |
+| `rust-nightly` | `rust-nightly/` | Fenix nightly toolchain, cargo, rust-src, clippy, rustfmt, pkg-config                                                                                                                                                                             |
+| `nodejs`       | `nodejs/`       | node, pnpm, yarn, typescript, typescript-language-server, prettier, eslint                                                                                                                                                                        |
+| `bun`          | `bun/`          | bun, typescript, typescript-language-server, biome                                                                                                                                                                                                |
+| `deno`         | `deno/`         | deno                                                                                                                                                                                                                                              |
+| `go`           | `go/`           | go, gopls, golangci-lint, gofumpt, golines, delve, gotests, go-tools, air, protobuf, protoc-gen-go, protoc-gen-go-grpc                                                                                                                            |
+| `cpp`          | `cpp/`          | gcc, cmake, gnumake, pkg-config, clang-tools, gdb, valgrind, cppcheck                                                                                                                                                                             |
 
 ---
 
@@ -41,12 +41,12 @@ All dev-shell flakes follow the same structure:
 ```nix
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.utils.url = "github:numtide/flake-utils";
 
-  outputs = { nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system: {
+  outputs = { nixpkgs, utils, ... }:
+    utils.lib.eachDefaultSystem (system: {
       devShells.default = pkgs.mkShell {
-        packages = [ ... ];
+        buildInputs = with pkgs; [ ... ];
         shellHook = ''
           # Project detection + helpful messages
         '';

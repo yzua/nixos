@@ -40,12 +40,12 @@
 
         bun = {
           path = ./bun;
-          description = "Bun Javascript App";
+          description = "Bun JavaScript/TypeScript development template";
         };
 
         nodejs = {
           path = ./nodejs;
-          description = "NodeJS Javascript App";
+          description = "Node.js JavaScript/TypeScript development template";
         };
 
         go = {

@@ -43,5 +43,5 @@
 
 ## Area Guides
 
-- Read the nearest nested `AGENTS.md` before changing code under `nixos/`, `home-manager/`, `scripts/`, `hosts/`, or `dev-shells/`.
+- Read the nearest nested `AGENTS.md` before changing code under `nixos-modules/`, `home-manager/`, `scripts/`, `hosts/`, or `dev-shells/`.
 - Especially relevant sub-guides: `nixos-modules/AGENTS.md`, `home-manager/modules/AGENTS.md`, `home-manager/modules/ai-agents/AGENTS.md`, `scripts/AGENTS.md`, `hosts/AGENTS.md`, `dev-shells/AGENTS.md`.

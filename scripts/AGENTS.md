@@ -24,7 +24,10 @@ scripts/
 │   └── android-re/
 │       ├── re-avd.sh        # Android emulator management (AVD create/start/snapshot)
 │       ├── re-avd-test.sh   # Unit tests for re-avd.sh
-│       └── re-static.sh     # Android static analysis workflow
+│       ├── re-static.sh     # Android static analysis workflow
+│       ├── opencode-android-re.sh # OpenCode Android RE workspace launcher
+│       ├── _helpers.sh      # Shared Android RE helper functions
+│       └── _spoof-table.sh  # Device fingerprint spoof table
 ├── apps/
 │   ├── browser-select.sh    # Browser profile selector (wofi menu)
 │   ├── element-desktop-keyring.sh # Element Desktop keyring helper
@@ -42,7 +45,8 @@ scripts/
 │   └── nvidia-fans.sh       # GPU fan control
 ├── lib/
 │   ├── logging.sh           # Shared logging library (colored output, timestamps)
-│   └── test-helpers.sh      # Shared test utilities (assertions, mocking)
+│   ├── test-helpers.sh      # Shared test utilities (assertions, mocking)
+│   └── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
 ├── sops/
 │   ├── editor-code-wait.sh  # VS Code wait wrapper for sops editing
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)

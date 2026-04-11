@@ -64,6 +64,7 @@ modules/
 │   ├── obs.nix         # OBS Studio with CUDA and plugins
 │   ├── obsidian.nix    # Obsidian Markdown notes app defaults
 │   ├── opensnitch-ui.nix # OpenSnitch application firewall GUI
+│   ├── metadata-scrubber.nix # Automatic metadata scrubbing (mat2/exiftool)
 │   ├── syncthing.nix   # Syncthing local file sync
 │   ├── _desktop-local-bin-wrappers.nix # Desktop local bin wrappers (helper, not in default.nix)
 │   ├── vscode/         # VS Code editor
@@ -97,23 +98,32 @@ modules/
 ├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD)
 │   ├── default.nix     # Import hub, apiQuotaScript, status-notifier-watcher
 │   ├── bar.nix         # Bar widgets (left, center, right panels)
-│   └── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)
+│   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)
+│   └── plugins/        # Noctalia shell plugins
+│       └── ai-quota/   # AI API quota bar widget (QML)
 ├── neovim/             # Neovim editor with LSP, completion, and modern plugins
 │   ├── default.nix     # Plugin declarations, treesitter, Lua config loading
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)
 │   └── plugins/        # Plugin-specific configs (wakatime)
 ├── programming-languages/ # Language tooling (Go, JS, Python, Mise)
-│   ├── go.nix          # Go toolchain, env vars, and aliases
-│   ├── javascript.nix  # JS/TS tooling, LSP servers, and aliases
-│   ├── python.nix      # Python tooling, LSP servers, and aliases
-│   └── mise.nix        # Mise polyglot runtime manager
+│   ├── _alias-helpers.nix # Shared zsh/bash alias wiring (helper, not a module)
+│   ├── go/              # Go runtime, aliases, GOPATH/GOBIN/session settings
+│   │   └── default.nix
+│   ├── javascript/      # Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper
+│   │   ├── default.nix
+│   │   └── _gitignores.nix # Git ignore patterns (helper)
+│   ├── python/          # Python toolchain, uv/poetry aliases, REPL config
+│   │   ├── default.nix
+│   │   └── _gitignores.nix # Git ignore patterns (helper)
+│   └── mise/            # Mise polyglot runtime manager
+│       └── default.nix
 ├── terminal/           # Shell, terminal, and CLI tools
 │   ├── ghostty.nix     # Ghostty terminal emulator
 │   ├── zellij/         # Terminal multiplexer (WASM plugins, 4 layouts)
 │   │   ├── default.nix # Import hub
 │   │   ├── config.nix  # Keybinds, UI, behavior
 │   │   ├── layouts.nix # Layouts (default, dev, ai, monitoring)
-│   │   └── plugins.nix # WASM plugins (zjstatus, autolock, monocle, room, harpoon)
+│   │   └── plugins.nix # WASM plugins (zjstatus, autolock, monocle, room, harpoon, forgot, multitask)
 │   ├── direnv.nix      # Per-directory environments
 │   ├── scripts.nix     # Custom utility script wrappers (currently `nvidia-fans`)
 │   ├── shell.nix       # Nix shell integration and dev tools
@@ -148,7 +158,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-12 domain chunks + 2 custom chunks: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/prayer`.
+12 domain chunks + 4 custom chunks: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/cursor`, `custom/kiro`, `custom/prayer`.
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 

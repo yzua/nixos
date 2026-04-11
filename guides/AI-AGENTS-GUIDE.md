@@ -25,7 +25,7 @@ OpenCode is configured against the current 1.4.0 schema surface rather than only
 
 ## Agency Agents Usage (Claude + OpenCode)
 
-Agency agents are an addon pack installed by `programs.aiAgents.agencyAgents.enable` via activation scripts.
+Agency agents are an addon pack installed by `programs.aiAgents.agencyAgents.enable` via activation scripts. **Note:** Currently disabled in this config (`agencyAgents.enable = false`).
 
 Invocation is explicit by default:
 
@@ -44,10 +44,26 @@ Impeccable is installed from `pbakaus/impeccable` as provider-specific skill bun
 Use slash commands directly in either CLI session:
 
 ```text
+/teach-impeccable
 /audit
+/critique
 /normalize
 /polish
 /distill
+/clarify
+/optimize
+/harden
+/animate
+/colorize
+/bolder
+/quieter
+/delight
+/extract
+/adapt
+/onboard
+/typeset
+/arrange
+/overdrive
 ```
 
 Optional scope arguments are supported:
@@ -391,6 +407,7 @@ Primary and subagents generated into OpenCode config:
 - `review`: bug/regression/security review subagent
 - `recon`: reverse-engineering and static triage subagent
 - `patch`: bounded edit and validation subagent
+- `android-re`: Android reverse-engineering and security analysis subagent
 
 Custom OpenCode slash commands generated from workflow prompts:
 
@@ -446,19 +463,19 @@ Operational notes:
 
 ### Codex
 
-| Setting                  | Value                     | Why                                                              |
-| ------------------------ | ------------------------- | ---------------------------------------------------------------- |
-| Model                    | `gpt-5.4`                 | Stable default across interactive coding and repository work     |
-| Personality              | `pragmatic`               | Direct, practical responses                                      |
-| Reasoning effort         | `medium`                  | Balanced speed/quality                                           |
-| Approval policy          | `on-request`              | Good autonomy/safety balance for local coding                    |
-| Sandbox mode             | `workspace-write`         | Lets Codex edit the repo without dropping sandboxing             |
-| Feature: multi_agent     | Enabled                   | Turns on Codex sub-agent workflows                               |
-| Feature: plugins         | Enabled                   | Keeps Codex plugin/skills workflows available                    |
-| Feature: child_agents_md | Enabled                   | Adds AGENTS scope guidance even when no local AGENTS file exists |
-| Agent thread cap         | `4`                       | Enables parallelism without overloading the main session         |
-| Profiles                 | quick, deep, safe, review | Context-switching presets                                        |
-| Custom agents            | reviewer, recon           | Narrow specialized workers                                       |
+| Setting                  | Value                                      | Why                                                              |
+| ------------------------ | ------------------------------------------ | ---------------------------------------------------------------- |
+| Model                    | `gpt-5.4`                                  | Stable default across interactive coding and repository work     |
+| Personality              | `pragmatic`                                | Direct, practical responses                                      |
+| Reasoning effort         | `medium`                                   | Balanced speed/quality                                           |
+| Approval policy          | `on-request`                               | Good autonomy/safety balance for local coding                    |
+| Sandbox mode             | `workspace-write`                          | Lets Codex edit the repo without dropping sandboxing             |
+| Feature: multi_agent     | Enabled                                    | Turns on Codex sub-agent workflows                               |
+| Feature: plugins         | Enabled                                    | Keeps Codex plugin/skills workflows available                    |
+| Feature: child_agents_md | Enabled                                    | Adds AGENTS scope guidance even when no local AGENTS file exists |
+| Agent thread cap         | `4`                                        | Enables parallelism without overloading the main session         |
+| Profiles                 | quick, deep, safe, review                  | Context-switching presets                                        |
+| Custom agents            | reviewer, recon, explorer, worker, monitor | Specialized workers and parallel agents                          |
 
 Trusted projects: `~/System`.
 
@@ -685,9 +702,16 @@ PostToolUse hooks auto-format files after edits:
 | Go                         | gofmt       |
 | Nix                        | nixfmt      |
 | Python                     | ruff format |
-| YAML/TOML                  | prettier    |
+| YAML                       | prettier    |
 
-A PreToolUse hook warns before destructive bash commands (`rm -rf`, `DROP`, `DELETE FROM`, `truncate`).
+PreToolUse hooks enforce safety guardrails:
+
+- Block system-destructive commands (`rm -rf /`, `mkfs`, `dd`, `shutdown`)
+- Warn on destructive DB commands (`DROP`, `DELETE FROM`, `truncate`)
+- Pre-commit lint check (triggers `just lint` / `pre-commit` / `npm lint` / `cargo check`)
+- Dev server tmux recommendation (suggests `npm/pnpm/yarn/bun run dev` in tmux)
+- Session persistence recommendation (for long-running tasks like `npm install/test`, `cargo`, `just`)
+- Block destructive git commands (`push --force`, `reset --hard`, `clean -fd`)
 
 ---
 
