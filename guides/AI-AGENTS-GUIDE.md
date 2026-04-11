@@ -243,11 +243,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                 |
 | `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                              |
 | `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                            |
-| `gem`                          | `gemini`                                                           | Gemini CLI balanced default                                               |
-| `gemu`                         | `gemini --approval-mode=yolo`                                      | Gemini CLI explicit YOLO                                                  |
-| `gemy`                         | `gemini --approval-mode=yolo`                                      | Same as `gemu`                                                            |
-| `gemp`                         | `gemini --approval-mode=plan`                                      | Gemini CLI explicit plan mode                                             |
-| `gemw`                         | `gemini --worktree`                                                | Gemini CLI in isolated git worktree                                       |
+| `gem`                          | `gemini --approval-mode=yolo`                                      | Gemini CLI default YOLO launcher                                          |
 | `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                               |
 | `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                        |
 | `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                     |

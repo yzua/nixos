@@ -58,7 +58,11 @@ ai-agents/
 │   ├── _file-templates.nix      # Config file templates
 │   ├── _workflow-prompts.nix    # Workflow prompt definitions
 │   ├── _zai-services.nix        # Z.AI MCP service registry
-│   └── _zai-filters.nix         # Z.AI MCP jq filter generation
+│   ├── _zai-filters.nix         # Z.AI MCP jq filter generation
+│   ├── _android-re-launchers.nix         # Android RE emulator/script launchers
+│   ├── _mk-cli-autoupdate-script.nix     # CLI autoupdate script builder
+│   ├── _services-shell-aliases.nix       # Shell alias definitions for agent services
+│   └── _services-systemd.nix             # Systemd user service/timer definitions
 ├── activation/              # Home Manager activation scripts
 │   ├── default.nix          # Aggregation: wires all activation steps
 │   ├── secrets.nix          # Secret patching (placeholder → real key injection)
@@ -66,9 +70,18 @@ ai-agents/
 │   ├── codex-setup.nix      # Codex CLI config file writes
 │   ├── plugins.nix          # Plugin/skill install scripts (impeccable, agency-agents)
 │   └── skills.nix           # Skill installations and omissions
+├── android-re/              # Android RE workflow prompts and config
+│   ├── _prompt.nix          # Prompt templates (not a module, imported by services)
+│   └── prompts/             # RE session prompts and operator guides
+│       ├── AGENTS.md        # Quick rules for RE sessions
+│       ├── README.md        # Operator guide and workflow map
+│       ├── WORKFLOW.md      # End-to-end RE workflow
+│       ├── TOOLS.md         # Installed tools and recommendations
+│       └── TROUBLESHOOTING.md # Known issues and recovery
 └── config/                  # Split configuration values
     ├── default.nix          # Import hub
     ├── defaults.nix         # Default values for agent options
+    ├── global-instructions.md # Global instructions text (not a module)
     ├── _skills.nix          # Skill installations and omissions
     ├── _formatters.nix      # Formatter registry for auto-formatting hooks (shared by claude + gemini)
     ├── mcp-servers.nix      # MCP server definitions + logging

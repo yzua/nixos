@@ -26,7 +26,11 @@ scripts/
 │       ├── re-avd-test.sh   # Unit tests for re-avd.sh
 │       └── re-static.sh     # Android static analysis workflow
 ├── apps/
-│   └── browser-select.sh    # Browser profile selector (wofi menu)
+│   ├── browser-select.sh    # Browser profile selector (wofi menu)
+│   ├── element-desktop-keyring.sh # Element Desktop keyring helper
+│   ├── playwright-cli-mcp-wrapper.sh # Playwright CLI MCP server wrapper
+│   ├── xdg-open-wrapper.sh  # XDG open wrapper for Wayland
+│   └── youtube-mpv.sh       # YouTube URL opener via mpv
 ├── build/
 │   ├── modules-check.sh     # Validates default.nix imports match .nix files on disk
 │   ├── modules-check-test.sh # Unit tests for modules-check.sh
@@ -128,4 +132,8 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                  |
 | `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                    |
 | `apps/browser-select.sh`                           | `home-manager/modules/apps/desktop-entries.nix` (`browser-select` wrapper)       |
+| `apps/element-desktop-keyring.sh`                  | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)  |
+| `apps/playwright-cli-mcp-wrapper.sh`               | `home-manager/modules/programming-languages/javascript/default.nix` (MCP server) |
+| `apps/xdg-open-wrapper.sh`                         | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)  |
+| `apps/youtube-mpv.sh`                              | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)  |
 | `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)              |

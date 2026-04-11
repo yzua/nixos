@@ -23,14 +23,16 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 
 ## Subdirectory Modules
 
-### `vscode/` (3 files + 1 helper)
+### `vscode/` (3 files + 3 helpers)
 
-| File             | Purpose                                                                         |
-| ---------------- | ------------------------------------------------------------------------------- |
-| `default.nix`    | Import hub: enable, package (`pkgs.vscode`), `mutableExtensionsDir = true`      |
-| `extensions.nix` | Extensions from nixpkgs + VS Code marketplace                                   |
-| `_settings.nix`  | Settings builder (helper, not in `default.nix`)                                 |
-| `activation.nix` | Writes mutable `settings.json` via activation script (avoids read-only symlink) |
+| File                      | Purpose                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| `default.nix`             | Import hub: enable, package (`pkgs.vscode`), `mutableExtensionsDir = true`      |
+| `extensions.nix`          | Extensions from nixpkgs + VS Code marketplace                                   |
+| `_settings.nix`           | Settings builder (helper, not in `default.nix`)                                 |
+| `_builtin-extensions.nix` | Built-in extension list (helper)                                                |
+| `_marketplace-refs.nix`   | Marketplace extension references (helper)                                       |
+| `activation.nix`          | Writes mutable `settings.json` via activation script (avoids read-only symlink) |
 
 **Unique pattern**: VS Code settings must be mutable (extensions write to it). `activation.nix` writes `settings.json` at activation time instead of using `home.file` symlink.
 

@@ -24,7 +24,11 @@ modules/
 │   │   ├── _file-templates.nix    # Config file templates
 │   │   ├── _workflow-prompts.nix  # Workflow prompt definitions
 │   │   ├── _zai-services.nix      # Z.AI MCP service registry
-│   │   └── _zai-filters.nix       # Z.AI MCP jq filter generation
+│   │   ├── _zai-filters.nix       # Z.AI MCP jq filter generation
+│   │   ├── _android-re-launchers.nix    # Android RE emulator/script launchers
+│   │   ├── _mk-cli-autoupdate-script.nix # CLI autoupdate script builder
+│   │   ├── _services-shell-aliases.nix  # Shell alias definitions for agent services
+│   │   └── _services-systemd.nix        # Systemd user service/timer definitions
 │   ├── activation/     # Home Manager activation scripts
 │   │   ├── default.nix      # Aggregation hub
 │   │   ├── secrets.nix      # Secret patching (placeholder → real key injection)
@@ -61,10 +65,13 @@ modules/
 │   ├── obsidian.nix    # Obsidian Markdown notes app defaults
 │   ├── opensnitch-ui.nix # OpenSnitch application firewall GUI
 │   ├── syncthing.nix   # Syncthing local file sync
+│   ├── _desktop-local-bin-wrappers.nix # Desktop local bin wrappers (helper, not in default.nix)
 │   ├── vscode/         # VS Code editor
 │   │   ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)
 │   │   ├── extensions.nix   # Extensions (nixpkgs + marketplace)
 │   │   ├── _settings.nix    # Settings builder (not a module, imported by activation)
+│   │   ├── _builtin-extensions.nix # Built-in extension list (helper)
+│   │   ├── _marketplace-refs.nix # Marketplace extension references (helper)
 │   │   └── activation.nix   # Writes mutable settings.json
 │   ├── brave/          # Brave browser
 │   │   ├── default.nix      # Import hub
