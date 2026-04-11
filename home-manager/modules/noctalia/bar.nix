@@ -13,62 +13,66 @@ in
 {
   programs.noctalia-shell.settings.bar = {
     position = "top";
-    floating = false;
     widgets = {
       left = [
         {
           id = "Clock";
+          clockColor = "primary";
+          customFont = "Anonymous Pro for Powerline";
           formatHorizontal = "hh:mm a ddd, MMM dd";
+          useCustomFont = true;
         }
         {
           id = "SystemMonitor";
-          compactMode = false;
+          compactMode = true;
+          iconColor = "secondary";
+          showCpuCores = true;
+          showCpuFreq = true;
           showGpuTemp = true;
-          showNetworkStats = true;
+          showCpuTemp = true;
+          showCpuUsage = true;
+          showDiskAvailable = true;
           showDiskUsage = true;
+          showDiskUsageAsPercent = true;
+          showLoadAverage = true;
+          showMemoryAsPercent = true;
+          showMemoryUsage = true;
+          showNetworkStats = false;
+          showSwapUsage = true;
+          useMonospaceFont = true;
+          usePadding = false;
         }
       ];
       center = [
         {
           id = "Workspace";
           showApplications = true;
-          labelMode = "name";
-          hideUnoccupied = false;
+          labelMode = "none";
+          hideUnoccupied = true;
           showLabelsOnlyWhenOccupied = false;
           enableScrollWheel = true;
-          colorizeIcons = false;
+          colorizeIcons = true;
+          emptyColor = "tertiary";
+          fontWeight = "bold";
+          groupedBorderOpacity = 0.55;
+          iconScale = 0.67;
+          showApplicationsHover = false;
+          unfocusedIconsOpacity = 0.61;
         }
       ];
       right = [
         {
-          id = "MediaMini";
-          hideMode = "hidden";
-          maxWidth = 145;
-          showArtistFirst = true;
-          showProgressRing = true;
-          scrollingMode = "hover";
-          panelShowAlbumArt = true;
-          panelShowVisualizer = true;
-          visualizerType = "linear";
+          id = "plugin:model-usage";
         }
         (mkOnHoverWidget "Network")
         {
           id = "Tray";
-          colorizeIcons = false;
-          drawerEnabled = false;
+          colorizeIcons = true;
+          drawerEnabled = true;
           hidePassive = true;
         }
         {
-          id = "plugin:model-usage";
-        }
-        {
-          id = "plugin:keybind-cheatsheet";
-        }
-        {
           id = "plugin:mawaqit";
-        }
-        {
-          id = "plugin:music-search";
         }
         (mkWidget "NotificationHistory")
         (mkOnHoverWidget "Microphone")

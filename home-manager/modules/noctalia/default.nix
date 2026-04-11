@@ -1,9 +1,7 @@
 # Noctalia Shell desktop environment.
 
 {
-  config,
   inputs,
-  pkgs,
   ...
 }:
 
@@ -34,6 +32,10 @@ let
         enabled = true;
         sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
       };
+      "browser-launcher" = {
+        enabled = true;
+        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+      };
     };
   };
 in
@@ -55,10 +57,26 @@ in
 
   home.file = {
     ".config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json".source = ./colorschemes/GruvboxAlt.json;
-    ".config/noctalia/plugins/model-usage".source = ./plugins/model-usage;
-    ".config/noctalia/plugins/keybind-cheatsheet".source = ./plugins/keybind-cheatsheet;
-    ".config/noctalia/plugins/mawaqit".source = ./plugins/mawaqit;
-    ".config/noctalia/plugins/music-search".source = ./plugins/music-search;
+    ".config/noctalia/plugins/model-usage" = {
+      source = ./plugins/model-usage;
+      force = true;
+    };
+    ".config/noctalia/plugins/keybind-cheatsheet" = {
+      source = ./plugins/keybind-cheatsheet;
+      force = true;
+    };
+    ".config/noctalia/plugins/mawaqit" = {
+      source = ./plugins/mawaqit;
+      force = true;
+    };
+    ".config/noctalia/plugins/music-search" = {
+      source = ./plugins/music-search;
+      force = true;
+    };
+    ".config/noctalia/plugins/browser-launcher" = {
+      source = ./plugins/browser-launcher;
+      force = true;
+    };
     ".config/noctalia/plugins.json".text = pluginsJson;
   };
 }
