@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Services.UI
@@ -55,8 +56,32 @@ Item {
   property var cfg:      pluginApi?.pluginSettings || ({})
   property var defaults: pluginApi?.manifest?.metadata?.defaultSettings || ({})
 
-  readonly property string city:              cfg.city              ?? defaults.city              ?? "London"
-  readonly property string country:           cfg.country           ?? defaults.country           ?? "UK"
+  property string locationCity: ""
+  property string locationCountry: ""
+
+  FileView {
+    id: locationFile
+    path: (Quickshell.env("HOME") ?? "/home") + "/.cache/noctalia/location.json"
+    watchChanges: true
+    onLoaded: root.parseLocation(text())
+    onFileChanged: reload()
+  }
+
+  function parseLocation(content) {
+    try {
+      const data = JSON.parse(content)
+      const rawName = String(data?.name ?? "").trim()
+      if (rawName === "") return
+      const parts = rawName.split(",")
+      root.locationCity = String(parts[0] ?? "").trim()
+      root.locationCountry = String(parts.slice(1).join(",") ?? "").trim()
+    } catch (e) {
+      Logger.w("Mawaqit", "Location cache parse failed:", e.message)
+    }
+  }
+
+  readonly property string city:              cfg.city              ?? (locationCity !== "" ? locationCity : (defaults.city ?? "London"))
+  readonly property string country:           cfg.country           ?? (locationCountry !== "" ? locationCountry : (defaults.country ?? "UK"))
   readonly property int    method:            cfg.method            ?? defaults.method            ?? 3
 
   readonly property bool   tune:        cfg.tune        ?? defaults.tune        ?? false
@@ -90,6 +115,8 @@ Item {
   onSchoolChanged:  if (lastFetchDate) Qt.callLater(forceRefresh)
   onFajrAngleChanged: if (lastFetchDate) Qt.callLater(forceRefresh)
   onIshaAngleChanged: if (lastFetchDate) Qt.callLater(forceRefresh)
+  onLocationCityChanged: if (!cfg.city && lastFetchDate) Qt.callLater(forceRefresh)
+  onLocationCountryChanged: if (!cfg.country && lastFetchDate) Qt.callLater(forceRefresh)
 
   readonly property var prayerKeys: {
     const base = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
@@ -273,7 +300,7 @@ Item {
       Logger.d("Mawaqit", "Using cached data for today")
       processEntry(cached)
     } else {
-      fetchWeek()
+      fetchSingleDay()
     }
   }
 
@@ -284,7 +311,7 @@ Item {
       for (const key in settings) { if (key.startsWith("_cal_")) delete settings[key] }
       pluginApi.saveSettings()
     } catch(e) {}
-    fetchWeek()
+    fetchSingleDay()
   }
 
   function fetchPrayerTimes() { forceRefresh() }
@@ -293,12 +320,11 @@ Item {
     if (_xhr) return
     isLoading = true; hasError = false
     const today = new Date()
-    const from  = Qt.formatDate(today, "dd-MM-yyyy")
-    const toD   = new Date(today); toD.setDate(toD.getDate() + 6)
-    const to    = Qt.formatDate(toD, "dd-MM-yyyy")
+    const year  = today.getFullYear()
+    const month = today.getMonth() + 1
     const methodSettings = `${fajrAngle !== null ? fajrAngle : 'null'},null,${ishaAngle !== null ? ishaAngle : 'null'}`
-    const url   = `https://api.aladhan.com/v1/timingsByCity/${from}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}&methodSettings=${methodSettings}&school=${school}&days=7&tune=${encodeURIComponent(tuneParam)}`
-    Logger.d("Mawaqit", "Fetching week from", from, "to", to)
+    const url   = `https://api.aladhan.com/v1/calendarByCity/${year}/${month}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}&methodSettings=${methodSettings}&school=${school}&tune=${encodeURIComponent(tuneParam)}`
+    Logger.d("Mawaqit", "Fetching month calendar for", city, country, year, month)
 
     const xhr = new XMLHttpRequest()
     _xhr = xhr
@@ -308,19 +334,31 @@ Item {
       if (xhr.status === 200) {
         try {
           const json = JSON.parse(xhr.responseText)
-          if (json.code === 200 && json.data && json.data.length > 0) {
+          if (json.code === 200 && Array.isArray(json.data) && json.data.length > 0) {
             _retryCount = 0; retryTimer.stop()
-            saveCache(json.data)
             const todayStr = new Date().toISOString().substring(0, 10)
+            const monthEntries = json.data.map(entry => ({
+              date: entry.date?.gregorian?.date ?? "",
+              timings: entry.timings,
+              hijri: entry.date?.hijri ?? null,
+              readable: entry.date?.readable ?? ""
+            }))
+            const futureEntries = monthEntries.filter(entry => {
+              const parts = entry.date.split("-")
+              if (parts.length !== 3) return false
+              const iso = `${parts[2]}-${parts[1]}-${parts[0]}`
+              return iso >= todayStr
+            }).slice(0, 7)
+            saveCache(futureEntries.length > 0 ? futureEntries : monthEntries.slice(0, 7))
             let todayEntry = null
-            for (const entry of json.data) {
+            for (const entry of monthEntries) {
               const parts = entry.date.split("-")
               const iso = `${parts[2]}-${parts[1]}-${parts[0]}`
               if (iso === todayStr) { todayEntry = entry; break }
             }
-            processEntry(todayEntry || json.data[0])
+            processEntry(todayEntry || futureEntries[0] || monthEntries[0])
           } else {
-            Logger.e("Mawaqit", "API error:", json.status)
+            Logger.e("Mawaqit", "API error:", json.status || json.code)
             fetchSingleDay()
           }
         } catch(e) {
@@ -361,6 +399,7 @@ Item {
               hijri:   json.data.date.hijri,
               readable: json.data.date.readable
             }
+            saveCache([entry])
             processEntry(entry)
           } else {
             onFetchFailed(json.status || "API error")
