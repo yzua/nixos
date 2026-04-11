@@ -77,11 +77,17 @@ let
       text = ''
         #!/usr/bin/env bash
         set -euo pipefail
+        if [ "$#" -gt 0 ]; then
+          exec ${pkgsStable.librewolf}/bin/librewolf \
+            --name librewolf-${name} \
+            --profile "$HOME/.librewolf/${profilePath}" \
+            --new-tab "$1"
+        fi
+
         exec ${pkgsStable.librewolf}/bin/librewolf \
           --new-instance \
           --name librewolf-${name} \
-          --profile "$HOME/.librewolf/${profilePath}" \
-          "$@"
+          --profile "$HOME/.librewolf/${profilePath}"
       '';
     };
   };
