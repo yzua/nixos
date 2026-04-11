@@ -4,16 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
-
-# Ensure fzf inherits Home Manager theme when launched outside interactive shells.
-if [[ -z "${FZF_DEFAULT_OPTS:-}" ]] && [[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
-	# shellcheck disable=SC1091
-	source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-fi
-
-if [[ -z "${FZF_DEFAULT_OPTS:-}" ]]; then
-	export FZF_DEFAULT_OPTS="--color=fg:#ebdbb2,bg:#32302f,hl:#fabd2f,fg+:#ebdbb2,bg+:#3c3836,hl+:#fabd2f,info:#8ec07c,prompt:#83a598,pointer:#fe8019,marker:#b8bb26,spinner:#d3869b,header:#928374,border:#504945,gutter:#282828"
-fi
+# shellcheck source=scripts/lib/fzf-theme.sh
+source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
 
 COMMIT_SPLIT_PROMPT="${COMMIT_SPLIT_PROMPT:-}"
 REFACTOR_MAINTAINABILITY_PROMPT="${REFACTOR_MAINTAINABILITY_PROMPT:-}"
@@ -156,7 +148,7 @@ execute_agent() {
 		execute_claude_glm "$prompt"
 		;;
 	gem)
-		exec gemini --yolo
+		exec gemini --approval-mode=yolo
 		;;
 	cx | cxu)
 		if [[ -z "$prompt" ]]; then
@@ -167,30 +159,30 @@ execute_agent() {
 		;;
 	lcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="low"'
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="low"'
 		else
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="low"' "$prompt"
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="low"' "$prompt"
 		fi
 		;;
 	mcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="medium"'
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="medium"'
 		else
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="medium"' "$prompt"
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="medium"' "$prompt"
 		fi
 		;;
 	hcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="high"'
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="high"'
 		else
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="high"' "$prompt"
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="high"' "$prompt"
 		fi
 		;;
 	xcx)
 		if [[ -z "$prompt" ]]; then
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="xhigh"'
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="xhigh"'
 		else
-			exec codex --no-alt-screen --full-auto -c 'model_reasoning_effort="xhigh"' "$prompt"
+			exec codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="xhigh"' "$prompt"
 		fi
 		;;
 	oc)
