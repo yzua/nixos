@@ -33,7 +33,7 @@
         };
         gpu = {
           apply_gpu_optimisations = "accept-responsibility";
-          gpu_device = 0; # NVIDIA GPU index
+          gpu_device = 1; # NVIDIA GPU is card1 (card0 has no vendor file)
           nv_powermizer_mode = 1; # Prefer maximum performance
         };
         custom = {
