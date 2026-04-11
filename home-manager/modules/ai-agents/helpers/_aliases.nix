@@ -8,7 +8,6 @@
 }:
 
 let
-  cfg = config.programs.aiAgents;
   workflowPrompts = import ./_workflow-prompts.nix;
   commitSplitPrompt = workflowPrompts.commitSplit;
   refactorMaintainabilityPrompt = workflowPrompts.refactorMaintainability;
