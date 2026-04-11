@@ -17,6 +17,15 @@ progress_bar() {
 	printf "%s" "$bar"
 }
 
+display_pct() {
+	local pct="$1"
+	if [[ "$pct" =~ ^[0-9]+$ ]]; then
+		printf "%02d" "$pct"
+	else
+		printf '%s' '--'
+	fi
+}
+
 remaining_color() {
 	local remaining="$1"
 	if [[ ! "$remaining" =~ ^[0-9]+$ ]]; then
@@ -28,6 +37,20 @@ remaining_color() {
 	else
 		printf "#b8bb26"
 	fi
+}
+
+status_row() {
+	local label="$1"
+	local value="$2"
+	local color="$3"
+	printf "<tt><span style='color:#a89984'>%-7s</span> <span style='color:%s'><b>%s</b></span></tt>" "$label" "$color" "$value"
+}
+
+build_status_text() {
+	local zai_pct="$1"
+	local claude_pct="$2"
+	local codex_pct="$3"
+	printf "Z%s C%s O%s" "$(display_pct "$zai_pct")" "$(display_pct "$claude_pct")" "$(display_pct "$codex_pct")"
 }
 
 format_tokens() {
@@ -105,19 +128,19 @@ build_window_tip() {
 	remaining=$(numeric_pct_to_remaining "$used_pct") || return 1
 	color=$(remaining_color "$remaining")
 
-	tip="<b>${title}</b> <span style='color:${color}'><b>${remaining}% left</b></span>"
-	tip+="${NL}<tt>Left: [$(progress_bar "$remaining")] ${remaining}%</tt>"
-	tip+="${NL}5h used: $(printf "%.1f" "$used_pct")%"
+	tip="<span style='color:#ebdbb2'><b>${title}</b></span>"
+	tip+="${NL}$(status_row "Left" "${remaining}% [$(progress_bar "$remaining")]" "$color")"
+	tip+="${NL}$(status_row "5h used" "$(printf "%.1f%%" "$used_pct")" "#ebdbb2")"
 
 	local epoch
 	if epoch=$(resolve_reset_epoch "$reset_value" "$reset_format"); then
-		tip+=" | Reset: $(time_until "$epoch")"
+		tip+="  <span style='color:#a89984'>Reset</span> $(time_until "$epoch")"
 	fi
 
 	if [[ -n "$seven_day_pct" ]]; then
 		local seven_remaining
 		if seven_remaining=$(numeric_pct_to_remaining "$seven_day_pct"); then
-			tip+="${NL}7d used: $(printf "%.1f" "$seven_day_pct")% (left ${seven_remaining}%)"
+			tip+="${NL}$(status_row "7d used" "$(printf "%.1f%%" "$seven_day_pct") left ${seven_remaining}%" "#ebdbb2")"
 		fi
 	fi
 

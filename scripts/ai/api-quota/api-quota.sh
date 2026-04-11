@@ -16,6 +16,7 @@ CODEX_SESSIONS_DIR="${HOME}/.codex/sessions"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/api-quota"
 # shellcheck disable=SC2034
 CACHE_TTL=120
+# shellcheck disable=SC2034 # Shared newline separator consumed by sourced helpers/providers.
 NL=$'\n'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,41 +26,81 @@ source "${SCRIPT_DIR}/api-quota-helpers.sh"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/api-quota-providers.sh"
 
-main() {
+collect_data() {
 	local zai_json claude_json codex_json
 	zai_json=$(fetch_zai)
 	claude_json=$(fetch_claude)
 	codex_json=$(fetch_codex)
 
-	local zai_pct claude_pct codex_pct zai_tip claude_tip codex_tip
+	local zai_pct claude_pct codex_pct
 	zai_pct=$(echo "$zai_json" | jq -r '.pct')
 	claude_pct=$(echo "$claude_json" | jq -r '.pct')
 	codex_pct=$(echo "$codex_json" | jq -r '.pct')
-	zai_tip=$(echo "$zai_json" | jq -r '.tip')
-	claude_tip=$(echo "$claude_json" | jq -r '.tip')
-	codex_tip=$(echo "$codex_json" | jq -r '.tip')
 
 	local icon="activity"
+	local accent="#83a598"
 	local pct
 	for pct in "$zai_pct" "$claude_pct" "$codex_pct"; do
 		if [[ "$pct" =~ ^[0-9]+$ ]]; then
 			if ((pct <= 20)); then
 				icon="alert-triangle"
+				accent="#fb4934"
 				break
-			elif ((pct <= 40)); then icon="alert-circle"; fi
+			elif ((pct <= 40)); then
+				icon="alert-circle"
+				accent="#fabd2f"
+			fi
 		fi
 	done
 
-	local tooltip
-	tooltip="${zai_tip}${NL}${NL}${claude_tip}${NL}${NL}${codex_tip}${NL}${NL}<span style='color:#a89984'>Updated: $(date +%H:%M)</span>"
+	jq -c -n \
+		--argjson zai "$zai_json" \
+		--argjson claude "$claude_json" \
+		--argjson codex "$codex_json" \
+		--arg summary "$(build_status_text "$zai_pct" "$claude_pct" "$codex_pct")" \
+		--arg updated "$(date +%H:%M)" \
+		--arg updatedEpoch "$(date +%s)" \
+		--arg icon "$icon" \
+		--arg accent "$accent" \
+		'{
+			"summary":$summary,
+			"updatedLabel":("Updated " + $updated),
+			"updatedEpoch":($updatedEpoch | tonumber),
+			"icon":$icon,
+			"accent":$accent,
+			"providers":[$codex, $claude, $zai]
+		}'
+}
 
-	# Wrap in left-aligned HTML — Noctalia tooltip defaults to centered text
-	tooltip="<p align='left'>${tooltip}</p>"
+render_widget() {
+	local data_json
+	data_json=$(collect_data)
 
-	# Single-line JSON output — critical for Noctalia parseJson (multi-line breaks parser)
-	jq -c -n --arg icon "$icon" --arg tooltip "$tooltip" '{"text":"","icon":$icon,"tooltip":$tooltip}'
+	local text icon tooltip
+	text=$(echo "$data_json" | jq -r '.summary')
+	icon=$(echo "$data_json" | jq -r '.icon')
+	tooltip=$(echo "$data_json" | jq -r '
+		"<span style='\''color:#ebdbb2'\''><b>AI Quota</b></span>\n" +
+		"<span style='\''color:#a89984'\''>" + .summary + "</span>\n\n" +
+		(.providers | map(.tip) | join("\n\n")) + "\n\n" +
+		"<span style='\''color:#a89984'\''>" + .updatedLabel + "</span>"
+	')
+
+	tooltip="<div align='left'>${tooltip}</div>"
+	jq -c -n --arg text "$text" --arg icon "$icon" --arg tooltip "$tooltip" '{"text":$text,"icon":$icon,"tooltip":$tooltip}'
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-	main "$@"
+	case "${1:-widget}" in
+	widget)
+		render_widget
+		;;
+	data)
+		collect_data
+		;;
+	*)
+		echo "Usage: api-quota.sh [widget|data]" >&2
+		exit 1
+		;;
+	esac
 fi
