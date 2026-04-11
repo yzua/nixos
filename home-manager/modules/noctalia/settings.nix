@@ -106,6 +106,7 @@ in
     };
 
     appLauncher = {
+      overviewLayer = true;
       enableClipboardHistory = true;
       enableClipboardSmartIcons = true;
       enableClipboardChips = true;
