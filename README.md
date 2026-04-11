@@ -1,6 +1,6 @@
 # NixOS System Configuration
 
-Flake-based NixOS + Home Manager config with Niri compositor, Noctalia Shell, Gruvbox theming, and full privacy/monitoring stack.
+Flake-based NixOS + Home Manager config with Niri compositor, Noctalia Shell, GruvboxAlt theming, and full privacy/monitoring stack.
 
 ---
 
@@ -29,38 +29,41 @@ Register in `hosts/_inventory.nix`:
 ]
 ```
 
-Deploy:
+Deploy the current personal desktop config:
 
 ```bash
-just all   # modules, pkgs, lint (parallel) -> format -> check -> nixos -> home
+just all   # hardcoded to desktop: modules, pkgs, lint -> format -> check -> nixos -> home
 ```
+
+For a newly added host, use explicit `nh` commands instead of the hardcoded `just home` / `just nixos` recipes.
 
 ---
 
 ## Commands
 
-| Command                   | Description                                                                                   |
-| ------------------------- | --------------------------------------------------------------------------------------------- |
-| `just all`                | Full pipeline: `modules`, `pkgs`, `lint` in parallel; then `format -> check -> nixos -> home` |
-| `just home`               | Apply Home Manager (user-level, safe)                                                         |
-| `just nixos`              | Apply NixOS (system-level)                                                                    |
-| `just modules`            | Validate import structure                                                                     |
-| `just pkgs`               | Check for duplicate packages and program/module ownership conflicts                           |
-| `just lint`               | statix + deadnix + shellcheck + markdownlint                                                  |
-| `just dead`               | deadnix only (subset of lint)                                                                 |
-| `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                                   |
-| `just check`              | `nix flake check --no-build`                                                                  |
-| `just diff`               | Diff current vs previous NixOS generation                                                     |
-| `just report [mode]`      | Generate system health report                                                                 |
-| `just report-view [type]` | View latest system report                                                                     |
-| `just update`             | Update flake inputs                                                                           |
-| `just clean`              | `nh clean` + HM generation expiry + store optimise                                            |
-| `just install-hooks`      | Install repo-local pre-commit/pre-push hooks                                                  |
-| `just sops-edit`          | Edit encrypted secrets                                                                        |
-| `just sops-view`          | View secrets (read-only)                                                                      |
-| `just secrets-add KEY`    | Add a single secret (prompted securely)                                                       |
-| `just security-audit`     | Systemd hardening + CVE scan                                                                  |
-| `just skills-sync`        | Sync AI agent skills from GitHub                                                              |
+| Command                   | Description                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `just all`                | Full desktop pipeline: `modules`, `pkgs`, `lint` in parallel; then `format -> check -> nixos -> home` |
+| `just home`               | Apply Home Manager for `yz@desktop`                                                                   |
+| `just nixos`              | Apply NixOS for `desktop`                                                                             |
+| `just modules`            | Validate import structure                                                                             |
+| `just pkgs`               | Check for duplicate packages and program/module ownership conflicts                                   |
+| `just lint`               | statix + deadnix + shellcheck + markdownlint                                                          |
+| `just dead`               | deadnix only (subset of lint)                                                                         |
+| `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                                           |
+| `just check`              | `nix flake check --no-build`                                                                          |
+| `just diff`               | Diff current vs previous NixOS generation                                                             |
+| `just report [mode]`      | Generate system health report                                                                         |
+| `just report-view [type]` | View latest system report                                                                             |
+| `just update`             | Update flake inputs (pre/post health checks)                                                          |
+| `just upgrade`            | Full upgrade: update → nixos → home → security-audit                                                  |
+| `just clean`              | `nh clean all --keep 1` + HM generation expiry + store optimise                                       |
+| `just install-hooks`      | Install repo-local pre-commit/pre-push hooks                                                          |
+| `just sops-edit`          | Edit encrypted secrets                                                                                |
+| `just sops-view`          | View secrets (read-only)                                                                              |
+| `just secrets-add KEY`    | Add a single secret (prompted securely)                                                               |
+| `just security-audit`     | Systemd hardening + CVE scan                                                                          |
+| `just skills-sync`        | Sync AI agent skills from GitHub                                                                      |
 
 ---
 
@@ -68,55 +71,55 @@ just all   # modules, pkgs, lint (parallel) -> format -> check -> nixos -> home
 
 Set `hostProfile` first, then override as needed:
 
-| Option                       | Description                                                  |
-| ---------------------------- | ------------------------------------------------------------ |
-| `hostProfile`                | `"desktop"` or `"laptop"` — sets defaults below              |
-| `hostInfo.enable`            | Hostname + stateVersion from flake args                      |
-| `nvidia.enable`              | NVIDIA drivers, CUDA, Wayland                                |
-| `fwupd.enable`               | Firmware updates (LVFS)                                      |
-| `gaming.enable`              | Steam, Lutris, Wine, MangoHud                                |
-| `gaming.enableGamemode`      | Feral GameMode daemon                                        |
-| `gaming.enableGamescope`     | Gamescope compositor                                         |
-| `bluetooth.enable`           | Bluetooth services                                           |
-| `bluetooth.powerOnBoot`      | Auto-power Bluetooth adapter on boot                         |
-| `mullvadVpn.enable`          | Mullvad VPN                                                  |
-| `tor.enable`                 | Tor SOCKS proxy (port 9050)                                  |
-| `i2pd.enable`                | I2P anonymous network router                                 |
-| `i2pd.port`                  | I2P transport port (used with firewall opening)              |
-| `i2pd.openFirewall`          | Open firewall for I2P transport port                         |
-| `i2pd.notransit`             | Disable transit tunnel participation                         |
-| `i2pd.bandwidth`             | Optional I2P bandwidth cap (KB/s)                            |
-| `yggdrasil.enable`           | Yggdrasil mesh network                                       |
-| `dnscryptProxy.enable`       | Encrypted DNS with DNSSEC                                    |
-| `virtualisation.enable`      | Docker, libvirt/QEMU                                         |
-| `flatpak.enable`             | Flatpak + Flathub                                            |
-| `printing.enable`            | CUPS                                                         |
-| `nautilus.enable`            | GNOME Files                                                  |
-| `nixLd.enable`               | Dynamic linker for non-Nix binaries                          |
-| `cleanup.enable`             | Automated cleanup timers                                     |
-| `backup.enable`              | Restic backups (requires sops secret)                        |
-| `backup.repository`          | Restic repository target path                                |
-| `netdata.enable`             | System monitoring (port 19999)                               |
-| `scrutiny.enable`            | Disk health (port 8080)                                      |
-| `glance.enable`              | Dashboard (port 8082)                                        |
-| `opensnitch.enable`          | Application firewall                                         |
-| `ntfy.enable`                | Alertmanager → ntfy.sh notifications                         |
-| `ntfy.port`                  | Local ntfy bridge listener port                              |
-| `observability.enable`       | Prometheus + Alertmanager + Grafana (ports 9090, 9093, 3001) |
-| `loki.enable`                | Log aggregation with Promtail                                |
-| `systemReport.enable`        | Unified health reporting                                     |
-| `systemReport.outputDir`     | System report output directory                               |
-| `systemReport.retentionDays` | System report retention window (days)                        |
-| `greetd.enable`              | Display manager                                              |
-| `waydroid.enable`            | Android emulation                                            |
-| `auditLogging.enable`        | fail2ban logging                                             |
-| `aide.enable`                | AIDE file integrity monitoring (default: on)                 |
-| `metadataScrubber.enable`    | Automatic metadata scrubbing (mat2/exiftool)                 |
-| `kdeconnect.enable`          | KDE Connect phone integration                                |
-| `vnc.enable`                 | VNC remote access                                            |
-| `secureBoot.enable`          | Secure Boot preparation with sbctl                           |
-| `webRe.enable`               | Web reverse engineering and security tools                   |
-| android (unconditional)      | ADB, Fastboot, Android Studio (no toggle)                    |
+| Option                       | Description                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `hostProfile`                | `"desktop"` or `"laptop"` — sets defaults below                           |
+| `hostInfo.enable`            | Hostname + stateVersion from flake args                                   |
+| `nvidia.enable`              | NVIDIA drivers, CUDA, Wayland                                             |
+| `fwupd.enable`               | Firmware updates (LVFS)                                                   |
+| `gaming.enable`              | Steam, Lutris, Wine, MangoHud                                             |
+| `gaming.enableGamemode`      | Feral GameMode daemon                                                     |
+| `gaming.enableGamescope`     | Gamescope compositor                                                      |
+| `bluetooth.enable`           | Bluetooth services                                                        |
+| `bluetooth.powerOnBoot`      | Auto-power Bluetooth adapter on boot                                      |
+| `mullvadVpn.enable`          | Mullvad VPN                                                               |
+| `tor.enable`                 | Tor SOCKS proxy (port 9050)                                               |
+| `i2pd.enable`                | I2P anonymous network router                                              |
+| `i2pd.port`                  | I2P transport port (used with firewall opening)                           |
+| `i2pd.openFirewall`          | Open firewall for I2P transport port                                      |
+| `i2pd.notransit`             | Disable transit tunnel participation                                      |
+| `i2pd.bandwidth`             | Optional I2P bandwidth cap (KB/s)                                         |
+| `yggdrasil.enable`           | Yggdrasil mesh network                                                    |
+| `dnscryptProxy.enable`       | Encrypted DNS with DNSSEC                                                 |
+| `virtualisation.enable`      | Docker, libvirt/QEMU                                                      |
+| `flatpak.enable`             | Flatpak + Flathub                                                         |
+| `printing.enable`            | CUPS                                                                      |
+| `nautilus.enable`            | GNOME Files                                                               |
+| `nixLd.enable`               | Dynamic linker for non-Nix binaries                                       |
+| `cleanup.enable`             | Automated cleanup timers                                                  |
+| `backup.enable`              | Restic backups (requires sops secret)                                     |
+| `backup.repository`          | Restic repository target path                                             |
+| `netdata.enable`             | System monitoring (port 19999)                                            |
+| `scrutiny.enable`            | Disk health (port 8080)                                                   |
+| `glance.enable`              | Dashboard (port 8082)                                                     |
+| `opensnitch.enable`          | Application firewall                                                      |
+| `ntfy.enable`                | Alertmanager → ntfy.sh notifications                                      |
+| `ntfy.port`                  | Local ntfy bridge listener port                                           |
+| `observability.enable`       | Prometheus + Alertmanager + Grafana (ports 9090, 9093, 3001)              |
+| `loki.enable`                | Log aggregation with Promtail                                             |
+| `systemReport.enable`        | Unified health reporting                                                  |
+| `systemReport.outputDir`     | System report output directory                                            |
+| `systemReport.retentionDays` | System report retention window (days)                                     |
+| `greetd.enable`              | Display manager                                                           |
+| `waydroid.enable`            | Android emulation                                                         |
+| `auditLogging.enable`        | fail2ban logging                                                          |
+| `aide.enable`                | AIDE file integrity monitoring (default: on)                              |
+| `metadataScrubber.enable`    | System-side metadata scrubber tooling (`mat2`/`exiftool`/`inotify-tools`) |
+| `kdeconnect.enable`          | KDE Connect phone integration                                             |
+| `vnc.enable`                 | VNC remote access                                                         |
+| `secureBoot.enable`          | Secure Boot preparation with sbctl                                        |
+| `webRe.enable`               | Web reverse engineering and security tools                                |
+| android (unconditional)      | ADB, Fastboot, Android Studio (no toggle)                                 |
 
 ---
 
@@ -124,7 +127,7 @@ Set `hostProfile` first, then override as needed:
 
 Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
 
-On by default (toggleable): AIDE file integrity, metadata scrubbing.
+On by default (toggleable): AIDE file integrity. `mySystem.metadataScrubber.enable` currently controls system-side scrubber tooling; the Home Manager watcher/timer is imported separately.
 
 Toggleable: Mullvad VPN, Tor, Yggdrasil, DNSCrypt, OpenSnitch, fail2ban.
 
@@ -209,6 +212,9 @@ home-manager/                 # User-level modules + packages
 scripts/                      # Utility scripts
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
 dev-shells/                   # Per-language dev environments
+guides/                       # User-facing tool guides (Niri, Neovim, Zellij, etc.)
+skills/                       # AI agent skill definitions
+themes/                       # Theme assets
 ```
 
 Area-specific guidance in `AGENTS.md` files throughout the repo.
