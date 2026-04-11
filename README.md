@@ -122,7 +122,7 @@ Set `hostProfile` first, then override as needed:
 
 ## Security
 
-Always-on: kernel hardening, AppArmor, MAC randomization, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
+Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
 
 On by default (toggleable): AIDE file integrity, metadata scrubbing.
 

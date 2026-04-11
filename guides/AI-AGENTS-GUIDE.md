@@ -272,6 +272,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                 |
 | `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix     |
 | `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries              |
+| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                      |
 | `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt              |
 | `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                    |
 | `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`              |
@@ -286,7 +287,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `agents-search`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 
 ### Interactive Selector (`ais`)
@@ -313,6 +314,29 @@ Optional flags:
 
 - `ait --tool <family>` to skip the first picker
 - `ait --tool <family> --section <kind>` to jump directly to one section (for example `--section skill`)
+
+### Directory Guidance Scanner (`agents-search`)
+
+Scans a project tree for directories that genuinely need `AGENTS.md` guidance files. Works on any repo from any path — respects `.gitignore` via `git ls-files` automatically.
+
+```bash
+agents-search                  # smart mode — only dirs that truly need guidance
+agents-search ~/other-project  # scan a different project
+agents-search --all .          # show everything that passes base threshold
+agents-search --json .         # machine-readable output
+agents-search -t 2 -l 100 .    # custom thresholds (file count / line count)
+```
+
+Smart mode applies different thresholds based on parent coverage:
+
+| Condition | Shows when | Rationale |
+|---|---|---|
+| No parent AGENTS.md | ≥4 files **OR** ≥250 lines | Directory is genuinely uncovered |
+| Parent has AGENTS.md | ≥5 files **AND** ≥400 lines | Parent already documents this area — child only needs its own if substantially complex |
+
+Output includes a `PARENT` column showing `covered` (parent guide exists) or `uncovered` (no guidance anywhere above). This helps prioritize which directories to write guides for first.
+
+Source: `scripts/ai/agents-search.sh` · Wired via `home-manager/modules/ai-agents/services.nix`.
 
 ---
 

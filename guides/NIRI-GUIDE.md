@@ -87,8 +87,8 @@ Learn these first. Everything else can wait.
 | `Super+Down`       | Focus window below (in same column)            |
 | `Super+Tab`        | Focus next column (same as Right)              |
 | `Super+Shift+Tab`  | Focus previous column (same as Left)           |
-| `Super+A`          | Focus next window/workspace down (MRU order)   |
-| `Super+Shift+A`    | Focus previous window/workspace up (MRU order) |
+| `Super+A`          | Focus next window/workspace down               |
+| `Super+Shift+A`    | Focus previous window/workspace up             |
 | `Super+Shift+Home` | Focus first column                             |
 | `Super+Shift+End`  | Focus last column                              |
 
@@ -295,7 +295,7 @@ Your system follows this idle sequence:
 
 | Timeout    | Action   | What Happens                                          |
 | ---------- | -------- | ----------------------------------------------------- |
-| 3 minutes  | Dim      | Screen brightness drops to 30% (restores on activity) |
+| 3 minutes  | Dim      | Screen brightness reduced (restores on activity)      |
 | 8 minutes  | Lock     | Noctalia lock screen activates                        |
 | 20 minutes | DPMS off | Monitors power off (wake on any input)                |
 
@@ -390,7 +390,7 @@ These apps open floating instead of tiled:
 
 ### Mouse
 
-- **Acceleration**: Flat (mouse/trackpoint), Adaptive (touchpad)
+- **Acceleration**: Adaptive (touchpad), Flat (trackpoint)
 - **Focus follows mouse**: Enabled (hover to focus, no scroll stealing)
 - **Warp to focus**: Disabled (mouse stays in place on focus change)
 
@@ -539,8 +539,8 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | `Super+Up/Down`        | Focus window up/down (in column)      |
 | `Super+Tab`            | Focus next column                     |
 | `Super+Shift+Tab`      | Focus previous column                 |
-| `Super+A`              | Focus next window/workspace (MRU)     |
-| `Super+Shift+A`        | Focus previous window/workspace (MRU) |
+| `Super+A`              | Focus next window/workspace down     |
+| `Super+Shift+A`        | Focus previous window/workspace up   |
 | `Super+Shift+Home/End` | Focus first/last column               |
 
 ### Move
