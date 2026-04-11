@@ -14,6 +14,7 @@ ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
 FRIDA_BIN="${FRIDA_BIN:-${HOME}/Downloads/android-re-tools/frida/frida-server-17.5.1-android-x86_64}"
 FRIDA_TARGET="${FRIDA_TARGET:-/data/local/tmp/frida-server-17.5.1}"
 FRIDA_LOG_PATH="${FRIDA_LOG_PATH:-/data/local/tmp/frida.log}"
+FRIDA_PS_BIN="${FRIDA_PS_BIN:-}"
 FRIDA_WAIT_TIMEOUT="${FRIDA_WAIT_TIMEOUT:-10}"
 FRIDA_WAIT_RETRIES="${FRIDA_WAIT_RETRIES:-3}"
 MITM_CONF_DIR="${MITM_CONF_DIR:-${HOME}/Downloads/android-re-tools/custom-ca}"
@@ -54,7 +55,12 @@ resolve_frida_ps_bin() {
 
 frida_host_probe() {
 	resolve_frida_ps_bin
-	timeout "${FRIDA_WAIT_TIMEOUT}" "${FRIDA_PS_BIN}" -U >/dev/null 2>&1
+	# Enumerate processes — fast when server is up (sub-second).
+	# Use timeout -k to guarantee SIGKILL if frida-ps hangs on USB transport.
+	local rc=0
+	timeout -k 3 "${FRIDA_WAIT_TIMEOUT}" "${FRIDA_PS_BIN}" -U >/dev/null 2>&1 || rc=$?
+	# rc 0 = server up and listing succeeded; rc 124/137 = timeout/kill = server not ready
+	((rc == 0))
 }
 
 log_frida_failure_context() {
@@ -564,7 +570,17 @@ frida_start() {
 	resolve_frida_ps_bin
 	log_info "deploying frida server"
 	adb_run push "${FRIDA_BIN}" "${FRIDA_TARGET}" >/dev/null
-	adb_run shell "su 0 sh -c 'chmod 755 ${FRIDA_TARGET} && pkill -x $(basename "${FRIDA_TARGET}") 2>/dev/null || true && nohup ${FRIDA_TARGET} -l 0.0.0.0:27042 >${FRIDA_LOG_PATH} 2>&1 &'"
+
+	# Kill any existing frida server before starting a new one
+	adb_run shell "su 0 sh -c 'pkill -x $(basename "${FRIDA_TARGET}") 2>/dev/null || true'" >/dev/null
+	sleep 1
+
+	# Start frida server. Background the entire adb call on the host side
+	# because adb shell hangs when the remote command spawns a background child.
+	# The server will be ready in a few seconds; we probe below.
+	(
+		adb shell "su 0 sh -c 'chmod 755 ${FRIDA_TARGET} && ${FRIDA_TARGET} -l 0.0.0.0:27042 </dev/null >${FRIDA_LOG_PATH} 2>&1 &'" >/dev/null 2>&1
+	) &
 
 	for attempt in $(seq 1 "${FRIDA_WAIT_RETRIES}"); do
 		sleep 2
