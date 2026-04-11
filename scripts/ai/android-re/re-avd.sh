@@ -30,7 +30,7 @@ EMU_GPU_MODE="${EMU_GPU_MODE:-auto}"
 EMU_HEADLESS="${EMU_HEADLESS:-0}"
 EMU_DISABLE_VULKAN="${EMU_DISABLE_VULKAN:-0}"
 EMU_DISABLE_HARDWARE_DECODER="${EMU_DISABLE_HARDWARE_DECODER:-1}"
-RE_ENABLE_PROXY="${RE_ENABLE_PROXY:-0}"
+RE_ENABLE_PROXY="${RE_ENABLE_PROXY:-1}"
 RE_SELINUX_PERMISSIVE="${RE_SELINUX_PERMISSIVE:-1}"
 TMUX_SESSION="${TMUX_SESSION:-android-re}"
 TMUX_SHELL_WINDOW="${TMUX_SHELL_WINDOW:-shell}"
@@ -205,8 +205,17 @@ kill_mitm_listeners() {
 	pkill -f "mitmdump.*--listen-port ${MITM_PORT}" 2>/dev/null || true
 	pkill -f "mitmproxy.*--listen-port ${MITM_PORT}" 2>/dev/null || true
 
+	for _ in $(seq 1 10); do
+		if ! command -v ss >/dev/null 2>&1 || ! ss -ltnH "( sport = :${MITM_PORT} )" | grep -q .; then
+			return 0
+		fi
+		sleep 0.5
+	done
+
 	if command -v ss >/dev/null 2>&1 && ss -ltnH "( sport = :${MITM_PORT} )" | grep -q .; then
-		log_warning "port ${MITM_PORT} still has a listener after mitm cleanup"
+		log_warning "port ${MITM_PORT} still has a listener after mitm cleanup — killing forcefully"
+		ss -ltnpH "( sport = :${MITM_PORT} )" | grep -oP 'pid=\K[0-9]+' | xargs -r kill -9 2>/dev/null || true
+		sleep 1
 	fi
 }
 
@@ -475,27 +484,61 @@ start_emulator() {
 }
 
 start_re() {
+	# ── Phase 1: Full cleanup of stale state ──
+	log_info "cleaning up stale RE state"
+
+	# Kill old tmux session (windows, mitmdump, frida REPL, logcat — everything)
+	if tmux has-session -t "${TMUX_SESSION}" 2>/dev/null; then
+		log_info "killing stale tmux session ${TMUX_SESSION}"
+		tmux kill-session -t "${TMUX_SESSION}" 2>/dev/null || true
+	fi
+
+	# Kill stale mitmproxy listeners on our port
+	kill_mitm_listeners
+
+	# Kill stale frida server on device (if emulator is reachable)
+	if adb devices 2>/dev/null | grep -q '^emulator-'; then
+		adb shell "su 0 sh -c 'pkill -9 frida-server 2>/dev/null || true'" >/dev/null 2>&1 || true
+	fi
+
+	# Kill stale emulator processes
+	stop_all_emulators
+
+	log_success "cleanup complete"
+
+	# ── Phase 2: Boot emulator ──
 	start_emulator
+
+	# ── Phase 3: Set up tmux + mitmproxy ──
 	start_mitm_tmux
+
+	# ── Phase 4: Open Ghostty terminal on android workspace ──
 	open_re_terminal
+
+	# ── Phase 5: Root + SELinux ──
 	if [[ "${RE_SELINUX_PERMISSIVE}" == "1" ]]; then
 		set_selinux_mode permissive
 	else
 		set_selinux_mode enforcing
 	fi
+
+	# ── Phase 6: Device spoofing ──
 	if [[ "${RE_SPOOF_DEVICE}" == "1" ]]; then
 		spoof_device
 	fi
+
+	# ── Phase 7: Inject mitmproxy CA into system trust store ──
 	sync_mitm_ca
+
+	# ── Phase 8: Deploy and start Frida server ──
 	if ! frida_start; then
 		log_warning "continuing without a confirmed Frida connection so tmux and OpenCode still start"
 	fi
-	if [[ "${RE_ENABLE_PROXY}" == "1" ]]; then
-		proxy_set "${PROXY_HOST}:${MITM_PORT}" 1
-	else
-		proxy_clear
-		log_info "proxy disabled by default; set RE_ENABLE_PROXY=1 to route emulator traffic through mitmproxy"
-	fi
+
+	# ── Phase 9: Enable proxy + QUIC blocking (default on) ──
+	proxy_set "${PROXY_HOST}:${MITM_PORT}" 1
+
+	# ── Phase 10: Final health report ──
 	status
 }
 
@@ -691,7 +734,7 @@ Env:
   EMU_HEADLESS                  Use -no-window with QT offscreen (default: 0)
   EMU_DISABLE_VULKAN            Pass -feature -Vulkan to disable guest Vulkan (default: 0)
   EMU_DISABLE_HARDWARE_DECODER  Pass -feature -HardwareDecoder (default: 1)
-  RE_ENABLE_PROXY               Set to 1 to apply emulator proxy + QUIC blocking (default: 0)
+  RE_ENABLE_PROXY               Set to 1 to apply emulator proxy + QUIC blocking (default: 1)
   RE_SELINUX_PERMISSIVE         Set to 1 to switch guest SELinux to permissive for app root workflows (default: 1)
   RE_SPOOF_DEVICE               Set to 1 to spoof device identity on start (default: 1)
 
