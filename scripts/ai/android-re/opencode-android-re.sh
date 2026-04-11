@@ -24,12 +24,12 @@ else
 	OPENCODE_CONFIG_DIR="$HOME/.config/opencode-${PROFILE}"
 fi
 
-# Focus the android workspace in niri and remember it for Ghostty spawn
-NIRI_WS_REF=""
+# Focus the android workspace in niri — window rule by title "^android-re" places it correctly
 if command -v niri >/dev/null 2>&1 && niri msg version >/dev/null 2>&1; then
 	NIRI_WS_REF="$(niri msg workspaces 2>/dev/null | sed -n 's/.*"\([^"]*android[^"]*\)".*/\1/p' | head -n1)"
 	if [[ -n "${NIRI_WS_REF}" ]]; then
 		niri msg action focus-workspace "${NIRI_WS_REF}" >/dev/null 2>&1 || true
+		sleep 0.3
 	fi
 fi
 
@@ -48,21 +48,15 @@ else
 fi
 
 # Launch Ghostty with OpenCode on the android-re agent
-# Use niri spawn to place it on the android workspace if available
+# The niri window rule matches title "^android-re" and opens on workspace 06-android
 if command -v ghostty >/dev/null 2>&1; then
 	title="android-re"
 	if [[ "${PROFILE}" != "default" ]]; then
 		title="android-re (${PROFILE})"
 	fi
 
-	if [[ -n "${NIRI_WS_REF}" ]] && command -v niri >/dev/null 2>&1 && niri msg version >/dev/null 2>&1; then
-		# Spawn directly on the android workspace via niri
-		OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}" \
-			niri msg action spawn -- ghostty --title="${title}" -e opencode --agent android-re "$@" >/dev/null 2>&1
-	else
-		OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}" \
-			exec ghostty --title="${title}" -e opencode --agent android-re "$@"
-	fi
+	OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}" \
+		exec ghostty --title="${title}" -e opencode --agent android-re "$@"
 else
 	# Fallback: run directly in current terminal
 	OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}" \
