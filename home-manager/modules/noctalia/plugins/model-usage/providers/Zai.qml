@@ -12,14 +12,14 @@ Item {
     property bool enabled: false
     property bool ready: false
 
-    // Primary rate limit: TOKENS_LIMIT
+    // Primary rate limit: coding quota
     property real rateLimitPercent: -1
-    property string rateLimitLabel: "Token quota"
+    property string rateLimitLabel: "5h coding quota"
     property string rateLimitResetAt: ""
 
-    // Secondary rate limit: TIME_LIMIT (MCP calls)
+    // Secondary rate limit: MCP tools quota
     property real secondaryRateLimitPercent: -1
-    property string secondaryRateLimitLabel: "MCP calls"
+    property string secondaryRateLimitLabel: "MCP tools"
     property string secondaryRateLimitResetAt: ""
 
     property int todayPrompts: 0
@@ -28,16 +28,22 @@ Item {
     property var todayTokensByModel: ({})
 
     property var recentDays: []
+    property int recentPrompts: 0
+    property int recentSessions: 0
     property int totalPrompts: 0
     property int totalSessions: 0
     property var modelUsage: ({})
+    property string rateLimitDetailText: ""
+    property string secondaryRateLimitDetailText: ""
 
     property string tierLabel: ""
     property string authHelpText: "Place API key at /run/secrets/zai_api_key"
     property bool hasLocalStats: false
+    property string extraUsageTitle: "MCP tools"
+    property var extraUsageItems: []
 
     property var providerSettings: ({})
-    property string apiKeyPath: "/run/secrets/zai_api_key"
+    property string apiKeyPath: providerSettings?.apiKeyPath ?? "/run/secrets/zai_api_key"
 
     property string _apiKey: ""
     property string _rawResponse: ""
@@ -99,7 +105,7 @@ Item {
     property string usageStatusText: ""
 
     Timer {
-        interval: root.providerSettings?.refreshIntervalSec ?? 120
+        interval: (root.providerSettings?.refreshIntervalSec ?? 120) * 1000
         running: root.enabled
         repeat: true
         onTriggered: root.fetchQuota()
@@ -133,6 +139,7 @@ Item {
 
         const data = resp.data;
         root.tierLabel = data.level || "";
+        root.usageStatusText = "";
 
         let tokenLimit = null;
         let timeLimit = null;
@@ -145,56 +152,59 @@ Item {
                 timeLimit = limits[i];
         }
 
-        // Primary: token quota
+        root.todayTotalTokens = 0;
+        root.todayTokensByModel = {};
+        root.modelUsage = {};
+        root.extraUsageItems = [];
+
+        // Primary: coding quota
         if (tokenLimit) {
             const pct = tokenLimit.percentage ?? 0;
             root.rateLimitPercent = pct / 100;
-            root.rateLimitLabel = "Token quota (" + (tokenLimit.unit ?? "?") + "x " + (tokenLimit.number ?? "?") + ")";
+            root.rateLimitLabel = "5h coding quota";
+            root.rateLimitDetailText = Math.round(pct) + "% used";
 
             if (tokenLimit.nextResetTime) {
                 root.rateLimitResetAt = new Date(tokenLimit.nextResetTime).toISOString();
             }
-
-            // Estimate tokens from limit info
-            // unit * number * 1M is approximate token allocation per period
-            const estimatedTokens = (tokenLimit.unit || 0) * (tokenLimit.number || 0) * 1000000;
-            const usedTokens = Math.round(estimatedTokens * (pct / 100));
-            root.todayTotalTokens = usedTokens;
-            root.todayTokensByModel = { "glm-coding": usedTokens };
-            root.modelUsage = { "glm-coding": { inputTokens: usedTokens, outputTokens: 0, cacheReadInputTokens: 0, cacheCreationInputTokens: 0 } };
         } else {
             root.rateLimitPercent = -1;
+            root.rateLimitLabel = "5h coding quota";
+            root.rateLimitDetailText = "";
             root.rateLimitResetAt = "";
         }
 
-        // Secondary: MCP time limit
+        // Secondary: MCP tools quota
         if (timeLimit) {
             const pct = timeLimit.percentage ?? 0;
             root.secondaryRateLimitPercent = pct / 100;
-            root.secondaryRateLimitLabel = "MCP calls (" + timeLimit.remaining + "/" + timeLimit.usage + ")";
+            root.secondaryRateLimitLabel = "MCP tools (" + (timeLimit.currentValue ?? 0) + "/" + (timeLimit.usage ?? 0) + ")";
+            root.secondaryRateLimitDetailText = String(timeLimit.currentValue ?? 0) + " used • " + String(timeLimit.remaining ?? 0) + " remaining";
 
             if (timeLimit.nextResetTime) {
                 root.secondaryRateLimitResetAt = new Date(timeLimit.nextResetTime).toISOString();
             }
 
-            // Build model usage from usageDetails
             const details = timeLimit.usageDetails || [];
-            const usageByModel = {};
+            const usageItems = [];
             for (let i = 0; i < details.length; i++) {
-                usageByModel[details[i].modelCode] = details[i].usage;
+                usageItems.push({
+                    label: details[i].modelCode,
+                    count: details[i].usage ?? 0
+                });
             }
-            // Show as "calls" in todayTokensByModel
-            root.todayTokensByModel = {};
-            for (const model in usageByModel) {
-                root.todayTokensByModel[model] = usageByModel[model];
-            }
+            root.extraUsageItems = usageItems;
         } else {
             root.secondaryRateLimitPercent = -1;
+            root.secondaryRateLimitLabel = "MCP tools";
+            root.secondaryRateLimitDetailText = "";
             root.secondaryRateLimitResetAt = "";
         }
 
         root.todayPrompts = timeLimit ? (timeLimit.currentValue || 0) : 0;
-        root.todaySessions = 1;
+        root.todaySessions = 0;
+        root.recentPrompts = root.todayPrompts;
+        root.recentSessions = 0;
         root.ready = true;
     }
 

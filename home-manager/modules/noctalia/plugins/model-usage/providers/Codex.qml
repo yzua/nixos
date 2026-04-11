@@ -25,9 +25,13 @@ Item {
     property var todayTokensByModel: ({})
 
     property var recentDays: []
+    property int recentPrompts: 0
+    property int recentSessions: 0
     property int totalPrompts: 0
     property int totalSessions: 0
     property var modelUsage: ({})
+    property string rateLimitDetailText: ""
+    property string secondaryRateLimitDetailText: ""
 
     property string tierLabel: ""
     property string authHelpText: "Run `codex` to authenticate."
@@ -48,6 +52,30 @@ Item {
         const m = String(now.getMonth() + 1).padStart(2, "0");
         const d = String(now.getDate()).padStart(2, "0");
         return y + "-" + m + "-" + d;
+    }
+
+    function dateDaysAgoString(daysAgo) {
+        const dt = new Date();
+        dt.setHours(0, 0, 0, 0);
+        dt.setDate(dt.getDate() - daysAgo);
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, "0");
+        const d = String(dt.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + d;
+    }
+
+    function labelForWindow(windowMinutes) {
+        if (!windowMinutes)
+            return "";
+        if (windowMinutes === 300)
+            return "5h window";
+        if (windowMinutes === 10080)
+            return "Weekly (7-day)";
+        if (windowMinutes % 1440 === 0)
+            return Math.round(windowMinutes / 1440) + "d window";
+        if (windowMinutes % 60 === 0)
+            return Math.round(windowMinutes / 60) + "h window";
+        return windowMinutes + "m window";
     }
 
     FileView {
@@ -132,30 +160,58 @@ Item {
 
     function parseHistory(content) {
         try {
-            const now = new Date();
-            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
             const lines = content.split("\n");
+            const today = root.localDateString();
+            const dayCounts = {};
+            const todaySessions = {};
+            const allSessions = {};
+            const recentSessions = {};
             let prompts = 0;
-            const sessions = {};
+            let recentPrompts = 0;
 
-            for (let i = lines.length - 1; i >= 0; i--) {
+            for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line)
                     continue;
                 try {
                     const entry = JSON.parse(line);
-                    if ((entry.ts ?? 0) < startOfDay)
-                        break;
+                    const ts = entry.ts ?? 0;
+                    if (!ts)
+                        continue;
+                    const date = new Date(ts * 1000).toISOString().slice(0, 10);
                     prompts++;
-                    if (entry.session_id)
-                        sessions[entry.session_id] = true;
+                    if ((new Date(today + "T00:00:00").getTime() - new Date(date + "T00:00:00").getTime()) / 86400000 <= 6)
+                        recentPrompts++;
+                    dayCounts[date] = (dayCounts[date] ?? 0) + 1;
+
+                    if (entry.session_id) {
+                        allSessions[entry.session_id] = true;
+                        if (date === today)
+                            todaySessions[entry.session_id] = true;
+                        if ((new Date(today + "T00:00:00").getTime() - new Date(date + "T00:00:00").getTime()) / 86400000 <= 6)
+                            recentSessions[entry.session_id] = true;
+                    }
                 } catch (e) {
                     continue;
                 }
             }
 
-            root.todayPrompts = prompts;
-            root.todaySessions = Object.keys(sessions).length;
+            root.totalPrompts = prompts;
+            root.totalSessions = Object.keys(allSessions).length;
+            root.todayPrompts = dayCounts[today] ?? 0;
+            root.todaySessions = Object.keys(todaySessions).length;
+            root.recentPrompts = recentPrompts;
+            root.recentSessions = Object.keys(recentSessions).length;
+
+            const recent = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = root.dateDaysAgoString(i);
+                recent.push({
+                    date: date,
+                    messageCount: dayCounts[date] ?? 0
+                });
+            }
+            root.recentDays = recent;
             root.ready = true;
         } catch (e) {
             console.log("model-usage/codex", "Failed to parse history.jsonl:", e);
@@ -230,7 +286,9 @@ Item {
     function parseSessionData(content) {
         try {
             const lines = content.split("\n");
-            let lastTokenCount = null;
+            let latestUsageTokenCount = null;
+            let latestRateLimits = null;
+            let latestPlanType = "";
 
             for (let i = lines.length - 1; i >= 0; i--) {
                 const line = lines[i].trim();
@@ -246,34 +304,59 @@ Item {
                     else if (entry.type === "response_item" && entry.payload?.type === "event_msg" && entry.payload?.payload?.type === "token_count")
                         candidate = entry.payload.payload;
 
-                    if (candidate) {
-                        lastTokenCount = candidate;
-                        break;
+                    if (!candidate)
+                        continue;
+
+                    if (!latestUsageTokenCount && candidate.info?.total_token_usage)
+                        latestUsageTokenCount = candidate;
+
+                    if (!latestRateLimits && (candidate.rate_limits?.primary || candidate.rate_limits?.secondary)) {
+                        latestRateLimits = candidate.rate_limits;
+                        latestPlanType = candidate.rate_limits?.plan_type ?? "";
                     }
+
+                    if (latestUsageTokenCount && latestRateLimits)
+                        break;
                 } catch (e) {
                     continue;
                 }
             }
 
-            if (!lastTokenCount) {
+            if (!latestUsageTokenCount && !latestRateLimits) {
                 root.loadPreviousSessionFile();
                 return;
             }
 
-            const rl = lastTokenCount.rate_limits?.primary;
-            if (rl) {
-                root.rateLimitPercent = (rl.used_percent ?? 0) / 100;
-                if (rl.window_minutes === 10080)
-                    root.rateLimitLabel = "Weekly (7-day)";
-                else
-                    root.rateLimitLabel = Math.round(rl.window_minutes / 60) + "h window";
-                if (rl.resets_at) {
-                    const resetDate = new Date(rl.resets_at * 1000);
-                    root.rateLimitResetAt = resetDate.toISOString();
-                }
+            if (!root.tierLabel && latestPlanType)
+                root.tierLabel = latestPlanType;
+
+            const primary = latestRateLimits?.primary ?? null;
+            if (primary) {
+                root.rateLimitPercent = (primary.used_percent ?? 0) / 100;
+                root.rateLimitLabel = root.labelForWindow(primary.window_minutes);
+                root.rateLimitDetailText = Math.round((primary.used_percent ?? 0)) + "% used";
+                root.rateLimitResetAt = primary.resets_at ? new Date(primary.resets_at * 1000).toISOString() : "";
+            } else {
+                root.rateLimitPercent = -1;
+                root.rateLimitLabel = "5h window";
+                root.rateLimitDetailText = "";
+                root.rateLimitResetAt = "";
             }
 
-            const usage = lastTokenCount.info?.total_token_usage;
+            const secondary = latestRateLimits?.secondary ?? null;
+            if (secondary) {
+                root.secondaryRateLimitPercent = (secondary.used_percent ?? 0) / 100;
+                root.secondaryRateLimitLabel = root.labelForWindow(secondary.window_minutes);
+                root.secondaryRateLimitDetailText = Math.round((secondary.used_percent ?? 0)) + "% used";
+                root.secondaryRateLimitResetAt = secondary.resets_at ? new Date(secondary.resets_at * 1000).toISOString() : "";
+            } else {
+                root.secondaryRateLimitPercent = -1;
+                root.secondaryRateLimitLabel = "";
+                root.secondaryRateLimitDetailText = "";
+                root.secondaryRateLimitResetAt = "";
+            }
+
+            const usage = latestUsageTokenCount?.info?.total_token_usage;
             if (usage) {
                 const input = usage.input_tokens ?? 0;
                 const output = usage.output_tokens ?? 0;

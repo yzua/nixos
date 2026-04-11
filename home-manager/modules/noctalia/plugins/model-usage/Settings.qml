@@ -16,6 +16,10 @@ ColumnLayout {
         pluginApi.saveSettings();
     }
 
+    function editSettingsChanged() {
+        root.editSettings = JSON.parse(JSON.stringify(root.editSettings));
+    }
+
     spacing: Style.marginL
 
     NText {

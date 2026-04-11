@@ -21,12 +21,12 @@
 		"defaultSettings": {
 			"providers": {
 				"claude": {
-					"enabled": false,
+					"enabled": true,
 					"statsPath": "~/.claude/stats-cache.json",
 					"credentialsPath": "~/.claude/.credentials.json"
 				},
 				"codex": {
-					"enabled": false
+					"enabled": true
 				},
 				"copilot": {
 					"enabled": false

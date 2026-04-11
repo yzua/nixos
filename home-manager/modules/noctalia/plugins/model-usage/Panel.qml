@@ -266,6 +266,13 @@ Item {
                                 }
 
                                 NText {
+                                    visible: (root.selectedProvider?.rateLimitDetailText ?? "") !== ""
+                                    text: root.selectedProvider?.rateLimitDetailText ?? ""
+                                    pointSize: Style.fontSizeXS
+                                    color: Color.mOnSurfaceVariant
+                                }
+
+                                NText {
                                     visible: (root.selectedProvider?.rateLimitResetAt ?? "") !== ""
                                     text: "Resets in " + (root.selectedProvider?.formatResetTime(root.selectedProvider?.rateLimitResetAt ?? "") ?? "")
                                     pointSize: Style.fontSizeXS
@@ -338,6 +345,13 @@ Item {
                                             }
                                         }
                                     }
+                                }
+
+                                NText {
+                                    visible: (root.selectedProvider?.secondaryRateLimitDetailText ?? "") !== ""
+                                    text: root.selectedProvider?.secondaryRateLimitDetailText ?? ""
+                                    pointSize: Style.fontSizeXS
+                                    color: Color.mOnSurfaceVariant
                                 }
 
                                 NText {
@@ -469,6 +483,41 @@ Item {
                                 color: Color.mPrimary
                             }
 
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: Style.marginXL
+
+                                ColumnLayout {
+                                    spacing: Style.marginXXS
+                                    NText {
+                                        text: String(root.selectedProvider?.recentPrompts ?? 0)
+                                        pointSize: Style.fontSizeXL
+                                        font.weight: Style.fontWeightBold
+                                        color: Color.mOnSurface
+                                    }
+                                    NText {
+                                        text: "prompts"
+                                        pointSize: Style.fontSizeXS
+                                        color: Color.mOnSurfaceVariant
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    spacing: Style.marginXXS
+                                    NText {
+                                        text: String(root.selectedProvider?.recentSessions ?? 0)
+                                        pointSize: Style.fontSizeXL
+                                        font.weight: Style.fontWeightBold
+                                        color: Color.mOnSurface
+                                    }
+                                    NText {
+                                        text: "sessions"
+                                        pointSize: Style.fontSizeXS
+                                        color: Color.mOnSurfaceVariant
+                                    }
+                                }
+                            }
+
                             Repeater {
                                 model: root.selectedProvider?.recentDays ?? []
 
@@ -533,6 +582,57 @@ Item {
                                         color: Color.mOnSurface
                                         Layout.preferredWidth: 30
                                         horizontalAlignment: Text.AlignRight
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        visible: (root.selectedProvider?.extraUsageItems ?? []).length > 0
+                        Layout.fillWidth: true
+                        color: root.sectionBackgroundColor
+                        radius: Style.radiusS
+                        implicitHeight: extraUsageColumn.implicitHeight + Style.marginXL
+
+                        ColumnLayout {
+                            id: extraUsageColumn
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                                margins: Style.marginL
+                            }
+                            spacing: Style.marginM
+
+                            NText {
+                                text: root.selectedProvider?.extraUsageTitle ?? "Extra usage"
+                                pointSize: Style.fontSizeL
+                                font.weight: Style.fontWeightSemiBold
+                                color: Color.mPrimary
+                            }
+
+                            Repeater {
+                                model: root.selectedProvider?.extraUsageItems ?? []
+
+                                RowLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: Style.marginS
+
+                                    NText {
+                                        text: mainInstance?.friendlyModelName(modelData?.label ?? "") ?? (modelData?.label ?? "")
+                                        pointSize: Style.fontSizeS
+                                        color: Color.mOnSurfaceVariant
+                                    }
+                                    Item {
+                                        Layout.fillWidth: true
+                                    }
+                                    NText {
+                                        text: String(modelData?.count ?? 0)
+                                        pointSize: Style.fontSizeS
+                                        font.weight: Style.fontWeightSemiBold
+                                        color: Color.mOnSurface
                                     }
                                 }
                             }
