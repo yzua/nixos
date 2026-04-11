@@ -35,6 +35,10 @@
       ntfy_topic = {
         mode = "0444"; # DynamicUser service — no persistent user/group to grant access
       };
+      noctalia_location = {
+        owner = user;
+        mode = "0444";
+      };
     };
   };
 }
