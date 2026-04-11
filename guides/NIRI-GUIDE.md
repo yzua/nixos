@@ -66,7 +66,7 @@ Learn these first. Everything else can wait.
 | `Super+Shift+Return` | Terminal (bare Ghostty)                             |
 | `Super+T`            | Scratchpad terminal (floating, drops down from top) |
 | `Super+D`            | App launcher (Noctalia)                             |
-| `Super+B`            | Web browser (personal profile)                      |
+| `Super+B`            | Browser selector (interactive profile picker)       |
 | `Super+Shift+B`      | Web browser (librewolf-i2pd)                        |
 | `Super+Shift+R`      | File manager (Nautilus)                             |
 | `Super+E`            | Emoji picker (bemoji)                               |
@@ -79,18 +79,18 @@ Learn these first. Everything else can wait.
 
 ### Focus Navigation
 
-| Key                | What It Does                                   |
-| ------------------ | ---------------------------------------------- |
-| `Super+Left`       | Focus column to the left                       |
-| `Super+Right`      | Focus column to the right                      |
-| `Super+Up`         | Focus window above (in same column)            |
-| `Super+Down`       | Focus window below (in same column)            |
-| `Super+Tab`        | Focus next column (same as Right)              |
-| `Super+Shift+Tab`  | Focus previous column (same as Left)           |
-| `Super+A`          | Focus next window/workspace down               |
-| `Super+Shift+A`    | Focus previous window/workspace up             |
-| `Super+Shift+Home` | Focus first column                             |
-| `Super+Shift+End`  | Focus last column                              |
+| Key                | What It Does                         |
+| ------------------ | ------------------------------------ |
+| `Super+Left`       | Focus column to the left             |
+| `Super+Right`      | Focus column to the right            |
+| `Super+Up`         | Focus window above (in same column)  |
+| `Super+Down`       | Focus window below (in same column)  |
+| `Super+Tab`        | Focus next column (same as Right)    |
+| `Super+Shift+Tab`  | Focus previous column (same as Left) |
+| `Super+A`          | Focus next window/workspace down     |
+| `Super+Shift+A`    | Focus previous window/workspace up   |
+| `Super+Shift+Home` | Focus first column                   |
+| `Super+Shift+End`  | Focus last column                    |
 
 ### Moving Windows
 
@@ -214,7 +214,6 @@ Screenshots are saved to `~/Screens/screenshot-YYYY-MM-DD-HH-MM-SS.png` and also
 | `Super+Print`       | Capture entire screen + notification                                 |
 | `Super+Shift+Print` | Capture focused window + notification                                |
 | `Super+Alt+Print`   | Annotated screenshot (region → swappy editor for arrows, text, blur) |
-| `Super+O`           | Book launcher (fuzzy search PDF library)                             |
 | `Super+Shift+I`     | Color picker (pick pixel → hex to clipboard)                         |
 
 ---
@@ -276,6 +275,8 @@ Noctalia Shell provides the bar, launcher, notifications, lock screen, wallpaper
 | `Super+N`            | Toggle notification history             |
 | `Super+Shift+C`      | Toggle control center                   |
 | `Super+Shift+D`      | Toggle dark mode                        |
+| `Super+F1`           | Toggle keybind cheatsheet               |
+| `Super+P`            | Music search (toggle)                   |
 | `Super+Shift+Escape` | Session menu (logout, shutdown, reboot) |
 
 ---
@@ -293,11 +294,11 @@ Noctalia Shell provides the bar, launcher, notifications, lock screen, wallpaper
 
 Your system follows this idle sequence:
 
-| Timeout    | Action   | What Happens                                          |
-| ---------- | -------- | ----------------------------------------------------- |
-| 3 minutes  | Dim      | Screen brightness reduced (restores on activity)      |
-| 8 minutes  | Lock     | Noctalia lock screen activates                        |
-| 20 minutes | DPMS off | Monitors power off (wake on any input)                |
+| Timeout    | Action   | What Happens                                     |
+| ---------- | -------- | ------------------------------------------------ |
+| 3 minutes  | Dim      | Screen brightness reduced (restores on activity) |
+| 8 minutes  | Lock     | Noctalia lock screen activates                   |
+| 20 minutes | DPMS off | Monitors power off (wake on any input)           |
 
 The lock screen also activates automatically before sleep and when you run `loginctl lock-session`. Clipboard history is wiped on lock for security.
 
@@ -341,6 +342,7 @@ These apps open floating instead of tiled:
 | App               | Workspace | Width         |
 | ----------------- | --------- | ------------- |
 | LibreWolf         | 󰖟 browser | Full width    |
+| Brave             | 󰖟 browser | Full width    |
 | VSCode            | 󰨞 editor  | Default (50%) |
 | Ghostty           | 󰨞 editor  | Default (50%) |
 | Vesktop (Discord) | 󰍡 social  | Default (50%) |
@@ -505,17 +507,18 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 
 ### Applications
 
-| Key                  | Action                         |
-| -------------------- | ------------------------------ |
-| `Super+Return`       | Terminal (Ghostty with Zellij) |
-| `Super+Shift+Return` | Terminal (bare Ghostty)        |
-| `Super+T`            | Scratchpad terminal (floating) |
-| `Super+D`            | App launcher                   |
-| `Super+B`            | Web browser                    |
-| `Super+Shift+B`      | Web browser (librewolf-i2pd)   |
-| `Super+Shift+R`      | File manager (Nautilus)        |
-| `Super+E`            | Emoji picker (bemoji)          |
-| `Super+Period`       | Emoji picker (Noctalia)        |
+| Key                  | Action                                   |
+| -------------------- | ---------------------------------------- |
+| `Super+Return`       | Terminal (Ghostty with Zellij)           |
+| `Super+Shift+Return` | Terminal (bare Ghostty)                  |
+| `Super+T`            | Scratchpad terminal (floating)           |
+| `Super+D`            | App launcher                             |
+| `Super+B`            | Browser selector (profile picker)        |
+| `Super+Shift+B`      | Web browser (librewolf-i2pd)             |
+| `Super+Shift+R`      | File manager (Nautilus)                  |
+| `Super+E`            | Emoji picker (bemoji)                    |
+| `Super+O`            | Book launcher (fuzzy search PDF library) |
+| `Super+Period`       | Emoji picker (Noctalia)                  |
 
 ### Windows
 
@@ -533,15 +536,15 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 
 ### Focus
 
-| Key                    | Action                                |
-| ---------------------- | ------------------------------------- |
-| `Super+Left/Right`     | Focus column left/right               |
-| `Super+Up/Down`        | Focus window up/down (in column)      |
-| `Super+Tab`            | Focus next column                     |
-| `Super+Shift+Tab`      | Focus previous column                 |
-| `Super+A`              | Focus next window/workspace down     |
-| `Super+Shift+A`        | Focus previous window/workspace up   |
-| `Super+Shift+Home/End` | Focus first/last column               |
+| Key                    | Action                             |
+| ---------------------- | ---------------------------------- |
+| `Super+Left/Right`     | Focus column left/right            |
+| `Super+Up/Down`        | Focus window up/down (in column)   |
+| `Super+Tab`            | Focus next column                  |
+| `Super+Shift+Tab`      | Focus previous column              |
+| `Super+A`              | Focus next window/workspace down   |
+| `Super+Shift+A`        | Focus previous window/workspace up |
+| `Super+Shift+Home/End` | Focus first/last column            |
 
 ### Move
 
@@ -614,7 +617,8 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | `Super+Shift+C`      | Control center            |
 | `Super+Shift+D`      | Toggle dark mode          |
 | `Super+V`            | Clipboard history         |
-| `Super+Shift+H`      | Show hotkey overlay       |
+| `Super+F1`           | Toggle keybind cheatsheet |
+| `Super+P`            | Music search (toggle)     |
 
 ### Niri Column Model Legend
 

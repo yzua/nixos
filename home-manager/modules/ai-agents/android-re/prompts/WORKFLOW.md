@@ -51,7 +51,7 @@ Minimum healthy state:
 - emulator device online in `adb devices`
 - boot property `sys.boot_completed=1`
 - unattended root works
-- proxy left at `:0` unless you explicitly enable interception
+- proxy set to `10.0.2.2:8084` by default unless you started with `RE_ENABLE_PROXY=0`
 
 Additional host-side check:
 

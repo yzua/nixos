@@ -226,15 +226,15 @@ Format-on-save is enabled with a 500ms timeout. If the formatter times out, it f
 
 Async linting runs automatically on save and insert-leave. Linters are configured per filetype:
 
-| Language              | Linter        |
-| --------------------- | ------------- |
-| JavaScript/TypeScript | biomejs       |
-| Python                | ruff          |
-| Go                    | golangci-lint |
-| Nix                   | statix        |
-| Bash/Shell            | shellcheck    |
-| Markdown              | markdownlint  |
-| C/C++                 | cppcheck      |
+| Language              | Linter       |
+| --------------------- | ------------ |
+| JavaScript/TypeScript | biomejs      |
+| Python                | ruff         |
+| Go                    | golangcilint |
+| Nix                   | statix       |
+| Bash/Shell            | shellcheck   |
+| Markdown              | markdownlint |
+| C/C++                 | cppcheck     |
 
 Lint errors appear as diagnostics in the gutter and can be navigated with `[d` / `]d`.
 

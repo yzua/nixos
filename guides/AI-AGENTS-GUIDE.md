@@ -98,9 +98,23 @@ Upstream-verified facts:
 - Optional scope arguments are supported.
 - Core quality loop documented upstream: `audit`, `normalize`, `polish`, `distill`.
 
+## Everything Claude Code (addon)
+
+Installed by `programs.aiAgents.everythingClaudeCode.enable` (default: `true`) via activation scripts from `affaan-m/everything-claude-code`. Provides skills, commands, and agents prefixed `ecc-` for Claude Code, Codex, and OpenCode.
+
+Installs into:
+
+- `~/.claude/skills/everything-claude-code/` and `~/.claude/commands/ecc-*.md` (Claude Code)
+- `~/.codex/agents/ecc-*.toml` (Codex)
+- `~/.config/opencode/commands/ecc-*.md` and instructions (OpenCode, all profiles)
+
+Activation is gated by each agent's enable flag — disabled agents skip ECC install. Cleanup on disable removes all `ecc-` prefixed files and the skill directory.
+
+Source: `home-manager/modules/ai-agents/activation/plugins.nix` (lines 140-225).
+
 ---
 
-## Verification Snapshot (2026-04-08)
+## Verification Snapshot (2026-04-12)
 
 This guide is verified against the live configuration sources in:
 
@@ -265,14 +279,16 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                     |
 | `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                       |
 | `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                 |
-| `cxu`                          | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex YOLO (unsafe explicit)                                              |
+| `cxu`                          | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Alias of `cx` (identical command)                                         |
 | `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                  |
 | `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                     |
 | `hocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT high reasoning variant                                       |
 | `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                 |
 | `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix     |
 | `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries              |
-| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                      |
+| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                       |
+| `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                              |
+| `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)          |
 | `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt              |
 | `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                    |
 | `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`              |
@@ -287,7 +303,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `agents-search`, `occm`, `ocbp`, etc.) are defined in `home-manager/modules/ai-agents/services.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `agents-search`, `occm`, `ocbp`, `oc-port`, `ai-mcp-scan`, etc.) are defined in `home-manager/modules/ai-agents/services.nix` and `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 
 ### Interactive Selector (`ais`)
@@ -329,9 +345,9 @@ agents-search -t 2 -l 100 .    # custom thresholds (file count / line count)
 
 Smart mode applies different thresholds based on parent coverage:
 
-| Condition | Shows when | Rationale |
-|---|---|---|
-| No parent AGENTS.md | ≥4 files **OR** ≥250 lines | Directory is genuinely uncovered |
+| Condition            | Shows when                  | Rationale                                                                              |
+| -------------------- | --------------------------- | -------------------------------------------------------------------------------------- |
+| No parent AGENTS.md  | ≥4 files **OR** ≥250 lines  | Directory is genuinely uncovered                                                       |
 | Parent has AGENTS.md | ≥5 files **AND** ≥400 lines | Parent already documents this area — child only needs its own if substantially complex |
 
 Output includes a `PARENT` column showing `covered` (parent guide exists) or `uncovered` (no guidance anywhere above). This helps prioritize which directories to write guides for first.
@@ -355,7 +371,11 @@ ai-agents/
 │   ├── _file-templates.nix    # Config file templates
 │   ├── _workflow-prompts.nix  # Workflow prompt definitions
 │   ├── _zai-services.nix      # Z.AI MCP service registry
-│   └── _zai-filters.nix       # Z.AI MCP jq filter generation
+│   ├── _zai-filters.nix       # Z.AI MCP jq filter generation
+│   ├── _services-systemd.nix  # Systemd service/timer definitions
+│   ├── _services-shell-aliases.nix # Shell alias generation
+│   ├── _mk-cli-autoupdate-script.nix # Auto-update script builder
+│   └── _android-re-launchers.nix # Android RE agent launcher helpers
 ├── activation/              # Activation scripts (secret patching, Codex/Claude setup, plugin installs)
 │   ├── default.nix            # Aggregation hub
 │   ├── codex-setup.nix        # Codex config.toml + ~/.codex/agents generation
@@ -364,7 +384,8 @@ ai-agents/
 │   ├── plugins.nix            # Plugin install scripts (impeccable, agency-agents)
 │   └── skills.nix             # Skill installations and omissions
 ├── android-re/              # Android RE workflow prompts and config
-│   └── _prompt.nix            # Prompt templates (not a module, imported by services)
+│   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
+│   └── prompts/               # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 ├── files.nix                # home.file + xdg.configFile declarations
 ├── services.nix             # Packages, zsh aliases, systemd user services/timers
 ├── log-analyzer.nix         # Log analysis tools and dashboard
@@ -567,11 +588,11 @@ Uses a separate config directory (`~/.config/opencode-gpt/`) with the model over
 
 ### GPT Model Reference
 
-| Model ID            | Use Case                             |
-| ------------------- | ------------------------------------ |
-| gpt-5.4             | Primary coding and deep execution    |
-| gpt-5.3             | Analysis, planning, and review tasks |
-| opencode/gpt-5-nano | Fast low-cost exploration            |
+| Model ID          | Use Case                             |
+| ----------------- | ------------------------------------ |
+| gpt-5.4           | Primary coding and deep execution    |
+| gpt-5.4-spark     | Fast low-cost exploration            |
+| gpt-5.1-codex-max | Max-capacity GPT for demanding tasks |
 
 Provider prefixes: `openai/` (OpenAI API), `opencode/` (OpenCode hosted/free tier).
 
@@ -585,7 +606,7 @@ OpenCode free-tier models as primary models for low-cost sessions.
 
 Uses a separate config directory (`~/.config/opencode-zen/`) with the model overridden to Zen free variants. Reuses the same MCP servers and permissions as the default profile.
 
-Primary model: `opencode/minimax-m2.5-free`, fast lane: `opencode/mimo-v2-flash-free`.
+Primary model: `opencode/minimax-m2.5-free`.
 
 ---
 
@@ -793,6 +814,7 @@ All sops functions use `_load_zai_key()` which reads `/run/secrets/zai_api_key`.
 | `ai-errors`         | Error grep filtered for known benign MCP probe noise                           |
 | `ai-errors-runtime` | Focused runtime failures (`Not connected`, TUI/bootstrap, bun info)            |
 | `ai-mcp-health`     | MCP readiness check (bun/bunx/uvx, gh auth, JSON validity, token placeholders) |
+| `ai-mcp-scan`       | Fallback to `ai-mcp-health` (mcp-scan package unavailable)                     |
 | `ai-stats`          | Log statistics summary (wrapper-based)                                         |
 | `ai-report`         | Full analysis report                                                           |
 | `ai-dash`           | Interactive fzf dashboard                                                      |
@@ -805,6 +827,7 @@ Use `*-log` aliases for explicit logged sessions through the wrapper:
 | ------------ | ---------------------------------------- |
 | `cl-log`     | `ai-agent-log-wrapper claude claude`     |
 | `oc-log`     | `ai-agent-log-wrapper opencode opencode` |
+| `oc-port`    | `opencode --port 4096`                   |
 | `codex-log`  | `ai-agent-log-wrapper codex codex`       |
 | `gemini-log` | `ai-agent-log-wrapper gemini gemini`     |
 

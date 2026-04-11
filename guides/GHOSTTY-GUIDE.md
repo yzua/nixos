@@ -73,24 +73,24 @@ You can also scroll with the mouse wheel.
 
 Your Ghostty setup includes:
 
-| Setting                    | Value                           | Why                                       |
-| -------------------------- | ------------------------------- | ----------------------------------------- |
-| Font                       | JetBrainsMono Nerd Font         | Ligatures, icons, code readability        |
-| Font size                  | System default (from constants) | Consistent with other apps                |
-| Font thicken               | Enabled                         | Bolder strokes for readability            |
-| Line height                | 0%                              | Default system spacing                    |
-| Theme                      | Gruvbox Dark                    | Managed by Stylix for consistency         |
-| Cursor                     | Block, blinking, yellow         | Gruvbox yellow for visibility             |
-| Scrollback                 | 50,000 lines                    | Large buffer for log viewing              |
-| Window padding             | 8px                             | Clean spacing                             |
-| Window decorations         | Off                             | Niri handles decorations                  |
-| Copy on select             | Enabled                         | Select text to copy automatically         |
-| Clipboard paste protection | Enabled                         | Warns about suspicious pastes             |
-| Selection highlight        | Inverted fg/bg                  | Clear visibility when selecting text      |
-| Bold is bright             | Disabled                        | Bold text stays same color (cleaner look) |
-| GTK tabs                   | Hidden                          | Zellij handles multiplexing               |
-| VSync                      | Enabled                         | Smooth scrolling on Wayland               |
-| Auto-update                | Off                             | Managed by Nix                            |
+| Setting                    | Value                           | Why                                           |
+| -------------------------- | ------------------------------- | --------------------------------------------- |
+| Font                       | JetBrainsMono Nerd Font         | Ligatures, icons, code readability            |
+| Font size                  | System default (from constants) | Consistent with other apps                    |
+| Font thicken               | Enabled                         | Bolder strokes for readability                |
+| Cell height adjustment     | 0%                              | Default system spacing (`adjust-cell-height`) |
+| Theme                      | Gruvbox Dark                    | Managed by Stylix for consistency             |
+| Cursor                     | Block, blinking, yellow_dim     | Gruvbox dim yellow (`#d79921`) for visibility |
+| Scrollback                 | 50,000 lines                    | Large buffer for log viewing                  |
+| Window padding             | 8px                             | Clean spacing                                 |
+| Window decorations         | Off                             | Niri handles decorations                      |
+| Copy on select             | Enabled                         | Select text to copy automatically             |
+| Clipboard paste protection | Enabled                         | Warns about suspicious pastes                 |
+| Selection highlight        | Inverted fg/bg                  | Clear visibility when selecting text          |
+| Bold is bright             | Disabled                        | Bold text stays same color (cleaner look)     |
+| GTK tabs                   | Hidden                          | Zellij handles multiplexing                   |
+| VSync                      | Enabled                         | Smooth scrolling on Wayland                   |
+| Auto-update                | Off                             | Managed by Nix                                |
 
 ---
 

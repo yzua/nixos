@@ -28,16 +28,16 @@ Zellij is modal, like Vim. The current mode is shown in the bottom-left of the s
 | Mode        | Color        | How to Enter                | What It Does                           |
 | ----------- | ------------ | --------------------------- | -------------------------------------- |
 | **Normal**  | None         | `Esc` from any mode         | Default. All Alt shortcuts work here   |
-| **Locked**  | Yellow (dim) | `Ctrl g`                    | Passes all keys to the running program |
+| **Locked**  | Yellow (dim) | `Ctrl g` (Zellij default)   | Passes all keys to the running program |
 | **Scroll**  | Aqua         | `Ctrl s`                    | Navigate scrollback with Vim keys      |
 | **Search**  | Purple       | `/` or `s` from Scroll mode | Search through scrollback              |
-| **Session** | Red          | `Ctrl o`                    | Session management (detach/quit)       |
+| **Session** | Red          | `Ctrl o` (Zellij default)   | Session management (detach/quit)       |
 | **Resize**  | Orange       | (default bindings)          | Resize panes                           |
 | **Pane**    | Green        | (default bindings)          | Pane management                        |
 | **Tab**     | Blue         | (default bindings)          | Tab management                         |
 | **Move**    | Gold         | (default bindings)          | Move panes around                      |
 
-**Auto-lock**: The `zellij-autolock` plugin automatically switches to Locked mode when you're inside `nvim`, `vim`, `git`, `fzf`, `zoxide`, `atuin`, or `lazygit`. It switches back when you exit.
+**Auto-lock**: The `zellij-autolock` plugin is downloaded but **not yet loaded** in layouts or config. The auto-switching behavior described in some references is not active. To activate, add a `load_plugin` or `LaunchOrFocusPlugin` entry for `zellij-autolock.wasm` in `home-manager/modules/terminal/zellij/config.nix` or `layouts.nix`.
 
 ---
 
@@ -197,7 +197,7 @@ zellij -l monitoring
 
 Two tabs for system monitoring:
 
-- **system** (focused): btop and nvtop side by side
+- **system** (focused): btop and nvtop stacked vertically
 - **logs**: Live `journalctl -f` output
 
 ---
@@ -219,9 +219,9 @@ Within any tab, you can cycle through different pane arrangements:
 
 Gruvbox-themed status bar showing the current mode, open tabs, and time. Always visible at the bottom of every tab. No interaction needed — it updates automatically.
 
-### zellij-autolock (Auto Lock)
+### zellij-autolock (Auto Lock) — Not Yet Active
 
-Automatically switches to Locked mode when a trigger program is detected (nvim, vim, git, fzf, zoxide, atuin, lazygit). Switches back 0.3s after the program exits. This means your Alt keybindings won't interfere with Neovim.
+Plugin is downloaded but not loaded in layouts or config. Once activated, it will automatically switch to Locked mode when a trigger program is detected (nvim, vim, git, fzf, zoxide, atuin, lazygit) and switch back 0.3s after the program exits. This means your Alt keybindings won't interfere with Neovim.
 
 ### monocle (Fuzzy Finder)
 
@@ -267,10 +267,10 @@ Run the same command across multiple panes simultaneously.
 
 ## Miscellaneous
 
-| Key      | Action                                    |
-| -------- | ----------------------------------------- |
-| `Alt e`  | Open scrollback in Neovim (from any mode) |
-| `Ctrl g` | Toggle Locked mode                        |
+| Key      | Action                                                  |
+| -------- | ------------------------------------------------------- |
+| `Alt e`  | Open scrollback in Neovim (not in locked/rename/search) |
+| `Ctrl g` | Toggle Locked mode (Zellij default)                     |
 
 ### Settings Summary
 
@@ -320,7 +320,7 @@ Sessions auto-persist. Run `zellij attach` to reconnect. Run `zellij list-sessio
 
 ### "I want to detach and come back later"
 
-Press `Ctrl o` then `d` to detach. If you close the terminal window, the session will end because `on_force_close` is set to "quit". To keep sessions alive across window closes, use the detach command (`Ctrl o` then `d`) explicitly before closing.
+Press `Ctrl o` then `d` to detach. Sessions are serialized to disk (`session_serialization = true`), so they survive terminal window closes and can be reattached with `zellij attach`. Use detach explicitly for a clean exit.
 
 ---
 
@@ -328,26 +328,26 @@ Press `Ctrl o` then `d` to detach. If you close the terminal window, the session
 
 ### Global Shortcuts (work in all modes except Locked)
 
-| Key               | Action                     |
-| ----------------- | -------------------------- |
-| `Alt h/j/k/l`     | Navigate panes (Vim-style) |
-| `Alt 1-9`         | Jump to tab                |
-| `Alt 0`           | Toggle last tab            |
-| `Alt n`           | New pane                   |
-| `Alt s`           | Split below                |
-| `Alt v`           | Split right                |
-| `Alt x`           | Close pane                 |
-| `Alt z`           | Zoom pane                  |
-| `Alt w`           | Toggle floating panes      |
-| `Alt f`           | Float/embed toggle         |
-| `Alt Enter`       | New tab                    |
-| `Alt q`           | Close tab                  |
-| `Alt ,` / `Alt .` | Move tab left/right        |
-| `Alt =` / `Alt -` | Resize bigger/smaller      |
-| `Alt [` / `Alt ]` | Cycle layouts              |
-| `Alt e`           | Edit scrollback in Neovim  |
-| `Ctrl s`          | Enter Scroll mode          |
-| `Ctrl g`          | Toggle Locked mode         |
+| Key               | Action                       |
+| ----------------- | ---------------------------- |
+| `Alt h/j/k/l`     | Navigate panes (Vim-style)   |
+| `Alt 1-9`         | Jump to tab                  |
+| `Alt 0`           | Toggle last tab              |
+| `Alt n`           | New pane                     |
+| `Alt s`           | Split below                  |
+| `Alt v`           | Split right                  |
+| `Alt x`           | Close pane                   |
+| `Alt z`           | Zoom pane                    |
+| `Alt w`           | Toggle floating panes        |
+| `Alt f`           | Float/embed toggle           |
+| `Alt Enter`       | New tab                      |
+| `Alt q`           | Close tab                    |
+| `Alt ,` / `Alt .` | Move tab left/right          |
+| `Alt =` / `Alt -` | Resize bigger/smaller        |
+| `Alt [` / `Alt ]` | Cycle layouts                |
+| `Alt e`           | Edit scrollback in Neovim    |
+| `Ctrl s`          | Enter Scroll mode            |
+| `Ctrl g`          | Toggle Locked mode (default) |
 
 ### Plugin Shortcuts
 
