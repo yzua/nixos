@@ -111,23 +111,22 @@ Fix:
 Important emulator note:
 
 - `frida-ps -U` success does not guarantee `attach` works
-- on this emulator, Frida `17.5.1` often enumerates processes but fails attach
-- the current working workaround is the isolated `16.4.10` client/server pair
+- use the system Frida `17.5.1` toolchain with the matching server binary at `~/Downloads/android-re-tools/frida/`
+- the isolated `16.4.10` client venv is broken (missing python3.11) — do not use it
 
 Known working commands:
 
 ```bash
-adb shell 'su 0 sh -c "/data/local/tmp/frida-server-16.4.10 -l 0.0.0.0:27042"'
-. "$HOME/Downloads/android-re-tools/frida16410-py311/bin/activate"
+bash scripts/ai/android-re/re-avd.sh frida-start
 frida-ps -U
 frida -U -p <pid> -q -e 'Process.id'
 ```
 
 If attach still fails with `connection closed`:
 
-- verify you are not accidentally using the system Frida tools
-- verify the server is the `16.4.10` binary, not `17.5.1`
-- verify the host client is the pinned `16.4.10` binary under `~/Downloads/android-re-tools/frida16410-py311/bin/`
+- verify you are using the system `frida` (v17.5.1), not the broken v16 venv
+- verify the server is the `17.5.1` binary at `/data/local/tmp/frida-server-17.5.1`
+- check for version mismatch: `frida --version` on host vs `adb shell 'su 0 /data/local/tmp/frida-server-17.5.1 --version'`
 
 ## Root Checker Says The Device Is Not Rooted
 
@@ -190,6 +189,57 @@ If the app still fails while proxy is set, check both logs:
 tail -f ~/Downloads/android-re-tools/emulator-runtime.log
 adb logcat -b all -v threadtime
 ```
+
+## App Detects The Emulator
+
+If an app refuses to run or shows "emulator detected":
+
+1. Verify spoofing was applied:
+
+```bash
+adb shell getprop ro.hardware           # should show "pixel" not "ranchu"
+adb shell getprop ro.product.model      # should show "Pixel 7"
+adb shell getprop ro.build.characteristics  # should show "nosdcard,phone"
+adb shell getprop ro.kernel.qemu        # should show "0"
+```
+
+1. Re-apply if needed:
+
+```bash
+bash scripts/ai/android-re/re-avd.sh spoof
+```
+
+1. If the app still detects the emulator, it's likely using runtime checks beyond system props:
+   - File existence checks (`/dev/goldfish_pipe`, `/dev/qemu_pipe`)
+   - Sensor checks (accelerometer, gyroscope patterns)
+   - CPU/ABI checks via native code
+   - Timing-based detection
+
+1. For runtime detection, use Frida hooks on:
+   - `android.os.Build` fields
+   - `java.io.File.exists` for emulator-indicator paths
+   - Sensor data injection
+   - Any native detection functions found in static analysis
+
+## `agent-device` Cannot Find The Emulator
+
+```bash
+agent-device devices --platform android
+```
+
+If empty:
+
+1. Verify the emulator is running: `adb devices`
+2. `agent-device` discovers devices through `adb` — the emulator must be fully booted
+3. If booted but not found, check `ANDROID_SERIAL` or `ANDROID_DEVICE` env vars aren't set to a wrong value
+
+If `agent-device` shows the device but commands fail:
+
+```bash
+agent-device open Settings --platform android --debug
+```
+
+Check the diagnostic logs under `~/.agent-device/logs/`.
 
 ## Target-Specific Reverse Engineering Logic
 

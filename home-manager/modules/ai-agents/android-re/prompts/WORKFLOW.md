@@ -72,9 +72,20 @@ ocglmare "look for anti-analysis behavior"
 oczenare "static-first APK triage"
 ```
 
-These commands start the baseline workflow and open OpenCode on the `android-re` agent using the prompt source in this directory.
+These commands start the emulator baseline, spoof the device identity, and open Ghostty running OpenCode on the `android-re` agent using the prompt source in this directory.
 
-For manual install or launch:
+For manual app interaction, use `agent-device` (load the skill first):
+
+```bash
+# Launch and navigate
+agent-device open Settings --platform android
+agent-device snapshot -i
+agent-device find "Network" click
+agent-device screenshot --out /tmp/screen.png
+agent-device close
+```
+
+For manual install or launch with `adb`:
 
 ```bash
 adb install -r /path/to/app.apk
@@ -170,24 +181,48 @@ Clear it when done:
 bash scripts/ai/android-re/re-avd.sh proxy-clear
 ```
 
+## 5b. Navigate And Exercise The App With agent-device
+
+After static analysis identifies screens and flows of interest, use `agent-device` to navigate the app and trigger traffic while `mitmproxy` captures:
+
+```bash
+# Open the target app
+agent-device open com.example.target --platform android
+
+# Navigate to login or target screen
+agent-device snapshot -i
+agent-device find "Login" click
+agent-device snapshot -i
+agent-device fill @e5 "user@example.com"
+agent-device fill @e7 "password123"
+agent-device find "Submit" click
+
+# Wait for response and capture
+agent-device wait text "Welcome" 10000
+agent-device screenshot --out /tmp/after-login.png
+agent-device close
+```
+
+This lets you exercise app flows programmatically while `mitmproxy`, Frida, or `logcat` capture data in background tmux panes.
+
 ## 6. Prepare Frida
 
-Important limitation on this emulator:
+Important version note on this emulator:
 
-- system Frida `17.5.1` can enumerate processes but attach is unreliable or broken
-- use the isolated Frida `16.4.10` toolchain for actual hook work
+- use the system Frida `17.5.1` toolchain for all attach and hook work
+- server binary is at `~/Downloads/android-re-tools/frida/frida-server-17.5.1-android-x86_64`
+- the isolated `16.4.10` toolchain venv is broken (missing python3.11) — do not use it
 - ARM64 Frida server is staged locally, but a native ARM64 AVD cannot currently boot on this host's emulator backend
 
 Start or restart Frida server:
 
 ```bash
-adb shell 'su 0 sh -c "/data/local/tmp/frida-server-16.4.10 -l 0.0.0.0:27042"'
+bash scripts/ai/android-re/re-avd.sh frida-start
 ```
 
 In another shell:
 
 ```bash
-. "$HOME/Downloads/android-re-tools/frida16410-py311/bin/activate"
 frida-ps -U
 ```
 

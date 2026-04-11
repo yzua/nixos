@@ -13,8 +13,11 @@ The Markdown files here are injected into the `android-re` OpenCode agent. Keep 
 - Root: Magisk with unattended `shell` policy
 - Graphics on Linux: host GPU path via NVIDIA Vulkan ICD
 - Working HTTPS interception: custom CA on `mitmdump` port `8084`
-- Frida: use the isolated `16.4.10` toolchain, not the system `17.5.1` tools
+- Frida: use the system `17.5.1` toolchain (matching server at `~/Downloads/android-re-tools/frida/` and system `frida`/`frida-ps`)
+- Device spoofing: automatic on `start` — emulator identity masked as real Pixel 7 via `resetprop`
+- UI automation: `agent-device` for structured accessibility-tree interaction with stable refs
 - Host limitation: native ARM64 AVD boot is not supported by the current Google emulator on this `x86_64` Linux host
+- iOS limitation: `agent-device --platform ios` is not available on this Linux host; requires macOS + Xcode
 
 ## Prompt Source Layout
 
@@ -51,9 +54,9 @@ Available profile launchers:
 
 Each launcher:
 
-- starts the Android RE baseline through `scripts/ai/android-re/re-avd.sh start`
+- boots the emulator and applies device spoofing via `scripts/ai/android-re/re-avd.sh start`
 - builds a prompt from every root-level Markdown file in this directory
-- opens Ghostty with OpenCode on the `android-re` agent
+- opens Ghostty running OpenCode on the `android-re` agent with the chosen profile
 - points the session at this prompt source directory so the agent knows where to improve its own instructions
 
 ## Focused Manual Commands
@@ -81,6 +84,25 @@ bash scripts/ai/android-re/re-avd.sh proxy-set 10.0.2.2:8084 --block-quic
 bash scripts/ai/android-re/re-avd.sh proxy-clear
 bash scripts/ai/android-re/re-avd.sh frida-start
 bash scripts/ai/android-re/re-avd.sh frida-stop
+```
+
+Device UI automation (load the `agent-device` skill first):
+
+```bash
+agent-device open Settings --platform android
+agent-device snapshot -i
+agent-device click @e3
+agent-device find "Network" click
+agent-device fill @e5 "user@example.com"
+agent-device screenshot --out /tmp/screen.png
+agent-device close
+```
+
+Device spoofing:
+
+```bash
+bash scripts/ai/android-re/re-avd.sh spoof      # re-apply Pixel 7 identity
+bash scripts/ai/android-re/re-avd.sh unspoof    # restore hidden emulator files
 ```
 
 ## Static Output Default

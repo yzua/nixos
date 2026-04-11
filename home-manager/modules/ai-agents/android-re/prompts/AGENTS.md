@@ -14,7 +14,7 @@ Purpose-built workspace for Android emulator testing, reverse engineering, Frida
 - Host uses the Android SDK at `~/Android/Sdk`
 - Primary RE emulator name is `re-pixel7-api34`
 - Unattended root is available with `adb shell 'su 0 ...'`
-- Reliable Frida attach uses the isolated `16.4.10` toolchain under `~/Downloads/android-re-tools/frida16410-py311/`
+- Reliable Frida attach uses the system `17.5.1` toolchain (matching server + client under `~/Downloads/android-re-tools/frida/`)
 - Reliable HTTPS interception uses the custom CA under `~/Downloads/android-re-tools/custom-ca/`
 - This host is `x86_64`, and Google emulator ARM64 AVDs are not runnable here with the current QEMU2 emulator
 
@@ -42,14 +42,16 @@ The `oc*are` commands start the Android RE baseline and open Ghostty running Ope
 ## Agent Workflow
 
 1. Check health first: `doctor`, then `status`.
-2. Use explicit proxy mode before transparent proxy mode.
-3. Use `su 0 ...`, not `su -c ...`, because this Magisk build expects UID-first syntax.
-4. Prefer the custom-CA proxy on `8084` over the default `~/.mitmproxy` CA on this Android 14 emulator.
-5. Prefer Frida `16.4.10` over the system Frida `17.5.1` tools for attach and hooking.
-6. Prefer `jadx` + `apktool` before patching or hooking.
-7. Treat anti-root, anti-Frida, and pinning as target-specific hurdles, not emulator setup failures.
-8. If an app is unstable on the `google_apis/x86_64` AVD, check package ABI before blaming the host setup.
-9. On this host, do not plan around a native ARM64 AVD path unless the emulator backend changes.
+2. Use `agent-device` for all UI interaction on the emulator — load the `agent-device` skill first for the canonical command reference.
+3. Use explicit proxy mode before transparent proxy mode.
+4. Use `su 0 ...`, not `su -c ...`, because this Magisk build expects UID-first syntax.
+5. Prefer the custom-CA proxy on `8084` over the default `~/.mitmproxy` CA on this Android 14 emulator.
+6. Prefer the system Frida `17.5.1` toolchain (matching server + client) for attach and hook work.
+7. Prefer `jadx` + `apktool` before patching or hooking.
+8. Treat anti-root, anti-Frida, and pinning as target-specific hurdles, not emulator setup failures.
+9. If an app is unstable on the `google_apis/x86_64` AVD, check package ABI before blaming the host setup.
+10. On this host, do not plan around a native ARM64 AVD path unless the emulator backend changes.
+11. Device identity is spoofed automatically on `start` (Pixel 7 profile). If an app still detects the emulator, combine `re-avd.sh spoof` with Frida hooks targeting `Build` fields and file-existence checks.
 
 ## Safety Rules
 
@@ -65,8 +67,21 @@ The `oc*are` commands start the Android RE baseline and open Ghostty running Ope
 - `home-manager/modules/ai-agents/android-re/prompts/WORKFLOW.md`: detailed static + dynamic RE flow
 - `home-manager/modules/ai-agents/android-re/prompts/TOOLS.md`: installed tools, missing tools, and recommendations
 - `home-manager/modules/ai-agents/android-re/prompts/TROUBLESHOOTING.md`: failure modes and recovery steps
-- `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, and cert helper
+- `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, cert, and spoofing helper
 - `scripts/ai/android-re/re-static.sh`: static APK analysis helper
+- `scripts/ai/android-re/_spoof-table.sh`: declarative device identity spoofing data (Pixel 7 profile)
+- `scripts/ai/android-re/opencode-android-re.sh`: OpenCode Android RE session launcher (used by `oc*are` aliases)
+
+## agent-device Skill
+
+The `agent-device` skill is installed and should be loaded before any device UI interaction. Core workflow:
+
+1. `agent-device open <app> --platform android` — launch an app
+2. `agent-device snapshot -i` — get interactive elements with stable refs
+3. `agent-device click @eN` / `fill @eN "text"` / `find "label" click` — interact
+4. `agent-device close` — end session
+
+Always snapshot before interacting — refs invalidate on UI changes. Prefer refs (`@eN`) over raw coordinates.
 
 ## Important Findings
 
