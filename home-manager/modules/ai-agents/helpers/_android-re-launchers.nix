@@ -5,15 +5,13 @@
 }:
 let
   launcherScript = "${config.home.homeDirectory}/System/scripts/ai/android-re/opencode-android-re.sh";
-  promptSourceDir = "${config.home.homeDirectory}/System/home-manager/modules/ai-agents/android-re/prompts";
   mkAndroidReLauncher =
     {
       name,
       profile,
     }:
     pkgs.writeShellScriptBin name ''
-      ANDROID_RE_PROMPT_SOURCE_DIR=${lib.escapeShellArg promptSourceDir} \
-        ANDROID_RE_OPENCODE_PROFILE=${lib.escapeShellArg profile} \
+      ANDROID_RE_OPENCODE_PROFILE=${lib.escapeShellArg profile} \
         exec ${launcherScript} "$@"
     '';
 in

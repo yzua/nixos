@@ -11,11 +11,8 @@ trap 'log_error "command failed at line ${LINENO}: ${BASH_COMMAND}"' ERR
 AVD_NAME="${AVD_NAME:-re-pixel7-api34}"
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}"
 ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
-FRIDA_BIN="${FRIDA_BIN:-${HOME}/Downloads/android-re-tools/frida16/frida-server-16.4.10-android-x86_64}"
-FRIDA_TARGET="${FRIDA_TARGET:-/data/local/tmp/frida-server-16.4.10}"
-FRIDA_HOST_DIR="${FRIDA_HOST_DIR:-${HOME}/Downloads/android-re-tools/frida16410-py311/bin}"
-FRIDA_CLI_BIN="${FRIDA_CLI_BIN:-${FRIDA_HOST_DIR}/frida}"
-FRIDA_PS_BIN="${FRIDA_PS_BIN:-${FRIDA_HOST_DIR}/frida-ps}"
+FRIDA_BIN="${FRIDA_BIN:-${HOME}/Downloads/android-re-tools/frida/frida-server-17.5.1-android-x86_64}"
+FRIDA_TARGET="${FRIDA_TARGET:-/data/local/tmp/frida-server-17.5.1}"
 FRIDA_LOG_PATH="${FRIDA_LOG_PATH:-/data/local/tmp/frida.log}"
 FRIDA_WAIT_TIMEOUT="${FRIDA_WAIT_TIMEOUT:-10}"
 FRIDA_WAIT_RETRIES="${FRIDA_WAIT_RETRIES:-3}"
@@ -43,15 +40,15 @@ TMUX_LOGCAT_WINDOW="${TMUX_LOGCAT_WINDOW:-logcat}"
 RE_WORKSPACE="${RE_WORKSPACE:-6}"
 RUNTIME_LOG="${RUNTIME_LOG:-${HOME}/Downloads/android-re-tools/emulator-runtime.log}"
 BOOT_WAIT_TIMEOUT="${BOOT_WAIT_TIMEOUT:-180}"
+RE_SPOOF_DEVICE="${RE_SPOOF_DEVICE:-1}"
 
 # shellcheck source=scripts/ai/android-re/_helpers.sh
 source "${SCRIPT_DIR}/_helpers.sh"
+# shellcheck source=scripts/ai/android-re/_spoof-table.sh
+source "${SCRIPT_DIR}/_spoof-table.sh"
 
 resolve_frida_ps_bin() {
-	if [[ ! -x "${FRIDA_PS_BIN}" ]]; then
-		FRIDA_PS_BIN="$(command -v frida-ps || true)"
-	fi
-
+	FRIDA_PS_BIN="$(command -v frida-ps || true)"
 	[[ -n "${FRIDA_PS_BIN}" ]] || error_exit "missing frida-ps host tool"
 }
 
@@ -92,6 +89,67 @@ init_mitm_ca_vars() {
 adb_run() {
 	need_cmd adb
 	adb "$@"
+}
+
+spoof_device() {
+	local changed=0 failed=0
+	log_info "spoofing device identity to look like a real ${SPOOF_DEVICE_MODEL}"
+
+	# Resolve Magisk binary — it acts as a multi-call binary (resetprop, magisk, su, etc.)
+	# On this AVD, Magisk is installed as an app; the binary lives under the app data directory.
+	local resetprop_bin
+	resetprop_bin="$(adb shell 'su 0 sh -c "ls /data/user/0/com.android.shell/Magisk/lib/x86_64/magisk 2>/dev/null || ls /data/adb/magisk/magisk 2>/dev/null || which magisk 2>/dev/null || echo """' 2>/dev/null | tr -d '\r' || true)"
+	if [[ -z "${resetprop_bin}" ]]; then
+		log_error "cannot find Magisk binary for resetprop"
+		return 1
+	fi
+	log_info "using Magisk binary: ${resetprop_bin}"
+
+	# Apply system properties via Magisk resetprop (bypasses ro.* read-only)
+	local entry prop value old
+	for entry in "${SPOOF_PROPS[@]}"; do
+		IFS='|' read -r prop value <<<"${entry}"
+		old="$(adb shell "su 0 getprop ${prop}" 2>/dev/null | tr -d '\r' || true)"
+		if [[ "${old}" == "${value}" ]]; then
+			continue
+		fi
+		if adb shell "su 0 ${resetprop_bin} resetprop ${prop} '${value}'" >/dev/null 2>&1; then
+			changed=$((changed + 1))
+		else
+			log_warning "resetprop failed: ${prop}"
+			failed=$((failed + 1))
+		fi
+	done
+
+	# Hide emulator-indicator files (goldfish, qemu pipes)
+	local emu_file
+	for emu_file in "${SPOOF_HIDE_FILES[@]}"; do
+		adb shell "su 0 sh -c 'if [ -e ${emu_file} ]; then mv ${emu_file} ${emu_file}.hidden; fi'" >/dev/null 2>&1 || true
+	done
+
+	# Kill emulator-specific services that aren't needed for app execution
+	local svc
+	for svc in "${SPOOF_STOP_SERVICES[@]}"; do
+		adb shell "su 0 sh -c 'stop ${svc} 2>/dev/null || true'" >/dev/null 2>&1 || true
+	done
+
+	log_success "device spoof applied (${changed} props changed, ${failed} failed, ${#SPOOF_HIDE_FILES[@]} files hidden, ${#SPOOF_STOP_SERVICES[@]} services stopped)"
+
+	# Quick verification
+	log_info "identity check: hardware=$(adb shell getprop ro.hardware 2>/dev/null | tr -d '\r') model=$(adb shell getprop ro.product.model 2>/dev/null | tr -d '\r') characteristics=$(adb shell getprop ro.build.characteristics 2>/dev/null | tr -d '\r')"
+}
+
+unspoof_device() {
+	log_info "restoring original emulator identity"
+
+	local emu_file
+	for emu_file in "${SPOOF_HIDE_FILES[@]}"; do
+		adb shell "su 0 sh -c 'if [ -e ${emu_file}.hidden ]; then mv ${emu_file}.hidden ${emu_file}; fi'" >/dev/null 2>&1 || true
+	done
+
+	# resetprop reverts are unreliable; recommend reboot for full restore
+	log_warning "system property changes persist until emulator reboot"
+	log_success "hidden files restored"
 }
 
 list_emulator_pids() {
@@ -419,6 +477,9 @@ start_re() {
 	else
 		set_selinux_mode enforcing
 	fi
+	if [[ "${RE_SPOOF_DEVICE}" == "1" ]]; then
+		spoof_device
+	fi
 	sync_mitm_ca
 	if ! frida_start; then
 		log_warning "continuing without a confirmed Frida connection so tmux and OpenCode still start"
@@ -616,6 +677,7 @@ Env:
   EMU_DISABLE_HARDWARE_DECODER  Pass -feature -HardwareDecoder (default: 1)
   RE_ENABLE_PROXY               Set to 1 to apply emulator proxy + QUIC blocking (default: 0)
   RE_SELINUX_PERMISSIVE         Set to 1 to switch guest SELinux to permissive for app root workflows (default: 1)
+  RE_SPOOF_DEVICE               Set to 1 to spoof device identity on start (default: 1)
 
 Commands:
   start                         Boot the rooted RE AVD and wire Frida + mitmproxy
@@ -630,6 +692,8 @@ Commands:
                                 Set global proxy and optionally block UDP/443
   proxy-clear                   Clear global proxy and unblock QUIC
   cert-check                    Verify system CA placement
+  spoof                         Spoof device identity to look like a real Pixel 7
+  unspoof                       Restore hidden emulator files (props need reboot)
   doctor                        Inventory required tools and artifacts
 EOF
 }
@@ -674,6 +738,12 @@ main() {
 		;;
 	cert-check)
 		cert_check
+		;;
+	spoof)
+		spoof_device
+		;;
+	unspoof)
+		unspoof_device
 		;;
 	doctor)
 		doctor
