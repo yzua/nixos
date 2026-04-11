@@ -18,6 +18,7 @@ let
     "btca"
     "skills"
     "agent-browser"
+    "agent-device"
     "@playwright/cli"
   ];
   npmGlobalPackages = [

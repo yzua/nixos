@@ -34,6 +34,7 @@ SKILLS=(
 	"supercent-io/skills-template|workflow-automation|workflow-automation"
 	"microsoft/playwright-cli|playwright-cli|playwright-cli"
 	"ChromeDevTools/chrome-devtools-mcp|skills/chrome-devtools-cli|chrome-devtools-cli"
+	"callstackincubator/agent-device|agent-device|agent-device"
 )
 
 echo "Syncing ${#SKILLS[@]} skills to $SKILLS_DIR..."

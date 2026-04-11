@@ -54,6 +54,10 @@
       repo = "vercel-labs/agent-browser";
       skill = "agent-browser";
     }
+    {
+      repo = "callstackincubator/agent-device";
+      skill = "agent-device";
+    }
   ];
 
   # Keep broad repo installs, then remove language/framework-specific skills.

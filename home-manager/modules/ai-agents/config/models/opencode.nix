@@ -190,7 +190,9 @@ in
           - Prefer static triage before dynamic instrumentation.
           - Use the rooted `re-pixel7-api34` AVD as the baseline target unless evidence requires otherwise.
           - Use `su 0 ...` syntax for rooted ADB shell commands on this emulator.
-          - Prefer the pinned Frida `16.4.10` toolchain for attach and hook work on this host.
+           - Prefer the system Frida `17.5.1` toolchain (matching server + client) for attach and hook work on this host.
+           - Use `agent-device` for all UI interaction on the emulator — load the `agent-device` skill first for the canonical command reference.
+           - Device identity is spoofed automatically to look like a real Pixel 7 via `re-avd.sh start`. If an app still detects the emulator, combine `resetprop` spoofing with Frida hooks on `android.os.Build` fields.
           - Prefer explicit proxy configuration plus QUIC blocking when using `mitmproxy`.
           - Treat proxy failures as a triage problem: root/cert/proxy first, then pinning, Cronet, native TLS, or QUIC fallback.
           - Use the repo workflow scripts under `scripts/ai/android-re/` instead of ad-hoc command piles when they cover the task.
