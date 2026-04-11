@@ -16,10 +16,10 @@ let
       "${pkgs.bash}/bin/sh"
       "-c"
       ''
-        if ! ${pkgs.noctalia-shell}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1; then
-          ${pkgs.coreutils}/bin/nohup ${pkgs.noctalia-shell}/bin/noctalia-shell >/dev/null 2>&1 &
+        if ! ${config.home.profileDirectory}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1; then
+          ${pkgs.coreutils}/bin/nohup ${config.home.profileDirectory}/bin/noctalia-shell >/dev/null 2>&1 &
           ${pkgs.coreutils}/bin/sleep 0.35
-          ${pkgs.noctalia-shell}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
+          ${config.home.profileDirectory}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
         fi
       ''
       "sh"
