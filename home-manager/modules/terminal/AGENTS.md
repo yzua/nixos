@@ -20,7 +20,7 @@ terminal/
 ├── scripts.nix      # Custom script wrappers (currently `nvidia-fans`)
 ├── shell.nix        # Nix shell integration and dev tools
 ├── zsh/
-│   ├── default.nix  # Zsh + OMZ (oxide theme, 23 setOptions)
+│   ├── default.nix  # Zsh + OMZ (Starship prompt, 23 setOptions)
 │   ├── aliases.nix  # Shell aliases
 │   ├── config.nix   # Zsh settings and initialization
 │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
@@ -54,7 +54,7 @@ terminal/
 
 ### Zsh (`zsh/`, 5 files)
 
-- **Framework**: Oh My Zsh with oxide theme
+- **Framework**: Oh My Zsh (Starship handles the prompt)
 - **Plugins**: sudo, extract, copypath, copyfile, bgnotify, fzf-tab
 - **Completions**: Carapace (not OMZ completions)
 - **Privacy history**: 20+ patterns filtered (tokens, passwords, API keys, SSH, sops commands)
@@ -65,7 +65,7 @@ terminal/
 
 - **Plugins** (7 WASM): zjstatus (bar), zellij-autolock, monocle, room, harpoon, zellij-forgot, multitask
 - **Layouts** (4): default (terminal), dev (nvim + lazygit), ai (Claude + logs), monitoring (btop + nvtop)
-- **Keybinds**: 100+ bindings, colored mode indicators (Gruvbox)
+- **Keybinds**: ~60 bindings, colored mode indicators (Gruvbox)
 - **Integration**: Auto-attach on terminal launch, `zjstatus` bar with git/mode/tabs
 
 ### Git (`tools/git/`, 3 files)

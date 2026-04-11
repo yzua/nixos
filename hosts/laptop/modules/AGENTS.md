@@ -52,5 +52,7 @@ just pkgs
 just lint
 just format
 just check
-just nixos
 ```
+
+- `hosts/_inventory.nix` currently sets `laptop.enabled = false`, so `just check` and `just nixos` do not evaluate the laptop host path.
+- For laptop-only changes, rely on `just modules` / `just pkgs` / `just lint` / `just format` for repo-wide checks, then use an explicit host-targeted eval or build command if you need to validate the dormant host.

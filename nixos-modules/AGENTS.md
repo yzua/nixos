@@ -14,6 +14,7 @@ The module system follows a strict layout:
 - **validation.nix**: The safety layer. It uses assertions to stop conflicting services.
 - **Feature Modules**: Single files like `gaming.nix` or `nvidia.nix` that manage specific subsystems.
 - **Sub-module Directories**: Paths like `security/` or `cleanup/` that have their own internal hubs.
+- **helpers/**: Shared internal helpers (`_option-helpers.nix`, `_systemd-helpers.nix`). Not in the hub; import manually.
 
 ## WHERE TO LOOK
 

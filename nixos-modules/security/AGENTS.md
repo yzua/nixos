@@ -15,7 +15,7 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 | `services.nix`          | dbus-broker and journald hardening                                                           | Always-on                          |
 | `audit.nix`             | Weekly Lynis security audit timer + service (owns `lynis` package)                           | Always-on                          |
 | `audit-logging.nix`     | fail2ban intrusion prevention (5 retries, 1h ban, exponential backoff, owns `audit` package) | `mySystem.auditLogging.enable`     |
-| `metadata-scrubber.nix` | Automatic metadata scrubbing for user files (owns `mat2`, `exiftool`, `inotify-tools`)       | `mySystem.metadataScrubber.enable` |
+| `metadata-scrubber.nix` | System-side metadata scrubber tooling (`mat2`, `exiftool`, `inotify-tools`) for the user-level watcher/timer | `mySystem.metadataScrubber.enable` |
 | `opsec.nix`             | kexec disable, zram swap, Chrony NTS                                                         | Always-on                          |
 | `aide.nix`              | AIDE file integrity monitoring (weekly scan, owns `aide` package)                            | `mySystem.aide.enable`             |
 

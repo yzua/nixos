@@ -1,47 +1,47 @@
 # System Repo Notes
 
-- Personal flake-based NixOS + standalone Home Manager config. `desktop` is the only active host; `laptop` exists in `hosts/_inventory.nix` but `enabled = false`.
-- `flake.nix` generates both `nixosConfigurations` and `homeConfigurations` from `hosts/_inventory.nix`. If a host is not enabled there, it is effectively out of scope.
-- `just home` and `just nixos` are hardcoded to `yz@desktop` and `desktop`. They are not generic wrappers for arbitrary hosts.
+- Personal flake-based NixOS + standalone Home Manager config.
+- `flake.nix` generates both `nixosConfigurations` and `homeConfigurations` from `hosts/_inventory.nix`; today only `desktop` is enabled, so `laptop` is usually out of scope.
+- `just home` and `just nixos` are hardcoded to `yz@desktop` and `desktop`; they are not generic host wrappers.
 
-## Validate First
+## Validate With Repo Commands
 
-- Fastest focused checks: `just modules`, `just pkgs`, `just lint`, `just format`, `just check`.
-- `just all` is the real pipeline, not a shorthand guess: `modules`, `pkgs`, and `lint` run in parallel first; then `format`, `check`, `nixos`, and `home` run sequentially.
-- Safe apply order while iterating is usually `just home` before `just nixos`, but `just all` intentionally applies `nixos` before `home` because that is how the `justfile` is written.
-- There are no normal unit-test suites at repo root. Verification is eval/lint/build oriented.
+- Fast checks: `just modules`, `just pkgs`, `just lint`, `just format`, `just check`.
+- `just check` is eval-only: `nix flake check --no-build path:.`. It does not replace `just home` or `just nixos`.
+- `just all` is the real full pipeline: `modules`, `pkgs`, and `lint` in parallel, then `format -> check -> nixos -> home`.
+- There is no normal unit-test suite at repo root; verification here is mostly import/lint/eval/apply.
 
-## Repo Rules That Are Enforced
+## Rules The Repo Enforces
 
-- Every directory with Nix modules must have a `default.nix` import hub. `just modules` walks all of them and fails on missing imports or broken directory imports.
-- Helper files stay prefixed `_*.nix` and are manually imported, not added to import hubs.
-- If a non-module helper must be mentioned inside `default.nix`, annotate it with a comment like `modules-check: manual-helper ...`; `scripts/build/modules-check.sh` looks for that exact escape hatch.
-- `just pkgs` checks more than duplicate packages: it also flags packages installed both explicitly and via `programs.<name>` or `services.<name>`. Give each package a single owner.
+- Every module directory needs a `default.nix` import hub. `scripts/build/modules-check.sh` walks all `default.nix` files and fails on missing local imports or broken directory imports.
+- Helper files stay prefixed `_*.nix` and are imported manually, not added to import hubs.
+- If `default.nix` must mention a non-module helper, annotate it with `modules-check: manual-helper ...`; the modules check looks for that exact escape hatch.
+- `just pkgs` also checks ownership conflicts: a package cannot be installed explicitly and also enabled via `programs.<name>` or `services.<name>`.
 
 ## Architecture Shortcuts
 
-- System entrypoint: `hosts/<host>/configuration.nix` importing `../../nixos-modules`.
-- Home entrypoint: `home-manager/home.nix` importing `./modules` and `./packages`.
-- Home Manager is standalone here, not embedded as a NixOS module. HM code cannot rely on NixOS `config.*`; shared values come through flake `extraSpecialArgs` like `constants`, `hostname`, and `pkgsStable`.
-- Shared system features live under `mySystem.*`; host configs set `mySystem.hostProfile` and then override only deltas.
-- `nixos-modules/validation.nix` is the place for cross-module conflicts. Do not scatter those assertions into feature modules.
-
-## Paths That Matter
-
-- `shared/constants.nix`: single source of truth for identity, terminal, editor, fonts, and shared defaults.
-- `nixos-modules/default.nix`: real system module map.
-- `home-manager/modules/default.nix`: real HM module map.
-- `home-manager/packages/default.nix`: package chunk ownership for `home.packages`.
-- `scripts/build/modules-check.sh` and `scripts/build/packages-check.sh`: source of truth for what repo validation actually enforces.
+- System entrypoint: `hosts/<host>/configuration.nix`, which imports `../../nixos-modules`.
+- Home Manager entrypoint: `home-manager/home.nix`, which imports `./modules` and `./packages`.
+- Home Manager is standalone here, not a NixOS module. HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs` like `constants`, `hostname`, and `pkgsStable`.
+- System feature toggles live under `mySystem.*`; hosts set `mySystem.hostProfile` first and override only deltas.
+- Put cross-module assertions in `nixos-modules/validation.nix`, not in feature modules.
 
 ## Operational Gotchas
 
-- `niri` intentionally does not follow `nixpkgs` in `flake.nix`; do not "clean that up".
-- Root dev shell is minimal: formatter/lint tools only (`statix`, `deadnix`, `shellcheck`, `nixfmt-tree`). Do not assume it provides the full deployment toolchain.
-- Repo-local hooks are optional and installed by `just install-hooks`; they chain after Home Manager-managed global hooks.
-- Secrets are managed through `sops` helpers (`just sops-view`, `just sops-edit`, `just secrets-add KEY`). Never write secrets into Nix files.
+- `niri` intentionally does **not** follow `nixpkgs` in `flake.nix`; do not “simplify” that.
+- Root dev shell only provides formatter/lint tools (`statix`, `deadnix`, `shellcheck`, `nixfmt-tree`).
+- `just install-hooks` installs repo-local hooks after Home Manager-managed global hooks. The pre-commit hook runs `modules-check`, then `statix` + `deadnix`, then `nix fmt -- --fail-on-change --no-cache .`, then `nix flake check --no-build path:.`; it does **not** run `just pkgs`, `shellcheck`, or `markdownlint`.
+- Secrets belong in `sops`, via `just sops-view`, `just sops-edit`, and `just secrets-add KEY`; never write secrets into Nix files.
+
+## High-Value Paths
+
+- `shared/constants.nix`: identity, terminal, editor, fonts, theme, color palette, keyboard layout, proxy endpoints, service URLs.
+- `nixos-modules/default.nix`: system module registry.
+- `home-manager/modules/default.nix`: HM module registry.
+- `home-manager/packages/default.nix`: `home.packages` ownership.
+- `scripts/build/modules-check.sh` and `scripts/build/packages-check.sh`: executable source of truth for repo validation.
 
 ## Area Guides
 
-- Read the nearest nested `AGENTS.md` before changing code under `nixos-modules/`, `home-manager/`, `scripts/`, `hosts/`, or `dev-shells/`.
-- Especially relevant sub-guides: `nixos-modules/AGENTS.md`, `home-manager/modules/AGENTS.md`, `home-manager/modules/ai-agents/AGENTS.md`, `scripts/AGENTS.md`, `hosts/AGENTS.md`, `dev-shells/AGENTS.md`.
+- Read the nearest nested `AGENTS.md` before editing `nixos-modules/`, `home-manager/`, `scripts/`, `hosts/`, or `dev-shells/`.
+- Start with: `nixos-modules/AGENTS.md`, `home-manager/modules/AGENTS.md`, `home-manager/modules/ai-agents/AGENTS.md`, `scripts/AGENTS.md`, `hosts/AGENTS.md`, `dev-shells/AGENTS.md`.

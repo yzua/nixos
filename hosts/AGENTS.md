@@ -83,7 +83,7 @@ just check
 4. Adjust `mySystem.*` options in `configuration.nix` for hardware
 5. Set `services.avahi.allowInterfaces` to the correct network interface
 6. Create/modify `modules/` for hardware-specific needs
-7. Deploy: `just nixos` (or `nh os switch --hostname <new-hostname>`)
+7. Deploy the new host with an explicit hostname command: `nh os switch 'path:.' --hostname <new-hostname>` (`just nixos` is hardcoded to `desktop`)
 
 ---
 

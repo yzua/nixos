@@ -96,11 +96,16 @@ modules/
 │       ├── open-books.nix    # Book launcher (find + wofi + zathura)
 │       └── screenshot.nix    # Screenshot annotator (grim + slurp + swappy)
 ├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD, GruvboxAlt colorscheme)
-│   ├── default.nix     # Import hub, apiQuotaScript, status-notifier-watcher
+│   ├── default.nix     # Import hub, status-notifier-watcher
 │   ├── bar.nix         # Bar widgets (left, center, right panels)
 │   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)
+│   ├── colorschemes/   # Custom color schemes (GruvboxAlt)
+│   │   └── GruvboxAlt.json # Gruvbox palette for Noctalia
 │   └── plugins/        # Noctalia shell plugins
-│       └── ai-quota/   # AI API quota bar widget (QML)
+│       ├── keybind-cheatsheet/ # Keyboard shortcut overlay (QML)
+│       ├── mawaqit/           # Prayer time widget (QML)
+│       ├── model-usage/       # AI model usage tracker (QML)
+│       └── music-search/      # Music search/player widget (QML)
 ├── neovim/             # Neovim editor with LSP, completion, and modern plugins
 │   ├── default.nix     # Plugin declarations, treesitter, Lua config loading
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)
@@ -127,7 +132,7 @@ modules/
 │   ├── direnv.nix      # Per-directory environments
 │   ├── scripts.nix     # Custom utility script wrappers (currently `nvidia-fans`)
 │   ├── shell.nix       # Nix shell integration and dev tools
-│   ├── zsh/            # Zsh + Oh My Zsh (oxide theme)
+│   ├── zsh/            # Zsh + Oh My Zsh (Starship handles the prompt)
 │   │   ├── default.nix # Main zsh config with setOptions, OMZ
 │   │   ├── aliases.nix # Shell aliases
 │   │   ├── config.nix  # Zsh settings and initialization
@@ -170,7 +175,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 - Fonts: JetBrains Mono (mono), Noto Sans (sans), Noto Serif (serif)
 - Cursor: Bibata-Modern-Classic (24px)
 - Icons: Gruvbox-Plus-Dark
-- GTK extra CSS: flat style, no rounded corners (177 lines custom CSS)
+- GTK extra CSS: flat style — `border-radius: 0; box-shadow: none` on `*` selector
 
 ### Stylix-Exempt Modules
 

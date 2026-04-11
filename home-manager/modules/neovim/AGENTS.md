@@ -41,7 +41,7 @@ Scope here is Neovim-only behavior; shared editor defaults belong in parent HM m
 - Mixing plugin Lua configuration directly into `default.nix`.
 - Adding a `lua/plugins/*.lua` file without appending it to `initLua`.
 - Duplicating plugin setup both in `lua/plugins/` and inline Vimscript snippets.
-- Putting non-Neovim toolchain policy here (belongs in `home-manager/modules/languages/`).
+- Putting non-Neovim toolchain policy here (belongs in `home-manager/modules/programming-languages/`).
 
 ---
 

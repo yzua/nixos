@@ -32,7 +32,7 @@ Seven OpenCode profiles are defined in `helpers/_opencode-profiles.nix`:
 | --------------------- | ------------------------------------------------- |
 | `opencode`            | Default (from `programs.aiAgents.opencode.model`) |
 | `opencode-glm`        | Z.AI GLM-5.1                                      |
-| `opencode-gemini`     | Google Gemini 3.1 Pro                             |
+| `opencode-gemini`     | Google Gemini 3 Pro Preview                       |
 | `opencode-gpt`        | OpenAI GPT-5.4                                    |
 | `opencode-openrouter` | OpenRouter Hunter Alpha                           |
 | `opencode-sonnet`     | Anthropic Claude Sonnet 4.6                       |
@@ -120,7 +120,7 @@ All `helpers/_*.nix` files are plain Nix expressions (not modules). They are imp
 
 ### Activation File Rules
 
-The `activation/` directory is a submodule with its own `default.nix`. Individual files (`secrets.nix`, `claude-setup.nix`, `codex-setup.nix`, `plugins.nix`) are helpers imported by `activation/default.nix` — not listed in the top-level `ai-agents/default.nix` import hub.
+The `activation/` directory is a submodule with its own `default.nix`. Individual files (`secrets.nix`, `claude-setup.nix`, `codex-setup.nix`, `plugins.nix`, `skills.nix`) are helpers imported by `activation/default.nix` — not listed in the top-level `ai-agents/default.nix` import hub.
 
 ### Complexity Hotspots (WARNING)
 

@@ -36,7 +36,7 @@ Terminal tools enforce a "Multi-Layered Git Defense" strategy to prevent secrets
 
 1. **Pre-commit**:
    - **Secret Scanning**: Runs `gitleaks` on staged changes.
-   - **Sanity Checks**: Blocks large files (>5MB), merge conflict markers, and detects trailing whitespace.
+   - **Sanity Checks**: Blocks large files (>5MB) and merge conflict markers. Warns on trailing whitespace (non-blocking).
 2. **Commit-msg**:
    - **Conventional Commits**: Enforces the `<type>[scope]: <description>` format.
 3. **Post-commit**:

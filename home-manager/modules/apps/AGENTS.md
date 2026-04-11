@@ -27,7 +27,7 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 
 | File                      | Purpose                                                                         |
 | ------------------------- | ------------------------------------------------------------------------------- |
-| `default.nix`             | Import hub: enable, package (`pkgs.vscode`), `mutableExtensionsDir = true`      |
+| `default.nix`             | Import hub: enable, package (`pkgs.vscode-fhs`), `mutableExtensionsDir = true`  |
 | `extensions.nix`          | Extensions from nixpkgs + VS Code marketplace                                   |
 | `_settings.nix`           | Settings builder (helper, not in `default.nix`)                                 |
 | `_builtin-extensions.nix` | Built-in extension list (helper)                                                |

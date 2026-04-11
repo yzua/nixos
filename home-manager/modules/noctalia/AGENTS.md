@@ -7,11 +7,11 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 
 ## Module Map
 
-| File           | Purpose      | Key Details                                                                                                           |
-| -------------- | ------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `default.nix`  | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings; defines `apiQuotaScript`, `status-notifier-watcher` |
-| `bar.nix`      | Bar widgets  | Left (workspaces, window title), center (clock, media), right (system tray, monitoring, power)                        |
-| `settings.nix` | Shell config | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks |
+| File           | Purpose      | Key Details                                                                                                            |
+| -------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `default.nix`  | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings; `status-notifier-watcher`                            |
+| `bar.nix`      | Bar widgets  | Left (clock, system monitor), center (workspace widget), right (media, network, tray, plugins, volume, control center) |
+| `settings.nix` | Shell config | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks                               |
 
 ---
 
@@ -39,13 +39,6 @@ Noctalia ignores Stylix auto-theming. Colors come from a custom GruvboxAlt color
 - QML plugin files use the same palette via hardcoded color properties
 
 When the scheme changes, update `colorschemes/GruvboxAlt.json`, the QML plugin colors, and `shared/constants.nix` (if accent colors shift).
-
----
-
-## API Quota Widget
-
-`default.nix` defines `apiQuotaScript` as a shell command string pointing at `scripts/ai/api-quota/api-quota.sh`.
-Displays Z.AI + Claude Max + Codex usage in the bar's right panel.
 
 ---
 
