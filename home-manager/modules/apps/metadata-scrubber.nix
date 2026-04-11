@@ -13,6 +13,7 @@
 
 let
   scrubberBinPath = lib.makeBinPath [
+    pkgsStable.coreutils
     pkgsStable.mat2
     pkgsStable.exiftool
     pkgsStable.inotify-tools
