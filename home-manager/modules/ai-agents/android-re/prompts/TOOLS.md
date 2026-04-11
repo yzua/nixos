@@ -451,6 +451,130 @@ frida -U -n com.example.target -l scripts/ai/android-re/frida-spoof-build.js
 
 ---
 
+## Scripting & POC Development
+
+You are expected to **write and run custom scripts** to test findings, prove vulnerabilities, and build POCs. This is core RE work — don't just observe, validate.
+
+### Available runtimes
+
+| Runtime | Version | Use for |
+|---------|---------|---------|
+| Bash | 5.3 | Quick one-liners, adb/frida orchestration, pipeline scripts |
+| Python 3 | 3.13 | API replay, crypto, data analysis, automation |
+| Node.js | 24.13 | HTTP clients, API testing, JSON manipulation |
+| Bun | 1.3.10 | Fast TS/JS execution, HTTP servers, scripting |
+
+### Writing and running Frida scripts
+
+Frida scripts live in JS and run against the target app. Write them to `/tmp/` or anywhere on the host:
+
+```bash
+# Write a hook script
+cat > /tmp/hook-login.js << 'EOF'
+Java.perform(function() {
+    var LoginActivity = Java.use("com.example.target.LoginActivity");
+    LoginActivity.validateCredentials.implementation = function(user, pass) {
+        console.log("[LOGIN] user=" + user + " pass=" + pass);
+        return this.validateCredentials(user, pass);
+    };
+});
+EOF
+
+# Run it on the target (spawn mode — injects before app code runs)
+frida -U -f com.example.target -l /tmp/hook-login.js
+
+# Or attach to a running process
+frida -U -n com.example.target -l /tmp/hook-login.js
+```
+
+Existing Frida scripts in the repo:
+- `scripts/ai/android-re/frida-spoof-build.js` — overrides `android.os.Build.*` fields + `File.exists` hook
+
+### Writing Python POCs
+
+```bash
+# Replay captured API requests
+cat > /tmp/replay-api.py << 'EOF'
+import requests, json
+url = "https://api.example.com/v1/login"
+headers = {"Authorization": "Bearer <token>", "User-Agent": "OpenSooq/441/v2.1/3"}
+resp = requests.post(url, headers=headers, json={"phone": "1234567890"})
+print(f"Status: {resp.status_code}")
+print(json.dumps(resp.json(), indent=2))
+EOF
+python3 /tmp/replay-api.py
+
+# Decode JWT tokens from captured traffic
+python3 -c "
+import base64, json, sys
+token = sys.argv[1]
+parts = token.split('.')
+for i in range(len(parts)):
+    padded = parts[i] + '=' * (4 - len(parts[i]) % 4)
+    print(json.dumps(json.loads(base64.urlsafe_b64decode(padded)), indent=2))
+" 'eyJhbGciOiJIUzI1NiIs...'
+
+# Extract and analyze APK crypto
+pip install pycryptodome  # if needed
+```
+
+### Writing Node/Bun scripts
+
+```bash
+# Quick HTTP API fuzzer
+cat > /tmp/api-test.ts << 'EOF'
+const BASE = "https://api.example.com/v1";
+const headers = { "Authorization": "Bearer TOKEN", "User-Agent": "Test/1.0" };
+
+async function test(endpoint: string) {
+    const res = await fetch(`${BASE}${endpoint}`, { headers });
+    console.log(`${res.status} ${endpoint} → ${await res.text().slice(0, 200)}`);
+}
+
+await test("/users");
+await test("/admin/settings");
+await test("/debug");
+EOF
+bun run /tmp/api-test.ts
+
+# Run a quick Bun script inline
+bun -e 'const r = await fetch("https://httpbin.org/get"); console.log(await r.json())'
+```
+
+### Writing Bash POCs
+
+```bash
+# Quick curl-based API testing with captured tokens
+curl -s -H "Authorization: Bearer $TOKEN" -H "User-Agent: OpenSooq/441/v2.1/3" \
+  "https://api.example.com/v1/configurations/token" | jq .
+
+# Dump and analyze app database
+adb shell "su 0 sh -c 'cp /data/data/com.example.target/databases/app.db /data/local/tmp/'"
+adb pull /data/local/tmp/app.db /tmp/app.db
+sqlite3 /tmp/app.db ".tables"
+sqlite3 /tmp/app.db "SELECT * FROM users LIMIT 10;"
+
+# Extract and read shared preferences
+adb shell "su 0 sh -c 'cat /data/data/com.example.target/shared_prefs/*.xml'"
+```
+
+### Where to save scripts
+
+- **Throwaway POCs**: `/tmp/` — won't persist across reboots, fine for quick tests
+- **Target-specific scripts**: `scripts/ai/android-re/targets/<app-name>/` — create this directory for repeatable analysis
+- **Reusable Frida hooks**: `scripts/ai/android-re/` — next to `frida-spoof-build.js`
+- **Share findings with the user**: write summary files to `/tmp/` or the current working directory
+
+### POC workflow
+
+1. **Observe** the vulnerability through static analysis or traffic capture
+2. **Write a minimal script** that proves the issue (auth bypass, data leak, IDOR, etc.)
+3. **Run it** against the live target on the emulator
+4. **Document** the finding: endpoint, parameters, expected vs actual behavior, impact
+5. **Save the POC** so it can be re-run if needed
+
+---
+
 ## Not Currently Available In PATH
 
 - `dex2jar`

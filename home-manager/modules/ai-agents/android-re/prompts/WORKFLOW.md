@@ -343,3 +343,34 @@ Move to native hooks when:
 - Java hooks show only thin wrappers
 - pinning is implemented in native libraries
 - the app uses Cronet, BoringSSL, or JNI-heavy auth paths
+
+## 8. Validate Findings With POC Scripts
+
+When you find a vulnerability or interesting behavior, **write a script to prove it**. Don't just describe — demonstrate.
+
+Available runtimes: Bash, Python 3.13, Node.js 24, Bun 1.3.10, Frida JS.
+
+Typical POC patterns:
+
+```bash
+# Auth bypass — replay a request without auth
+curl -s "https://api.example.com/v1/users/me" | jq .
+
+# IDOR — iterate user IDs
+for i in $(seq 1 10); do
+  curl -s -H "Authorization: Bearer $TOKEN" "https://api.example.com/v1/users/$i" | jq '.email'
+done
+
+# Frida hook to dump decrypted API responses
+frida -U -n com.example.target -q -e '
+Java.perform(function(){
+  var OkHttpClient = Java.use("okhttp3.OkHttpClient");
+  // hook response body reading
+});
+'
+
+# Python script for complex replay
+python3 /tmp/replay-with-modified-params.py
+```
+
+See TOOLS.md "Scripting & POC Development" section for full runtime details and examples.
