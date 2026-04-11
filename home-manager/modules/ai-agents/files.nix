@@ -143,8 +143,6 @@ let
       "${name}/tui.json" = {
         text = toJSON {
           theme = "gruvbox";
-          show_tokens = true;
-          show_cost = true;
         };
         force = true;
       };
