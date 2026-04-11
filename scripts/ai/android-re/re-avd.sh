@@ -11,8 +11,6 @@ trap 'log_error "command failed at line ${LINENO}: ${BASH_COMMAND}"' ERR
 AVD_NAME="${AVD_NAME:-re-pixel7-api34}"
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}"
 ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
-ADB_BIN="${ADB_BIN:-$(command -v adb || true)}"
-EMU_BIN="${EMU_BIN:-$(command -v emulator || true)}"
 FRIDA_BIN="${FRIDA_BIN:-${HOME}/Downloads/android-re-tools/frida16/frida-server-16.4.10-android-x86_64}"
 FRIDA_TARGET="${FRIDA_TARGET:-/data/local/tmp/frida-server-16.4.10}"
 FRIDA_HOST_DIR="${FRIDA_HOST_DIR:-${HOME}/Downloads/android-re-tools/frida16410-py311/bin}"
@@ -46,20 +44,8 @@ RE_WORKSPACE="${RE_WORKSPACE:-6}"
 RUNTIME_LOG="${RUNTIME_LOG:-${HOME}/Downloads/android-re-tools/emulator-runtime.log}"
 BOOT_WAIT_TIMEOUT="${BOOT_WAIT_TIMEOUT:-180}"
 
-error_exit() {
-	log_error "$1"
-	exit "${2:-1}"
-}
-
-need_cmd() {
-	local name="$1"
-	command -v "$name" >/dev/null 2>&1 || error_exit "missing command: ${name}"
-}
-
-need_file() {
-	local path="$1"
-	[[ -e "$path" ]] || error_exit "missing file: ${path}"
-}
+# shellcheck source=scripts/ai/android-re/_helpers.sh
+source "${SCRIPT_DIR}/_helpers.sh"
 
 resolve_frida_ps_bin() {
 	if [[ ! -x "${FRIDA_PS_BIN}" ]]; then
@@ -106,11 +92,6 @@ init_mitm_ca_vars() {
 adb_run() {
 	need_cmd adb
 	adb "$@"
-}
-
-tmux_has_window() {
-	local window_name="$1"
-	tmux list-windows -t "${TMUX_SESSION}" -F '#{window_name}' 2>/dev/null | grep -Fx "${window_name}" >/dev/null
 }
 
 list_emulator_pids() {
@@ -353,7 +334,7 @@ wait_boot() {
 
 	local waited=0
 	until [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do
-		if (( waited >= BOOT_WAIT_TIMEOUT )); then
+		if ((waited >= BOOT_WAIT_TIMEOUT)); then
 			log_error "emulator boot did not complete within ${BOOT_WAIT_TIMEOUT}s"
 			show_runtime_log_tail
 			return 1
@@ -389,11 +370,11 @@ start_emulator() {
 	)
 
 	if [[ "${EMU_DISABLE_HARDWARE_DECODER}" == "1" ]]; then
-		emulator_args+=( -feature -HardwareDecoder )
+		emulator_args+=(-feature -HardwareDecoder)
 	fi
 
 	if [[ "${EMU_DISABLE_VULKAN}" == "1" ]]; then
-		emulator_args+=( -feature -Vulkan )
+		emulator_args+=(-feature -Vulkan)
 	fi
 
 	if [[ "${headless}" != "1" && -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]]; then
@@ -403,7 +384,7 @@ start_emulator() {
 
 	if [[ "${headless}" == "1" ]]; then
 		qt_platform="offscreen"
-		emulator_args+=( -no-window )
+		emulator_args+=(-no-window)
 	elif [[ -z "${DISPLAY:-}" && -n "${WAYLAND_DISPLAY:-}" && -z "${QT_QPA_PLATFORM:-}" ]]; then
 		qt_platform="wayland;xcb"
 	fi

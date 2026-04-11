@@ -8,18 +8,8 @@ source "${REPO_ROOT}/scripts/lib/logging.sh"
 
 OUTPUT_ROOT="${OUTPUT_ROOT:-${HOME}/.cache/android-re/out}"
 
-error_exit() {
-	log_error "$1"
-	exit "${2:-1}"
-}
-
-need_cmd() {
-	command -v "$1" >/dev/null 2>&1 || error_exit "missing command: $1"
-}
-
-need_file() {
-	[[ -f "$1" ]] || error_exit "missing file: $1"
-}
+# shellcheck source=scripts/ai/android-re/_helpers.sh
+source "${SCRIPT_DIR}/_helpers.sh"
 
 app_name_from_apk() {
 	basename "$1" .apk
