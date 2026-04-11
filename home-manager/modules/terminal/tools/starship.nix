@@ -1,4 +1,4 @@
-# Starship cross-shell prompt with Gruvbox theming.
+# Starship cross-shell prompt with GruvboxAlt theming.
 
 let
   mkVersionModule = style: {

@@ -1,4 +1,4 @@
-# Stylix theming engine (Gruvbox dark, flat style).
+# Stylix theming engine (Gruvbox dark, flat style). Active Noctalia scheme: GruvboxAlt.
 
 {
   constants,

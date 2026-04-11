@@ -24,7 +24,7 @@ Identity is centralized in `shared/constants.nix` and consumed by tools to maint
 
 - **User profile**: `constants.user.name`, `constants.user.email`, and `constants.user.signingKey`.
 - **Git identity**: Consumed by `git/config.nix`. Note the `includeIf` pattern for `github.com` which swaps the primary email for `constants.user.githubEmail`.
-- **Fuzzy finding**: `fzf.nix` uses `constants.color.*` to match the global Gruvbox theme.
+- **Fuzzy finding**: `fzf.nix` uses `constants.color.*` to match the global GruvboxAlt theme.
 
 ---
 

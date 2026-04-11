@@ -35,7 +35,7 @@
     sizeApplications = 11;
   };
 
-  # Theme (Gruvbox)
+  # Theme (GruvboxAlt)
   theme = "gruvbox-dark-soft";
 
   # Gruvbox color palette (base16 colors)
@@ -47,6 +47,7 @@
     bg_soft = "#32302f"; # bg0_hard
     bg0 = "#3c3836"; # bg0
     bg1 = "#504945"; # bg1
+    outline = "#57514e"; # GruvboxAlt outline/border
 
     # Foreground shades
     fg0 = "#ebdbb2"; # base06 (primary light foreground)

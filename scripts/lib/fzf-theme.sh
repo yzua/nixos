@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Shared FZF theme initialization for scripts run outside interactive shells.
-# Sources: Home Manager session vars first, then Gruvbox fallback.
+# Sources: Home Manager session vars first, then GruvboxAlt fallback.
 #
 # Usage: source "$(dirname "$0")/../lib/fzf-theme.sh"
 
@@ -11,5 +11,5 @@ if [[ -z "${FZF_DEFAULT_OPTS:-}" ]] && [[ -f "$HOME/.nix-profile/etc/profile.d/h
 fi
 
 if [[ -z "${FZF_DEFAULT_OPTS:-}" ]]; then
-	export FZF_DEFAULT_OPTS="--color=fg:#ebdbb2,bg:#32302f,hl:#fabd2f,fg+:#ebdbb2,bg+:#3c3836,hl+:#fabd2f,info:#8ec07c,prompt:#83a598,pointer:#fe8019,marker:#b8bb26,spinner:#d3869b,header:#928374,border:#504945,gutter:#282828"
+	export FZF_DEFAULT_OPTS="--color=fg:#ebdbb2,bg:#32302f,hl:#fabd2f,fg+:#ebdbb2,bg+:#3c3836,hl+:#fabd2f,info:#8ec07c,prompt:#83a598,pointer:#83a598,marker:#b8bb26,spinner:#d3869b,header:#928374,border:#57514e,gutter:#282828"
 fi

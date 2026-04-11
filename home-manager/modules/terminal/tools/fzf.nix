@@ -1,4 +1,4 @@
-# Fzf configuration with full Gruvbox dark soft theming.
+# Fzf configuration with full GruvboxAlt dark soft theming.
 
 { constants, ... }:
 
@@ -23,12 +23,12 @@
       # UI elements
       "info" = constants.color.aqua;
       "prompt" = constants.color.blue;
-      "pointer" = constants.color.orange;
+      "pointer" = constants.color.blue;
       "marker" = constants.color.green;
       "spinner" = constants.color.purple;
       "header" = constants.color.gray;
       # Border and gutter
-      "border" = constants.color.bg1;
+      "border" = constants.color.outline;
       "gutter" = constants.color.bg;
     };
   };

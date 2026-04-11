@@ -26,7 +26,7 @@ let
 
         mode_normal        ""
         mode_locked        "#[bg=${constants.color.yellow_dim},fg=${constants.color.bg_hard},bold]  LOCKED #[bg=${constants.color.bg_soft},fg=${constants.color.yellow_dim}]"
-        mode_resize        "#[bg=${constants.color.orange},fg=${constants.color.bg_hard},bold] 󰩨 RESIZE #[bg=${constants.color.bg_soft},fg=${constants.color.orange}]"
+        mode_resize        "#[bg=${constants.color.blue},fg=${constants.color.bg_hard},bold] 󰩨 RESIZE #[bg=${constants.color.bg_soft},fg=${constants.color.blue}]"
         mode_pane          "#[bg=${constants.color.green},fg=${constants.color.bg_hard},bold]  PANE #[bg=${constants.color.bg_soft},fg=${constants.color.green}]"
         mode_tab           "#[bg=${constants.color.blue},fg=${constants.color.bg_hard},bold]  TAB #[bg=${constants.color.bg_soft},fg=${constants.color.blue}]"
         mode_scroll        "#[bg=${constants.color.aqua},fg=${constants.color.bg_hard},bold]  SCROLL #[bg=${constants.color.bg_soft},fg=${constants.color.aqua}]"
