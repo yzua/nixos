@@ -8,7 +8,6 @@
 {
   config,
   lib,
-  pkgs,
   modulesPath,
   ...
 }:
@@ -39,7 +38,10 @@
     "/" = {
       device = "/dev/mapper/luks-5e77e20c-28e2-4012-bc2a-c4c02acf3aab";
       fsType = "ext4";
-      options = [ "noatime" ]; # Reduce unnecessary SSD writes
+      options = [
+        "noatime" # Reduce unnecessary SSD writes
+        "commit=60" # Less frequent journal commits — reduces write amplification on DRAM-less SSD
+      ];
     };
     "/boot" = {
       device = "/dev/disk/by-uuid/0C09-B111";

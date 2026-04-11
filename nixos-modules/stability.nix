@@ -53,8 +53,13 @@
 
     # Memory management
     "vm.swappiness" = 10;
-    "vm.dirty_ratio" = 10;
-    "vm.dirty_background_ratio" = 3;
+    # Dirty ratios tuned for DRAM-less SSD + LUKS — flush writes sooner in smaller
+    # bursts to avoid saturating the device. Default dirty_ratio=20 causes multi-second
+    # stalls when the SSD's SLC cache fills and writes drop to native TLC speed.
+    "vm.dirty_ratio" = 5; # Max 5% of RAM dirty before blocking writes
+    "vm.dirty_background_ratio" = 1; # Start background writeback at 1%
+    "vm.dirty_writeback_centisecs" = 300; # Flush every 3 seconds (default 500 = 5s)
+    "vm.dirty_expire_centisecs" = 1500; # Expire dirty pages after 15s (default 3000)
     "vm.vfs_cache_pressure" = 50; # Keep dentries/inodes longer (good for dev work with large codebases)
 
     # TCP optimizations
