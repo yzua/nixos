@@ -23,6 +23,9 @@ in
         args = [
           "@upstash/context7-mcp@2.1.2"
         ];
+        env = {
+          CONTEXT7_API_KEY = "__CONTEXT7_API_KEY_PLACEHOLDER__"; # patched at activation from sops secret
+        };
       };
 
       web-search-prime = mkZaiRemoteMcp "web_search_prime";

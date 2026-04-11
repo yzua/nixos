@@ -31,6 +31,9 @@ let
   openrouterPlaceholderFilter = ''
     walk(if type == "string" then gsub("__OPENROUTER_API_KEY_PLACEHOLDER__"; $key) else . end)
   '';
+  context7PlaceholderFilter = ''
+    walk(if type == "string" then gsub("__CONTEXT7_API_KEY_PLACEHOLDER__"; $key) else . end)
+  '';
 
   # Import helper modules
   # modules-check: manual-helper ./secrets.nix ./codex-setup.nix ./claude-setup.nix ./plugins.nix ./skills.nix
@@ -45,6 +48,7 @@ let
       geminiZaiFilter
       githubPlaceholderFilter
       openrouterPlaceholderFilter
+      context7PlaceholderFilter
       ;
   };
   codexConfig = import ./codex-setup.nix {

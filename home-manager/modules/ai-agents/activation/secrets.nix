@@ -10,6 +10,7 @@
   geminiZaiFilter,
   githubPlaceholderFilter,
   openrouterPlaceholderFilter,
+  context7PlaceholderFilter,
 }:
 lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "setupClaudeConfig" ] ''
   patch_json_file() {
@@ -76,6 +77,35 @@ lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "set
       unset OPENROUTER_KEY
     else
       echo "⚠ ${cfg.secrets.openrouterApiKeyFile} not found - run 'just nixos' first"
+    fi
+  fi
+
+  if [[ -n "${cfg.secrets.context7ApiKeyFile or ""}" ]]; then
+    if [[ -f "${cfg.secrets.context7ApiKeyFile}" ]]; then
+      CONTEXT7_KEY="$(cat "${cfg.secrets.context7ApiKeyFile}")"
+      for OPENCODE_CFG in ${opencodeConfigPathList}; do
+        if [[ -f "$OPENCODE_CFG" ]]; then
+          patch_json_file "$OPENCODE_CFG" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
+          echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Context7 API key"
+        fi
+      done
+      if [[ -f "$HOME/.mcp.json" ]]; then
+        patch_json_file "$HOME/.mcp.json" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
+        echo "✓ Patched .mcp.json with Context7 API key"
+      fi
+      if [[ -f "$HOME/.codex/config.toml" ]]; then
+        ESCAPED_CONTEXT7="$(escape_sed_replacement "$CONTEXT7_KEY")"
+        ${pkgs.gnused}/bin/sed -i "s/__CONTEXT7_API_KEY_PLACEHOLDER__/$ESCAPED_CONTEXT7/g" "$HOME/.codex/config.toml"
+        unset ESCAPED_CONTEXT7
+        echo "✓ Patched codex config.toml with Context7 API key"
+      fi
+      if [[ -f "$HOME/.gemini/settings.json" ]]; then
+        patch_json_file "$HOME/.gemini/settings.json" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
+        echo "✓ Patched gemini settings.json with Context7 API key"
+      fi
+      unset CONTEXT7_KEY
+    else
+      echo "⚠ ${cfg.secrets.context7ApiKeyFile} not found - run 'just nixos' first"
     fi
   fi
 
