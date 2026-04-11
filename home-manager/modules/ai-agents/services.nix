@@ -15,6 +15,9 @@ let
       AI_AGENT_NOTIFY_ON_ERROR=${if cfg.logging.notifyOnError then "true" else "false"} \
       exec ${config.home.homeDirectory}/System/scripts/ai/agent-log-wrapper.sh "$@"
   '';
+  agentsSearch = pkgs.writeShellScriptBin "agents-search" ''
+    exec ${config.home.homeDirectory}/System/scripts/ai/agents-search.sh "$@"
+  '';
   androidReLaunchers = import ./helpers/_android-re-launchers.nix {
     inherit config lib pkgs;
   };
@@ -57,6 +60,7 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [
       agentLogWrapper
+      agentsSearch
       aiAgentLauncher
       aiAgentInventory
       pkgs.bubblewrap
