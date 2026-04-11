@@ -27,7 +27,8 @@ let
   npmGlobalDir = "${homeDir}/.npm-global";
   pnpmHomeDir = "${homeDir}/.local/share/pnpm";
   bunInstallDir = "${homeDir}/.bun";
-  cacertBundle = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+  cacertDir = "${pkgs.cacert}/etc/ssl/certs";
+  cacertBundle = "${cacertDir}/ca-bundle.crt";
 in
 {
   programs =
@@ -95,6 +96,7 @@ in
       NPM_CONFIG_PREFIX = npmGlobalDir;
       PNPM_HOME = pnpmHomeDir;
       BUN_INSTALL = bunInstallDir;
+      SSL_CERT_DIR = cacertDir;
       SSL_CERT_FILE = cacertBundle;
       NODE_EXTRA_CA_CERTS = cacertBundle;
       COREPACK_ENABLE_AUTO_PIN = "1";
