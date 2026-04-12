@@ -1,5 +1,8 @@
 # Allow and deny command/file patterns for Claude Code permissions.
 
+let
+  destructiveRules = import ../../helpers/_destructive-rules.nix;
+in
 {
   allow = [
     "Bash(git *)"
@@ -35,13 +38,8 @@
     "Bash(tmux *)"
   ];
 
-  deny = [
-    "Bash(rm -rf /)"
-    "Bash(rm -rf ~)"
-    "Bash(rm -rf /*)"
-    "Bash(> /dev/sda*)"
-    "Bash(mkfs*)"
-    "Bash(dd if=*)"
+  deny = destructiveRules.mkClaudeDenyRules destructiveRules.systemCommands ++ [
+    # File read restrictions (not shell commands — Claude-specific)
     "Read(.env)"
     "Read(.env.*)"
     "Read(./secrets/**)"

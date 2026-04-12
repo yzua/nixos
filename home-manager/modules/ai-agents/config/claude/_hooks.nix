@@ -89,6 +89,10 @@ let
 in
 {
   # --- PreToolUse Hooks ---
+  # NOTE: The destructive command patterns here should be kept in sync with
+  # helpers/_destructive-rules.nix. The regex format is specialized (handles
+  # sudo prefixes and embedded commands) so it can't be auto-generated, but
+  # the canonical command list lives in the shared source.
   PreToolUse = [
     (mkBashHook {
       body = ''
