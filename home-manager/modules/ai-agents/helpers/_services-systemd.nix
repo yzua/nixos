@@ -7,6 +7,39 @@
   mkCliAutoupdateScript,
   mkWeeklyTimer,
 }:
+let
+  autoUpdateTools = [
+    {
+      binary = "claude";
+      npmPackage = "@anthropic-ai/claude-code";
+      label = "Claude Code CLI";
+    }
+    {
+      binary = "codex";
+      npmPackage = "@openai/codex";
+      label = "Codex CLI";
+    }
+    {
+      binary = "gemini";
+      npmPackage = "@google/gemini-cli";
+      label = "Gemini CLI";
+    }
+  ];
+
+  mkAutoUpdateService =
+    {
+      binary,
+      npmPackage,
+      label,
+    }:
+    {
+      Unit.Description = "Auto-update ${label}";
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${mkCliAutoupdateScript { inherit binary npmPackage label; }}";
+      };
+    };
+in
 lib.mkIf cfg.logging.enable {
   tmpfiles.rules = [
     "d ${cfg.logging.directory} 0755 - - -"
@@ -34,49 +67,19 @@ lib.mkIf cfg.logging.enable {
         ''}";
       };
     };
-
-    claude-autoupdate = {
-      Unit.Description = "Auto-update Claude Code CLI";
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${mkCliAutoupdateScript {
-          binary = "claude";
-          npmPackage = "@anthropic-ai/claude-code";
-          label = "Claude Code CLI";
-        }}";
-      };
-    };
-
-    codex-autoupdate = {
-      Unit.Description = "Auto-update Codex CLI";
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${mkCliAutoupdateScript {
-          binary = "codex";
-          npmPackage = "@openai/codex";
-          label = "Codex CLI";
-        }}";
-      };
-    };
-
-    gemini-autoupdate = {
-      Unit.Description = "Auto-update Gemini CLI";
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${mkCliAutoupdateScript {
-          binary = "gemini";
-          npmPackage = "@google/gemini-cli";
-          label = "Gemini CLI";
-        }}";
-      };
-    };
-  };
+  }
+  // builtins.listToAttrs (
+    map (tool: lib.nameValuePair "${tool.binary}-autoupdate" (mkAutoUpdateService tool)) autoUpdateTools
+  );
 
   timers = {
     ai-agent-log-cleanup = mkWeeklyTimer "Weekly AI agent log cleanup";
     opencode-db-vacuum = mkWeeklyTimer "Weekly OpenCode database vacuum";
-    claude-autoupdate = mkWeeklyTimer "Weekly Claude Code CLI auto-update";
-    codex-autoupdate = mkWeeklyTimer "Weekly Codex CLI auto-update";
-    gemini-autoupdate = mkWeeklyTimer "Weekly Gemini CLI auto-update";
-  };
+  }
+  // builtins.listToAttrs (
+    map (
+      tool:
+      lib.nameValuePair "${tool.binary}-autoupdate" (mkWeeklyTimer "Weekly ${tool.label} auto-update")
+    ) autoUpdateTools
+  );
 }
