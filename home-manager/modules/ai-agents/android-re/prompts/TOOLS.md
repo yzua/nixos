@@ -18,13 +18,12 @@
 ### Proxy and network
 
 - `mitmproxy`, `mitmdump`, `mitmweb`
-- `wireshark-cli`
+- `tshark`
 
 ### Static analysis
 
 - `jadx` (includes `jadx-gui`)
 - `apktool`
-- `ghidra-bin`
 - `radare2`, `cutter`
 - `binwalk`
 
@@ -52,13 +51,13 @@
 
 `re-avd.sh start` creates a tmux session called `android-re` with these windows:
 
-| Window | Name    | Purpose                                       |
-|--------|---------|-----------------------------------------------|
-| 0      | `shell` | General shell, `adb` commands                 |
-| 1      | `mitm`  | `mitmdump` live traffic capture               |
-| 2      | `frida` | Frida REPL / hook output                      |
-| 3      | `logs`  | `tail -f` emulator runtime log                |
-| 4      | `logcat`| `adb logcat -b all -v threadtime`             |
+| Window | Name     | Purpose                           |
+| ------ | -------- | --------------------------------- |
+| 0      | `shell`  | General shell, `adb` commands     |
+| 1      | `mitm`   | `mitmdump` live traffic capture   |
+| 2      | `frida`  | Frida REPL / hook output          |
+| 3      | `logs`   | `tail -f` emulator runtime log    |
+| 4      | `logcat` | `adb logcat -b all -v threadtime` |
 
 ### Reading tmux panes from the agent
 
@@ -443,7 +442,7 @@ adb pull /data/local/tmp/screen.png /tmp/screen.png
 
 ```bash
 # Run the Build spoof script on a target app
-frida -U -f com.example.target -l scripts/ai/android-re/frida-spoof-build.js --no-pause
+frida -U -f com.example.target -l scripts/ai/android-re/frida-spoof-build.js
 
 # Or attach to a running app
 frida -U -n com.example.target -l scripts/ai/android-re/frida-spoof-build.js
@@ -457,12 +456,12 @@ You are expected to **write and run custom scripts** to test findings, prove vul
 
 ### Available runtimes
 
-| Runtime | Version | Use for |
-|---------|---------|---------|
-| Bash | 5.3 | Quick one-liners, adb/frida orchestration, pipeline scripts |
-| Python 3 | 3.13 | API replay, crypto, data analysis, automation |
-| Node.js | 24.13 | HTTP clients, API testing, JSON manipulation |
-| Bun | 1.3.10 | Fast TS/JS execution, HTTP servers, scripting |
+| Runtime  | Version | Use for                                                     |
+| -------- | ------- | ----------------------------------------------------------- |
+| Bash     | 5.3     | Quick one-liners, adb/frida orchestration, pipeline scripts |
+| Python 3 | 3.13    | API replay, crypto, data analysis, automation               |
+| Node.js  | 24.13   | HTTP clients, API testing, JSON manipulation                |
+| Bun      | 1.3.10  | Fast TS/JS execution, HTTP servers, scripting               |
 
 ### Writing and running Frida scripts
 
@@ -488,6 +487,7 @@ frida -U -n com.example.target -l /tmp/hook-login.js
 ```
 
 Existing Frida scripts in the repo:
+
 - `scripts/ai/android-re/frida-spoof-build.js` — overrides `android.os.Build.*` fields + `File.exists` hook
 
 ### Writing Python POCs

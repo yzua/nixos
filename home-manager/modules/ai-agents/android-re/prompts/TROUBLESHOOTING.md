@@ -141,7 +141,7 @@ frida-ps -U | grep com.example.target
 frida -U -p <pid>
 
 # Try spawn mode (fresh start with injection)
-frida -U -f com.example.target -l hook.js --no-pause
+frida -U -f com.example.target -l hook.js
 
 # Try emulated realm (for ARM translation)
 frida -U -n com.example.target --realm=emulated
@@ -262,6 +262,7 @@ tmux capture-pane -t android-re:mitm -p -S -40
 ```
 
 Look for:
+
 - `Client TLS handshake failed` → certificate pinning (app doesn't trust mitmproxy CA)
 - `client disconnected` → app retrying or rejecting the connection
 - `connection refused` → mitmdump not running or wrong port
@@ -292,6 +293,7 @@ bash scripts/ai/android-re/re-avd.sh cert-check
 ```
 
 If cert is installed but app still fails:
+
 - App uses certificate pinning — check static analysis for `CertificatePinner`, `TrustManager`, or native pinning
 - App may pin specific public keys, not just CAs
 - Use Frida to bypass pinning (see WORKFLOW.md hooking patterns)

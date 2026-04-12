@@ -242,7 +242,7 @@ Important version note on this emulator:
 - use the system Frida `17.5.1` toolchain for all attach and hook work
 - server binary is at `~/Downloads/android-re-tools/frida/frida-server-17.5.1-android-x86_64`
 - the isolated `16.4.10` toolchain venv is broken (missing python3.11) — do not use it
-- ARM64 Frida server is staged locally, but a native ARM64 AVD cannot currently boot on this host's emulator backend
+- only x86_64 Frida server is staged (`frida-server-17.5.1-android-x86_64`); ARM64 AVDs cannot currently boot on this host's emulator backend
 
 Start or restart Frida server:
 
@@ -270,7 +270,7 @@ frida -U -n com.example.target -q -e 'console.log("attached to " + Process.id)'
 frida -U -n com.example.target -l hook.js -q
 
 # Spawn mode (injects before app code runs — best for bypass hooks)
-frida -U -f com.example.target -l hook.js --no-pause
+frida -U -f com.example.target -l hook.js
 ```
 
 For translated or emulated code paths, try:
