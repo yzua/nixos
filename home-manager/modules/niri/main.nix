@@ -94,7 +94,7 @@ in
         ];
       }
 
-      { argv = [ "/home/${constants.user.handle}/.local/bin/librewolf-personal" ]; }
+      { argv = [ "${config.home.homeDirectory}/.local/bin/librewolf-personal" ]; }
       { argv = [ "${constants.editor}" ]; }
       {
         argv = [

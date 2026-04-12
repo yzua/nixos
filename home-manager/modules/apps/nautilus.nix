@@ -7,7 +7,7 @@
 }:
 
 let
-  homeDir = "/home/${config.home.username}";
+  homeDir = config.home.homeDirectory;
   bookmarkDirs = [
     "Documents"
     "Pictures"
