@@ -41,6 +41,38 @@ let
   ];
   codexReasoningEffortNullable = lib.types.nullOr codexReasoningEffortType;
   codexApprovalPolicyNullable = lib.types.nullOr codexApprovalPolicyType;
+
+  # Shared option set for Codex profiles and custom agents.
+  mkCodexEntityOpts =
+    extraOpts:
+    lib.types.submodule {
+      options = {
+        model = mkNullOrStrOption null "Model override";
+        reasoningEffort = lib.mkOption {
+          type = codexReasoningEffortNullable;
+          default = null;
+          description = "Reasoning effort level";
+        };
+        approvalPolicy = lib.mkOption {
+          type = codexApprovalPolicyNullable;
+          default = null;
+          description = "Command approval policy";
+        };
+        sandboxMode = mkNullOrStrOption null "Sandbox mode";
+        enableSearch = mkBoolOption false "Enable native Codex web search";
+        developerInstructions = lib.mkOption {
+          type = lib.types.lines;
+          default = "";
+          description = "Developer instructions";
+        };
+        extraToml = lib.mkOption {
+          type = lib.types.lines;
+          default = "";
+          description = "Extra TOML content";
+        };
+      }
+      // extraOpts;
+    };
 in
 {
   options.programs.aiAgents = {
@@ -217,8 +249,6 @@ in
     codex = {
       enable = lib.mkEnableOption "Codex CLI configuration";
 
-      # Compatibility option: kept for stable API surface; currently not consumed.
-      useWrapper = mkBoolOption true "Use logging wrapper for Codex";
       model = mkStrOption "gpt-5.4" "Default model for Codex";
       sandboxMode = mkStrOption "workspace-write" "Default sandbox mode for Codex";
       # Active only at top-level codex settings.
@@ -246,73 +276,17 @@ in
 
       features = mkTypedOption (lib.types.attrsOf lib.types.bool) { } "Feature flags for Codex";
 
-      profiles = mkTypedOption (lib.types.attrsOf (
-        lib.types.submodule {
-          options = {
-            model = mkNullOrStrOption null "Profile-specific model override";
-            personality = lib.mkOption {
-              type = lib.types.nullOr codexPersonalityType;
-              default = null;
-              description = "Profile-specific personality override";
-            };
-            reasoningEffort = lib.mkOption {
-              type = codexReasoningEffortNullable;
-              default = null;
-              description = "Profile-specific reasoning effort";
-            };
-            approvalPolicy = lib.mkOption {
-              type = codexApprovalPolicyNullable;
-              default = null;
-              description = "Profile-specific approval policy";
-            };
-            sandboxMode = mkNullOrStrOption null "Profile-specific sandbox mode";
-            # Compatibility option: retained for future profile-level support.
-            enableSearch = mkBoolOption false "Enable native Codex web search for this profile";
-            developerInstructions = lib.mkOption {
-              type = lib.types.lines;
-              default = "";
-              description = "Additional developer instructions for the profile";
-            };
-            extraToml = lib.mkOption {
-              type = lib.types.lines;
-              default = "";
-              description = "Extra TOML appended inside this profile";
-            };
-          };
-        }
-      )) { } "Named Codex config profiles";
+      profiles = mkTypedOption (lib.types.attrsOf (mkCodexEntityOpts {
+        personality = lib.mkOption {
+          type = lib.types.nullOr codexPersonalityType;
+          default = null;
+          description = "Profile-specific personality override";
+        };
+      })) { } "Named Codex config profiles";
 
-      customAgents = mkTypedOption (lib.types.attrsOf (
-        lib.types.submodule {
-          options = {
-            description = mkStrOption "" "Human-facing description for when to use this custom Codex agent";
-            developerInstructions = lib.mkOption {
-              type = lib.types.lines;
-              default = "";
-              description = "Developer instructions for the custom Codex agent";
-            };
-            model = mkNullOrStrOption null "Agent-specific model override";
-            reasoningEffort = lib.mkOption {
-              type = codexReasoningEffortNullable;
-              default = null;
-              description = "Agent-specific reasoning effort";
-            };
-            approvalPolicy = lib.mkOption {
-              type = codexApprovalPolicyNullable;
-              default = null;
-              description = "Agent-specific approval policy";
-            };
-            sandboxMode = mkNullOrStrOption null "Agent-specific sandbox mode";
-            # Compatibility option: retained for future custom-agent-level support.
-            enableSearch = mkBoolOption false "Enable native Codex web search for this agent";
-            extraToml = lib.mkOption {
-              type = lib.types.lines;
-              default = "";
-              description = "Extra TOML appended to the custom agent file";
-            };
-          };
-        }
-      )) { } "Custom Codex agents written to ~/.codex/agents/*.toml";
+      customAgents = mkTypedOption (lib.types.attrsOf (mkCodexEntityOpts {
+        description = mkStrOption "" "Human-facing description for when to use this custom Codex agent";
+      })) { } "Custom Codex agents written to ~/.codex/agents/*.toml";
 
       extraToml = lib.mkOption {
         type = lib.types.lines;

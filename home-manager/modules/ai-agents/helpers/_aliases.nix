@@ -19,7 +19,6 @@ let
 
   gptLowModel = "openai/gpt-5.4-spark";
   gptMedModel = "openai/gpt-5.4";
-  gptHighModel = "openai/gpt-5.4";
   gptXHighModel = "openai/gpt-5.1-codex-max";
 
   mkAliasAttrs =
@@ -125,11 +124,6 @@ let
     {
       alias = "mocgpt";
       command = "opencode_gpt --model ${gptMedModel}";
-      workflowPromptMode = "flag";
-    }
-    {
-      alias = "hocgpt";
-      command = "opencode_gpt --model ${gptHighModel}";
       workflowPromptMode = "flag";
     }
     {

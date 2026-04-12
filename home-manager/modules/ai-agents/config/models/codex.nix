@@ -8,7 +8,6 @@
 {
   programs.aiAgents.codex = {
     enable = true;
-    useWrapper = true;
     model = "gpt-5.4";
     sandboxMode = "workspace-write";
     enableSearch = false;
