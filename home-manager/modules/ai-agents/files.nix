@@ -13,6 +13,7 @@ let
   inherit (builtins) toJSON;
 
   fileTemplates = import ./helpers/_file-templates.nix;
+  geminiPolicies = import ./helpers/_gemini-policies.nix;
   settingsBuilders = import ./helpers/_settings-builders.nix { inherit config lib pkgs; };
   inherit (settingsBuilders)
     opencodeSettings
@@ -212,7 +213,7 @@ in
         }
         // (mkTextFiles ".gemini/commands" fileTemplates.geminiCommands)
         // (mkTextFiles ".gemini/skills" fileTemplates.geminiSkills)
-        // (mkTextFiles ".gemini/policies" fileTemplates.geminiPolicies)
+        // (mkTextFiles ".gemini/policies" geminiPolicies)
       ))
     ];
 
