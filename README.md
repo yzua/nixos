@@ -51,7 +51,7 @@ For a newly added host, use explicit `nh` commands instead of the hardcoded `jus
 | `just lint`               | statix + deadnix + shellcheck + markdownlint                                                          |
 | `just dead`               | deadnix only (subset of lint)                                                                         |
 | `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                                           |
-| `just check`              | `nix flake check --no-build`                                                                          |
+| `just check`              | `nix flake check --no-build path:.`                                                                   |
 | `just diff`               | Diff current vs previous NixOS generation                                                             |
 | `just report [mode]`      | Generate system health report                                                                         |
 | `just report-view [type]` | View latest system report                                                                             |
@@ -127,9 +127,9 @@ Set `hostProfile` first, then override as needed:
 
 Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
 
-On by default (toggleable): AIDE file integrity. `mySystem.metadataScrubber.enable` currently controls system-side scrubber tooling; the Home Manager watcher/timer is imported separately.
+On by default (toggleable): AIDE file integrity, fail2ban, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot.
 
-Toggleable: Mullvad VPN, Tor, Yggdrasil, DNSCrypt, OpenSnitch, fail2ban.
+Off by default (toggleable): Yggdrasil, I2P, backup (requires sops secret), VNC.
 
 ---
 

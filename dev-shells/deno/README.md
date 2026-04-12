@@ -12,6 +12,10 @@ nix flake init -t "/home/yz/System/dev-shells#deno"
 
 - `nix develop`: opens up a `bash` shell with the required packages
 
+## Included Tools
+
+- `deno` — JS/TS runtime and toolchain
+
 ## Reference
 
 1. [wiki/Flakes](https://nixos.wiki/wiki/Flakes)
