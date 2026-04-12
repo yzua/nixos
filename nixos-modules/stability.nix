@@ -1,35 +1,6 @@
-# System stability, resource limits, and high-performance networking tuning.
-
-{ lib, ... }:
+# Kernel and network performance tuning (sysctl, TCP BBR, inotify, memory).
 
 {
-  services = {
-    fstrim = {
-      enable = true;
-      interval = "weekly";
-    };
-
-    earlyoom = {
-      enable = true;
-      freeMemThreshold = 8; # 8% ≈ 2.6GB on 32GB (was 5%)
-      freeSwapThreshold = 10;
-      enableNotifications = true; # Desktop notification on kill
-    };
-
-    # Resolve conflict: earlyoom sets systembus-notify=true, smartd (via Scrutiny) sets false.
-    # We want notifications enabled for earlyoom OOM-kill alerts.
-    systembus-notify.enable = lib.mkForce true;
-
-    # Journald limits -- Loki/Promtail retains 30 days, so keep journal lean
-    journald.extraConfig = ''
-      SystemMaxUse=500M
-      SystemMaxFileSize=50M
-      MaxRetentionSec=7day
-      ForwardToSyslog=no
-      Compress=yes
-    '';
-  };
-
   boot.kernelModules = [ "tcp_bbr" ]; # BBR congestion control module
 
   boot.kernel.sysctl = {
@@ -70,51 +41,4 @@
     "net.core.default_qdisc" = "fq";
     "net.ipv4.tcp_congestion_control" = "bbr";
   };
-
-  systemd.settings.Manager = {
-    DefaultTimeoutStopSec = "30s";
-    # Avoid greetd/user@ login loops when user manager startup is heavy on cold boot.
-    DefaultTimeoutStartSec = "180s";
-    DefaultDeviceTimeoutSec = "30s";
-    DefaultLimitNOFILE = 200000;
-    DefaultLimitNPROC = 65536;
-    # Disable hardware watchdog arming on reboot/shutdown to prevent
-    # "watchdog0: watchdog did not stop!" and unnecessary 10-minute fallback timer.
-    RuntimeWatchdogSec = "0";
-    RebootWatchdogSec = "0";
-    KExecWatchdogSec = "0";
-  };
-
-  # Keep user-session app scopes from delaying reboot for the default 90s.
-  systemd.user.extraConfig = ''
-    DefaultTimeoutStopSec=30s
-  '';
-
-  # PAM session limits (consolidated — includes core dump disable from security/hardening.nix)
-  security.pam.loginLimits = [
-    {
-      domain = "*";
-      type = "hard";
-      item = "core";
-      value = "0"; # Disable core dumps (security hardening)
-    }
-    {
-      domain = "*";
-      type = "-";
-      item = "nofile";
-      value = 200000;
-    }
-    {
-      domain = "*";
-      type = "-";
-      item = "nproc";
-      value = 65536;
-    }
-    {
-      domain = "*";
-      type = "-";
-      item = "stack";
-      value = "65536"; # 64 MB
-    }
-  ];
 }
