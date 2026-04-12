@@ -6,37 +6,34 @@
 }:
 
 let
+  pluginUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+
   pluginsJson = builtins.toJSON {
     version = 2;
     sources = [
       {
         enabled = true;
         name = "Noctalia Plugins";
-        url = "https://github.com/noctalia-dev/noctalia-plugins";
+        url = pluginUrl;
       }
     ];
-    states = {
-      "model-usage" = {
-        enabled = true;
-        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-      };
-      "keybind-cheatsheet" = {
-        enabled = true;
-        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-      };
-      "mawaqit" = {
-        enabled = true;
-        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-      };
-      "music-search" = {
-        enabled = true;
-        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-      };
-      "browser-launcher" = {
-        enabled = true;
-        sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-      };
-    };
+    states = builtins.listToAttrs (
+      map
+        (name: {
+          inherit name;
+          value = {
+            enabled = true;
+            sourceUrl = pluginUrl;
+          };
+        })
+        [
+          "model-usage"
+          "keybind-cheatsheet"
+          "mawaqit"
+          "music-search"
+          "browser-launcher"
+        ]
+    );
   };
 in
 {
@@ -44,6 +41,7 @@ in
     inputs.noctalia.homeModules.default
     (import ./bar.nix { })
     ./settings.nix
+    ./activation.nix
   ];
 
   # Required for system tray icons (SNI protocol).
