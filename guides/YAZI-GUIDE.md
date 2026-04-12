@@ -117,7 +117,7 @@ Files open with your default apps (configured in MIME settings). The editor for 
 | `[`     | Previous tab           |
 | `]`     | Next tab               |
 | `{`     | Swap with previous tab |
-| `}``    | Swap with next tab     |
+| `}`     | Swap with next tab     |
 
 ---
 

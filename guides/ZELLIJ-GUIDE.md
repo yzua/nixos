@@ -308,7 +308,7 @@ Use `zellij -l dev` to get a pre-built layout with Neovim, a shell, and lazygit.
 
 ### "My keybindings aren't working inside Neovim"
 
-The autolock plugin puts Zellij into Locked mode when Neovim is focused. This is intentional — it ensures your Alt keys go to Neovim, not Zellij. Press `Ctrl g` to manually toggle Lock if needed.
+Zellij's Alt keybinds (like `Alt h/j/k/l`) can conflict with Neovim. Press `Ctrl g` to enter Locked mode, which passes all keys through to the terminal. The `zellij-autolock` plugin (downloaded but not loaded) would automate this — see the Modes section for activation instructions.
 
 ### "I want to move a pane to a different position"
 

@@ -22,16 +22,16 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 ## Your Workspaces
 
-Six named workspaces are preconfigured, each with auto-launching apps:
+Six named workspaces are preconfigured:
 
-| #   | Workspace | Apps (auto-start)            | Access    |
-| --- | --------- | ---------------------------- | --------- |
-| 1   | 󰖟 browser | LibreWolf (personal)         | `Super+1` |
-| 2   | 󰨞 editor  | VSCode, Ghostty (+Zellij)    | `Super+2` |
-| 3   | 󰍡 social  | Vesktop (Discord), Telegram  | `Super+3` |
-| 4   | 󰎆 media   | Music/Video players          | `Super+4` |
-| 5   | 󰦝 vpn     | Mullvad VPN, KeePassXC       | `Super+5` |
-| 6   | 󰀲 android | Android tools (window rules) | `Super+6` |
+| #   | Workspace | Apps                                | Access    |
+| --- | --------- | ----------------------------------- | --------- |
+| 1   | 󰖟 browser | LibreWolf (auto-start)              | `Super+1` |
+| 2   | 󰨞 editor  | VSCode, Ghostty (auto-start)        | `Super+2` |
+| 3   | 󰍡 social  | Vesktop, Telegram (auto-start)      | `Super+3` |
+| 4   | 󰎆 media   | Music/Video players (rules)         | `Super+4` |
+| 5   | 󰦝 vpn     | Mullvad VPN, KeePassXC (auto-start) | `Super+5` |
+| 6   | 󰀲 android | Android tools (rules only)          | `Super+6` |
 
 Workspaces 7–9 are available as unnamed extras (`Super+7` through `Super+9`).
 
