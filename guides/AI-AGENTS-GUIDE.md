@@ -753,7 +753,7 @@ PreToolUse hooks enforce safety guardrails:
 
 - Block system-destructive commands (`rm -rf /`, `mkfs`, `dd`, `shutdown`)
 - Warn on destructive DB commands (`DROP`, `DELETE FROM`, `truncate`)
-- Pre-commit lint check (triggers `just lint` / `pre-commit` / `npm lint` / `cargo check`)
+- Pre-commit lint check (triggers `just lint` / `pre-commit run` / `npm run lint` / `cargo check`)
 - Dev server tmux recommendation (suggests `npm/pnpm/yarn/bun run dev` in tmux)
 - Session persistence recommendation (for long-running tasks like `npm install/test`, `cargo`, `just`)
 - Block destructive git commands (`push --force`, `reset --hard`, `clean -fd`)
