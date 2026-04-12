@@ -87,7 +87,7 @@ Item {
         if (normalized === "" || looksLikeUrl(query)) {
             const results = allEntries.slice();
             if (isYouTubeUrl(query)) {
-                results.push({
+                results.unshift({
                     id: "youtube-mpv",
                     name: "MPV (YouTube)",
                     description: "Open YouTube in mpv",
@@ -113,11 +113,13 @@ Item {
         const entries = filterEntries(query);
 
         return entries.map(function(entry) {
+            const isPreferredYouTubeTarget = entry.id === "youtube-mpv" && isYouTubeUrl(query);
             return {
                 "name": entry.name,
                 "description": query !== "" && looksLikeUrl(query) ? query : entry.description,
                 "icon": entry.icon,
                 "isTablerIcon": true,
+                "_score": isPreferredYouTubeTarget ? 100 : 0,
                 "provider": root,
                 "onActivate": function() {
                     root.launchEntry(entry, query);

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # mpv-ipc.sh — mpv IPC communication and status
+[[ -n "${_MPV_IPC_SOURCED:-}" ]] && return 0
+_MPV_IPC_SOURCED=1
 
 _current_status_commit_unlocked() {
   local pid="${1-}"

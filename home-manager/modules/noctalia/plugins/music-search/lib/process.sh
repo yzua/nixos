@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # process.sh — process management, hashing, cleanup
+[[ -n "${_PROCESS_SOURCED:-}" ]] && return 0
+_PROCESS_SOURCED=1
 
 library_entry_exists() {
   local entry_id="$1"

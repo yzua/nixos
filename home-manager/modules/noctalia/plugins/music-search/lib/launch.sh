@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # launch.sh — mpv launch helpers
 # shellcheck disable=SC2016
+[[ -n "${_LAUNCH_SOURCED:-}" ]] && return 0
+_LAUNCH_SOURCED=1
 
 launch_youtube_stream() {
   local source_url="$1"

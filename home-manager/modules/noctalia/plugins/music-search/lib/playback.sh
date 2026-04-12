@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # playback.sh — pause, resume, position, seek, speed
+[[ -n "${_PLAYBACK_SOURCED:-}" ]] && return 0
+_PLAYBACK_SOURCED=1
 
 pause_playback() {
   local pid

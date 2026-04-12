@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # queue.sh — persistent playback queue storage
+[[ -n "${_QUEUE_SOURCED:-}" ]] && return 0
+_QUEUE_SOURCED=1
 
 _list_queue_unlocked() {
   safe_read_json "$QUEUE_FILE"

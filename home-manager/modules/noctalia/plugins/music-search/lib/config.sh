@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # config.sh — constants, directory setup, and helpers
 # shellcheck disable=SC2034
+[[ -n "${_CONFIG_SOURCED:-}" ]] && return 0
+_CONFIG_SOURCED=1
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 DEFAULT_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"

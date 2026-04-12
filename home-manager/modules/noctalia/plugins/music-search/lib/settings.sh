@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # settings.sh — provider, search, tags, ratings, sort
+[[ -n "${_SETTINGS_SOURCED:-}" ]] && return 0
+_SETTINGS_SOURCED=1
 
 get_provider() {
   with_lock "$SETTINGS_LOCK" _get_provider_unlocked
@@ -92,22 +94,13 @@ search_local() {
     guessed_title="$display_name"
     guessed_artist=""
 
-    if [[ "$display_name" == *" - "* ]]; then
-      guessed_artist="${display_name%% - *}"
-      guessed_title="${display_name#* - }"
-    elif [[ "$display_name" == *" — "* ]]; then
-      guessed_artist="${display_name%% — *}"
-      guessed_title="${display_name#* — }"
-    elif [[ "$display_name" == *" – "* ]]; then
-      guessed_artist="${display_name%% – *}"
-      guessed_title="${display_name#* – }"
-    fi
+    split_display_name "$display_name" guessed_artist guessed_title
 
     searchable="$(printf '%s %s %s %s' "$filename" "$display_name" "$guessed_artist" "$guessed_title" | tr '[:upper:]' '[:lower:]')"
 
     if [[ "$searchable" == *"$query_lower"* ]]; then
       result_objects+=("$(jq -nc \
-        --arg id "local-$(printf '%s' "$filepath" | sha256sum | cut -c1-16)" \
+        --arg id "$(local_file_id "$filepath")" \
         --arg title "${guessed_title:-$display_name}" \
         --arg url "$filepath" \
         --arg uploader "${guessed_artist:-Local file}" \

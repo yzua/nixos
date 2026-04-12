@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # state.sh — state file read/write
+[[ -n "${_STATE_SOURCED:-}" ]] && return 0
+_STATE_SOURCED=1
 
 _write_state_unlocked() {
   local is_playing="$1"

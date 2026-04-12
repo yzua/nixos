@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # library.sh — library CRUD, playback recording, search dispatch, details, download
+[[ -n "${_LIBRARY_SOURCED:-}" ]] && return 0
+_LIBRARY_SOURCED=1
 
 _record_library_playback_unlocked() {
   local entry_id="${1-}"
@@ -201,10 +203,6 @@ search_tracks() {
   fi
 
   case "$provider" in
-    youtube)
-      require_cmd yt-dlp
-      search_youtube "$query"
-      ;;
     soundcloud)
       require_cmd yt-dlp
       search_soundcloud "$query"
@@ -212,7 +210,7 @@ search_tracks() {
     local)
       search_local "$query"
       ;;
-    *)
+    youtube|*)
       require_cmd yt-dlp
       search_youtube "$query"
       ;;

@@ -1,5 +1,28 @@
 #!/usr/bin/env bash
 # media-utils.sh — filename sanitization, URL parsing, local file metadata
+[[ -n "${_MEDIA_UTILS_SOURCED:-}" ]] && return 0
+_MEDIA_UTILS_SOURCED=1
+
+# Supported audio file extensions (used by search and folder scanning).
+readonly AUDIO_EXTENSIONS=(mp3 flac ogg opus m4a wav wma aac)
+
+# Split a display name into artist and title using common separators.
+split_display_name() {
+  local display_name="${1-}"
+  local artist="${2-}"
+  local title="${3-}"
+
+  if [[ "$display_name" == *" - "* ]]; then
+    printf -v "$artist" '%s' "${display_name%% - *}"
+    printf -v "$title" '%s' "${display_name#* - }"
+  elif [[ "$display_name" == *" — "* ]]; then
+    printf -v "$artist" '%s' "${display_name%% — *}"
+    printf -v "$title" '%s' "${display_name#* — }"
+  elif [[ "$display_name" == *" – "* ]]; then
+    printf -v "$artist" '%s' "${display_name%% – *}"
+    printf -v "$title" '%s' "${display_name#* – }"
+  fi
+}
 
 sanitize_filename() {
   local value="${1-}"
@@ -8,6 +31,11 @@ sanitize_filename() {
   value="${value//\//-}"
   value="$(printf '%s' "$value" | sed 's/[<>:\"\\|?*]/-/g; s/[[:space:]]\+/ /g; s/^ //; s/ $//')"
   printf '%s' "${value:-track}"
+}
+
+# Generate a deterministic local file ID from a filepath.
+local_file_id() {
+  printf 'local-%s' "$(printf '%s' "${1-}" | sha256sum | cut -c1-16)"
 }
 
 strip_known_media_id_suffix() {
@@ -105,16 +133,7 @@ local_file_metadata_json() {
   album=""
   duration="0"
 
-  if [[ "$display_name" == *" - "* ]]; then
-    guessed_artist="${display_name%% - *}"
-    guessed_title="${display_name#* - }"
-  elif [[ "$display_name" == *" — "* ]]; then
-    guessed_artist="${display_name%% — *}"
-    guessed_title="${display_name#* — }"
-  elif [[ "$display_name" == *" – "* ]]; then
-    guessed_artist="${display_name%% – *}"
-    guessed_title="${display_name#* – }"
-  fi
+  split_display_name "$display_name" guessed_artist guessed_title
 
   if command -v ffprobe >/dev/null 2>&1; then
     probe_json="$(ffprobe -v quiet -print_format json \
@@ -144,7 +163,7 @@ local_file_metadata_json() {
   fi
 
   jq -nc \
-    --arg id "local-$(printf '%s' "$filepath" | sha256sum | cut -c1-16)" \
+    --arg id "$(local_file_id "$filepath")" \
     --arg title "${guessed_title:-$display_name}" \
     --arg url "$filepath" \
     --arg uploader "${guessed_artist:-Local file}" \
@@ -166,19 +185,17 @@ local_file_metadata_json() {
 
 local_audio_candidates() {
   local query="${1-}"
+  local ext rg_globs find_args=()
+
+  for ext in "${AUDIO_EXTENSIONS[@]}"; do
+    rg_globs+=(-g "*.${ext}")
+    find_args+=(-iname "*.${ext}" -o)
+  done
+  unset 'find_args[-1]'
+
   if command -v rg >/dev/null 2>&1; then
     local -a rg_args
-    rg_args=(
-      rg --files "$LOCAL_MUSIC_DIR"
-      -g '*.mp3'
-      -g '*.flac'
-      -g '*.ogg'
-      -g '*.opus'
-      -g '*.m4a'
-      -g '*.wav'
-      -g '*.wma'
-      -g '*.aac'
-    )
+    rg_args=(rg --files "$LOCAL_MUSIC_DIR" "${rg_globs[@]}")
 
     if [[ -n "$query" ]]; then
       "${rg_args[@]}" 2>/dev/null | rg -i -F -- "$query" 2>/dev/null || true
@@ -186,8 +203,7 @@ local_audio_candidates() {
       "${rg_args[@]}" 2>/dev/null || true
     fi
   else
-    find "$LOCAL_MUSIC_DIR" -maxdepth 4 -type f \
-      \( -iname '*.mp3' -o -iname '*.flac' -o -iname '*.ogg' -o -iname '*.opus' -o -iname '*.m4a' -o -iname '*.wav' -o -iname '*.wma' -o -iname '*.aac' \) \
+    find "$LOCAL_MUSIC_DIR" -maxdepth 4 -type f \( "${find_args[@]}" \) \
       -print 2>/dev/null || true
   fi
 }
@@ -198,19 +214,18 @@ folder_audio_candidates() {
     return 0
   fi
 
+  local ext rg_globs find_args=()
+
+  for ext in "${AUDIO_EXTENSIONS[@]}"; do
+    rg_globs+=(-g "*.${ext}")
+    find_args+=(-iname "*.${ext}" -o)
+  done
+  unset 'find_args[-1]'
+
   if command -v rg >/dev/null 2>&1; then
-    rg --files "$folder" \
-      -g '*.mp3' \
-      -g '*.flac' \
-      -g '*.ogg' \
-      -g '*.opus' \
-      -g '*.m4a' \
-      -g '*.wav' \
-      -g '*.wma' \
-      -g '*.aac' 2>/dev/null || true
+    rg --files "$folder" "${rg_globs[@]}" 2>/dev/null || true
   else
-    find "$folder" -type f \
-      \( -iname '*.mp3' -o -iname '*.flac' -o -iname '*.ogg' -o -iname '*.opus' -o -iname '*.m4a' -o -iname '*.wav' -o -iname '*.wma' -o -iname '*.aac' \) \
+    find "$folder" -type f \( "${find_args[@]}" \) \
       -print 2>/dev/null || true
   fi
 }

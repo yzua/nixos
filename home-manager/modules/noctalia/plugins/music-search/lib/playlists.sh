@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # playlists.sh — playlist CRUD and library listing
+[[ -n "${_PLAYLISTS_SOURCED:-}" ]] && return 0
+_PLAYLISTS_SOURCED=1
 
 _create_playlist_unlocked() {
   local name="${1-}"
@@ -205,7 +207,7 @@ _local_entry_id_for_filepath() {
 
   entry_id="$(jq -r '.id // ""' <<< "$(local_file_metadata_json "$filepath")" 2>/dev/null || true)"
   if [[ -z "$entry_id" ]]; then
-    entry_id="local-$(printf '%s' "$filepath" | sha256sum | cut -c1-16)"
+    entry_id="$(local_file_id "$filepath")"
   fi
 
   printf '%s\n' "$entry_id"
