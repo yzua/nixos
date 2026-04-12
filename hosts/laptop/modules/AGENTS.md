@@ -7,14 +7,14 @@ Use this directory only for laptop-only behavior (power, thermals, Optimus, kern
 
 ## Structure
 
-| File          | Purpose                                                                             |
-| ------------- | ----------------------------------------------------------------------------------- |
-| `default.nix` | Import hub for all laptop-only modules                                              |
-| `boot.nix`    | Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)                       |
-| `nvidia.nix`  | NVIDIA Optimus offload + `mySystem.nvidia.{intelBusId,nvidiaBusId}` options         |
-| `power.nix`   | Enables power mgmt, disables `power-profiles-daemon`, loads ThinkPad kernel modules |
-| `tlp.nix`     | TLP policy + battery charge thresholds via `mySystem.laptop.battery.*`              |
-| `thermal.nix` | Enables `services.thermald`                                                         |
+| File          | Purpose                                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------------------- |
+| `default.nix` | Import hub for all laptop-only modules                                                               |
+| `boot.nix`    | Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)                                        |
+| `nvidia.nix`  | NVIDIA Optimus offload + `mySystem.nvidia.{intelBusId,nvidiaBusId}` options                          |
+| `power.nix`   | Enables power mgmt, disables `power-profiles-daemon`, loads `acpi_call`, `thinkpad_acpi`, `tp_smapi` |
+| `tlp.nix`     | TLP policy + battery charge thresholds via `mySystem.laptop.battery.*`                               |
+| `thermal.nix` | Enables `services.thermald`                                                                          |
 
 ---
 
