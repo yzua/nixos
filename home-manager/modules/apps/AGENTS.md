@@ -40,7 +40,7 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 
 | File             | Purpose                                                                                 |
 | ---------------- | --------------------------------------------------------------------------------------- |
-| `default.nix`    | Import hub: `programs.chromium` with Brave package                                      |
+| `default.nix`    | Import hub: `programs.brave` with Brave package                                         |
 | `extensions.nix` | Declarative extensions grouped by GitHub, privacy/security, web dev, and YouTube/social |
 
 ### `librewolf/` (3 files)

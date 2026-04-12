@@ -42,6 +42,7 @@ scripts/
 │   └── nvidia-fans.sh       # GPU fan control
 ├── lib/
 │   ├── logging.sh           # Shared logging library (colored output, timestamps)
+│   ├── log-dirs.sh          # Log directory path resolution
 │   ├── test-helpers.sh      # Shared test utilities (assertions, mocking)
 │   └── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
 ├── sops/

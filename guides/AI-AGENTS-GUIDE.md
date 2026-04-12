@@ -282,7 +282,6 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `cxu`                          | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Alias of `cx` (identical command)                                         |
 | `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                  |
 | `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                     |
-| `hocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT high reasoning variant                                       |
 | `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                 |
 | `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix     |
 | `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries              |
@@ -303,7 +302,8 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `hocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `agents-search`, `occm`, `ocbp`, `oc-port`, `ai-mcp-scan`, etc.) are defined in `home-manager/modules/ai-agents/services.nix` and `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `occm`, `ocbp`, `oc-port`, `ai-mcp-scan`, etc.) are defined in `home-manager/modules/ai-agents/services.nix` and `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Packages** (`agents-search`) are `writeShellScriptBin` wrappers added to `home.packages` in `home-manager/modules/ai-agents/services.nix`.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 
 ### Interactive Selector (`ais`)
@@ -368,7 +368,9 @@ ai-agents/
 │   ├── _option-helpers.nix    # Shared option constructors
 │   ├── _opencode-profiles.nix # OpenCode profile names and config paths
 │   ├── _aliases.nix           # Shared alias generation
+│   ├── _destructive-rules.nix # Destructive action allow/deny rules per agent
 │   ├── _file-templates.nix    # Config file templates
+│   ├── _gemini-policies.nix   # Gemini CLI safety policy definitions
 │   ├── _workflow-prompts.nix  # Workflow prompt definitions
 │   ├── _zai-services.nix      # Z.AI MCP service registry
 │   ├── _zai-filters.nix       # Z.AI MCP jq filter generation

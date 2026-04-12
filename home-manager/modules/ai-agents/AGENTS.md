@@ -55,7 +55,9 @@ ai-agents/
 │   ├── _option-helpers.nix      # Shared option constructors
 │   ├── _opencode-profiles.nix   # OpenCode profile names and config paths
 │   ├── _aliases.nix             # Zsh alias generation for agent launchers/workflows
+│   ├── _destructive-rules.nix   # Destructive action allow/deny rules per agent
 │   ├── _file-templates.nix      # Config file templates
+│   ├── _gemini-policies.nix     # Gemini CLI safety policy definitions
 │   ├── _workflow-prompts.nix    # Workflow prompt definitions
 │   ├── _zai-services.nix        # Z.AI MCP service registry
 │   ├── _zai-filters.nix         # Z.AI MCP jq filter generation
