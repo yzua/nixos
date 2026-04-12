@@ -15,7 +15,7 @@
 
 - Every module directory needs a `default.nix` import hub. `scripts/build/modules-check.sh` walks all `default.nix` files and fails on missing local imports or broken directory imports.
 - Helper files stay prefixed `_*.nix` and are imported manually, not added to import hubs.
-- If `default.nix` must mention a non-module helper, annotate it with `modules-check: manual-helper ...`; the modules check looks for that exact escape hatch.
+- If `default.nix` must mention a non-module helper, annotate it with `modules-check: manual-helper ...`; the modules check also accepts `imported manually` as an alternative escape-hatch phrase. Both must appear on a `#` comment line.
 - `just pkgs` also checks ownership conflicts: a package cannot be installed explicitly and also enabled via `programs.<name>` or `services.<name>`.
 
 ## Architecture Shortcuts
