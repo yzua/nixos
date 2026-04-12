@@ -2,11 +2,22 @@
 
 {
   inputs,
+  pkgs,
   ...
 }:
 
 let
   pluginUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+  patchedNoctaliaPackage =
+    inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
+      (old: {
+        postInstall = (old.postInstall or "") + ''
+          substituteInPlace $out/share/noctalia-shell/Modules/Bar/Widgets/Workspace.qml \
+            --replace-fail \
+              'return ThemeIcons.iconForAppId(modelData.appId?.toLowerCase());' \
+              'return ThemeIcons.iconForAppId(modelData?.appId?.toLowerCase());'
+        '';
+      });
 
   pluginsJson = builtins.toJSON {
     version = 2;
@@ -48,6 +59,7 @@ in
   services.status-notifier-watcher.enable = true;
 
   programs.noctalia-shell.enable = true;
+  programs.noctalia-shell.package = patchedNoctaliaPackage;
 
   # Allow the activation script to overwrite the mutable settings.json
   # (patched at activation time by the sops location injector)
