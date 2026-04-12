@@ -1,5 +1,6 @@
 {
   lib,
+  homeDir,
 }:
 
 let
@@ -12,10 +13,9 @@ let
   ) (builtins.attrNames promptEntries);
 
   # The real filesystem path the agent should use for editing.
-  # Nix paths copy into /nix/store (read-only), so we hardcode the repo location
-  # so the agent can actually edit these files.
-  realRepoRoot = "/home/yz/System";
-  realPromptSourceDir = "${realRepoRoot}/home-manager/modules/ai-agents/android-re/prompts";
+  # Nix paths copy into /nix/store (read-only), so we derive the repo location
+  # from homeDir so the agent can actually edit these files.
+  realPromptSourceDir = "${homeDir}/System/home-manager/modules/ai-agents/android-re/prompts";
 
   renderPromptFile =
     name:
