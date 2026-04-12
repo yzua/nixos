@@ -121,12 +121,12 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                        |
 | `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                        |
 | `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                          |
-| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/services.nix` (`ai-agent-launcher` wrapper)            |
+| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-launcher` wrapper)    |
 | `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)         |
 | `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)         |
 | `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)        |
 | `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)       |
-| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-inventory` wrapper)           |
+| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-inventory` wrapper)   |
 | `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/services.nix` (RE launcher wrapper)                    |
 | `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                       |
 | `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                        |

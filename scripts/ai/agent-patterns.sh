@@ -4,10 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
-
-LOG_DIR="${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agents/logs}"
-OPENCODE_LOG_DIR="${OPENCODE_LOG_DIR:-$HOME/.local/share/opencode/log}"
-CODEX_LOG_DIR="${CODEX_LOG_DIR:-$HOME/.codex/log}"
+# shellcheck source=scripts/lib/log-dirs.sh
+source "${SCRIPT_DIR}/../lib/log-dirs.sh"
 
 find_recent_logs() {
 	local root
