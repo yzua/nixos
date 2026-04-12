@@ -18,16 +18,20 @@ The `y` command is the recommended way to use Yazi. When you quit (`q`), your sh
 
 ## Navigation
 
-| Key                     | What It Does              |
-| ----------------------- | ------------------------- |
-| `j` / `↓`               | Move down                 |
-| `k` / `↑`               | Move up                   |
-| `l` / `→` / `Enter`     | Open file/enter directory |
-| `h` / `←` / `Backspace` | Go to parent directory    |
-| `gg`                    | Go to first item          |
-| `G`                     | Go to last item           |
-| `Ctrl+u`                | Page up                   |
-| `Ctrl+d`                | Page down                 |
+| Key                 | What It Does               |
+| ------------------- | -------------------------- |
+| `j` / `↓`           | Move down                  |
+| `k` / `↑`           | Move up                    |
+| `l` / `→` / `Enter` | Open file/enter directory  |
+| `h` / `←`           | Go to parent directory     |
+| `gg`                | Go to first item           |
+| `G`                 | Go to last item            |
+| `H`                 | Back to previous directory |
+| `L`                 | Forward to next directory  |
+| `Ctrl+u`            | Move up half page          |
+| `Ctrl+d`            | Move down half page        |
+| `Ctrl+b`            | Move up full page          |
+| `Ctrl+f`            | Move down full page        |
 
 ---
 
@@ -38,21 +42,21 @@ The `y` command is the recommended way to use Yazi. When you quit (`q`), your sh
 | Key           | What It Does                                 |
 | ------------- | -------------------------------------------- |
 | `Enter` / `l` | Open file with default app / enter directory |
-| `o`           | Open with selected opener                    |
-| `Ctrl+Enter`  | Open file interactively (choose app)         |
+| `o`           | Open selected files                          |
+| `O`           | Open selected files interactively            |
 
 Files open with your default apps (configured in MIME settings). The editor for text files is VS Code (set in constants).
 
 ### Selection
 
-| Key      | What It Does                       |
-| -------- | ---------------------------------- |
-| `Space`  | Toggle selection on current item   |
-| `v`      | Enter visual selection mode        |
-| `V`      | Enter visual selection mode (line) |
-| `Ctrl+a` | Select all                         |
-| `Ctrl+r` | Invert selection                   |
-| `Esc`    | Clear selection                    |
+| Key      | What It Does                        |
+| -------- | ----------------------------------- |
+| `Space`  | Toggle selection on current item    |
+| `Ctrl+a` | Select all                          |
+| `Ctrl+r` | Invert selection                    |
+| `v`      | Enter visual selection mode         |
+| `V`      | Enter visual selection mode (unset) |
+| `Esc`    | Clear selection                     |
 
 ### Copy, Move, Delete
 
@@ -67,78 +71,109 @@ Files open with your default apps (configured in MIME settings). The editor for 
 
 ### Create and Rename
 
-| Key | What It Does                |
-| --- | --------------------------- |
-| `a` | Create file                 |
-| `A` | Create directory            |
-| `r` | Rename file                 |
-| `c` | Copy filename to clipboard  |
-| `C` | Copy file path to clipboard |
+| Key | What It Does                                             |
+| --- | -------------------------------------------------------- |
+| `a` | Create file or directory (ends with `/` for directories) |
+| `r` | Rename file                                              |
+
+### Copy Path
+
+| Key   | What It Does                    |
+| ----- | ------------------------------- |
+| `c c` | Copy file path                  |
+| `c d` | Copy directory path             |
+| `c f` | Copy filename                   |
+| `c n` | Copy filename without extension |
 
 ---
 
-## Search and Filter
+## Find and Filter
 
 | Key   | What It Does                |
 | ----- | --------------------------- |
-| `/`   | Search in current directory |
-| `?`   | Search backwards            |
-| `n`   | Next search match           |
-| `N`   | Previous search match       |
-| `f`   | Filter (fuzzy search)       |
-| `Esc` | Clear filter                |
+| `/`   | Find next file (fuzzy)      |
+| `?`   | Find previous file (fuzzy)  |
+| `n`   | Next found match            |
+| `N`   | Previous found match        |
+| `f`   | Filter files (smart)        |
+| `Esc` | Clear filter or cancel find |
+
+### Search
+
+| Key | What It Does                     |
+| --- | -------------------------------- |
+| `s` | Search files by name (via fd)    |
+| `S` | Search files by content (via rg) |
 
 ---
 
 ## Tabs
 
-| Key      | What It Does      |
-| -------- | ----------------- |
-| `t`      | Create new tab    |
-| `1`-`9`  | Switch to tab N   |
-| `[`      | Previous tab      |
-| `]`      | Next tab          |
-| `Ctrl+c` | Close current tab |
+| Key     | What It Does           |
+| ------- | ---------------------- |
+| `t t`   | Create new tab in CWD  |
+| `t r`   | Rename current tab     |
+| `1`-`9` | Switch to tab N        |
+| `[`     | Previous tab           |
+| `]`     | Next tab               |
+| `{`     | Swap with previous tab |
+| `}``    | Swap with next tab     |
 
 ---
 
 ## View Options
 
-| Key | What It Does                |
-| --- | --------------------------- |
-| `.` | Toggle hidden files         |
-| `z` | Toggle preview              |
-| `Z` | Toggle preview (with image) |
-| `s` | Sort by... (opens menu)     |
+| Key | What It Does                 |
+| --- | ---------------------------- |
+| `.` | Toggle hidden files          |
+| `K` | Seek up 5 units in preview   |
+| `J` | Seek down 5 units in preview |
 
-### Sorting Options (after pressing `s`)
+### Jump
 
-| Key | Sort By                               |
-| --- | ------------------------------------- |
-| `m` | Modified time                         |
-| `M` | Modified time (reverse)               |
-| `c` | Created time                          |
-| `C` | Created time (reverse)                |
-| `e` | Extension                             |
-| `E` | Extension (reverse)                   |
-| `a` | Alphabetically                        |
-| `A` | Alphabetically (reverse)              |
-| `n` | Naturally (numbers handled correctly) |
-| `N` | Naturally (reverse)                   |
-| `s` | Size                                  |
-| `S` | Size (reverse)                        |
+| Key | What It Does                   |
+| --- | ------------------------------ |
+| `z` | Jump to file/directory via fzf |
+| `Z` | Jump to directory via zoxide   |
 
----
+### Sorting
 
-## Bookmarks and Marks
+| Key   | Sort By                               |
+| ----- | ------------------------------------- |
+| `, m` | Modified time                         |
+| `, M` | Modified time (reverse)               |
+| `, b` | Birth time                            |
+| `, B` | Birth time (reverse)                  |
+| `, e` | Extension                             |
+| `, E` | Extension (reverse)                   |
+| `, a` | Alphabetically                        |
+| `, A` | Alphabetically (reverse)              |
+| `, n` | Naturally (numbers handled correctly) |
+| `, N` | Naturally (reverse)                   |
+| `, s` | Size                                  |
+| `, S` | Size (reverse)                        |
+| `, r` | Random                                |
 
-| Key | What It Does             |
-| --- | ------------------------ |
-| `m` | Create bookmark          |
-| `'` | Jump to bookmark         |
-| `"` | Delete bookmark          |
-| `~` | Go to home directory     |
-| `-` | Go to previous directory |
+### Linemode
+
+| Key   | What It Shows |
+| ----- | ------------- |
+| `m s` | File size     |
+| `m p` | Permissions   |
+| `m b` | Birth time    |
+| `m m` | Modified time |
+| `m o` | Owner         |
+| `m n` | None (clear)  |
+
+### Go To
+
+| Key       | What It Does                                  |
+| --------- | --------------------------------------------- |
+| `g h`     | Go to home directory                          |
+| `g c`     | Go to `~/.config`                             |
+| `g d`     | Diff selected file with hovered file (custom) |
+| `g Space` | Jump interactively                            |
+| `g f`     | Follow hovered symlink                        |
 
 ---
 
@@ -146,19 +181,18 @@ Files open with your default apps (configured in MIME settings). The editor for 
 
 | Key | What It Does                         |
 | --- | ------------------------------------ |
-| `:` | Open command prompt                  |
-| `;` | Run shell command                    |
-| `!` | Run shell command (block until done) |
-| `S` | Open shell in current directory      |
+| `;` | Run shell command (interactive)      |
+| `:` | Run shell command (block until done) |
 
 ---
 
 ## Help
 
-| Key | What It Does     |
-| --- | ---------------- |
-| `~` | Open help menu   |
-| `?` | Show keybindings |
+| Key   | What It Does |
+| ----- | ------------ |
+| `~`   | Open help    |
+| `F1`  | Open help    |
+| `Esc` | Close help   |
 
 ---
 
@@ -209,17 +243,19 @@ Supported preview types:
 
 1. **Use `y` instead of `yazi`.** The shell wrapper automatically `cd`s to your final directory when you quit.
 
-2. **Preview panel.** The right panel shows file previews. Press `z` to toggle it off if you need more space.
+2. **Preview panel.** Press `K`/`J` to seek up/down in the preview of the hovered file.
 
-3. **Quick navigation.** Type `/` to search, then `n`/`N` to jump between matches. Faster than scrolling.
+3. **Quick navigation.** Type `/` to find, then `n`/`N` to jump between matches. Faster than scrolling.
 
 4. **Bulk operations.** Select multiple files with `Space`, then yank (`y`) or cut (`x`) and paste (`p`) to move them in batch.
 
-5. **Sort by modified.** Press `s` then `m` to sort by modification time — useful for finding recent files.
+5. **Sort by modified.** Press `,` then `m` to sort by modification time — useful for finding recent files.
 
 6. **Open with default app.** Just press `Enter` on any file. MIME types are configured to open files in the right app.
 
 7. **Hidden files visible.** Hidden files are shown by default. Press `.` to toggle them off if needed.
+
+8. **Quick jump.** Press `z` to fuzzy-find a file via fzf, or `Z` to jump to a frequently-visited directory via zoxide.
 
 ---
 
@@ -244,31 +280,32 @@ To apply changes after editing: `just home` (rebuilds Home Manager configuration
 | `Enter`     | Open / enter directory   |
 | `q`         | Quit (cd to current dir) |
 | `Space`     | Toggle selection         |
+| `~`         | Open help                |
 
 ### File Operations
 
-| Key | Action           |
-| --- | ---------------- |
-| `y` | Copy (yank)      |
-| `x` | Cut              |
-| `p` | Paste            |
-| `d` | Delete (trash)   |
-| `a` | Create file      |
-| `A` | Create directory |
-| `r` | Rename           |
+| Key | Action          |
+| --- | --------------- |
+| `y` | Copy (yank)     |
+| `x` | Cut             |
+| `p` | Paste           |
+| `d` | Delete (trash)  |
+| `a` | Create file/dir |
+| `r` | Rename          |
 
-### Search & Filter
+### Find & Filter
 
 | Key       | Action              |
 | --------- | ------------------- |
-| `/`       | Search              |
-| `f`       | Fuzzy filter        |
-| `n` / `N` | Next/previous match |
+| `/`       | Find next           |
+| `?`       | Find previous       |
+| `f`       | Filter (smart)      |
+| `n` / `N` | Next/previous found |
 
 ### View
 
 | Key | Action              |
 | --- | ------------------- |
 | `.` | Toggle hidden files |
-| `z` | Toggle preview      |
-| `s` | Sort menu           |
+| `,` | Sort prefix         |
+| `z` | Jump via fzf        |
