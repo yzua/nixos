@@ -9,7 +9,9 @@ source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
 
 COMMIT_SPLIT_PROMPT="${COMMIT_SPLIT_PROMPT:-}"
 REFACTOR_MAINTAINABILITY_PROMPT="${REFACTOR_MAINTAINABILITY_PROMPT:-}"
+BUGFIX_ROOT_CAUSE_PROMPT="${BUGFIX_ROOT_CAUSE_PROMPT:-}"
 SECURITY_AUDIT_PROMPT="${SECURITY_AUDIT_PROMPT:-}"
+DEPENDENCY_UPGRADE_PROMPT="${DEPENDENCY_UPGRADE_PROMPT:-}"
 BUILD_PERFORMANCE_PROMPT="${BUILD_PERFORMANCE_PROMPT:-}"
 MARKDOWN_SYNC_PROMPT="${MARKDOWN_SYNC_PROMPT:-}"
 
@@ -22,6 +24,11 @@ pick() {
 	local header="$1"
 	shift
 	printf '%s\n' "$@" | fzf --height=50% --reverse --header="$header"
+}
+
+pick_lines() {
+	local header="$1"
+	fzf --height=50% --reverse --header="$header"
 }
 
 usage() {
@@ -85,8 +92,14 @@ resolve_workflow_prompt() {
 	rf)
 		echo "$REFACTOR_MAINTAINABILITY_PROMPT"
 		;;
+	fx)
+		echo "$BUGFIX_ROOT_CAUSE_PROMPT"
+		;;
 	sa)
 		echo "$SECURITY_AUDIT_PROMPT"
+		;;
+	du)
+		echo "$DEPENDENCY_UPGRADE_PROMPT"
 		;;
 	bp)
 		echo "$BUILD_PERFORMANCE_PROMPT"
@@ -100,19 +113,76 @@ resolve_workflow_prompt() {
 	esac
 }
 
+workflow_label() {
+	case "$1" in
+	cm)
+		echo "commit split (cm) — Splits working tree into logical commits with validated, minimal staging."
+		;;
+	rf)
+		echo "refactor maintainability (rf) — Improves structure and clarity without changing behavior, APIs, or workflows."
+		;;
+	fx)
+		echo "bugfix root cause (fx) — Reproduces bugs, proves root cause, fixes minimally, validates regressions afterward."
+		;;
+	sa)
+		echo "security audit (sa) — Finds evidence-backed security weaknesses across code, configs, dependencies, infrastructure surfaces."
+		;;
+	du)
+		echo "dependency upgrade (du) — Upgrades dependencies safely, handles breaking changes, validates compatibility, reports blockers."
+		;;
+	bp)
+		echo "build performance (bp) — Measures bottlenecks, applies low-risk optimizations, compares before-and-after performance evidence clearly."
+		;;
+	md)
+		echo "markdown sync (md) — Synchronizes documentation with repository reality, removing drift, ambiguity, stale instructions."
+		;;
+	*)
+		return 1
+		;;
+	esac
+}
+
+workflow_display_lines() {
+	echo "none"
+	local suffix
+	for suffix in cm rf fx sa du bp md; do
+		workflow_label "$suffix"
+	done
+}
+
+workflow_suffix_from_selection() {
+	local selection="$1"
+	if [[ "$selection" == "none" ]]; then
+		echo "none"
+		return 0
+	fi
+
+	local suffix
+	for suffix in cm rf fx sa du bp md; do
+		if [[ "$selection" == "$(workflow_label "$suffix")" ]]; then
+			echo "$suffix"
+			return 0
+		fi
+	done
+
+	return 1
+}
+
 choose_workflow_suffix() {
 	local base_alias="$1"
-	local suffix
+	local selection suffix
 
 	if ! supports_workflow_suffix "$base_alias"; then
 		echo "none"
 		return 0
 	fi
 
-	suffix="$(pick "Select Workflow Suffix" none cm rf sa bp md)"
-	if [[ -z "${suffix:-}" ]]; then
+	selection="$(workflow_display_lines | pick_lines "Select Workflow Suffix")"
+	if [[ -z "${selection:-}" ]]; then
 		return 1
 	fi
+
+	suffix="$(workflow_suffix_from_selection "$selection")" || return 1
 
 	echo "$suffix"
 }
@@ -319,34 +389,40 @@ run_sectioned_mode() {
 	echo "$agent_alias"
 }
 
-simple_mode=false
-while [[ $# -gt 0 ]]; do
-	case "$1" in
-	-s | --simple)
-		simple_mode=true
-		;;
-	-h | --help)
-		usage
-		exit 0
-		;;
-	*)
-		print_error "Unknown argument: $1"
-		usage >&2
-		exit 1
-		;;
-	esac
-	shift
-done
+main() {
+	local simple_mode=false
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
+		-s | --simple)
+			simple_mode=true
+			;;
+		-h | --help)
+			usage
+			exit 0
+			;;
+		*)
+			print_error "Unknown argument: $1"
+			usage >&2
+			exit 1
+			;;
+		esac
+		shift
+	done
 
-agent_alias=""
-workflow_suffix=""
+	local agent_alias=""
+	local workflow_suffix=""
 
-if [[ "$simple_mode" == true ]]; then
-	agent_alias="$(run_simple_mode)" || exit 0
-else
-	agent_alias="$(run_sectioned_mode)" || exit 0
+	if [[ "$simple_mode" == true ]]; then
+		agent_alias="$(run_simple_mode)" || exit 0
+	else
+		agent_alias="$(run_sectioned_mode)" || exit 0
+	fi
+
+	workflow_suffix="$(choose_workflow_suffix "$agent_alias")" || exit 0
+
+	execute_agent "$agent_alias" "$workflow_suffix"
+}
+
+if [[ "${AI_AGENT_LAUNCHER_SOURCE_ONLY:-0}" != "1" ]]; then
+	main "$@"
 fi
-
-workflow_suffix="$(choose_workflow_suffix "$agent_alias")" || exit 0
-
-execute_agent "$agent_alias" "$workflow_suffix"
