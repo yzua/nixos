@@ -16,6 +16,8 @@ scripts/
 │   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
 │   ├── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
 │   ├── agents-search.sh     # Scan project trees for directories needing AGENTS.md
+│   ├── agent-iter.sh        # Run an AI agent command N times (iterative loop)
+│   ├── agent-iter-test.sh   # Unit tests for agent-iter.sh
 │   ├── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
 │   └── android-re/
 │       ├── re-avd.sh        # Android emulator management (AVD create/start/snapshot)
@@ -111,30 +113,31 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 
 ## Nix Integration Table
 
-| Script                                             | Referenced By                                                                          |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `build/modules-check.sh`                           | `justfile` (`just modules`)                                                            |
-| `build/packages-check.sh`                          | `justfile` (`just pkgs`)                                                               |
-| `build/shellcheck-nix-inline.sh`                   | `justfile` (`just lint`)                                                               |
-| `system/report/system-report.sh`                   | `nixos-modules/system-report.nix` (wrapped with `writeShellApplication`)               |
-| `system/report/report-collectors.sh`               | Sourced by `system-report.sh` (loads module files)                                     |
-| `system/report/report-collectors-core.sh`          | Sourced by `system/report/report-collectors.sh`                                        |
-| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                        |
-| `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                        |
-| `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                          |
-| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-launcher` wrapper)    |
-| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)         |
-| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)         |
-| `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)        |
-| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)       |
-| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-inventory` wrapper)   |
-| `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/services.nix` (RE launcher wrapper)                    |
-| `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                       |
-| `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                        |
-| `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                          |
-| `apps/browser-select.sh`                           | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (`browser-select` wrapper) |
-| `apps/element-desktop-keyring.sh`                  | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)        |
-| `apps/playwright-cli-mcp-wrapper.sh`               | `home-manager/modules/programming-languages/javascript/default.nix` (MCP server)       |
-| `apps/xdg-open-wrapper.sh`                         | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)        |
-| `apps/youtube-mpv.sh`                              | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)        |
-| `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)                    |
+| Script                                             | Referenced By                                                                                                            |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `build/modules-check.sh`                           | `justfile` (`just modules`)                                                                                              |
+| `build/packages-check.sh`                          | `justfile` (`just pkgs`)                                                                                                 |
+| `build/shellcheck-nix-inline.sh`                   | `justfile` (`just lint`)                                                                                                 |
+| `system/report/system-report.sh`                   | `nixos-modules/system-report.nix` (wrapped with `writeShellApplication`)                                                 |
+| `system/report/report-collectors.sh`               | Sourced by `system-report.sh` (loads module files)                                                                       |
+| `system/report/report-collectors-core.sh`          | Sourced by `system/report/report-collectors.sh`                                                                          |
+| `system/report/report-collectors-observability.sh` | Sourced by `system/report/report-collectors.sh`                                                                          |
+| `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                                                          |
+| `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                                                            |
+| `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-launcher` wrapper)                                      |
+| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)                                           |
+| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)                                           |
+| `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)                                          |
+| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)                                         |
+| `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-inventory` wrapper)                                     |
+| `ai/agent-iter.sh`                                 | `home-manager/modules/ai-agents/services.nix` (iterative agent loop wrapper)                                             |
+| `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/config/models/opencode.nix` (prompt docs), called at runtime by `opencode-android-re.sh` |
+| `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                                                         |
+| `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                                                          |
+| `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                                                            |
+| `apps/browser-select.sh`                           | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (`browser-select` wrapper)                                   |
+| `apps/element-desktop-keyring.sh`                  | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                          |
+| `apps/playwright-cli-mcp-wrapper.sh`               | `home-manager/modules/programming-languages/javascript/default.nix` (MCP server)                                         |
+| `apps/xdg-open-wrapper.sh`                         | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                          |
+| `apps/youtube-mpv.sh`                              | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                          |
+| `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)                                                      |

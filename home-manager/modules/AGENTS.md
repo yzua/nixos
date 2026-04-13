@@ -247,6 +247,7 @@ More detailed module-level guidance exists at:
 - `niri/AGENTS.md` — Compositor keybindings, workspaces, window rules
 - `noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming
 - `apps/AGENTS.md` — Application configs, subdirectory modules (VS Code, Brave)
+- `programming-languages/AGENTS.md` — Language toolchains (Go, JS/TS, Python, Mise)
 
 Read these when working in those areas.
 

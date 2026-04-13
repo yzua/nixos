@@ -100,7 +100,7 @@ Upstream-verified facts:
 
 ## Everything Claude Code (addon)
 
-Installed by `programs.aiAgents.everythingClaudeCode.enable` (default: `true`) via activation scripts from `affaan-m/everything-claude-code`. Provides skills, commands, and agents prefixed `ecc-` for Claude Code, Codex, and OpenCode.
+Installed by `programs.aiAgents.everythingClaudeCode.enable` (default: `false`) via activation scripts from `affaan-m/everything-claude-code`. Provides skills, commands, and agents prefixed `ecc-` for Claude Code, Codex, and OpenCode.
 
 Installs into:
 
@@ -285,6 +285,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                 |
 | `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix     |
 | `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries              |
+| `iter`                         | `iter [count] <agent> [prompt...]`                                 | Headless Ralph-style reruns; no count means unlimited until failure       |
 | `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                       |
 | `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                              |
 | `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)          |
@@ -303,8 +304,27 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 ### Aliases vs Functions
 
 - **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `occm`, `ocbp`, `oc-port`, `ai-mcp-scan`, etc.) are defined in `home-manager/modules/ai-agents/services.nix` and `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
-- **Packages** (`agents-search`) are `writeShellScriptBin` wrappers added to `home.packages` in `home-manager/modules/ai-agents/services.nix`.
+- **Packages** (`agents-search`, `iter`) are `writeShellScriptBin` wrappers added to `home.packages` in `home-manager/modules/ai-agents/services.nix`.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
+
+### Repeated Agent Runs (`iter`)
+
+Use `iter` when you want to immediately rerun the same launcher after each completion:
+
+```bash
+iter clglmmd        # loop forever until a run fails or you stop it
+iter 3 ocgem        # run exactly 3 times
+iter 5 cx "audit again for anything missed"
+```
+
+Behavior:
+
+- Positive integer first argument = exact iteration count.
+- No count = unlimited reruns.
+- Stops immediately on the first non-zero exit and returns that exit code.
+- Runs each supported agent in its **non-interactive/headless** mode (`claude --print`, `opencode run`, `codex exec`, `gemini --prompt`) so the loop can actually advance.
+- Use an explicit prompt (`iter 3 clglm "review again"`) or a workflow alias that already implies one (`iter clglmmd`, `iter occm`).
+- Promptless interactive aliases like `iter clglm` are rejected intentionally, because an interactive TUI would block the loop.
 
 ### Interactive Selector (`ais`)
 
@@ -432,7 +452,7 @@ ai-agents/
 | Cleanup           | 14 days          | Auto-delete old sessions                             |
 | Attribution       | Disabled         | No auto-attribution in commits/PRs                   |
 
-Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `cargo`, `docker`, etc. Deny: `rm -rf /`, `rm -rf ~`, disk operations (`dd`, `mkfs`), `.env` files, `./secrets/`, SSH keys.
+Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `nh`, `home-manager`, `cargo`, `docker`, `make`, `go`, `python`, etc. Deny (execution): `rm -rf /`, `rm -rf ~`, `dd`, `mkfs`, `shutdown`, `reboot`, `poweroff`, `git push --force`, `git reset --hard`. Deny (file read): `.env`, `.env.*`, `./secrets/**`, `.ssh/*`, SSH private keys.
 
 ### OpenCode
 

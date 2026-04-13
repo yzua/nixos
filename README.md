@@ -127,9 +127,11 @@ Set `hostProfile` first, then override as needed:
 
 Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
 
-On by default (toggleable): AIDE file integrity, fail2ban, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot.
+On by default (toggleable): AIDE file integrity, fail2ban, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid.
 
-Off by default (toggleable): Yggdrasil, I2P, backup (requires sops secret), VNC.
+Profile-dependent defaults: gaming/gamemode/gamescope (on for `desktop`), bluetooth (on for `laptop`).
+
+Off by default (toggleable): Yggdrasil, I2P, web RE/security tools, backup (requires sops secret), VNC.
 
 ---
 
