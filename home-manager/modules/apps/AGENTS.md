@@ -1,25 +1,26 @@
 # Application Configurations
 
-11 root app config files + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
+11 root app config files + 1 helper + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
 
 ## App Map
 
-| File                    | App                        | Config Pattern                                     |
-| ----------------------- | -------------------------- | -------------------------------------------------- |
-| `activitywatch.nix`     | ActivityWatch              | `services.activitywatch` (Wayland watcher setup)   |
-| `chromium.nix`          | Chromium                   | Launch wrapper with Wayland crash workaround       |
-| `desktop-entries.nix`   | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries`                 |
-| `keepassxc.nix`         | KeePassXC                  | Desktop entry                                      |
-| `nautilus.nix`          | GNOME Files                | `dconf.settings` (preferences)                     |
-| `nixcord.nix`           | Discord (Vesktop)          | `programs.nixcord` (Vencord declarative plugins)   |
-| `obs.nix`               | OBS Studio                 | `programs.obs-studio` + CUDA + plugins             |
-| `obsidian.nix`          | Obsidian                   | Desktop entry + default vault registration         |
-| `opensnitch-ui.nix`     | OpenSnitch                 | `services.opensnitch-ui` enablement                |
-| `syncthing.nix`         | Syncthing                  | `services.syncthing` (local file sync)             |
-| `metadata-scrubber.nix` | Metadata scrubber          | inotifywait watcher + weekly full scrub via `mat2` |
+| File                              | App                        | Config Pattern                                     |
+| --------------------------------- | -------------------------- | -------------------------------------------------- |
+| `activitywatch.nix`               | ActivityWatch              | `services.activitywatch` (Wayland watcher setup)   |
+| `chromium.nix`                    | Chromium                   | Launch wrapper with Wayland crash workaround       |
+| `desktop-entries.nix`             | Desktop launchers/wrappers | `home.file` + `xdg.desktopEntries`                 |
+| `keepassxc.nix`                   | KeePassXC                  | Desktop entry                                      |
+| `nautilus.nix`                    | GNOME Files                | `dconf.settings` (preferences)                     |
+| `nixcord.nix`                     | Discord (Vesktop)          | `programs.nixcord` (Vencord declarative plugins)   |
+| `obs.nix`                         | OBS Studio                 | `programs.obs-studio` + CUDA + plugins             |
+| `obsidian.nix`                    | Obsidian                   | Desktop entry + default vault registration         |
+| `opensnitch-ui.nix`               | OpenSnitch                 | `services.opensnitch-ui` enablement                |
+| `syncthing.nix`                   | Syncthing                  | `services.syncthing` (local file sync)             |
+| `metadata-scrubber.nix`           | Metadata scrubber          | inotifywait watcher + weekly full scrub via `mat2` |
+| `_desktop-local-bin-wrappers.nix` | Desktop bin wrappers       | Helper, imported manually (not in import hub)      |
 
 ## Subdirectory Modules
 

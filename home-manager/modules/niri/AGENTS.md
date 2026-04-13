@@ -1,23 +1,24 @@
 # Niri Compositor Configuration
 
-Scrollable tiling Wayland compositor. 7 local modules plus 3 helper scripts (and 2 imported flake modules).
+Scrollable tiling Wayland compositor. 7 local modules plus 1 shared helper (`_workspace-names.nix`) and 3 helper scripts (and 2 imported flake modules).
 Configures `programs.niri.settings` — all settings live under that namespace.
 
 ---
 
 ## Module Map
 
-| File          | Configures                            | Key Details                                                                                    |
-| ------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `default.nix` | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 7 local modules |
-| `main.nix`    | Workspaces, autostart, environment    | 6 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC                                  |
-| `binds.nix`   | Keybindings                           | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/`                        |
-| `input.nix`   | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp`                               |
-| `layout.nix`  | Gaps, columns, borders                | 3px gaps, 3 preset widths (1/3, 1/2, 2/3), focus-ring disabled (Stylix border instead)         |
-| `rules.nix`   | Window rules                          | Square corners (`0px`), floating rules, opacity, workspace assignments by `app-id`             |
-| `idle.nix`    | Idle/DPMS                             | swayidle integration, screen lock timeout                                                      |
-| `lock.nix`    | Screen locker                         | swaylock fallback configuration                                                                |
-| `scripts/`    | Helper scripts                        | `color-picker.nix`, `screenshot.nix`, `open-books.nix` — each returns a derivation             |
+| File                   | Configures                            | Key Details                                                                                    |
+| ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `default.nix`          | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 7 local modules |
+| `main.nix`             | Workspaces, autostart, environment    | 6 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC                                  |
+| `binds.nix`            | Keybindings                           | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/`                        |
+| `input.nix`            | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp`                               |
+| `layout.nix`           | Gaps, columns, borders                | 3px gaps, 3 preset widths (1/3, 1/2, 2/3), focus-ring disabled (Stylix border instead)         |
+| `rules.nix`            | Window rules                          | Square corners (`0px`), floating rules, opacity, workspace assignments by `app-id`             |
+| `idle.nix`             | Idle/DPMS                             | swayidle integration, screen lock timeout                                                      |
+| `lock.nix`             | Screen locker                         | swaylock fallback configuration                                                                |
+| `_workspace-names.nix` | Workspace display names               | Helper, imported by `main.nix`, `binds.nix`, `rules.nix` (not in import hub)                   |
+| `scripts/`             | Helper scripts                        | `color-picker.nix`, `screenshot.nix`, `open-books.nix` — each returns a derivation             |
 
 ---
 

@@ -22,16 +22,18 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 ## Your Workspaces
 
-Six named workspaces are preconfigured:
+Six named workspaces are preconfigured, five reachable by key:
 
-| #   | Workspace | Apps                                | Access    |
-| --- | --------- | ----------------------------------- | --------- |
-| 1   | 󰖟 browser | LibreWolf (auto-start)              | `Super+1` |
-| 2   | 󰨞 editor  | VSCode, Ghostty (auto-start)        | `Super+2` |
-| 3   | 󰍡 social  | Vesktop, Telegram (auto-start)      | `Super+3` |
-| 4   | 󰎆 media   | Music/Video players (rules)         | `Super+4` |
-| 5   | 󰦝 vpn     | Mullvad VPN, KeePassXC (auto-start) | `Super+5` |
-| 6   | 󰀲 android | Android tools (rules only)          | `Super+6` |
+| #   | Workspace   | Apps                           | Access    |
+| --- | ----------- | ------------------------------ | --------- |
+| 1   | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1` |
+| 2   | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2` |
+| 3   | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3` |
+| 4   | 󰎆 media     | Music/Video players (rules)    | `Super+4` |
+| 5   | _(unnamed)_ | General purpose                | `Super+5` |
+| 6   | 󰀲 android   | Android tools (rules only)     | `Super+6` |
+
+The 󰦝 **vpn** workspace exists but is only reachable via window rules — Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open there. There is no keybinding to focus or move windows to it directly.
 
 Workspaces 7–9 are available as unnamed extras (`Super+7` through `Super+9`).
 
@@ -148,7 +150,9 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+2`         | Go to 󰨞 editor workspace                      |
 | `Super+3`         | Go to 󰍡 social workspace                      |
 | `Super+4`         | Go to 󰎆 media workspace                       |
-| `Super+5–9`       | Go to workspace 5–9                           |
+| `Super+5`         | Go to unnamed workspace 5                     |
+| `Super+6`         | Go to 󰀲 android workspace                     |
+| `Super+7–9`       | Go to unnamed workspaces 7–9                  |
 | `Super+Page_Up`   | Go to workspace above                         |
 | `Super+Page_Down` | Go to workspace below                         |
 | `Super+U`         | Go to previous workspace (back-and-forth)     |
@@ -156,15 +160,17 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 
 ### Moving Windows Between Workspaces
 
-| Key                     | What It Does                       |
-| ----------------------- | ---------------------------------- |
-| `Super+Shift+1`         | Move column to 󰖟 browser workspace |
-| `Super+Shift+2`         | Move column to 󰨞 editor workspace  |
-| `Super+Shift+3`         | Move column to 󰍡 social workspace  |
-| `Super+Shift+4`         | Move column to 󰎆 media workspace   |
-| `Super+Shift+5–9`       | Move column to workspace 5–9       |
-| `Super+Shift+Page_Up`   | Move column to workspace above     |
-| `Super+Shift+Page_Down` | Move column to workspace below     |
+| Key                     | What It Does                          |
+| ----------------------- | ------------------------------------- |
+| `Super+Shift+1`         | Move column to 󰖟 browser workspace    |
+| `Super+Shift+2`         | Move column to 󰨞 editor workspace     |
+| `Super+Shift+3`         | Move column to 󰍡 social workspace     |
+| `Super+Shift+4`         | Move column to 󰎆 media workspace      |
+| `Super+Shift+5`         | Move column to unnamed workspace 5    |
+| `Super+Shift+6`         | Move column to 󰀲 android workspace    |
+| `Super+Shift+7–9`       | Move column to unnamed workspaces 7–9 |
+| `Super+Shift+Page_Up`   | Move column to workspace above        |
+| `Super+Shift+Page_Down` | Move column to workspace below        |
 
 ### Reordering Workspaces
 
@@ -485,7 +491,7 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 
 2. **Tab-cycle is fast.** `Super+Tab` / `Super+Shift+Tab` to cycle columns is faster than arrow keys for quick switches.
 
-3. **Scratchpad terminal is your best friend.** `Super+T` drops a floating terminal from the top. Great for quick commands without leaving your workflow. Press `Super+T` again to dismiss (or `Super+Q` to close).
+3. **Scratchpad terminal is your best friend.** `Super+T` opens a floating terminal from the top. Great for quick commands without leaving your workflow. Close it with `Super+Q` when done. Note: pressing `Super+T` again opens a second scratchpad instance — it does not toggle the existing one.
 
 4. **Column width presets save time.** `Super+R` cycles between 1/3, 1/2, and 2/3 width. Way faster than dragging or using `Super+Ctrl+Left/Right` for fine adjustments.
 
@@ -566,15 +572,18 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 
 ### Workspaces
 
-| Key                        | Action                               |
-| -------------------------- | ------------------------------------ |
-| `Super+1–9`                | Focus workspace 1–9                  |
-| `Super+Shift+1–9`          | Move column to workspace 1–9         |
-| `Super+Page_Up/Down`       | Focus workspace above/below          |
-| `Super+Shift+Page_Up/Down` | Move column to workspace above/below |
-| `Super+Ctrl+Page_Up/Down`  | Move workspace up/down               |
-| `Super+U`                  | Previous workspace (back-and-forth)  |
-| `Super+Grave`              | Toggle overview                      |
+| Key                        | Action                                 |
+| -------------------------- | -------------------------------------- |
+| `Super+1–4`                | Focus named workspaces (browser–media) |
+| `Super+5`                  | Focus unnamed workspace 5              |
+| `Super+6`                  | Focus 󰀲 android workspace              |
+| `Super+7–9`                | Focus unnamed workspaces 7–9           |
+| `Super+Shift+1–9`          | Move column to workspace 1–9           |
+| `Super+Page_Up/Down`       | Focus workspace above/below            |
+| `Super+Shift+Page_Up/Down` | Move column to workspace above/below   |
+| `Super+Ctrl+Page_Up/Down`  | Move workspace up/down                 |
+| `Super+U`                  | Previous workspace (back-and-forth)    |
+| `Super+Grave`              | Toggle overview                        |
 
 ### Multi-Monitor
 

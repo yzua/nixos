@@ -7,14 +7,16 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 
 ## Structure
 
-| Directory/File       | Purpose                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------ |
-| `default.nix`        | Import hub for language modules                                                            |
-| `_alias-helpers.nix` | Shared helper for zsh/bash alias wiring                                                    |
-| `python/`            | Python toolchain, uv/poetry aliases, env/session vars, managed `.pythonrc`, workspace dirs |
-| `javascript/`        | Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper, global package bootstrap       |
-| `go/`                | Go runtime, aliases, GOPATH/GOBIN/session settings, Go tooling packages                    |
-| `mise/`              | Runtime manager configuration and shim path                                                |
+| Directory/File               | Purpose                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------ |
+| `default.nix`                | Import hub for language modules                                                            |
+| `_alias-helpers.nix`         | Shared helper for zsh/bash alias wiring                                                    |
+| `python/`                    | Python toolchain, uv/poetry aliases, env/session vars, managed `.pythonrc`, workspace dirs |
+| `python/_gitignores.nix`     | Python-specific `.gitignore` patterns (helper, imported by `default.nix`)                  |
+| `javascript/`                | Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper, global package bootstrap       |
+| `javascript/_gitignores.nix` | JS/TS-specific `.gitignore` patterns (helper, imported by `default.nix`)                   |
+| `go/`                        | Go runtime, aliases, GOPATH/GOBIN/session settings, Go tooling packages                    |
+| `mise/`                      | Runtime manager configuration and shim path                                                |
 
 ---
 

@@ -18,7 +18,7 @@ nix flake init -t "/home/yz/System/dev-shells#rust-stable"
 
 ## Included tools
 
-- `cargo`, `rustc`, `clippy`, `rustfmt`, `pkg-config`
+- `cargo`, `rustc`, `clippy`, `rustfmt`, `pkg-config`, `rustLibSrc` (stable toolchain)
 - `cargo-audit` (when Cargo.lock exists)
 
 ## Reference
