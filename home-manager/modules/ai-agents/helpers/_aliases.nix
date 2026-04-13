@@ -12,6 +12,8 @@ let
   commitSplitPrompt = workflowPrompts.commitSplit;
   refactorMaintainabilityPrompt = workflowPrompts.refactorMaintainability;
   securityAuditPrompt = workflowPrompts.securityAudit;
+  bugfixRootCausePrompt = workflowPrompts.bugfixRootCause;
+  dependencyUpgradePrompt = workflowPrompts.dependencyUpgrade;
   buildPerformancePrompt = workflowPrompts.buildPerformance;
   markdownSyncPrompt = workflowPrompts.markdownSync;
 
@@ -153,8 +155,16 @@ let
       prompt = refactorMaintainabilityPrompt;
     }
     {
+      suffix = "fx";
+      prompt = bugfixRootCausePrompt;
+    }
+    {
       suffix = "sa";
       prompt = securityAuditPrompt;
+    }
+    {
+      suffix = "du";
+      prompt = dependencyUpgradePrompt;
     }
     {
       suffix = "bp";
@@ -175,9 +185,9 @@ let
         alias = "${agent.alias}${workflow.suffix}";
         command =
           if agent.workflowPromptMode == "flag" then
-            "${agent.command} --prompt '${workflow.prompt}'"
+            "${agent.command} --prompt ${lib.escapeShellArg workflow.prompt}"
           else
-            "${agent.command} '${workflow.prompt}'";
+            "${agent.command} ${lib.escapeShellArg workflow.prompt}";
       }) workflowAgentSpecs
     ) workflowPromptSpecs
   );
@@ -196,14 +206,16 @@ let
   aiAgentLauncher = pkgs.writeShellScriptBin "ai-agent-launcher" ''
     COMMIT_SPLIT_PROMPT=${lib.escapeShellArg commitSplitPrompt} \
       REFACTOR_MAINTAINABILITY_PROMPT=${lib.escapeShellArg refactorMaintainabilityPrompt} \
+      BUGFIX_ROOT_CAUSE_PROMPT=${lib.escapeShellArg bugfixRootCausePrompt} \
       SECURITY_AUDIT_PROMPT=${lib.escapeShellArg securityAuditPrompt} \
+      DEPENDENCY_UPGRADE_PROMPT=${lib.escapeShellArg dependencyUpgradePrompt} \
       BUILD_PERFORMANCE_PROMPT=${lib.escapeShellArg buildPerformancePrompt} \
       MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg markdownSyncPrompt} \
       exec ${config.home.homeDirectory}/System/scripts/ai/agent-launcher.sh "$@"
   '';
 in
 {
-  inherit aiAliases aiAgentLauncher;
+  inherit aiAliases aiAgentLauncher workflowPrompts;
   aiAgentInventory = pkgs.writeShellScriptBin "ai-agent-inventory" ''
     exec ${config.home.homeDirectory}/System/scripts/ai/agent-inventory.sh "$@"
   '';
