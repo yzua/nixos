@@ -1,4 +1,6 @@
 # TLP power management for laptop.
+# Also handles power-profiles-daemon disable (conflicts with TLP)
+# and ThinkPad-specific kernel modules.
 
 { config, lib, ... }:
 
@@ -29,7 +31,17 @@ in
   };
 
   config = {
+    powerManagement.enable = true;
+
+    boot.kernelModules = [
+      "acpi_call"
+      "thinkpad_acpi"
+      "tp_smapi"
+    ];
+
     services = {
+      power-profiles-daemon.enable = false; # Conflicts with TLP
+
       tlp = {
         enable = true;
 
