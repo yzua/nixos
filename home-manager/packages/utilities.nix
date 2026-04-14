@@ -19,17 +19,9 @@
     # Audio control (easyeffects managed by services.easyeffects)
     pwvucontrol
 
-    # Development utilities
-    tree
-    xxd
-
     # Device management
     udisks
     udiskie
-
-    # Media optimization
-    jpegoptim
-    optipng
 
     # System tools
     desktop-file-utils

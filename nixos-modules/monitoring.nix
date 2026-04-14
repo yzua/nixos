@@ -17,6 +17,7 @@
       iotop
       sysstat
       lm_sensors
+      smartmontools # SMART disk health (used by Netdata, Scrutiny)
     ];
 
     services.vnstat.enable = true;

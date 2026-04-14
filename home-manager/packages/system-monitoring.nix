@@ -5,6 +5,8 @@
 {
   home.packages = with pkgs; [
     # Benchmarking
+    flamegraph
+    hyperfine
     stress-ng
     sysbench
 

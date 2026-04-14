@@ -7,6 +7,7 @@
     (bottles.override { removeWarningPopup = true; })
     code-cursor-fhs
     element-desktop
+    google-chrome
     imv
     kiro-fhs
     localsend

@@ -31,13 +31,17 @@
     nethogs
     nload
     termshark # TUI Wireshark (pcap analysis in terminal)
+    wireshark-cli # Wireshark CLI capture and analysis
 
     # Network scanning
     masscan
+    nmap
+    tcpdump
     zmap
 
     # Security testing
     hydra
+    mitmproxy # HTTP/HTTPS proxy for traffic analysis
 
     # VPN tools
     openvpn

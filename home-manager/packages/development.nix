@@ -63,6 +63,7 @@ let
     valgrind
 
     # Container tools
+    dive # Container image layer analysis
     skopeo # Container image inspection and copy (no daemon needed)
 
     # Databases (postgresql provides psql client + libs for local dev)

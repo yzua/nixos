@@ -1,4 +1,4 @@
-# CLI tools for file management, text processing, and development.
+# CLI tools for file management, text processing, and general use.
 # NOTE: fzf and carapace are managed by programs.* modules.
 # NOTE: restic managed by services.restic
 
@@ -15,11 +15,12 @@
       # Backup (restic managed by services.restic)
       borgbackup
 
-      # Container analysis
-      dive
-
       # Data formats
       fx
+
+      # Development utilities
+      tree
+      xxd
 
       # Documentation
       glow
@@ -50,17 +51,9 @@
       imagemagick
       yt-dlp
 
-      # Network analysis
-      mitmproxy
-      wireshark-cli
-
       # Nix tooling
       nix-diff # Derivation-level diff between NixOS generations
       nvd
-
-      # Performance and benchmarking
-      flamegraph
-      hyperfine
 
       # Shell UI
       gum
@@ -75,6 +68,9 @@
       # Terminal effects
       cmatrix
       peaclock
+
+      # Terminal multiplexer
+      tmux
 
       # Terminal theming
       vivid
@@ -91,12 +87,6 @@
 
       # Shell tools
       navi # Interactive cheatsheet browser with fzf
-
-      # Browser
-      google-chrome
-
-      # Terminal multiplexer
-      tmux
 
       # Version control (gh managed by programs.gh in terminal/tools/gh.nix)
       git-absorb

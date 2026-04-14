@@ -14,10 +14,6 @@ in
 {
   home.packages =
     (with pkgsStable; [
-      # Network analysis
-      nmap
-      tcpdump
-
       # Network anonymity (i2pd managed by services.i2pd)
       tribler
 
