@@ -2,6 +2,7 @@
 
 let
   formatterRegistry = import ../../helpers/_formatters.nix;
+  destructiveRules = import ../../helpers/_destructive-rules.nix;
 
   mkFormatterHook =
     {
@@ -89,14 +90,13 @@ let
 in
 {
   # --- PreToolUse Hooks ---
-  # NOTE: The destructive command patterns here should be kept in sync with
-  # helpers/_destructive-rules.nix. The regex format is specialized (handles
-  # sudo prefixes and embedded commands) so it can't be auto-generated, but
-  # the canonical command list lives in the shared source.
+  # Destructive command patterns are derived from helpers/_destructive-rules.nix
+  # via mkHookRegex. Only the sudo-prefix wrapper and word-boundary anchors
+  # are hook-specific; the canonical command list is the single source of truth.
   PreToolUse = [
     (mkBashHook {
       body = ''
-        if echo "$COMMAND" | grep -Eq '(^|[[:space:]])(sudo[[:space:]]+)?(rm[[:space:]]+-rf[[:space:]]+/( |$)|rm[[:space:]]+-rf[[:space:]]+~|rm[[:space:]]+-rf[[:space:]]+/\*|mkfs|dd[[:space:]]+if=|shutdown|reboot|poweroff)'; then
+        if echo "$COMMAND" | grep -Eq '(^|[[:space:]])(sudo[[:space:]]+)?(${destructiveRules.mkHookRegex destructiveRules.systemCommands})'; then
           echo "[Hook] BLOCKED: system-destructive command detected" >&2
           echo "[Hook] Run it manually outside Claude if you truly intend it." >&2
           exit 2
@@ -151,7 +151,7 @@ in
     })
     (mkBashHook {
       body = ''
-        if echo "$COMMAND" | grep -Eq '(git push --force|git push -f|git reset --hard|git clean -fd)'; then
+        if echo "$COMMAND" | grep -Eq '(${destructiveRules.mkHookRegex destructiveRules.gitCommands})'; then
           echo "[Hook] BLOCKED: destructive git command requires explicit manual execution" >&2
           echo "[Hook] Use safer alternatives (regular push, targeted restore, or new commit)." >&2
           exit 2

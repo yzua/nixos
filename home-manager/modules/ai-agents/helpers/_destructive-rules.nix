@@ -23,6 +23,23 @@ let
     "git clean -fd"
     "git clean -fdx"
   ];
+
+  # Map a canonical command to its hook-specific grep -E regex pattern.
+  # rm variants need [[:space:]]+ for variable spacing and path-aware matching.
+  # dd requires if= argument to avoid false positives on bare dd.
+  # Simple commands and git commands match literally.
+  toHookPattern =
+    cmd:
+    if cmd == "rm -rf /" then
+      "rm[[:space:]]+-rf[[:space:]]+/( |$)"
+    else if cmd == "rm -rf ~" then
+      "rm[[:space:]]+-rf[[:space:]]+~"
+    else if cmd == "rm -rf /*" then
+      "rm[[:space:]]+-rf[[:space:]]+/\\*"
+    else if cmd == "dd" then
+      "dd[[:space:]]+if="
+    else
+      cmd;
 in
 {
   inherit systemCommands gitCommands;
@@ -41,4 +58,8 @@ in
         decision = "deny"
         priority = 900'') commands
     );
+
+  # Generate a grep -E regex alternation for PreToolUse hook matching.
+  # Each canonical command is mapped to its hook-specific regex form.
+  mkHookRegex = commands: builtins.concatStringsSep "|" (map toHookPattern commands);
 }
