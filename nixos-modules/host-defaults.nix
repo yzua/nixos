@@ -54,7 +54,9 @@ in
       metadataScrubber.enable = mkDefaultTrue; # Auto-strip metadata from user files
       monitoring.enable = mkDefaultTrue; # System monitoring tools (iotop, sysstat, sensors, vnStat)
       aide.enable = mkDefaultTrue; # Weekly AIDE file integrity monitoring
+      lynis.enable = mkDefaultTrue; # Weekly Lynis security audit
       secureBoot.enable = mkDefaultTrue; # Secure Boot preparation with sbctl
+      hostInfo.enable = mkDefaultTrue; # Hostname and state version from flake args
       vnc.enable = mkDefaultFalse; # On-demand remote access
 
       # Profile-dependent defaults
