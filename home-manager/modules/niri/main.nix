@@ -8,7 +8,7 @@
 }:
 
 let
-  workspaceName = import ./_workspace-names.nix;
+  ws = import ./_workspace-names.nix;
   mkSpring =
     {
       dampingRatio,
@@ -33,22 +33,22 @@ in
 
     workspaces = {
       "01-browser" = {
-        name = workspaceName.browser; # nf-md-web
+        name = ws.browser; # nf-md-web
       };
       "02-code" = {
-        name = workspaceName.editor; # nf-md-code-braces
+        name = ws.editor; # nf-md-code-braces
       };
       "03-social" = {
-        name = workspaceName.social; # nf-md-chat
+        name = ws.social; # nf-md-chat
       };
       "04-media" = {
-        name = workspaceName.media; # nf-md-music
+        name = ws.media; # nf-md-music
       };
       "05-vpn" = {
-        name = workspaceName.vpn; # nf-md-shield-lock
+        name = ws.vpn; # nf-md-shield-lock
       };
       "06-android" = {
-        name = workspaceName.android; # nf-md-android
+        name = ws.android; # nf-md-android
       };
     };
 
