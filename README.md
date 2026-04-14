@@ -125,9 +125,9 @@ Set `hostProfile` first, then override as needed:
 
 ## Security
 
-Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening, Lynis weekly audit.
+Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening.
 
-On by default (toggleable): AIDE file integrity, fail2ban, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid.
+On by default (toggleable): AIDE file integrity, fail2ban, Lynis weekly audit, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid.
 
 Profile-dependent defaults: gaming/gamemode/gamescope (on for `desktop`), bluetooth (on for `laptop`).
 
@@ -209,7 +209,7 @@ All local, no cloud. Toggle via `mySystem.*`:
 flake.nix                     # Entry point
 shared/constants.nix          # User identity, terminal, editor, fonts
 hosts/<hostname>/             # Per-host config + hardware modules
-nixos-modules/                # Shared system modules (50+)
+nixos-modules/                # Shared system modules (56 imports in hub)
 home-manager/                 # User-level modules + packages
 scripts/                      # Utility scripts
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)

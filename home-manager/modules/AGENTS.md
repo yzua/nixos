@@ -18,7 +18,6 @@ modules/
 │   ├── helpers/        # Shared logic (not modules, imported by others)
 │   │   ├── _settings-builders.nix # Per-agent settings + profile variant overrides
 │   │   ├── _mcp-transforms.nix    # Unified MCP abstraction (shared → agent-specific)
-│   │   ├── _option-helpers.nix    # Shared option constructors
 │   │   ├── _opencode-profiles.nix # OpenCode profile names and config paths
 │   │   ├── _aliases.nix           # Zsh alias generation for agent launchers/workflows
 │   │   ├── _destructive-rules.nix # Destructive action allow/deny rules per agent
@@ -30,13 +29,20 @@ modules/
 │   │   ├── _android-re-launchers.nix    # Android RE emulator/script launchers
 │   │   ├── _mk-cli-autoupdate-script.nix # CLI autoupdate script builder
 │   │   ├── _services-shell-aliases.nix  # Shell alias definitions for agent services
-│   │   └── _services-systemd.nix        # Systemd user service/timer definitions
+│   │   ├── _services-systemd.nix        # Systemd user service/timer definitions
+│   │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
+│   │   └── _impeccable-commands.nix # Impeccable slash command definitions
 │   ├── activation/     # Home Manager activation scripts
 │   │   ├── default.nix      # Aggregation hub
 │   │   ├── secrets.nix      # Secret patching (placeholder → real key injection)
 │   │   ├── claude-setup.nix # Claude Code config file writes
 │   │   ├── codex-setup.nix  # Codex CLI config file writes
-│   │   ├── plugins.nix      # Plugin install scripts (impeccable, agency-agents)
+│   │   ├── plugins.nix      # Plugin aggregation (impeccable, agency-agents, ECC)
+│   │   ├── _plugin-impeccable.nix # Impeccable skill install
+│   │   ├── _plugin-agency-agents.nix # Agency agents install
+│   │   ├── _plugin-everything-claude-code.nix # ECC skill install
+│   │   ├── _cleanup-agency-agents.nix # Agency agents cleanup on disable
+│   │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   │   └── skills.nix       # Skill installations and omissions
 │   ├── android-re/     # Android RE workflow prompts and config
 │   │   └── _prompt.nix # Prompt templates (not a module, imported by services)
@@ -45,17 +51,21 @@ modules/
 │       ├── defaults.nix     # Default values for agent options
 │       ├── global-instructions.md # Global instructions text (not a module)
 │       ├── _skills.nix      # Skill installations and omissions (not a module)
-│       ├── _formatters.nix  # Formatter registry for auto-formatting hooks (not a module)
 │       ├── mcp-servers.nix  # MCP server definitions + logging
 │       ├── claude/          # Claude Code configuration
 │       │   ├── default.nix  # Permissions, hooks, settings (import hub)
-│       │   ├── _hooks.nix   # Claude Code lifecycle hooks (not a module)
+│       │   ├── _hooks.nix   # Lifecycle hooks aggregation (imports helpers + per-stage modules)
+│       │   ├── _hooks-helpers.nix # Shared hook constructors (mkFormatterHook, mkBashHook, etc.)
+│       │   ├── _hooks-pre-tool-use.nix  # Pre-tool-use safety hooks
+│       │   ├── _hooks-post-tool-use.nix # Post-tool-use auto-format hooks
+│       │   ├── _hooks-session.nix      # Session lifecycle hooks
 │       │   └── _permission-rules.nix # Claude allow/deny rules (not a module)
 │       └── models/          # Model/provider registries
 │           ├── default.nix  # Import hub + shared toggles (agencyAgents, impeccable)
 │           ├── codex.nix    # Codex CLI model config
 │           ├── gemini.nix   # Gemini CLI model config + mkModelAlias/mkThinkingAlias
-│           └── opencode.nix # OpenCode model config (owns all let bindings)
+│           ├── opencode.nix # OpenCode model config (owns all let bindings)
+│           └── _opencode-lsp.nix # OpenCode LSP tool configuration
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
 │   ├── chromium.nix    # Chromium launch wrapper with Wayland crash workaround
@@ -99,6 +109,7 @@ modules/
 │       └── screenshot.nix    # Screenshot annotator (grim + slurp + swappy)
 ├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD, GruvboxAlt colorscheme)
 │   ├── default.nix     # Import hub, status-notifier-watcher
+│   ├── activation.nix  # Activation script (wallpaper deployment, plugin compilation)
 │   ├── bar.nix         # Bar widgets (left, center, right panels)
 │   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)
 │   ├── colorschemes/   # Custom color schemes (GruvboxAlt)
@@ -150,6 +161,7 @@ modules/
 ├── ssh.nix             # SSH client hardening
 ├── mime.nix            # Default app associations
 ├── qt.nix              # Qt theming (Kvantum + Gruvbox)
+├── telemetry.nix       # Telemetry and tracking opt-out variables
 └── stylix.nix          # Theming engine (Gruvbox)
 ```
 

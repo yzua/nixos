@@ -9,10 +9,11 @@ Repository Bash scripts across `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `
 ```
 scripts/
 ├── ai/
+│   ├── _agent-registry.sh   # Shared agent registry: aliases, command mappings, workflow suffixes
 │   ├── agent-launcher.sh    # Interactive multi-provider AI agent launcher
+│   ├── agent-launcher-test.sh # Unit tests for agent-launcher.sh
 │   ├── agent-log-wrapper.sh # Agent command logging wrapper with error split
 │   ├── agent-analyze.sh     # Log analyzer CLI (stats/errors/sessions/search/tail/report)
-│   ├── agent-patterns.sh    # Error pattern detector across agent logs
 │   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
 │   ├── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
 │   ├── agents-search.sh     # Scan project trees for directories needing AGENTS.md
@@ -25,6 +26,12 @@ scripts/
 │       ├── re-static.sh     # Android static analysis workflow
 │       ├── opencode-android-re.sh # OpenCode Android RE workspace launcher
 │       ├── frida-spoof-build.js # Frida gadget spoof build script
+│       ├── frida-bypass-certificate-pinner.js # Frida: bypass OkHttp CertificatePinner
+│       ├── frida-hook-build-fields.js # Frida: log android.os.Build fields
+│       ├── frida-hook-file-exists.js # Frida: log File.exists root/emulator checks
+│       ├── frida-hook-shared-prefs.js # Frida: log SharedPreferences reads/writes
+│       ├── frida-hook-url-log.js # Frida: log URL creation and OkHttp requests
+│       ├── frida-hooks-test.sh # Unit tests for Frida hook scripts
 │       ├── _helpers.sh      # Shared Android RE helper functions
 │       └── _spoof-table.sh  # Device fingerprint spoof table
 ├── apps/
@@ -45,6 +52,7 @@ scripts/
 ├── lib/
 │   ├── logging.sh           # Shared logging library (colored output, timestamps)
 │   ├── log-dirs.sh          # Log directory path resolution
+│   ├── error-patterns.sh    # Shared error keyword pattern for AI agent log analysis
 │   ├── test-helpers.sh      # Shared test utilities (assertions, mocking)
 │   └── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
 ├── sops/
@@ -127,7 +135,6 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-launcher` wrapper)                                      |
 | `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)                                           |
 | `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-analyze` wrapper)                                           |
-| `ai/agent-patterns.sh`                             | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-patterns` wrapper)                                          |
 | `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/log-analyzer.nix` (`ai-agent-dashboard` wrapper)                                         |
 | `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-inventory` wrapper)                                     |
 | `ai/agent-iter.sh`                                 | `home-manager/modules/ai-agents/services.nix` (iterative agent loop wrapper)                                             |

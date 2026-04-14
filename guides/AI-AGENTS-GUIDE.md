@@ -110,7 +110,7 @@ Installs into:
 
 Activation is gated by each agent's enable flag — disabled agents skip ECC install. Cleanup on disable removes all `ecc-` prefixed files and the skill directory.
 
-Source: `home-manager/modules/ai-agents/activation/plugins.nix` (lines 140-225).
+Source: `home-manager/modules/ai-agents/activation/plugins.nix`.
 
 ---
 
@@ -385,7 +385,6 @@ ai-agents/
 ├── helpers/                 # Non-module helpers for builders, aliases, templates, transforms
 │   ├── _mcp-transforms.nix    # MCP server transform helpers
 │   ├── _settings-builders.nix # Per-agent settings builders
-│   ├── _option-helpers.nix    # Shared option constructors
 │   ├── _opencode-profiles.nix # OpenCode profile names and config paths
 │   ├── _aliases.nix           # Shared alias generation
 │   ├── _destructive-rules.nix # Destructive action allow/deny rules per agent
@@ -397,13 +396,20 @@ ai-agents/
 │   ├── _services-systemd.nix  # Systemd service/timer definitions
 │   ├── _services-shell-aliases.nix # Shell alias generation
 │   ├── _mk-cli-autoupdate-script.nix # Auto-update script builder
-│   └── _android-re-launchers.nix # Android RE agent launcher helpers
+│   ├── _android-re-launchers.nix # Android RE agent launcher helpers
+│   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
+│   └── _impeccable-commands.nix # Impeccable slash command definitions
 ├── activation/              # Activation scripts (secret patching, Codex/Claude setup, plugin installs)
 │   ├── default.nix            # Aggregation hub
 │   ├── codex-setup.nix        # Codex config.toml + ~/.codex/agents generation
 │   ├── claude-setup.nix       # Claude settings generation
 │   ├── secrets.nix            # Secret patching helpers
-│   ├── plugins.nix            # Plugin install scripts (impeccable, agency-agents)
+│   ├── plugins.nix            # Plugin aggregation (impeccable, agency-agents, ECC)
+│   ├── _plugin-impeccable.nix # Impeccable skill install
+│   ├── _plugin-agency-agents.nix # Agency agents install
+│   ├── _plugin-everything-claude-code.nix # ECC skill install
+│   ├── _cleanup-agency-agents.nix # Agency agents cleanup on disable
+│   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   └── skills.nix             # Skill installations and omissions
 ├── android-re/              # Android RE workflow prompts and config
 │   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
@@ -416,17 +422,21 @@ ai-agents/
     ├── defaults.nix         # Default values for agent options
     ├── global-instructions.md # Global instructions text (not a module)
     ├── _skills.nix          # Skill installations and omissions (not a module)
-    ├── _formatters.nix      # Formatter registry for auto-formatting hooks (not a module)
     ├── mcp-servers.nix      # MCP server definitions + logging
     ├── claude/              # Claude Code configuration
     │   ├── default.nix        # Permissions, hooks, settings (import hub)
-    │   ├── _hooks.nix         # Claude Code lifecycle hooks (not a module)
+    │   ├── _hooks.nix         # Lifecycle hooks aggregation (imports helpers + per-stage modules)
+    │   ├── _hooks-helpers.nix # Shared hook constructors (mkFormatterHook, mkBashHook, etc.)
+    │   ├── _hooks-pre-tool-use.nix  # Pre-tool-use safety hooks
+    │   ├── _hooks-post-tool-use.nix # Post-tool-use auto-format hooks
+    │   ├── _hooks-session.nix      # Session lifecycle hooks
     │   └── _permission-rules.nix # Claude allow/deny rules (not a module)
     └── models/              # Model/provider registries
         ├── default.nix        # Import hub + shared toggles
         ├── codex.nix          # Codex CLI model config
         ├── gemini.nix         # Gemini CLI model config + mkModelAlias/mkThinkingAlias
-        └── opencode.nix       # OpenCode model config (owns all let bindings)
+        ├── opencode.nix       # OpenCode model config (owns all let bindings)
+        └── _opencode-lsp.nix  # OpenCode LSP tool configuration
 ```
 
 ### How It Works

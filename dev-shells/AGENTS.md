@@ -36,7 +36,7 @@ echo 'use flake' > .envrc && direnv allow
 
 ## Common Patterns
 
-All dev-shell flakes follow the same structure:
+Per-language template flakes follow the same structure:
 
 ```nix
 {

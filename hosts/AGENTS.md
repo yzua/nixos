@@ -42,7 +42,7 @@ hosts/<hostname>/
 
 - `boot.nix` — Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)
 - `nvidia.nix` — Optimus offload mode (`mySystem.nvidia.*` bus IDs from laptop module options), fine-grained power mgmt
-- `power.nix` — Disables power-profiles-daemon, loads laptop kernel modules (thinkpad_acpi, tp_smapi)
+- `tlp.nix` — Disables power-profiles-daemon, loads laptop kernel modules (thinkpad_acpi, tp_smapi), battery thresholds
 - `tlp.nix` — Battery thresholds (75-80%), CPU governor, WiFi power saving
 - `thermal.nix` — thermald for Intel DPTF thermal zone management
 
@@ -97,7 +97,6 @@ Every host `configuration.nix` follows the same structure:
   imports = [
     ./hardware-configuration.nix  # Auto-generated
     ./local-packages.nix          # Host packages
-    ../common-host-info.nix       # Enables hostInfo
     ../../nixos-modules           # Shared modules
     ./modules                     # Host-specific modules
   ];
@@ -109,6 +108,6 @@ Every host `configuration.nix` follows the same structure:
 }
 ```
 
-**Note**: `common-host-info.nix` sets `mySystem.hostInfo.enable = true` for all hosts, which configures hostname and stateVersion from flake arguments.
+**Note**: `hostInfo.enable` defaults to `true` via `host-defaults.nix`, configuring hostname and stateVersion from flake arguments.
 
 **Key rule**: Set `mySystem.hostProfile` and override only what differs from profile defaults.

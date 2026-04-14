@@ -15,7 +15,7 @@ The module system follows a strict layout:
 - **Feature Modules**: Single files like `gaming.nix` or `nvidia.nix` that manage specific subsystems.
 - **Sub-module Directories**: Paths like `security/` or `cleanup/` that have their own internal hubs.
 - **helpers/**: Systemd helpers (`_systemd-helpers.nix`). Not in the hub; import manually.
-- **shared/**: Cross-cutting helpers (`_option-helpers.nix` for typed option constructors). Import from `../shared/`.
+- **`../shared/`**: Cross-cutting helpers (`_option-helpers.nix` for typed option constructors). Lives at repo root, not inside this directory. Import via `../shared/`.
 
 ## WHERE TO LOOK
 

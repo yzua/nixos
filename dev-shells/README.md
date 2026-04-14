@@ -24,6 +24,6 @@ nix develop
 
 ## Validation checklist
 
-- `nix flake show ./dev-shells`
+- `nix flake show` (run from within `dev-shells/` directory — the repo root flake shadows it)
 - `nix flake check --no-build` (for each initialized template)
 - `nix develop -c '<tool> --version'` smoke tests per template
