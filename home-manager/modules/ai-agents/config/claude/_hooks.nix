@@ -1,7 +1,7 @@
 # Lifecycle hook configuration for Claude Code.
 
 let
-  formatterRegistry = import ../_formatters.nix;
+  formatterRegistry = import ../../helpers/_formatters.nix;
 
   mkFormatterHook =
     {
@@ -96,7 +96,7 @@ in
   PreToolUse = [
     (mkBashHook {
       body = ''
-        if echo "$COMMAND" | grep -Eq '(^|[[:space:]])(sudo[[:space:]]+)?(rm[[:space:]]+-rf[[:space:]]+/( |$)|rm[[:space:]]+-rf[[:space:]]+/\*|mkfs|dd[[:space:]]+if=|shutdown|reboot|poweroff)'; then
+        if echo "$COMMAND" | grep -Eq '(^|[[:space:]])(sudo[[:space:]]+)?(rm[[:space:]]+-rf[[:space:]]+/( |$)|rm[[:space:]]+-rf[[:space:]]+~|rm[[:space:]]+-rf[[:space:]]+/\*|mkfs|dd[[:space:]]+if=|shutdown|reboot|poweroff)'; then
           echo "[Hook] BLOCKED: system-destructive command detected" >&2
           echo "[Hook] Run it manually outside Claude if you truly intend it." >&2
           exit 2

@@ -21,7 +21,4 @@ in
     default: description: mkTypedOption (lib.types.listOf lib.types.str) default description;
   mkNullOrStrOption =
     default: description: mkTypedOption (lib.types.nullOr lib.types.str) default description;
-  mkTypedOptionWith =
-    type: default: description: extra:
-    lib.mkOption ({ inherit type default description; } // extra);
 }

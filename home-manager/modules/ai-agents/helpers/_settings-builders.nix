@@ -9,7 +9,7 @@
 let
   cfg = config.programs.aiAgents;
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib; };
-  formatterRegistry = import ../config/_formatters.nix;
+  formatterRegistry = import ./_formatters.nix;
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   sonnetModel = "anthropic/claude-sonnet-4-6";
   opencodeFormatterSettings = builtins.listToAttrs (

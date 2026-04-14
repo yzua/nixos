@@ -65,6 +65,7 @@ ai-agents/
 │   ├── _mk-cli-autoupdate-script.nix     # CLI autoupdate script builder
 │   ├── _services-shell-aliases.nix       # Shell alias definitions for agent services
 │   └── _services-systemd.nix             # Systemd user service/timer definitions
+│   └── _formatters.nix                   # Formatter registry (shared by claude hooks + gemini config)
 ├── activation/              # Home Manager activation scripts
 │   ├── default.nix          # Aggregation: wires all activation steps
 │   ├── secrets.nix          # Secret patching (placeholder → real key injection)
@@ -85,16 +86,15 @@ ai-agents/
     ├── defaults.nix         # Default values for agent options
     ├── global-instructions.md # Global instructions text (not a module)
     ├── _skills.nix          # Skill installations and omissions
-    ├── _formatters.nix      # Formatter registry for auto-formatting hooks (shared by claude + gemini)
     ├── mcp-servers.nix      # MCP server definitions + logging
     ├── claude/              # Claude Code configuration
     │   ├── default.nix      # Import hub (permissions, hooks, settings)
-    │   ├── _hooks.nix       # Claude Code lifecycle hooks (imports ../_formatters.nix)
+    │   ├── _hooks.nix       # Claude Code lifecycle hooks (imports ../../helpers/_formatters.nix)
     │   └── _permission-rules.nix # Claude allow/deny rules
     └── models/              # Model/provider registries
         ├── default.nix      # Import hub + shared toggles (agencyAgents, impeccable)
         ├── codex.nix        # Codex CLI configuration
-        ├── gemini.nix       # Gemini CLI configuration (imports ../_formatters.nix)
+        ├── gemini.nix       # Gemini CLI configuration (imports ../../helpers/_formatters.nix)
         └── opencode.nix      # OpenCode configuration (agents, LSP, providers)
 ```
 

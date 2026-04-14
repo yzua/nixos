@@ -2,40 +2,51 @@
 
 ## Goals
 
-This workflow is for agents doing:
+This workflow exists to turn Android RE sessions into short, evidence-backed
+loops instead of random command spraying.
 
-- app install and smoke testing
-- network interception
-- runtime instrumentation with Frida
-- static APK inspection
-- debugging root, proxy, and instrumentation failures
+Primary outputs per target:
 
-## 1. Environment Validation
+- package identity, version, and ABI
+- install and launch status
+- exported components and interesting manifest flags
+- likely network stack and endpoint surface
+- proxy result: visible traffic / handshake failure / bypass / no traffic
+- Frida result: attach works / spawn works / blocked / emulated realm needed
+- anti-analysis result: root, emulator, Frida, pinning, native guards
+- next best action with proof
+
+## Phase 0: Environment Validation
 
 Run:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh doctor
+bash scripts/ai/android-re/re-avd.sh status
 ```
 
-Check for:
+Confirm:
 
-- `adb`, `emulator`, `avdmanager`, `sdkmanager`
-- `mitmproxy` and `mitmdump`
-- `frida` and `frida-ps`
-- `apktool` and `jadx`
-- local Frida server binary
-- local `mitmproxy` CA
-- configured AVD name
+- `adb`, `emulator`, `mitmproxy`, `mitmdump`, `frida`, `jadx`, `apktool`
+- local Frida server binary exists
+- custom CA exists
+- configured AVD exists
+- `adb devices` sees the emulator
+- `sys.boot_completed=1`
+- `adb shell 'su 0 sh -c id'` works
 
-## 2. Boot The Emulator
+If any baseline check fails, stop and use `TROUBLESHOOTING.md` before touching a
+target app.
 
-If launched via `oc*are`, the emulator starts in the background automatically. Check readiness:
+## Phase 1: Boot And Observe The Emulator
+
+If launched via `oc*are`, the emulator is already starting in the background.
+Verify readiness:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh status
-# Or check the background boot log:
 tail -f ~/Downloads/android-re-tools/re-avd-start.log
+tail -f ~/Downloads/android-re-tools/emulator-runtime.log
 ```
 
 If starting manually:
@@ -45,88 +56,63 @@ bash scripts/ai/android-re/re-avd.sh start
 bash scripts/ai/android-re/re-avd.sh status
 ```
 
-Minimum healthy state:
+Healthy state means:
 
-- AVD listed
-- emulator device online in `adb devices`
+- AVD listed and online in `adb devices`
 - boot property `sys.boot_completed=1`
 - unattended root works
-- proxy set to `10.0.2.2:8084` by default unless you started with `RE_ENABLE_PROXY=0`
+- proxy state is known
+- tmux session `android-re` exists with `mitm`, `frida`, `logs`, `logcat`
 
-Additional host-side check:
+## Phase 2: Target Intake
 
-```bash
-tail -f ~/Downloads/android-re-tools/emulator-runtime.log
-```
+Before hooks or interception, identify the target precisely.
 
-Healthy Linux graphics signal:
-
-- `Graphics Adapter Vendor Google (NVIDIA Corporation)`
-- `Graphics Adapter Android Emulator OpenGL ES Translator (NVIDIA GeForce RTX 2070/PCIe/SSE2)`
-
-## 3. Launch The RE Agent Or Install The Target App
-
-Preferred operator entrypoints:
+If you have an APK:
 
 ```bash
-ocare "triage this target"
-ocgptare "focus on traffic, endpoints, and auth"
-ocglmare "look for anti-analysis behavior"
-oczenare "static-first APK triage"
+bash scripts/ai/android-re/re-static.sh prepare /path/to/app.apk
+bash scripts/ai/android-re/re-static.sh hashes /path/to/app.apk
 ```
 
-These commands start the emulator baseline, spoof the device identity, and open Ghostty running OpenCode on the `android-re` agent using the prompt source in this directory.
-
-For manual app interaction, use `agent-device` (load the skill first):
-
-```bash
-# Launch and navigate
-agent-device open Settings --platform android
-agent-device snapshot -i
-agent-device find "Network" click
-agent-device screenshot --out /tmp/screen.png
-agent-device close
-```
-
-For manual install or launch with `adb`:
-
-```bash
-adb install -r /path/to/app.apk
-adb shell monkey -p com.example.target -c android.intent.category.LAUNCHER 1
-```
-
-Useful helpers:
+If the app is already installed:
 
 ```bash
 adb shell pm list packages | grep example
 adb shell dumpsys package com.example.target | grep versionName
-adb shell pidof com.example.target
 adb shell dumpsys package com.example.target | rg "primaryCpuAbi|secondaryCpuAbi|nativeLibraryDir|split_config"
 adb shell pm path com.example.target
 adb shell getprop ro.product.cpu.abi
 ```
 
-Interpretation guidance:
+Capture:
 
-- if the guest ABI is `x86_64` but the package reports `primaryCpuAbi=arm64-v8a`, the app is not on a native ABI match
-- on this host, translation can be good enough for many tasks but can still destabilize specific apps
+- package name
+- version
+- ABI
+- install path / split APK paths
+- whether it likely depends on ARM translation
 
-## 4. Static Analysis First
+Pivot rule:
 
-Before dynamic hooking, unpack the APK:
+- if the app is ARM-only on this `x86_64` guest, treat instability as a real
+  possibility and verify ABI before blaming root, proxy, or Frida.
 
-```bash
-bash scripts/ai/android-re/re-static.sh prepare /path/to/app.apk
-```
+## Phase 3: Static Triage First
 
-Use the outputs to inspect:
+Before dynamic hooking, inspect the APK output. This is where you decide which
+runtime path is worth exercising.
+
+Look for:
 
 - `AndroidManifest.xml`
-- exported components
-- network config and cleartext settings
+- exported activities, services, receivers, providers
+- deep links and intent filters
+- `networkSecurityConfig` and cleartext policy
+- authentication and token classes
 - certificate pinning code paths
-- root, emulator, and Frida detection strings
-- native library names under `lib/`
+- root / emulator / Frida detection strings
+- native libraries under `lib/`
 
 Common searches:
 
@@ -134,177 +120,213 @@ Common searches:
 grep -R "TrustManager\|CertificatePinner\|X509TrustManager" ~/.cache/android-re/out/<app>/jadx
 grep -R "frida\|magisk\|su\|test-keys\|ro.debuggable" ~/.cache/android-re/out/<app>/jadx
 grep -R "okhttp\|retrofit\|cronet\|quic" ~/.cache/android-re/out/<app>/jadx
+grep -R "root\|emulator\|isDebuggerConnected\|ptrace" ~/.cache/android-re/out/<app>/jadx
 ```
 
-## 5. Prepare Network Interception
+Static triage questions:
+
+1. Is the app likely Java-heavy, native-heavy, or mixed?
+2. Does it look like standard OkHttp/Retrofit or Cronet/native TLS?
+3. Are there obvious pinning or root-check classes?
+4. Do native libs suggest JNI-heavy auth or anti-analysis logic?
+
+Pivot rule:
+
+- if static analysis shows Cronet, BoringSSL, or native networking, assume Java
+  MITM guidance may be insufficient and be ready to pivot to native analysis.
+
+## Phase 4: Install, Launch, And Smoke Test
+
+Install and launch cleanly before proxying or hooking.
+
+```bash
+adb install -r /path/to/app.apk
+adb shell monkey -p com.example.target -c android.intent.category.LAUNCHER 1
+adb shell pidof com.example.target
+tmux capture-pane -t android-re:logcat -p -S -80
+```
+
+Or use structured UI navigation:
+
+```bash
+agent-device open com.example.target --platform android
+agent-device snapshot -i
+agent-device screenshot --out /tmp/initial-screen.png
+agent-device close
+```
+
+Capture:
+
+- does it launch, crash, hang, or immediately complain about environment
+- does `logcat` show TLS, root, tamper, debugger, or ABI failures
+- which screen you reached
+
+Pivot rule:
+
+- if the app crashes before any traffic, go to `logcat` and static code first;
+  do not jump to proxy setup as if the network layer is the issue.
+
+## Phase 5: Prepare Network Interception
 
 Default recommendation for this emulator:
 
-- do not rely on the default `~/.mitmproxy` CA
+- use explicit proxy mode first
 - use the custom CA under `~/Downloads/android-re-tools/custom-ca/`
 - use the verified listener on `8084`
-- `mitmdump` is already running in tmux window `android-re:mitm` after `re-avd.sh start`
+- block QUIC when testing apps that may bypass via UDP/443
 
-Point the emulator at the host proxy:
+Set proxy:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh proxy-set 10.0.2.2:8084 --block-quic
-```
-
-Or start the full stack with proxy enabled from the beginning:
-
-```bash
-RE_ENABLE_PROXY=1 bash scripts/ai/android-re/re-avd.sh start
-```
-
-Why:
-
-- `10.0.2.2` maps emulator to host
-- explicit proxy avoids extra routing complexity
-- QUIC blocking prevents silent UDP/443 bypass on some apps and browsers
-
-Verify proxy state:
-
-```bash
 adb shell settings get global http_proxy
-# Expected: 10.0.2.2:8084
 ```
 
-Clear it when done:
+Expected:
 
-```bash
-bash scripts/ai/android-re/re-avd.sh proxy-clear
+```text
+10.0.2.2:8084
 ```
 
-### Reading live traffic captures
-
-After the app is running and generating traffic, read the mitmproxy pane:
+Read the mitm pane:
 
 ```bash
-# Get all captured URLs (deduplicated)
-tmux capture-pane -t android-re:mitm -p -S -300 | grep -oP '(?:GET|POST|PUT|DELETE) https?://[^ ]+' | sort -u
-
-# Get all POST requests with response codes
-tmux capture-pane -t android-re:mitm -p -S -300 | grep -E '(POST https|<< HTTP)'
-
-# Look for auth tokens and API keys
+tmux capture-pane -t android-re:mitm -p -S -200
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -oP '(?:GET|POST|PUT|DELETE|PATCH|HEAD) https?://[^ ]+' | sort -u
 tmux capture-pane -t android-re:mitm -p -S -300 | grep -iE 'authorization|bearer|x-api-key|token'
-
-# Look for specific domains
-tmux capture-pane -t android-re:mitm -p -S -300 | grep -i 'api.example.com'
 ```
 
-### Restarting mitmdump with different verbosity
+Interpretation:
+
+- visible decrypted traffic -> interception works
+- `Client TLS handshake failed` -> trust/pinning issue
+- no traffic at all -> proxy bypass, Cronet/native path, cached connections, or
+  app not actually reaching the network
+- `client disconnected` -> retry, app rejection, or partial interception
+
+Pivot rule:
+
+- if no traffic appears, prove proxy state, mitmdump listener state, and app
+  restart before concluding certificate pinning.
+
+## Phase 6: Exercise The App Deliberately
+
+After static triage identifies important screens or flows, use `agent-device` to
+trigger real behavior while proxy and logs are active.
 
 ```bash
-# Stop current capture
-tmux send-keys -t android-re:mitm C-c
-sleep 1
-
-# Verbose mode (shows full headers and response bodies)
-tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 --set flow_detail=3" Enter
-
-# Filter to specific domain only
-tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 --set flow_detail=2 '~d api.example.com'" Enter
-
-# Save to file for later analysis
-tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 -w /tmp/capture.flow" Enter
-```
-
-## 5b. Navigate And Exercise The App With agent-device
-
-After static analysis identifies screens and flows of interest, use `agent-device` to navigate the app and trigger traffic while `mitmproxy` captures:
-
-```bash
-# Open the target app
 agent-device open com.example.target --platform android
-
-# Navigate to login or target screen
 agent-device snapshot -i
 agent-device find "Login" click
 agent-device snapshot -i
 agent-device fill @e5 "user@example.com"
 agent-device fill @e7 "password123"
 agent-device find "Submit" click
-
-# Wait for response and capture
-agent-device wait text "Welcome" 10000
-agent-device screenshot --out /tmp/after-login.png
+agent-device screenshot --out /tmp/after-submit.png
 agent-device close
 ```
 
-This lets you exercise app flows programmatically while `mitmproxy`, Frida, or `logcat` capture data in background tmux panes.
+While doing this, read:
 
-## 6. Prepare Frida
+```bash
+tmux capture-pane -t android-re:mitm -p -S -120
+tmux capture-pane -t android-re:logcat -p -S -120
+```
 
-Important version note on this emulator:
+Use the screen interaction to answer concrete questions:
 
-- use the system Frida `17.5.1` toolchain for all attach and hook work
-- server binary is at `~/Downloads/android-re-tools/frida/frida-server-17.5.1-android-x86_64`
-- the isolated `16.4.10` toolchain venv is broken (missing python3.11) — do not use it
-- only x86_64 Frida server is staged (`frida-server-17.5.1-android-x86_64`); ARM64 AVDs cannot currently boot on this host's emulator backend
+- what request fires on login
+- which domains or hosts appear
+- whether tokens are visible in headers or storage
+- whether runtime defenses trigger only on specific screens
 
-Start or restart Frida server:
+## Phase 7: Prepare Frida
+
+Use the system Frida `17.5.1` toolchain only.
+
+Before inventing new hooks, try the local hook library in
+`scripts/ai/android-re/` first. It gives fast proof for common build-field,
+filesystem, shared-preferences, URL, and certificate-pinning questions.
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh frida-start
+frida --version
+frida-ps -U | head -20
+adb shell "su 0 sh -c 'ps -A | grep frida'"
 ```
 
-Verify it's running:
+Attach modes:
 
 ```bash
-frida-ps -U | head -10
-```
-
-Attach to app:
-
-```bash
-# Interactive REPL (good for exploration)
+# Attach to a running process
 frida -U -n com.example.target
 
-# One-shot script with -q (quiet, non-interactive)
-# NOTE: Frida 17.x does NOT have --no-pause
-frida -U -n com.example.target -q -e 'console.log("attached to " + Process.id)'
+# One-shot inline probe
+frida -U -n com.example.target -q -e 'console.log("attached")'
 
-# Load a script file
-frida -U -n com.example.target -l hook.js -q
-
-# Spawn mode (injects before app code runs — best for bypass hooks)
+# Spawn mode for early bypasses
 frida -U -f com.example.target -l hook.js
-```
 
-For translated or emulated code paths, try:
-
-```bash
+# Emulated realm for translated code paths
 frida -U -n com.example.target --realm=emulated
 ```
 
-### Running Frida in tmux frida pane
-
-For long-running hook sessions, use the tmux frida pane:
+Use tmux for long-running hooks:
 
 ```bash
-# Start a Frida session in the frida tmux pane
+tmux send-keys -t android-re:frida C-c
 tmux send-keys -t android-re:frida "frida -U -n com.example.target" Enter
-
-# Wait for attach, then send hook code
 sleep 3
-tmux send-keys -t android-re:frida 'Java.perform(function(){ console.log("hooks loaded"); })' Enter
-
-# Read the output
-tmux capture-pane -t android-re:frida -p -S -40
+tmux capture-pane -t android-re:frida -p -S -60
 ```
+
+Pivot rule:
+
+- if attach fails, try PID, spawn, then `--realm=emulated` before assuming Frida
+  detection.
+
+## Phase 8: Anti-Analysis And Hooking
+
+Only move here after static analysis or runtime evidence points to a concrete
+guard worth bypassing.
+
+Prefer this order:
+
+1. reusable local hook library
+2. target-specific inline or file-backed Frida hooks
+3. external research on official docs, GitHub, CVEs, advisories, or known bypass patterns
+4. subagents for deeper static/native/protocol analysis when a branch becomes too
+   deep for the main session
+
+### Common Java targets
+
+- `okhttp3.CertificatePinner`
+- custom `TrustManager` implementations
+- root-check helper classes
+- `android.os.Build`
+- `java.io.File.exists`
+- package and process checks for Magisk/Frida
+
+### Common anti-analysis patterns
+
+- root file checks: `su`, `magisk`, `busybox`, writable system paths
+- emulator checks: `Build.*`, `ro.kernel.qemu`, qemu file paths, sensor absence
+- Frida checks: process names, open ports, loaded classes, timing anomalies
+- pinning: `CertificatePinner`, custom trust managers, native SSL verification
+- bypass paths: QUIC, Cronet, direct sockets, native TLS
 
 ### Quick recon hooks
 
 ```bash
-# What does the app see for device identity?
+# What Build fields does the app see?
 frida -U -n com.example.target -q -e '
-var B = Java.use("android.os.Build");
-console.log("MODEL=" + B.MODEL.value + " HW=" + B.HARDWARE.value + " MFG=" + B.MANUFACTURER.value);
+Java.perform(function(){
+  var B = Java.use("android.os.Build");
+  console.log("MODEL=" + B.MODEL.value + " HARDWARE=" + B.HARDWARE.value + " BRAND=" + B.BRAND.value);
+});
 '
 
-# Log all Java URL connections
+# Log Java URL creation
 frida -U -n com.example.target -q -e '
 Java.perform(function(){
   var URL = Java.use("java.net.URL");
@@ -316,61 +338,42 @@ Java.perform(function(){
 '
 ```
 
-## 7. Hooking Patterns
+### Native pivot conditions
 
-### Java layer
+Move to native hooks or binary analysis when:
 
-Use Frida Java hooks for:
+- Java hooks only hit wrappers
+- static analysis shows JNI-heavy auth or pinning
+- the app uses Cronet or native TLS
+- pinning appears to live in native libs
+- Java-level bypasses do not change runtime behavior
 
-- TLS bypass attempts
-- root-check patching
-- emulator-check patching
-- logging request parameters
-- short-circuiting feature flags
+## Phase 9: Prove Findings With POC Scripts
 
-Typical targets:
+When you find interesting behavior, write a script to prove it. Do not stop at
+describing the finding.
 
-- `okhttp3.CertificatePinner`
-- custom `TrustManager` implementations
-- root-check helper classes
-- `android.os.Build`
-- `java.io.File.exists`
+Available runtimes:
 
-### Native layer
-
-Move to native hooks when:
-
-- Java hooks show only thin wrappers
-- pinning is implemented in native libraries
-- the app uses Cronet, BoringSSL, or JNI-heavy auth paths
-
-## 8. Validate Findings With POC Scripts
-
-When you find a vulnerability or interesting behavior, **write a script to prove it**. Don't just describe — demonstrate.
-
-Available runtimes: Bash, Python 3.13, Node.js 24, Bun 1.3.10, Frida JS.
+- Bash
+- Python 3.13
+- Node.js 24
+- Bun 1.3.10
+- Frida JS
 
 Typical POC patterns:
 
 ```bash
-# Auth bypass — replay a request without auth
+# Replay a captured request
 curl -s "https://api.example.com/v1/users/me" | jq .
 
-# IDOR — iterate user IDs
+# Iterate an IDOR candidate
 for i in $(seq 1 10); do
   curl -s -H "Authorization: Bearer $TOKEN" "https://api.example.com/v1/users/$i" | jq '.email'
 done
 
-# Frida hook to dump decrypted API responses
-frida -U -n com.example.target -q -e '
-Java.perform(function(){
-  var OkHttpClient = Java.use("okhttp3.OkHttpClient");
-  // hook response body reading
-});
-'
-
-# Python script for complex replay
-python3 /tmp/replay-with-modified-params.py
+# Use a Frida script file for repeatable runtime capture
+frida -U -n com.example.target -l /tmp/hook.js -q
 ```
 
-See TOOLS.md "Scripting & POC Development" section for full runtime details and examples.
+The final deliverable should be operator-usable evidence, not just notes.

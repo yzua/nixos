@@ -191,7 +191,7 @@ in
                   "FILE_PATH=$(echo \"$INPUT\" | jq -r '.arguments.path // \"\"');"
                   "if [ -n \"$FILE_PATH\" ]; then"
                   "case \"$FILE_PATH\" in"
-                  (import ../_formatters.nix).geminiCaseBranches
+                  (import ../../helpers/_formatters.nix).geminiCaseBranches
                   "esac;"
                   "fi;"
                   "echo \"$INPUT\""

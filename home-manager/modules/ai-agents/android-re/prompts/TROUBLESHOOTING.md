@@ -1,62 +1,71 @@
 # Android RE Troubleshooting
 
+Use this file as a symptom -> proof -> next action guide. Do not apply fixes
+blindly. Confirm the failure mode first, then choose the smallest recovery step.
+
 ## Emulator Does Not Appear In `adb devices`
 
-Check:
+Prove the current state:
 
 ```bash
 adb devices -l
 bash scripts/ai/android-re/re-avd.sh status
-# If launched via oc*are, check the background boot log:
 tail -f ~/Downloads/android-re-tools/re-avd-start.log
 ```
 
-If needed, start manually:
+If the emulator was never started:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh start
 ```
 
-If needed:
+If `adb` looks stale:
 
 ```bash
 adb kill-server
 adb start-server
+adb devices -l
 ```
+
+Likely causes:
+
+- emulator still booting
+- stale `adb` server state
+- AVD failed before full boot
 
 ## AVD Exists But Does Not Boot Fully
 
-Check:
+Proof:
 
 ```bash
 adb shell getprop sys.boot_completed
+tail -f ~/Downloads/android-re-tools/emulator-runtime.log
+adb logcat -b all -v threadtime
+```
+
+Healthy value:
+
+```text
+1
 ```
 
 If stuck:
 
 - restart the emulator
-- inspect recent emulator logs under `~/Downloads/android-re-tools/`
-- confirm disk space and no stale lock files under `~/.android/avd/`
+- inspect lock files under `~/.android/avd/`
+- confirm disk space and runtime logs
 
-Additional logging:
-
-```bash
-tail -f ~/Downloads/android-re-tools/emulator-runtime.log
-adb logcat -b all -v threadtime
-```
-
-Host/ABI specific note:
-
-- on this `x86_64` Linux host, a true ARM64 AVD will not boot with the current emulator backend
-- fatal seen here:
+Host-specific note:
 
 ```text
 Avd's CPU Architecture 'arm64' is not supported by the QEMU2 emulator on x86_64 host. System image must match the host architecture.
 ```
 
+Do not chase ARM64 boot work on this host unless the emulator backend changes.
+
 ## `su` Stops Working
 
-First verify the correct invocation:
+First prove the invocation syntax:
 
 ```bash
 adb shell 'su 0 sh -c id'
@@ -68,25 +77,20 @@ Do not use:
 adb shell 'su -c id'
 ```
 
-If unattended root breaks again:
+If unattended root broke:
 
-1. check `adb root`
-2. pull `/data/adb/magisk.db`
-3. verify `policies` includes UID `2000` with policy `2`
-4. push the DB back and reboot
+1. verify `adb root`
+2. inspect `bash scripts/ai/android-re/re-avd.sh status`
+3. use `TROUBLESHOOTING.md` and the Magisk DB path only if status proves policy
+   drift
 
 ## `adb root` Works But Magisk Feels Broken
 
 Symptoms:
 
 - `adb root` succeeds
-- `magisk --sqlite` fails or daemon is incomplete
+- `magisk --sqlite` or app-side checks fail
 - `su` prompts or denies unexpectedly
-
-Likely causes:
-
-- Magisk app package and ramdisk state are out of sync for the current boot
-- a reboot is required after app update or DB changes
 
 Try:
 
@@ -95,331 +99,304 @@ adb reboot
 bash scripts/ai/android-re/re-avd.sh status
 ```
 
+Likely causes:
+
+- Magisk app and ramdisk state drifted
+- reboot required after DB or app change
+- app-side root checks are failing for reasons other than ADB shell root
+
 ## Frida Server Does Not Start
 
-Check:
+Prove the failure:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh frida-start
 frida-ps -U
 adb shell "su 0 sh -c 'ps -A | grep frida'"
-```
-
-Check server log:
-
-```bash
 adb shell "su 0 sh -c 'tail -30 /data/local/tmp/frida.log'"
 ```
 
 Common causes:
 
-- wrong Frida server version for host tools
+- wrong Frida server version
 - wrong ABI
-- old server process still bound to port 27042
+- stale server process still bound to port `27042`
 
-Fix:
+Recovery:
 
 ```bash
-# Kill any stale server
 adb shell "su 0 sh -c 'pkill -x frida-server-17.5.1'"
 sleep 1
-
-# Restart via re-avd.sh
 bash scripts/ai/android-re/re-avd.sh frida-start
-
-# Verify version match
 frida --version
 adb shell "su 0 sh -c '/data/local/tmp/frida-server-17.5.1 --version'"
-# Both should print 17.5.1
 ```
+
+Both version commands should print `17.5.1`.
 
 ## Frida Attach Fails Or Times Out
 
+Prove the exact failure mode:
+
 ```bash
-# Try by PID instead of name
 frida-ps -U | grep com.example.target
+frida -U -n com.example.target
 frida -U -p <pid>
-
-# Try spawn mode (fresh start with injection)
-frida -U -f com.example.target -l hook.js
-
-# Try emulated realm (for ARM translation)
+frida -U -f com.example.target
 frida -U -n com.example.target --realm=emulated
+tmux capture-pane -t android-re:frida -p -S -80
 ```
 
-If `frida -U` hangs:
+Interpretation:
+
+- attach by name fails, PID works -> process enumeration or package-name mismatch
+- attach fails, spawn works -> early anti-Frida or timing issue
+- only `--realm=emulated` works -> translated ARM path
+- everything fails -> server state, ABI mismatch, or hard anti-analysis
+
+Do not assume `frida-ps -U` alone proves real hookability.
+
+## Hooks Load But Do Not Fire
+
+Proof checklist:
 
 ```bash
-# Verify server is actually running
-adb shell "su 0 sh -c 'ps -A | grep frida'"
-# If not running, restart it:
-bash scripts/ai/android-re/re-avd.sh frida-start
+tmux capture-pane -t android-re:frida -p -S -80
+tmux capture-pane -t android-re:logcat -p -S -120
+tmux capture-pane -t android-re:mitm -p -S -120
 ```
 
-If attach returns "unexpectedly timed out":
+Likely causes:
 
-- Heavy processes (Chrome, system_server) may timeout on first attach — retry once
-- Try a lighter target or use `-f` spawn mode
-- Check if the app has anti-Frida detection running
+- hooked the wrong class or overload
+- hooked after the target code already ran
+- Java layer only wraps native logic
+- app path differs from the one you exercised
 
-## Frida Works But `frida-ps -U` Is Empty
+Next actions:
 
-```bash
-# Verify USB connection
-adb devices -l
-
-# Restart adb and frida
-adb kill-server && adb start-server
-sleep 2
-bash scripts/ai/android-re/re-avd.sh frida-start
-frida-ps -U
-```
-
-## Root Checker Says The Device Is Not Rooted
-
-If `adb shell 'su 0 sh -c id'` works but Root Checker or the Magisk app still says root is missing, check SELinux first:
-
-```bash
-adb shell getenforce
-adb logcat -d -v threadtime | rg 'su_exec|app=com.joeykrim.rootcheck|app=com.topjohnwu.magisk'
-```
-
-Known cause on this emulator:
-
-- `untrusted_app` is denied `read/getattr/execute` on `/system/xbin/su`
-- that breaks app-level root checks even though unattended ADB root still works
-
-Current fix:
-
-- `bash scripts/ai/android-re/re-avd.sh start` now switches the guest to `SELinux=Permissive` by default
-- override with `RE_SELINUX_PERMISSIVE=0` if you explicitly want enforcing mode
-- keep the server in the foreground while testing if needed
+- move from attach to spawn for earlier injection
+- verify class names from static analysis
+- log broader signals first (`URL`, `Build`, filesystem checks)
+- pivot to native triage if Java hooks remain silent
 
 ## `frida-ps -U` Works Once But Not After Reboot
 
-Check boot script:
+Check boot persistence:
 
 ```bash
 adb root
 adb shell 'ls -l /data/adb/service.d/frida.sh'
+bash scripts/ai/android-re/re-avd.sh frida-start
 ```
 
-If missing, recreate it and reboot.
+If missing, re-stage the server or boot script via the existing helper flow.
 
 ## `mitmproxy` Does Not See Traffic
 
-### Step 1: Verify proxy is set on device
+### Step 1: verify device proxy state
 
 ```bash
 adb shell settings get global http_proxy
-# Expected when enabled: 10.0.2.2:8084
-# If :0 or null, proxy is not set
 ```
 
-### Step 2: Verify mitmdump is listening
+Expected when enabled:
+
+```text
+10.0.2.2:8084
+```
+
+### Step 2: verify listener state
 
 ```bash
 ss -ltnH '( sport = :8084 )'
-# Should show a listener. If empty, mitmdump is not running.
+tmux capture-pane -t android-re:mitm -p -S -80
 ```
 
-### Step 3: Restart mitmdump if needed
-
-```bash
-tmux send-keys -t android-re:mitm C-c
-sleep 1
-tmux send-keys -t android-re:mitm "mitmdump --set confdir=$HOME/Downloads/android-re-tools/custom-ca --listen-host 0.0.0.0 --listen-port 8084 --set flow_detail=2" Enter
-```
-
-### Step 4: Force-stop and restart the target app
-
-The app may have cached connections from before proxy was enabled:
+### Step 3: restart the target app after enabling proxy
 
 ```bash
 adb shell am force-stop com.example.target
 adb shell monkey -p com.example.target -c android.intent.category.LAUNCHER 1
 ```
 
-### Step 5: Check if QUIC bypass is blocked
-
-Some apps use QUIC (UDP/443) which bypasses HTTP proxy:
+### Step 4: verify QUIC blocking
 
 ```bash
 adb shell "su 0 iptables -L OUTPUT -n | grep 443"
-# Should show REJECT rule for udp dpt:443
 ```
 
-If missing, apply:
+If missing:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh proxy-set 10.0.2.2:8084 --block-quic
 ```
 
-### Step 6: Check the mitmproxy pane for errors
+### Step 5: read `logcat`
 
 ```bash
-tmux capture-pane -t android-re:mitm -p -S -40
+tmux capture-pane -t android-re:logcat -p -S -120
 ```
 
-Look for:
+If traffic is still absent, suspect:
 
-- `Client TLS handshake failed` → certificate pinning (app doesn't trust mitmproxy CA)
-- `client disconnected` → app retrying or rejecting the connection
-- `connection refused` → mitmdump not running or wrong port
+- Cronet or native networking bypass
+- direct IP or custom socket logic
+- hardcoded proxy rules
+- app never reaching the code path you expected
 
-### Step 7: If still no traffic
+## All Traffic Shows `Client TLS Handshake Failed`
 
-- App may use a hardcoded proxy or direct IP (ignore system proxy settings)
-- App may use Cronet or a custom HTTP client that ignores system proxy
-- Check logcat for network errors: `tmux capture-pane -t android-re:logcat -p -S -40`
-- Try `mitmproxy` in transparent mode or use iptables-based redirection (advanced)
-
-## All Traffic Shows "Client TLS Handshake Failed"
-
-This means the app does NOT trust the mitmproxy CA certificate. Debug:
+Prove trust state:
 
 ```bash
-# 1. Verify CA is in system cert store
 bash scripts/ai/android-re/re-avd.sh cert-check
-
-# 2. Verify conscrypt bind mount is active
 adb shell "su 0 mountpoint /apex/com.android.conscrypt/cacerts"
-# Should print: /apex/com.android.conscrypt/cacerts is a mountpoint
+```
 
-# 3. If mount is missing, re-sync the CA
+If mount is missing or CA state looks stale:
+
+```bash
 bash scripts/ai/android-re/re-avd.sh start
-# Or manually:
 bash scripts/ai/android-re/re-avd.sh cert-check
 ```
 
-If cert is installed but app still fails:
+If cert installation looks correct but failures remain, suspect:
 
-- App uses certificate pinning — check static analysis for `CertificatePinner`, `TrustManager`, or native pinning
-- App may pin specific public keys, not just CAs
-- Use Frida to bypass pinning (see WORKFLOW.md hooking patterns)
+- certificate pinning
+- custom trust manager
+- native TLS validation
+- domain-specific anti-MITM logic
 
-### Google domains always fail
-
-Chrome pins certificates for `*.google.com` domains. This is expected and cannot be bypassed by CA injection alone. Non-Google sites should decrypt fine.
+Google domains are expected to pin aggressively. Use non-Google domains as the
+baseline signal for whether your CA path works.
 
 ## mitmproxy Shows Traffic But Responses Are Errors
 
-```bash
-# Read the full request/response cycle
-tmux capture-pane -t android-re:mitm -p -S -100 | grep -A5 '<< HTTP'
+Proof:
 
-# Common patterns:
-# 403/401 → App needs auth, token expired, or device binding
-# 400 → Malformed request, missing headers, wrong API version
-# 403 + "request blocked" → WAF/bot detection, may need user-agent or device spoofing
-# Connection reset → Server-side anti-MITM detection
+```bash
+tmux capture-pane -t android-re:mitm -p -S -120 | grep -A5 '<< HTTP'
 ```
+
+Interpretation:
+
+- `401` / `403` -> auth, token, or device binding issue
+- `400` -> malformed replay or wrong request shape
+- `403` with anti-bot messaging -> WAF or environment fingerprinting
+- connection reset -> server-side anti-MITM or protocol mismatch
+
+Do not call this a proxy failure unless the request never decrypted.
 
 ## App Detects The Emulator
 
-If an app refuses to run or shows "emulator detected":
-
-1. Verify spoofing was applied:
+Prove spoof state:
 
 ```bash
-adb shell getprop ro.hardware           # should show "pixel" not "ranchu"
-adb shell getprop ro.product.model      # should show "Pixel 7"
-adb shell getprop ro.build.characteristics  # should show "nosdcard,phone"
-adb shell getprop ro.kernel.qemu        # should show "0"
+adb shell getprop ro.hardware
+adb shell getprop ro.product.model
+adb shell getprop ro.build.characteristics
+adb shell getprop ro.kernel.qemu
 ```
 
-1. Re-apply if needed:
+Expected direction:
+
+- Pixel 7-style values
+- `ro.kernel.qemu=0`
+
+If needed:
 
 ```bash
 bash scripts/ai/android-re/re-avd.sh spoof
 ```
 
-1. If the app still detects the emulator, it's likely using runtime checks beyond system props:
-   - File existence checks (`/dev/goldfish_pipe`, `/dev/qemu_pipe`)
-   - Sensor checks (accelerometer, gyroscope patterns)
-   - CPU/ABI checks via native code
-   - Timing-based detection
+If the app still detects the emulator, suspect:
 
-1. For runtime detection, use Frida hooks on:
-   - `android.os.Build` fields
-   - `java.io.File.exists` for emulator-indicator paths
-   - Sensor data injection
-   - Any native detection functions found in static analysis
+- Java `Build.*` checks seeing cached values
+- file existence checks like `/dev/goldfish_pipe` or `/dev/qemu_pipe`
+- sensor or hardware heuristics
+- native ABI or timing checks
 
-## `agent-device` Cannot Find The Emulator
+Next actions:
 
-```bash
-agent-device devices --platform android
-```
+- use `scripts/ai/android-re/frida-spoof-build.js`
+- hook `java.io.File.exists`
+- check static analysis for detection helpers or native libs
 
-If empty:
+## Root Checker Says The Device Is Not Rooted
 
-1. Verify the emulator is running: `adb devices`
-2. `agent-device` discovers devices through `adb` — the emulator must be fully booted
-3. If booted but not found, check `ANDROID_SERIAL` or `ANDROID_DEVICE` env vars aren't set to a wrong value
-
-If `agent-device` shows the device but commands fail:
+If `adb shell 'su 0 sh -c id'` works but app-side root checks fail, prove the
+environment:
 
 ```bash
-agent-device open Settings --platform android --debug
+adb shell getenforce
+adb logcat -d -v threadtime | rg 'su_exec|root|magisk'
 ```
 
-Check the diagnostic logs under `~/.agent-device/logs/`.
+Known cause on this emulator:
 
-## Target-Specific Reverse Engineering Logic
+- app-side checks can fail because SELinux blocks expected root-path access even
+  while unattended ADB shell root still works
 
-If a target needs app-specific startup hooks, token generation, or protocol replay logic, keep that in a target-specific workspace or script instead of reintroducing it into this generic Android RE baseline.
+Current default fix path:
 
-Generic workflow ownership stops at:
-
-- emulator health
-- root and cert setup
-- Frida server orchestration
-- `mitmproxy` setup
-- static APK extraction
+- `re-avd.sh start` sets guest SELinux to permissive by default
+- override with `RE_SELINUX_PERMISSIVE=0` only when you explicitly want
+  enforcing mode
 
 ## CA Is Installed But TLS Still Fails
 
-Check:
+Prove both cert locations:
 
 ```bash
 adb shell 'ls -l /system/etc/security/cacerts'
 adb shell 'ls /apex/com.android.conscrypt/cacerts | tail'
 ```
 
-Then investigate:
+Then ask:
 
-- whether the cert was only copied to `/system/etc/security/cacerts` but not re-exposed from a tmpfs-backed system cert dir into Android 14 app namespaces
-- whether you are still using the default `~/.mitmproxy` CA instead of the verified custom CA in `~/Downloads/android-re-tools/custom-ca/`
-- pinning in Java or native code
-- custom trust manager
-- certificate transparency or domain-level anti-MITM logic
+- is the custom CA really the one mitmdump is using
+- was the namespace remount applied after the latest start
+- does static analysis point to pinning or native trust logic
+- is the failing domain protected differently from the rest of the app
 
-Recent evidence on this machine:
+## `agent-device` Cannot Find The Emulator
 
-- after the clean Android 14 cert injection path, many Chromium and Google HTTPS requests decrypt correctly in `mitmproxy`
-- if a specific domain still reports `certificate unknown`, check whether that process predates the latest namespace remount or is applying app-level trust logic
+Proof:
+
+```bash
+agent-device devices --platform android
+adb devices -l
+```
+
+If empty:
+
+- confirm the emulator is fully booted
+- confirm `ANDROID_SERIAL` or `ANDROID_DEVICE` are not set incorrectly
+- remember `agent-device` depends on `adb` visibility
+
+If commands fail after discovery:
+
+```bash
+agent-device open Settings --platform android --debug
+```
+
+Then inspect logs under `~/.agent-device/logs/`.
 
 ## Emulator Falls Back To Slow Software Rendering
 
-Check the runtime log:
+Proof:
 
 ```bash
 tail -f ~/Downloads/android-re-tools/emulator-runtime.log
 ```
 
-Healthy Linux host rendering now looks like:
+Healthy Linux rendering currently looks like:
 
 - `Graphics Adapter Vendor Google (NVIDIA Corporation)`
 - `Graphics Adapter Android Emulator OpenGL ES Translator (NVIDIA GeForce RTX 2070/PCIe/SSE2)`
 
-If you instead see `lavapipe` or `swangle`:
-
-- confirm the emulator is being launched through `bash scripts/ai/android-re/re-avd.sh start`
-- confirm the NixOS `emulator` wrapper is current
-- confirm `/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json` exists
-
-Fallbacks:
+If you see `lavapipe` or `swangle`, try:
 
 ```bash
 EMU_DISABLE_VULKAN=1 bash scripts/ai/android-re/re-avd.sh start
@@ -428,7 +405,7 @@ EMU_GPU_MODE=software bash scripts/ai/android-re/re-avd.sh start
 
 ## App Installs On One AVD But Not Another
 
-Check ABI before changing anything else:
+Prove ABI mismatch first:
 
 ```bash
 adb shell dumpsys package com.example.target | rg "primaryCpuAbi|secondaryCpuAbi|nativeLibraryDir|split_config"
@@ -436,6 +413,21 @@ adb shell getprop ro.product.cpu.abi
 adb shell getprop ro.product.cpu.abilist
 ```
 
-Known pattern discovered here:
+Known pattern on this host:
 
-- a clean `default/x86_64` AVD can reject translated ARM-only packages with `INSTALL_FAILED_NO_MATCHING_ABIS`
+- translated ARM-only packages can behave differently across `x86_64` AVDs
+- some packages may fail with `INSTALL_FAILED_NO_MATCHING_ABIS`
+
+## Generic Ownership Boundary
+
+This baseline owns:
+
+- emulator health
+- root and cert setup
+- Frida server orchestration
+- `mitmproxy` setup
+- static APK extraction
+
+Target-specific startup hooks, token generation logic, and exploit automation
+should live in target-specific scripts or workspaces rather than in this generic
+bundle.
