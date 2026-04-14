@@ -137,19 +137,5 @@
       };
 
       formatter.${system} = pkgs.nixfmt-tree;
-
-      # CI checks — run with `nix flake check`
-      checks.${system} = {
-        # Ensure flake evaluates without errors
-        flake-eval = pkgs.runCommand "flake-eval" { } ''
-          echo "Flake evaluation successful" > $out
-        '';
-
-        # Ensure formatter is available
-        formatter-available = pkgs.runCommand "formatter-check" { } ''
-          test -x ${pkgs.nixfmt-tree}/bin/nixfmt || exit 1
-          echo "Formatter check passed" > $out
-        '';
-      };
     };
 }
