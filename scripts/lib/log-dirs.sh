@@ -12,6 +12,19 @@ OPENCODE_LOG_DIR="${OPENCODE_LOG_DIR:-$HOME/.local/share/opencode/log}"
 # shellcheck disable=SC2034
 CODEX_LOG_DIR="${CODEX_LOG_DIR:-$OPENCODE_LOG_DIR}"
 
+# Add a root to seen_roots if not already present. Returns 0 (continue) or 1 (skip).
+# Args: $1 — root path to check
+# Modifies: seen_roots (caller must declare local -a seen_roots=())
+_add_unique_root() {
+	local root="$1"
+	local prev
+	for prev in "${seen_roots[@]}"; do
+		[[ "$root" == "$prev" ]] && return 1
+	done
+	seen_roots+=("$root")
+	return 0
+}
+
 # Find all agent log files across standard directories.
 # Args: $1 — mtime filter (default: -7, i.e. last 7 days)
 # Output: sorted unique list of log file paths
@@ -21,19 +34,9 @@ find_all_agent_logs() {
 	local -a seen_roots=()
 	local max_depth_args=()
 
-	# Deduplicate roots (CODEX_LOG_DIR may equal OPENCODE_LOG_DIR)
 	for root in "$LOG_DIR" "$OPENCODE_LOG_DIR" "$CODEX_LOG_DIR"; do
 		[[ -d "$root" ]] || continue
-		local skip=false
-		local prev
-		for prev in "${seen_roots[@]}"; do
-			if [[ "$root" == "$prev" ]]; then
-				skip=true
-				break
-			fi
-		done
-		$skip && continue
-		seen_roots+=("$root")
+		_add_unique_root "$root" || continue
 		if [[ "$root" == "$LOG_DIR" ]]; then
 			max_depth_args=(-maxdepth 1)
 		else
@@ -71,16 +74,7 @@ find_agent_logs() {
 	local max_depth_args=()
 	for root in "${roots[@]}"; do
 		[[ -d "$root" ]] || continue
-		local skip=false
-		local prev
-		for prev in "${seen_roots[@]}"; do
-			if [[ "$root" == "$prev" ]]; then
-				skip=true
-				break
-			fi
-		done
-		$skip && continue
-		seen_roots+=("$root")
+		_add_unique_root "$root" || continue
 		if [[ "$root" == "$LOG_DIR" ]]; then
 			max_depth_args=(-maxdepth 1)
 		else

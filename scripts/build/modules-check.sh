@@ -8,6 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
+SHARED_AWK="${SCRIPT_DIR}/../lib/awk-utils.awk"
 
 # Validate script dependencies
 check_dependencies() {
@@ -22,89 +23,12 @@ check_dependencies() {
 
 parse_imports() {
 	local default_file="$1"
-
-	# Extract:
-	# 1) explicit .nix references anywhere in default.nix (including helper imports)
-	# 2) directory entries from imports = [ ... ] lists.
-	awk '
-		function count_char(str, ch,    i, n) {
-			n = 0
-			for (i = 1; i <= length(str); i++) {
-				if (substr(str, i, 1) == ch) {
-					n += 1
-				}
-			}
-			return n
-		}
-
-		function extract_nix_paths(line,    remaining, path, start) {
-			remaining = line
-			while (match(remaining, /\.\.\/[[:alnum:]_./-]+\.nix|\.\/[[:alnum:]_./-]+\.nix/)) {
-				start = RSTART
-				path = substr(remaining, start, RLENGTH)
-				print path
-				remaining = substr(remaining, start + RLENGTH)
-			}
-		}
-
-		function extract_directory_imports(line,    remaining, path, start) {
-			remaining = line
-			while (match(remaining, /\.\.\/[[:alnum:]_./-]+|\.\/[[:alnum:]_./-]+/)) {
-				start = RSTART
-				path = substr(remaining, start, RLENGTH)
-				if (path !~ /\.nix$/) {
-					print path
-				}
-				remaining = substr(remaining, start + RLENGTH)
-			}
-		}
-
-		{
-			raw_line = $0
-			extract_nix_paths(raw_line)
-
-			line = raw_line
-			sub(/#.*/, "", line)
-
-			if (!in_imports) {
-				if (line ~ /imports[[:space:]]*=/) {
-					if (index(line, "[") > 0) {
-						in_imports = 1
-						bracket_depth = count_char(line, "[") - count_char(line, "]")
-						extract_directory_imports(line)
-						if (bracket_depth <= 0) {
-							in_imports = 0
-							bracket_depth = 0
-						}
-					} else {
-						waiting_for_open_bracket = 1
-					}
-				} else if (waiting_for_open_bracket && index(line, "[") > 0) {
-					in_imports = 1
-					waiting_for_open_bracket = 0
-					bracket_depth = count_char(line, "[") - count_char(line, "]")
-					extract_directory_imports(line)
-					if (bracket_depth <= 0) {
-						in_imports = 0
-						bracket_depth = 0
-					}
-				}
-				next
-			}
-
-			extract_directory_imports(line)
-			bracket_depth += count_char(line, "[") - count_char(line, "]")
-			if (bracket_depth <= 0) {
-				in_imports = 0
-				bracket_depth = 0
-			}
-		}
-	' "$default_file"
+	local awk_script="$2"
+	awk -f "$awk_script" "$default_file"
 }
 
 parse_manual_helpers() {
 	local default_file="$1"
-
 	awk '
 		{
 			line = $0
@@ -153,6 +77,78 @@ main() {
 	local error_count=0
 	check_dependencies
 
+	# Build combined AWK script: shared utils + import parsing logic
+	local parse_awk_script
+	parse_awk_script="$(mktemp)"
+	trap 'rm -f "${parse_awk_script:-}"' EXIT
+	{
+		cat "$SHARED_AWK"
+		cat <<'AWK'
+function extract_nix_paths(line,    remaining, path, start) {
+	remaining = line
+	while (match(remaining, /\.\.\/[[:alnum:]_./-]+\.nix|\.\/[[:alnum:]_./-]+\.nix/)) {
+		start = RSTART
+		path = substr(remaining, start, RLENGTH)
+		print path
+		remaining = substr(remaining, start + RLENGTH)
+	}
+}
+
+function extract_directory_imports(line,    remaining, path, start) {
+	remaining = line
+	while (match(remaining, /\.\.\/[[:alnum:]_./-]+|\.\/[[:alnum:]_./-]+/)) {
+		start = RSTART
+		path = substr(remaining, start, RLENGTH)
+		if (path !~ /\.nix$/) {
+			print path
+		}
+		remaining = substr(remaining, start + RLENGTH)
+	}
+}
+
+{
+	raw_line = $0
+	extract_nix_paths(raw_line)
+
+	line = raw_line
+	sub(/#.*/, "", line)
+
+	if (!in_imports) {
+		if (line ~ /imports[[:space:]]*=/) {
+			if (index(line, "[") > 0) {
+				in_imports = 1
+				bracket_depth = count_char(line, "[") - count_char(line, "]")
+				extract_directory_imports(line)
+				if (bracket_depth <= 0) {
+					in_imports = 0
+					bracket_depth = 0
+				}
+			} else {
+				waiting_for_open_bracket = 1
+			}
+		} else if (waiting_for_open_bracket && index(line, "[") > 0) {
+			in_imports = 1
+			waiting_for_open_bracket = 0
+			bracket_depth = count_char(line, "[") - count_char(line, "]")
+			extract_directory_imports(line)
+			if (bracket_depth <= 0) {
+				in_imports = 0
+				bracket_depth = 0
+			}
+		}
+		next
+	}
+
+	extract_directory_imports(line)
+	bracket_depth += count_char(line, "[") - count_char(line, "]")
+	if (bracket_depth <= 0) {
+		in_imports = 0
+		bracket_depth = 0
+	}
+}
+AWK
+	} > "$parse_awk_script"
+
 	local -a defaults=()
 	mapfile -t defaults < <(find . -type f -name default.nix | sort)
 
@@ -168,7 +164,7 @@ main() {
 		echo "⟳ Checking $default" >&2
 
 		local -a imported=()
-		mapfile -t imported < <(parse_imports "$default")
+		mapfile -t imported < <(parse_imports "$default" "$parse_awk_script")
 
 		local -a manual_helpers=()
 		mapfile -t manual_helpers < <(parse_manual_helpers "$default")

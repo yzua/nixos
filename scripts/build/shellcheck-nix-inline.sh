@@ -6,22 +6,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
+AWK_UTILS="${SCRIPT_DIR}/../lib/awk-utils.awk"
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 awk_script="$tmp_dir/extract.awk"
-cat >"$awk_script" <<'AWK'
-function count_char(str, ch,    i, n) {
-  n = 0
-  for (i = 1; i <= length(str); i++) {
-    if (substr(str, i, 1) == ch) {
-      n += 1
-    }
-  }
-  return n
-}
-
+{
+  cat "$AWK_UTILS"
+  cat <<'AWK'
 function sanitize_path(path, value) {
   value = path
   gsub(/[\/[:space:]]+/, "__", value)
@@ -182,6 +175,7 @@ END {
   }
 }
 AWK
+} > "$awk_script"
 
 mapfile -t extracted_scripts < <(
 	rg --files -g '*.nix' . | xargs -d '\n' -P4 -I{} awk -v tmpdir="$tmp_dir" -v src="{}" -f "$awk_script" "{}"

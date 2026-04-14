@@ -54,6 +54,7 @@ sanitize() {
 		-e 's/(sk-[A-Za-z0-9_-]+)/[REDACTED]/g' \
 		-e 's/(Bearer )[A-Za-z0-9._-]+/\1[REDACTED]/g'
 }
+export -f sanitize
 
 json_keys() {
 	local file="$1"
@@ -546,7 +547,7 @@ while true; do
 			--header="${tool}/${section}: filter entries (ENTER opens source file, ESC back)" \
 			--delimiter=$'\t' \
 			--with-nth=1,2,3,4 \
-			--preview 'printf "Tool: %s\nKind: %s\nName: %s\nDetail: %s\nSource: %s\n" {1} {2} {3} {4} {5} | sed -E "s/(gho_[A-Za-z0-9_]+)/[REDACTED]/g; s/(sk-[A-Za-z0-9_-]+)/[REDACTED]/g; s/(Bearer )[A-Za-z0-9._-]+/\1[REDACTED]/g"' \
+			--preview 'printf "Tool: %s\nKind: %s\nName: %s\nDetail: %s\nSource: %s\n" {1} {2} {3} {4} {5} | sanitize' \
 			<"$tmp_filtered"
 	} || true)"
 

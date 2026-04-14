@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Core collectors for system report generation.
 
+# shellcheck source=scripts/lib/error-patterns.sh
+source "${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../..}"/scripts/lib/error-patterns.sh
+
 scan_error_log_count() {
 	local mtime_filter="$1"
 	shift
@@ -15,7 +18,7 @@ scan_error_log_count() {
 
 	mapfile -t matched_files < <(
 		find "${find_args[@]}" -print0 2>/dev/null |
-			xargs -0 -r grep -Eil "error|panic|fatal|exception" 2>/dev/null || true
+			xargs -0 -r grep -Eil "$ERROR_PATTERN" 2>/dev/null || true
 	)
 
 	echo "${#matched_files[@]}"
