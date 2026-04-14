@@ -9,7 +9,8 @@
 
 let
   inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
-    mkOneshotHardening
+    mkServiceHardening
+    mkOneshotService
     mkPersistentTimer
     ;
 in
@@ -55,7 +56,7 @@ in
       {
         services = {
           scrutiny-collector.serviceConfig =
-            mkOneshotHardening {
+            mkServiceHardening {
               protectHome = true;
               protectSystem = null;
               useMkForce = true;
@@ -64,15 +65,12 @@ in
               ExecStartPre = [ "${waitScript}" ];
             };
 
-          scrutiny-retention-cleanup = {
+          scrutiny-retention-cleanup = mkOneshotService {
             description = "Clean old Scrutiny InfluxDB data";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = "${pkgs.findutils}/bin/find /var/lib/influxdb2 -type f -name '*.tsm' -mtime +365 -delete";
-            };
+            execStart = "${pkgs.findutils}/bin/find /var/lib/influxdb2 -type f -name '*.tsm' -mtime +365 -delete";
           };
 
-          scrutiny.serviceConfig = mkOneshotHardening {
+          scrutiny.serviceConfig = mkServiceHardening {
             readWritePaths = [ "/var/lib/scrutiny" ];
             protectHome = true;
             memoryMax = "128M";
@@ -80,9 +78,11 @@ in
             useMkForce = true;
           };
 
-          influxdb2.serviceConfig = {
-            MemoryMax = "256M";
-            MemoryHigh = "192M";
+          influxdb2.serviceConfig = mkServiceHardening {
+            protectHome = true;
+            memoryMax = "256M";
+            memoryHigh = "192M";
+            useMkForce = true;
           };
         };
 

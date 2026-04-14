@@ -10,7 +10,7 @@
 
 let
   cfg = config.mySystem.ntfy;
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
 
   # Config template for alertmanager-ntfy bridge.
   # Topic placeholder is replaced at runtime from sops secret.
@@ -66,11 +66,10 @@ in
       serviceConfig = {
         DynamicUser = true;
         RuntimeDirectory = "alertmanager-ntfy";
-        MemoryMax = "64M";
       }
-      // mkOneshotHardening {
+      // mkServiceHardening {
         protectHome = true;
-        memoryMax = null;
+        memoryMax = "64M";
       };
     };
 

@@ -6,7 +6,10 @@
   user,
 }:
 let
-  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; }) mkPersistentTimer;
+  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; })
+    mkOneshotService
+    mkPersistentTimer
+    ;
 
   bash = "${pkgs.bash}/bin/bash";
   find = "${pkgs.findutils}/bin/find";
@@ -21,18 +24,17 @@ let
       serviceUser ? user,
     }:
     {
-      systemd.services."cleanup-${name}" = {
-        inherit description;
-        wantedBy = [ ];
-        serviceConfig = {
-          Type = "oneshot";
-          User = serviceUser;
-          ExecStart = execStart;
-        }
-        // lib.optionalAttrs (postCommand != null) {
-          ExecStartPost = postCommand;
+      systemd.services."cleanup-${name}" =
+        (mkOneshotService {
+          inherit description execStart;
+          extraServiceConfig = {
+            User = serviceUser;
+          }
+          // lib.optionalAttrs (postCommand != null) { ExecStartPost = postCommand; };
+        })
+        // {
+          wantedBy = [ ];
         };
-      };
     };
 
   mkCleanupTimerUnit =

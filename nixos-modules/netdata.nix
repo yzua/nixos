@@ -9,7 +9,7 @@
 }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
 in
 {
   options.mySystem.netdata = {
@@ -49,42 +49,43 @@ in
 
       enableAnalyticsReporting = false;
 
-      configDir = {
+      configDir =
         # Disable go.d collectors that auto-detect but can't connect
-        "go.d/redis.conf" = pkgs.writeText "netdata-go-redis.conf" ''
-          autodetection_retry: 0
-          jobs: []
-        '';
-        "go.d/docker.conf" = pkgs.writeText "netdata-go-docker.conf" ''
-          autodetection_retry: 0
-          jobs: []
-        '';
-        "go.d/postgres.conf" = pkgs.writeText "netdata-go-postgres.conf" ''
-          autodetection_retry: 0
-          jobs: []
-        '';
-        "go.d/prometheus.conf" = pkgs.writeText "netdata-go-prometheus.conf" ''
-          autodetection_retry: 0
-          jobs: []
-        '';
+        builtins.listToAttrs (
+          map
+            (name: {
+              name = "go.d/${name}.conf";
+              value = pkgs.writeText "netdata-go-${name}.conf" ''
+                autodetection_retry: 0
+                jobs: []
+              '';
+            })
+            [
+              "redis"
+              "docker"
+              "postgres"
+              "prometheus"
+            ]
+        )
+        // {
 
-        "health.d/timex.conf" = pkgs.writeText "netdata-timex.conf" ''
-                alarm: system_clock_sync_state
-                   on: system.clock_sync_state
-                class: Errors
-                 type: System
-            component: Clock
-          host labels: _os=linux
-                 calc: $state
-                units: synchronization state
-                every: 10s
-                 warn: $this != $this
-                delay: down 5m
-              summary: System clock sync state
-                 info: When set to 0, the system kernel believes the system clock is not properly synchronized to a reliable server
-                   to: silent
-        '';
-      };
+          "health.d/timex.conf" = pkgs.writeText "netdata-timex.conf" ''
+                  alarm: system_clock_sync_state
+                     on: system.clock_sync_state
+                  class: Errors
+                   type: System
+              component: Clock
+            host labels: _os=linux
+                   calc: $state
+                  units: synchronization state
+                  every: 10s
+                   warn: $this != $this
+                  delay: down 5m
+                summary: System clock sync state
+                   info: When set to 0, the system kernel believes the system clock is not properly synchronized to a reliable server
+                     to: silent
+          '';
+        };
     };
 
     users.users.netdata.extraGroups = [
@@ -92,14 +93,12 @@ in
     ]
     ++ lib.optionals config.virtualisation.docker.enable [ "docker" ];
 
-    systemd.services.netdata.serviceConfig = mkOneshotHardening {
+    systemd.services.netdata.serviceConfig = mkServiceHardening {
       protectHome = true;
       protectSystem = "full";
       memoryMax = "512M";
       memoryHigh = "384M";
       useMkForce = true;
     };
-
-    environment.systemPackages = [ pkgsStable.smartmontools ];
   };
 }

@@ -21,7 +21,7 @@
 }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
 in
 {
   options.mySystem.secureBoot = {
@@ -61,7 +61,7 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
       }
-      // mkOneshotHardening {
+      // mkServiceHardening {
         readWritePaths = [
           "/boot"
           "/var/lib/sbctl"

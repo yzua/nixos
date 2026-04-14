@@ -8,7 +8,7 @@
 }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
 in
 
 {
@@ -56,7 +56,7 @@ in
           RestartSteps = 3; # Required when RestartMaxDelaySec is set
           RestartMaxDelaySec = 60;
         }
-        // mkOneshotHardening { protectHome = true; };
+        // mkServiceHardening { protectHome = true; };
       };
 
       # Start Flathub registration 2 minutes after boot (needs network + DNS)

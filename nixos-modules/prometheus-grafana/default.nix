@@ -8,6 +8,8 @@
 }:
 
 let
+  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+
   localhost = "127.0.0.1";
   netdataTarget = "${localhost}:19999";
   lokiTarget = "${localhost}:3100";
@@ -35,15 +37,21 @@ let
       orgId = 1;
       jsonData = { };
     };
-  mkMemoryService =
-    {
-      max,
-      high,
-    }:
-    {
-      MemoryMax = max;
-      MemoryHigh = high;
-    };
+  datasources = [
+    (mkDatasource {
+      name = "Prometheus";
+      type = "prometheus";
+      url = "http://${prometheusTarget}";
+      uid = "prometheus";
+      isDefault = true;
+    })
+    (mkDatasource {
+      name = "Loki";
+      type = "loki";
+      url = "http://${lokiTarget}";
+      uid = "loki";
+    })
+  ];
   dashboardDir = pkgs.runCommand "grafana-dashboards" { } ''
     mkdir -p $out
     cp ${./dashboards/system-overview.json} $out/system-overview.json
@@ -152,31 +160,8 @@ in
         provision = {
           datasources.settings = {
             apiVersion = 1;
-            deleteDatasources = [
-              {
-                name = "Prometheus";
-                orgId = 1;
-              }
-              {
-                name = "Loki";
-                orgId = 1;
-              }
-            ];
-            datasources = [
-              (mkDatasource {
-                name = "Prometheus";
-                type = "prometheus";
-                url = "http://${prometheusTarget}";
-                uid = "prometheus";
-                isDefault = true;
-              })
-              (mkDatasource {
-                name = "Loki";
-                type = "loki";
-                url = "http://${lokiTarget}";
-                uid = "loki";
-              })
-            ];
+            deleteDatasources = map (ds: { inherit (ds) name orgId; }) datasources;
+            inherit datasources;
           };
 
           dashboards.settings.providers = [
@@ -191,19 +176,24 @@ in
 
     # === Resource Limits ===
     systemd.services = {
-      prometheus.serviceConfig = mkMemoryService {
-        max = "512M";
-        high = "384M";
+      prometheus.serviceConfig = mkServiceHardening {
+        memoryMax = "512M";
+        memoryHigh = "384M";
+        protectHome = lib.mkDefault "read-only";
+        protectSystem = lib.mkDefault "strict";
       };
-      alertmanager.serviceConfig = mkMemoryService {
-        max = "128M";
-        high = "64M";
+      alertmanager.serviceConfig = mkServiceHardening {
+        memoryMax = "128M";
+        memoryHigh = "64M";
+        protectHome = lib.mkDefault "read-only";
       };
       grafana = {
         restartTriggers = [ config.sops.secrets.grafana_admin_password.path ];
-        serviceConfig = mkMemoryService {
-          max = "256M";
-          high = "192M";
+        serviceConfig = mkServiceHardening {
+          memoryMax = "256M";
+          memoryHigh = "192M";
+          protectHome = lib.mkDefault "read-only";
+          protectSystem = lib.mkDefault "strict";
         };
       };
     };

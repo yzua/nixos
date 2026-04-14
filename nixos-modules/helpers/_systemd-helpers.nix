@@ -1,8 +1,8 @@
-# Unified systemd helpers: oneshot hardening, persistent timers, oneshot services.
+# Unified systemd helpers: service hardening, persistent timers, oneshot services.
 
 { lib, ... }:
 {
-  mkOneshotHardening =
+  mkServiceHardening =
     {
       readWritePaths ? [ ],
       protectHome ? "read-only",

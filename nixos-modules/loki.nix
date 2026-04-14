@@ -3,7 +3,7 @@
 { config, lib, ... }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
 in
 {
   options.mySystem.loki = {
@@ -122,23 +122,19 @@ in
     # SECURITY: Systemd hardening directives + resource limits
     systemd = {
       services = {
-        loki.serviceConfig = {
-          MemoryMax = "256M";
-          MemoryHigh = "192M";
-        }
-        // mkOneshotHardening {
+        loki.serviceConfig = mkServiceHardening {
           readWritePaths = [ "/var/lib/loki" ];
           protectHome = true;
           useMkForce = true;
+          memoryMax = "256M";
+          memoryHigh = "192M";
         };
 
-        promtail.serviceConfig = {
-          MemoryMax = "128M";
-          MemoryHigh = "64M";
-        }
-        // mkOneshotHardening {
+        promtail.serviceConfig = mkServiceHardening {
           protectHome = true;
           useMkForce = true;
+          memoryMax = "128M";
+          memoryHigh = "64M";
         };
       };
 

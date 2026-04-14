@@ -7,6 +7,9 @@
   ...
 }:
 
+let
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+in
 {
   options.mySystem.greetd = {
     enable = lib.mkEnableOption "greetd display manager";
@@ -33,11 +36,8 @@
       TTYReset = true;
       TTYVHangup = true;
       TTYVTDisallocate = true;
-      # SECURITY: Systemd hardening directives (mkForce to override upstream defaults)
-      PrivateTmp = lib.mkForce true;
-      ProtectSystem = lib.mkForce "strict";
-      ProtectKernelTunables = lib.mkForce true;
-      NoNewPrivileges = lib.mkForce true;
-    };
+    }
+    # SECURITY: Systemd hardening directives (mkForce to override upstream defaults)
+    // mkServiceHardening { useMkForce = true; };
   };
 }
