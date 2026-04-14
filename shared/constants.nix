@@ -1,14 +1,6 @@
 # Shared constants used across NixOS and Home Manager configurations.
 # Single source of truth for terminal, editor, font, theme, and keyboard settings.
-#
-# Usage (in NixOS modules):
-#   { constants, ... }:
-#   { TERMINAL = constants.terminal; }
-#
-# Usage (in Home Manager modules):
-#   { constants, ... }:
-#   { config.programs.ghostty.settings.font-family = constants.font.mono; }
-
+# Passed via flake specialArgs (NixOS) and extraSpecialArgs (Home Manager).
 {
   # User Identity (Git, GitHub, Contact)
   user = {
