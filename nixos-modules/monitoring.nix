@@ -1,14 +1,25 @@
 # System monitoring (sensors, vnStat, bandwhich).
 
-{ pkgsStable, ... }:
+{
+  config,
+  lib,
+  pkgsStable,
+  ...
+}:
 
 {
-  environment.systemPackages = with pkgsStable; [
-    iotop
-    sysstat
-    lm_sensors
-  ];
+  options.mySystem.monitoring = {
+    enable = lib.mkEnableOption "system monitoring tools (iotop, sysstat, sensors, vnStat, bandwhich)";
+  };
 
-  services.vnstat.enable = true;
-  programs.bandwhich.enable = true;
+  config = lib.mkIf config.mySystem.monitoring.enable {
+    environment.systemPackages = with pkgsStable; [
+      iotop
+      sysstat
+      lm_sensors
+    ];
+
+    services.vnstat.enable = true;
+    programs.bandwhich.enable = true;
+  };
 }

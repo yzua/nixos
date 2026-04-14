@@ -7,8 +7,11 @@
 }:
 
 let
-  helpers = import ../helpers/_systemd-helpers.nix { inherit lib; };
-  inherit (helpers) mkOneshotService mkPersistentTimer;
+  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; })
+    mkOneshotHardening
+    mkOneshotService
+    mkPersistentTimer
+    ;
 
   auditScript = pkgsStable.writeShellScript "security-audit.sh" ''
     #!${pkgsStable.bash}/bin/bash
@@ -31,12 +34,9 @@ in
     services.security-audit = mkOneshotService {
       description = "Run Lynis security audit";
       execStart = auditScript;
-      extraServiceConfig = {
+      extraServiceConfig = mkOneshotHardening {
+        readWritePaths = [ "/tmp" ];
         # NOTE: PrivateNetwork omitted so Lynis can audit network config
-        PrivateTmp = true;
-        ProtectHome = true;
-        ProtectSystem = "strict";
-        ReadWritePaths = [ "/tmp" ];
       };
     };
   };

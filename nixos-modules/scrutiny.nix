@@ -8,7 +8,10 @@
 }:
 
 let
-  hardening = import ./helpers/_systemd-helpers.nix { inherit lib; };
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
+    mkOneshotHardening
+    mkPersistentTimer
+    ;
 in
 {
   options.mySystem.scrutiny = {
@@ -52,7 +55,7 @@ in
       {
         services = {
           scrutiny-collector.serviceConfig =
-            hardening.mkOneshotHardening {
+            mkOneshotHardening {
               protectHome = true;
               protectSystem = null;
               useMkForce = true;
@@ -69,7 +72,7 @@ in
             };
           };
 
-          scrutiny.serviceConfig = hardening.mkOneshotHardening {
+          scrutiny.serviceConfig = mkOneshotHardening {
             readWritePaths = [ "/var/lib/scrutiny" ];
             protectHome = true;
             memoryMax = "128M";
@@ -83,7 +86,7 @@ in
           };
         };
 
-        timers.scrutiny-retention-cleanup = hardening.mkPersistentTimer {
+        timers.scrutiny-retention-cleanup = mkPersistentTimer {
           description = "Monthly Scrutiny InfluxDB data cleanup";
           onCalendar = "monthly";
           randomizedDelaySec = "1h";

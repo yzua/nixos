@@ -2,10 +2,24 @@
 
 {
   inputs,
+  lib,
   pkgConfig,
   pkgsStable,
   ...
 }:
+
+let
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
+    mkOneshotHardening
+    mkOneshotService
+    mkPersistentTimer
+    ;
+
+  updateCheckScript = pkgsStable.writeShellScript "security-update-check.sh" ''
+    LOG=/var/log/security-update-check.log
+    ${pkgsStable.coreutils}/bin/date -Iseconds >> "$LOG"
+  '';
+in
 
 {
   # Mirror pkgConfig from flake.nix — nixosSystem evaluates its own nixpkgs instance
@@ -75,30 +89,20 @@
   # === Security Update Notification Timer ===
   # Daily reminder that updates should be checked. Does NOT auto-apply.
   # Run `just update && just nixos` manually when convenient.
-  systemd.services.security-update-check = {
-    description = "Log security update check timestamp";
-    script = ''
-      set -euo pipefail
-      LOG=/var/log/security-update-check.log
-      ${pkgsStable.coreutils}/bin/date -Iseconds >> "$LOG"
-    '';
-    serviceConfig = {
-      Type = "oneshot";
-      PrivateTmp = true;
-      ProtectHome = true;
-      ProtectSystem = "strict";
-      NoNewPrivileges = true;
-      ReadWritePaths = [ "/var/log" ];
+  systemd = {
+    services.security-update-check = mkOneshotService {
+      description = "Log security update check timestamp";
+      execStart = updateCheckScript;
+      extraServiceConfig = mkOneshotHardening {
+        readWritePaths = [ "/var/log" ];
+        protectHome = true;
+      };
     };
-  };
 
-  systemd.timers.security-update-check = {
-    description = "Daily security update check";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-      RandomizedDelaySec = "1h";
+    timers.security-update-check = mkPersistentTimer {
+      description = "Daily security update check";
+      onCalendar = "daily";
+      randomizedDelaySec = "1h";
     };
   };
 }

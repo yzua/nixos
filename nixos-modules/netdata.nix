@@ -9,7 +9,7 @@
 }:
 
 let
-  hardening = import ./helpers/_systemd-helpers.nix { inherit lib; };
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
 in
 {
   options.mySystem.netdata = {
@@ -92,7 +92,7 @@ in
     ]
     ++ lib.optionals config.virtualisation.docker.enable [ "docker" ];
 
-    systemd.services.netdata.serviceConfig = hardening.mkOneshotHardening {
+    systemd.services.netdata.serviceConfig = mkOneshotHardening {
       protectHome = true;
       protectSystem = "full";
       memoryMax = "512M";

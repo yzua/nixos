@@ -17,9 +17,7 @@ in
   options.mySystem.bluetooth = {
     enable = lib.mkEnableOption "Bluetooth support with Blueman manager";
 
-    powerOnBoot =
-      mkBoolOption false true
-        "Power on Bluetooth adapter automatically at boot. Disable on public networks for privacy.";
+    powerOnBoot = mkBoolOption false "Power on Bluetooth adapter automatically at boot. Disable on public networks for privacy.";
   };
 
   # Configuration applied when Bluetooth is enabled

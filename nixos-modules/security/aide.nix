@@ -9,8 +9,10 @@
 }:
 
 let
-  helpers = import ../helpers/_systemd-helpers.nix { inherit lib; };
-  inherit (helpers) mkOneshotService mkPersistentTimer;
+  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; })
+    mkOneshotService
+    mkPersistentTimer
+    ;
 
   aideConf = pkgs.writeText "aide.conf" ''
     database_in=file:/var/lib/aide/aide.db

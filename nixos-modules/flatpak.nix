@@ -1,7 +1,15 @@
 # Flatpak sandboxed application distribution with Flathub.
 # SECURITY: Default overrides restrict Flatpak apps to VPN tunnel and limit filesystem access.
 
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  ...
+}:
+
+let
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+in
 
 {
   options.mySystem.flatpak = {
@@ -47,14 +55,8 @@
           RestartSec = 10;
           RestartSteps = 3; # Required when RestartMaxDelaySec is set
           RestartMaxDelaySec = 60;
-          # SECURITY: Systemd hardening directives
-          PrivateTmp = true;
-          ProtectHome = true;
-          NoNewPrivileges = true;
-          ProtectKernelTunables = true;
-          ProtectControlGroups = true;
-          RestrictSUIDSGID = true;
-        };
+        }
+        // mkOneshotHardening { protectHome = true; };
       };
 
       # Start Flathub registration 2 minutes after boot (needs network + DNS)

@@ -6,8 +6,7 @@
   user,
 }:
 let
-  timerHelpers = import ../helpers/_systemd-helpers.nix { inherit lib; };
-  inherit (timerHelpers) mkPersistentTimer;
+  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; }) mkPersistentTimer;
 
   bash = "${pkgs.bash}/bin/bash";
   find = "${pkgs.findutils}/bin/find";

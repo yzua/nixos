@@ -20,6 +20,9 @@
   ...
 }:
 
+let
+  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkOneshotHardening;
+in
 {
   options.mySystem.secureBoot = {
     enable = lib.mkEnableOption "Secure Boot preparation with sbctl";
@@ -57,13 +60,13 @@
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ProtectHome = true;
-        ProtectSystem = "strict";
-        ReadWritePaths = [
+      }
+      // mkOneshotHardening {
+        readWritePaths = [
           "/boot"
           "/var/lib/sbctl"
         ];
-        NoNewPrivileges = true;
+        protectHome = true;
       };
     };
   };

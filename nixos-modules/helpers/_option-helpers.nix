@@ -1,19 +1,20 @@
-# Shared option constructors for common schemas.
+# Shared option constructors for NixOS modules.
 
 { lib }:
-
+let
+  mkTypedOption =
+    type: default: description:
+    lib.mkOption {
+      inherit type default description;
+    };
+in
 {
-  mkBoolOption =
-    default: example: description:
-    lib.mkOption {
-      type = lib.types.bool;
-      inherit default example description;
-    };
+  inherit mkTypedOption;
 
+  mkBoolOption = default: description: mkTypedOption lib.types.bool default description;
+  mkStrOption = default: description: mkTypedOption lib.types.str default description;
+  mkIntOption = default: description: mkTypedOption lib.types.int default description;
   mkNullableOption =
-    type: default: example: description:
-    lib.mkOption {
-      type = with lib.types; nullOr type;
-      inherit default example description;
-    };
+    type: default: description:
+    mkTypedOption (lib.types.nullOr type) default description;
 }
