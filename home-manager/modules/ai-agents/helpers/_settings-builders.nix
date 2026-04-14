@@ -118,29 +118,24 @@ let
     };
   };
 
-  sonnetProfile = {
-    opencode = opencodeSettings // {
+  # Profile variant settings keyed by profile name (matching _opencode-profiles.nix names).
+  opencodeSettingsByProfile = {
+    opencode = opencodeSettings;
+    "opencode-glm" = profiles.glm.opencode;
+    "opencode-gemini" = profiles.gemini.opencode;
+    "opencode-gpt" = profiles.gpt.opencode;
+    "opencode-openrouter" = profiles.openrouter.opencode;
+    "opencode-sonnet" = opencodeSettings // {
       model = sonnetModel;
     };
+    "opencode-zen" = profiles.zen.opencode;
   };
-
-  glmOpencodeSettings = profiles.glm.opencode;
-  geminiOpencodeSettings = profiles.gemini.opencode;
-  gptOpencodeSettings = profiles.gpt.opencode;
-  openrouterOpencodeSettings = profiles.openrouter.opencode;
-  sonnetOpencodeSettings = sonnetProfile.opencode;
-  zenOpencodeSettings = profiles.zen.opencode;
 in
 {
   inherit
     claudeSettings
     opencodeSettings
     geminiSettings
-    glmOpencodeSettings
-    geminiOpencodeSettings
-    gptOpencodeSettings
-    openrouterOpencodeSettings
-    sonnetOpencodeSettings
-    zenOpencodeSettings
+    opencodeSettingsByProfile
     ;
 }

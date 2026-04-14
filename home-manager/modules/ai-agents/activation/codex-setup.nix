@@ -77,57 +77,64 @@ lib.mkIf cfg.codex.enable (
     featuresToml = lib.concatStringsSep "\n" (
       lib.mapAttrsToList (name: enabled: "${name} = ${lib.boolToString enabled}") cfg.codex.features
     );
-    renderProfile =
-      name: profile:
-      let
-        lines =
-          lib.optional (profile.model != null) ''model = "${profile.model}"''
-          ++ lib.optional (profile.personality != null) ''personality = "${profile.personality}"''
-          ++ lib.optional (
-            profile.reasoningEffort != null
-          ) ''model_reasoning_effort = "${profile.reasoningEffort}"''
-          ++ lib.optional (profile.approvalPolicy != null) ''approval_policy = "${profile.approvalPolicy}"''
-          ++ lib.optional (profile.sandboxMode != null) ''sandbox_mode = "${profile.sandboxMode}"''
-          ++ lib.optional (profile.developerInstructions != "") ''
-            developer_instructions = """
-            ${profile.developerInstructions}
-            """
-          ''
-          ++ lib.optional (profile.extraToml != "") profile.extraToml;
-      in
+    # Shared TOML field rendering for profiles and custom agents.
+    mkEntityTomlFields =
+      {
+        model ? null,
+        personality ? null,
+        reasoningEffort ? null,
+        approvalPolicy ? null,
+        sandboxMode ? null,
+        developerInstructions ? "",
+        extraToml ? "",
+      }:
+      lib.optional (model != null) ''model = "${model}"''
+      ++ lib.optional (personality != null) ''personality = "${personality}"''
+      ++ lib.optional (reasoningEffort != null) ''model_reasoning_effort = "${reasoningEffort}"''
+      ++ lib.optional (approvalPolicy != null) ''approval_policy = "${approvalPolicy}"''
+      ++ lib.optional (sandboxMode != null) ''sandbox_mode = "${sandboxMode}"''
+      ++ lib.optional (developerInstructions != "") ''
+        developer_instructions = """
+        ${developerInstructions}
+        """
       ''
-        [profiles.${name}]
-        ${lib.concatStringsSep "\n" lines}
-      '';
+      ++ lib.optional (extraToml != "") extraToml;
+    renderProfile = name: profile: ''
+      [profiles.${name}]
+      ${lib.concatStringsSep "\n" (mkEntityTomlFields {
+        inherit (profile)
+          model
+          personality
+          reasoningEffort
+          approvalPolicy
+          sandboxMode
+          developerInstructions
+          extraToml
+          ;
+      })}
+    '';
     profilesToml = lib.concatStringsSep "\n\n" (lib.mapAttrsToList renderProfile cfg.codex.profiles);
-    renderCustomAgent =
-      name: agent:
-      let
-        lines = [
+    renderCustomAgent = name: agent: ''
+      cat > "$HOME/.codex/agents/${name}.toml" << 'CODEX_AGENT_EOF'
+      ${lib.concatStringsSep "\n" (
+        [
           ''name = "${name}"''
           ''description = "${agent.description}"''
         ]
-        ++ lib.optional (agent.model != null) ''model = "${agent.model}"''
-        ++ lib.optional (
-          agent.reasoningEffort != null
-        ) ''model_reasoning_effort = "${agent.reasoningEffort}"''
-        ++ lib.optional (agent.approvalPolicy != null) ''approval_policy = "${agent.approvalPolicy}"''
-        ++ lib.optional (agent.sandboxMode != null) ''sandbox_mode = "${agent.sandboxMode}"''
-        ++ [
-          ''
-            developer_instructions = """
-            ${agent.developerInstructions}
-            """
-          ''
-        ]
-        ++ lib.optional (agent.extraToml != "") agent.extraToml;
-      in
-      ''
-        cat > "$HOME/.codex/agents/${name}.toml" << 'CODEX_AGENT_EOF'
-        ${lib.concatStringsSep "\n" lines}
-        CODEX_AGENT_EOF
-        ${pkgs.gnused}/bin/sed -i 's/^        //' "$HOME/.codex/agents/${name}.toml"
-      '';
+        ++ mkEntityTomlFields {
+          inherit (agent)
+            model
+            reasoningEffort
+            approvalPolicy
+            sandboxMode
+            developerInstructions
+            extraToml
+            ;
+        }
+      )}
+      CODEX_AGENT_EOF
+      ${pkgs.gnused}/bin/sed -i 's/^        //' "$HOME/.codex/agents/${name}.toml"
+    '';
     customAgentsWrite = lib.concatStringsSep "\n" (
       lib.mapAttrsToList renderCustomAgent cfg.codex.customAgents
     );

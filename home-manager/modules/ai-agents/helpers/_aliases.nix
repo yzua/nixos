@@ -8,7 +8,7 @@
 }:
 
 let
-  workflowPrompts = import ./_workflow-prompts.nix {};
+  workflowPrompts = import ./_workflow-prompts.nix { };
   commitSplitPrompt = workflowPrompts.commitSplit;
   refactorMaintainabilityPrompt = workflowPrompts.refactorMaintainability;
   securityAuditPrompt = workflowPrompts.securityAudit;
@@ -65,11 +65,6 @@ let
     }
     {
       alias = "cx";
-      command = codexBase;
-      workflowPromptMode = "positional";
-    }
-    {
-      alias = "cxu";
       command = codexBase;
       workflowPromptMode = "positional";
     }
@@ -203,19 +198,29 @@ let
 
   aiAliases = mkAliasAttrs (aiAgentAliasSpecs ++ aiWorkflowAliasSpecs ++ workflowClipboardAliasSpecs);
 
-  aiAgentLauncher = pkgs.writeShellScriptBin "ai-agent-launcher" ''
+  # Shared env var passthrough for workflow prompts (used by launcher and iter wrappers).
+  mkWorkflowEnvVars = targetScript: ''
     COMMIT_SPLIT_PROMPT=${lib.escapeShellArg commitSplitPrompt} \
-      REFACTOR_MAINTAINABILITY_PROMPT=${lib.escapeShellArg refactorMaintainabilityPrompt} \
-      BUGFIX_ROOT_CAUSE_PROMPT=${lib.escapeShellArg bugfixRootCausePrompt} \
-      SECURITY_AUDIT_PROMPT=${lib.escapeShellArg securityAuditPrompt} \
-      DEPENDENCY_UPGRADE_PROMPT=${lib.escapeShellArg dependencyUpgradePrompt} \
-      BUILD_PERFORMANCE_PROMPT=${lib.escapeShellArg buildPerformancePrompt} \
-      MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg markdownSyncPrompt} \
-      exec ${config.home.homeDirectory}/System/scripts/ai/agent-launcher.sh "$@"
+    REFACTOR_MAINTAINABILITY_PROMPT=${lib.escapeShellArg refactorMaintainabilityPrompt} \
+    BUGFIX_ROOT_CAUSE_PROMPT=${lib.escapeShellArg bugfixRootCausePrompt} \
+    SECURITY_AUDIT_PROMPT=${lib.escapeShellArg securityAuditPrompt} \
+    DEPENDENCY_UPGRADE_PROMPT=${lib.escapeShellArg dependencyUpgradePrompt} \
+    BUILD_PERFORMANCE_PROMPT=${lib.escapeShellArg buildPerformancePrompt} \
+    MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg markdownSyncPrompt} \
+    exec ${targetScript} "$@"
   '';
+
+  aiAgentLauncher = pkgs.writeShellScriptBin "ai-agent-launcher" (
+    mkWorkflowEnvVars "${config.home.homeDirectory}/System/scripts/ai/agent-launcher.sh"
+  );
 in
 {
-  inherit aiAliases aiAgentLauncher workflowPrompts;
+  inherit
+    aiAliases
+    aiAgentLauncher
+    workflowPrompts
+    mkWorkflowEnvVars
+    ;
   aiAgentInventory = pkgs.writeShellScriptBin "ai-agent-inventory" ''
     exec ${config.home.homeDirectory}/System/scripts/ai/agent-inventory.sh "$@"
   '';

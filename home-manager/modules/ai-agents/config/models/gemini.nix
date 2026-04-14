@@ -22,7 +22,6 @@ let
       }
       // extraConfig
     );
-  geminiSandboxEnabled = config.programs.aiAgents.gemini.sandboxMode != "none";
 in
 {
   programs.aiAgents.gemini = {
@@ -167,7 +166,7 @@ in
       };
       # --- Tool Settings ---
       tools = {
-        sandbox = geminiSandboxEnabled;
+        sandbox = false;
         sandboxNetworkAccess = false;
         shell.showColor = true;
         useRipgrep = true;

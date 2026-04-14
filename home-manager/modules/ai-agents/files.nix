@@ -3,7 +3,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -15,30 +14,14 @@ let
   fileTemplates = import ./helpers/_file-templates.nix;
   geminiPolicies = import ./helpers/_gemini-policies.nix;
   impeccable = import ./helpers/_impeccable-commands.nix;
-  settingsBuilders = import ./helpers/_settings-builders.nix { inherit config lib pkgs; };
+  settingsBuilders = import ./helpers/_settings-builders.nix { inherit config lib; };
   inherit (settingsBuilders)
-    opencodeSettings
     geminiSettings
-    glmOpencodeSettings
-    geminiOpencodeSettings
-    gptOpencodeSettings
-    openrouterOpencodeSettings
-    sonnetOpencodeSettings
-    zenOpencodeSettings
+    opencodeSettingsByProfile
     ;
 
   opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   opencodeProfileNames = opencodeProfiles.names;
-
-  opencodeSettingsByProfile = {
-    opencode = opencodeSettings;
-    "opencode-glm" = glmOpencodeSettings;
-    "opencode-gemini" = geminiOpencodeSettings;
-    "opencode-gpt" = gptOpencodeSettings;
-    "opencode-openrouter" = openrouterOpencodeSettings;
-    "opencode-sonnet" = sonnetOpencodeSettings;
-    "opencode-zen" = zenOpencodeSettings;
-  };
 
   opencodeConfigFiles = lib.foldl' (
     acc: name:

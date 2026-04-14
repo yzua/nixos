@@ -15,16 +15,9 @@ let
       AI_AGENT_NOTIFY_ON_ERROR=${if cfg.logging.notifyOnError then "true" else "false"} \
       exec ${config.home.homeDirectory}/System/scripts/ai/agent-log-wrapper.sh "$@"
   '';
-  agentIter = pkgs.writeShellScriptBin "iter" ''
-    COMMIT_SPLIT_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.commitSplit} \
-      REFACTOR_MAINTAINABILITY_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.refactorMaintainability} \
-      BUGFIX_ROOT_CAUSE_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.bugfixRootCause} \
-      SECURITY_AUDIT_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.securityAudit} \
-      DEPENDENCY_UPGRADE_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.dependencyUpgrade} \
-      BUILD_PERFORMANCE_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.buildPerformance} \
-      MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg aliasLib.workflowPrompts.markdownSync} \
-      exec bash ${config.home.homeDirectory}/System/scripts/ai/agent-iter.sh "$@"
-  '';
+  agentIter = pkgs.writeShellScriptBin "iter" (
+    aliasLib.mkWorkflowEnvVars "bash ${config.home.homeDirectory}/System/scripts/ai/agent-iter.sh"
+  );
   agentsSearch = pkgs.writeShellScriptBin "agents-search" ''
     exec ${config.home.homeDirectory}/System/scripts/ai/agents-search.sh "$@"
   '';
