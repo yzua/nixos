@@ -21,6 +21,7 @@ in
     boot = {
       kernelParams = [
         "nvidia-drm.modeset=1"
+        "nvidia-drm.fbdev=1" # Framebuffer device for console resolution and VT switching on Wayland
         "nvidia.NVreg_PreserveVideoMemoryAllocations=1" # Preserve GPU memory on suspend/resume
       ];
       blacklistedKernelModules = [ "nouveau" ];
@@ -69,13 +70,6 @@ in
           libva
         ];
       };
-    };
-
-    nix.settings = {
-      substituters = [ "https://cuda-maintainers.cachix.org" ];
-      trusted-public-keys = [
-        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-      ];
     };
 
     environment.systemPackages = with pkgs; [
