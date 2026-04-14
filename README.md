@@ -112,7 +112,7 @@ Set `hostProfile` first, then override as needed:
 | `systemReport.retentionDays` | System report retention window (days)                                     |
 | `greetd.enable`              | Display manager                                                           |
 | `waydroid.enable`            | Android emulation                                                         |
-| `auditLogging.enable`        | fail2ban logging                                                          |
+| `fail2ban.enable`            | fail2ban intrusion prevention                                             |
 | `aide.enable`                | AIDE file integrity monitoring (default: on)                              |
 | `metadataScrubber.enable`    | System-side metadata scrubber tooling (`mat2`/`exiftool`/`inotify-tools`) |
 | `kdeconnect.enable`          | KDE Connect phone integration                                             |
@@ -190,7 +190,7 @@ All local, no cloud. Toggle via `mySystem.*`:
 | VNC stack (x11vnc + noVNC + websockify) | `mySystem.vnc.enable`            | Remote desktop access               |
 | Cleanup timers                          | `mySystem.cleanup.enable`        | Downloads/cache retention jobs      |
 | Restic backup jobs                      | `mySystem.backup.enable`         | Scheduled backups with pruning      |
-| fail2ban/audit logging                  | `mySystem.auditLogging.enable`   | SSH/auth log monitoring             |
+| fail2ban intrusion prevention           | `mySystem.fail2ban.enable`       | SSH/auth log monitoring             |
 | Secure Boot preparation                 | `mySystem.secureBoot.enable`     | sbctl for Secure Boot setup         |
 | Web RE/security tools                   | `mySystem.webRe.enable`          | Nuclei, Nikto, SQLMap, Nmap, etc.   |
 

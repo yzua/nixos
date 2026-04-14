@@ -8,11 +8,11 @@
 }:
 
 {
-  options.mySystem.auditLogging = {
-    enable = lib.mkEnableOption "Security event logging with fail2ban";
+  options.mySystem.fail2ban = {
+    enable = lib.mkEnableOption "fail2ban intrusion prevention";
   };
 
-  config = lib.mkIf config.mySystem.auditLogging.enable {
+  config = lib.mkIf config.mySystem.fail2ban.enable {
     environment.systemPackages = [ pkgsStable.audit ];
 
     services.fail2ban = {

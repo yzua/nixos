@@ -50,7 +50,7 @@ in
       observability.enable = mkDefaultTrue;
       loki.enable = mkDefaultTrue;
       systemReport.enable = mkDefaultTrue;
-      auditLogging.enable = mkDefaultTrue; # fail2ban does NOT conflict with AppArmor (only auditd does)
+      fail2ban.enable = mkDefaultTrue; # fail2ban does NOT conflict with AppArmor (only auditd does)
       metadataScrubber.enable = mkDefaultTrue; # Auto-strip metadata from user files
       monitoring.enable = mkDefaultTrue; # System monitoring tools (iotop, sysstat, sensors, vnStat)
       aide.enable = mkDefaultTrue; # Weekly AIDE file integrity monitoring
