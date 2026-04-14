@@ -6,7 +6,6 @@
   imports = [
     ./hardware-configuration.nix
     ./local-packages.nix
-    ../common-host-info.nix
     ../../nixos-modules
     ./modules
   ];
@@ -32,11 +31,4 @@
     "/dev/disk/by-uuid/4e98b5c2-4022-41a6-8e97-dddf0fe5c408";
 
   services.avahi.allowInterfaces = [ "eno1" ];
-
-  # BFQ scheduler on root SSD — prevents heavy write bursts from starving reads.
-  # The KINGSTON SA400S37480G is DRAM-less; mq-deadline lets bulk writes monopolize
-  # the device, causing 1+ second I/O stalls under load. BFQ guarantees read latency.
-  services.udev.extraRules = ''
-    ACTION=="add|change", KERNEL=="sdb", ATTR{queue/scheduler}="bfq"
-  '';
 }

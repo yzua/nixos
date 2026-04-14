@@ -6,7 +6,6 @@
   imports = [
     ./hardware-configuration.nix
     ./local-packages.nix
-    ../common-host-info.nix
     ../../nixos-modules
     ./modules
   ];
