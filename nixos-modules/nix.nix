@@ -1,25 +1,12 @@
-# Nix package manager configuration (flakes, GC, binary caches, update notifications).
+# Nix package manager configuration (flakes, GC, binary caches).
 
 {
+  config,
   inputs,
   lib,
   pkgConfig,
-  pkgsStable,
   ...
 }:
-
-let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
-    mkOneshotHardening
-    mkOneshotService
-    mkPersistentTimer
-    ;
-
-  updateCheckScript = pkgsStable.writeShellScript "security-update-check.sh" ''
-    LOG=/var/log/security-update-check.log
-    ${pkgsStable.coreutils}/bin/date -Iseconds >> "$LOG"
-  '';
-in
 
 {
   # Mirror pkgConfig from flake.nix — nixosSystem evaluates its own nixpkgs instance
@@ -70,11 +57,17 @@ in
         "https://cache.nixos.org?priority=10"
         "https://nix-community.cachix.org"
         "https://numtide.cachix.org"
+      ]
+      ++ lib.optionals config.mySystem.nvidia.enable [
+        "https://cuda-maintainers.cachix.org"
       ];
 
       trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE="
+      ]
+      ++ lib.optionals config.mySystem.nvidia.enable [
+        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
       ];
     };
 
@@ -83,26 +76,6 @@ in
       persistent = true;
       dates = "weekly";
       options = "--delete-older-than 7d";
-    };
-  };
-
-  # === Security Update Notification Timer ===
-  # Daily reminder that updates should be checked. Does NOT auto-apply.
-  # Run `just update && just nixos` manually when convenient.
-  systemd = {
-    services.security-update-check = mkOneshotService {
-      description = "Log security update check timestamp";
-      execStart = updateCheckScript;
-      extraServiceConfig = mkOneshotHardening {
-        readWritePaths = [ "/var/log" ];
-        protectHome = true;
-      };
-    };
-
-    timers.security-update-check = mkPersistentTimer {
-      description = "Daily security update check";
-      onCalendar = "daily";
-      randomizedDelaySec = "1h";
     };
   };
 }
