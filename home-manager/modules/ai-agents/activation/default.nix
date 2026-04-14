@@ -16,7 +16,7 @@ let
   mcpTransforms = import ../helpers/_mcp-transforms.nix { inherit config lib; };
   inherit (mcpTransforms) sharedMcpServers claudeMcpServers;
 
-  settingsBuilders = import ../helpers/_settings-builders.nix { inherit config lib pkgs; };
+  settingsBuilders = import ../helpers/_settings-builders.nix { inherit config lib; };
   inherit (settingsBuilders) claudeSettings;
 
   opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
