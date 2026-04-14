@@ -46,7 +46,6 @@
       qt.enable = false;
       neovim.enable = true;
       zellij.enable = true;
-      noctalia-shell.enable = false;
     };
 
     cursor = {

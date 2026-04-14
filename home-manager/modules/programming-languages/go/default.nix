@@ -6,6 +6,9 @@
   ...
 }:
 
+let
+  mkShellAliasPrograms = import ../_alias-helpers.nix;
+in
 {
   programs =
     let
@@ -21,7 +24,8 @@
         gotrace = "dlv trace";
       };
     in
-    {
+    (mkShellAliasPrograms { inherit shellAliases; })
+    // {
       go = {
         enable = true;
         package = pkgs.go;
@@ -32,9 +36,6 @@
           GOPRIVATE = [ ];
         };
       };
-
-      zsh.shellAliases = shellAliases;
-      bash.shellAliases = shellAliases;
 
       git.ignores = [
         "*.exe"

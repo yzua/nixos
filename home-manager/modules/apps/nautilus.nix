@@ -20,14 +20,14 @@ let
 in
 
 {
-  # Sidebar bookmarks (only existing directories)
-  home.file.".config/gtk-3.0/bookmarks" = {
-    force = true;
-    text = "${bookmarksText}\n";
-  };
-
-  # Document templates — populates Nautilus "New Document" context menu
   home.file = {
+    # Sidebar bookmarks (only existing directories)
+    ".config/gtk-3.0/bookmarks" = {
+      force = true;
+      text = "${bookmarksText}\n";
+    };
+
+    # Document templates — populates Nautilus "New Document" context menu
     "Templates/Text File.txt".text = "";
     "Templates/Markdown.md".text = "";
     "Templates/Shell Script.sh".text = ''
