@@ -9,8 +9,12 @@
 }:
 
 let
+  inherit (import ../shared/_option-helpers.nix { inherit lib; })
+    mkStrOption
+    mkIntOption
+    ;
   inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
-    mkOneshotHardening
+    mkServiceHardening
     mkOneshotService
     mkPersistentTimer
     ;
@@ -18,7 +22,7 @@ let
   cfg = config.mySystem.systemReport;
 
   # Standard hardening for system-report services
-  reportHardening = mkOneshotHardening { readWritePaths = [ cfg.outputDir ]; };
+  reportHardening = mkServiceHardening { readWritePaths = [ cfg.outputDir ]; };
 
   featureFlags = {
     HAS_PROMETHEUS = lib.boolToString config.mySystem.observability.enable;
@@ -90,16 +94,8 @@ in
 {
   options.mySystem.systemReport = {
     enable = lib.mkEnableOption "unified system health reporting";
-    outputDir = lib.mkOption {
-      type = lib.types.str;
-      default = "/var/lib/system-report";
-      description = "Directory for report output.";
-    };
-    retentionDays = lib.mkOption {
-      type = lib.types.int;
-      default = 30;
-      description = "Days to keep historical reports.";
-    };
+    outputDir = mkStrOption "/var/lib/system-report" "Directory for report output.";
+    retentionDays = mkIntOption 30 "Days to keep historical reports.";
   };
 
   config = lib.mkIf cfg.enable {

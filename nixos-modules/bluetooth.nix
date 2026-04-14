@@ -8,7 +8,7 @@
 }:
 
 let
-  optionHelpers = import ./helpers/_option-helpers.nix { inherit lib; };
+  optionHelpers = import ../shared/_option-helpers.nix { inherit lib; };
   inherit (optionHelpers) mkBoolOption;
 in
 
@@ -69,28 +69,5 @@ in
         RestartSec = 10;
       };
     };
-
-    # High-quality Bluetooth audio codecs (aptX, aptX-HD, LDAC, AAC, SBC-XQ)
-    services.pipewire.wireplumber.extraConfig = {
-      "10-bluez" = {
-        "monitor.bluez.properties" = {
-          "bluez5.enable-sbc-xq" = true;
-          "bluez5.enable-msbc" = true;
-          "bluez5.enable-hw-volume" = true;
-          "bluez5.codecs" = [
-            "sbc"
-            "sbc_xq"
-            "aac"
-            "ldac"
-            "aptx"
-            "aptx_hd"
-          ];
-        };
-      };
-    };
-
-    environment.systemPackages = with pkgsStable; [
-      libfreeaptx # aptX and aptX-HD codec support
-    ];
   };
 }

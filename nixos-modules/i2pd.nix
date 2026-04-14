@@ -8,7 +8,7 @@
 
 let
   cfg = config.mySystem.i2pd;
-  optionHelpers = import ./helpers/_option-helpers.nix { inherit lib; };
+  optionHelpers = import ../shared/_option-helpers.nix { inherit lib; };
   inherit (optionHelpers) mkBoolOption mkNullableOption;
 in
 {

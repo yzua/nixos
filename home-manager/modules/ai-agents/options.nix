@@ -7,7 +7,7 @@
 }:
 
 let
-  opt = import ./helpers/_option-helpers.nix { inherit lib; };
+  opt = import ../../../shared/_option-helpers.nix { inherit lib; };
   inherit (opt)
     mkTypedOption
     mkStrOption
@@ -16,6 +16,7 @@ let
     mkAttrsOption
     mkAttrsOfStrOption
     mkStrListOption
+    mkLinesOption
     mkNullOrStrOption
     ;
 
@@ -60,16 +61,8 @@ let
         };
         sandboxMode = mkNullOrStrOption null "Sandbox mode";
         enableSearch = mkBoolOption false "Enable native Codex web search";
-        developerInstructions = lib.mkOption {
-          type = lib.types.lines;
-          default = "";
-          description = "Developer instructions";
-        };
-        extraToml = lib.mkOption {
-          type = lib.types.lines;
-          default = "";
-          description = "Extra TOML content";
-        };
+        developerInstructions = mkLinesOption "" "Developer instructions";
+        extraToml = mkLinesOption "" "Extra TOML content";
       }
       // extraOpts;
     };
@@ -79,11 +72,7 @@ in
     # === Core Options ===
     enable = lib.mkEnableOption "AI coding agents configuration";
 
-    globalInstructions = lib.mkOption {
-      type = lib.types.lines;
-      default = "";
-      description = "Global instructions injected into all AI agents (Claude CLAUDE.md, OpenCode instructions, Codex developer_instructions, Gemini systemInstruction)";
-    };
+    globalInstructions = mkLinesOption "" "Global instructions injected into all AI agents (Claude CLAUDE.md, OpenCode instructions, Codex developer_instructions, Gemini systemInstruction)";
 
     secrets = {
       zaiApiKeyFile = mkNullOrStrOption "/run/secrets/zai_api_key" "Path to sops-decrypted Z.AI API key file";
@@ -210,7 +199,7 @@ in
     claude = {
       enable = lib.mkEnableOption "Claude Code configuration";
 
-      model = mkStrOption "claude-sonnet-4-6" "Default model for Claude Code";
+      model = mkStrOption "opus" "Default model for Claude Code";
       env = mkAttrsOfStrOption { } "Environment variables for Claude Code";
       permissions = mkAttrsOption {
         allow = [ ];
@@ -224,7 +213,7 @@ in
     opencode = {
       enable = lib.mkEnableOption "OpenCode configuration";
 
-      model = mkStrOption "anthropic/claude-sonnet-4-6" "Default model for OpenCode";
+      model = mkStrOption "anthropic/claude-opus-4-6" "Default model for OpenCode";
       plugins = mkStrListOption [ ] "OpenCode plugins to enable";
       providers = mkAttrsOption { } "Provider configurations for OpenCode";
       permission =
@@ -288,11 +277,7 @@ in
         description = mkStrOption "" "Human-facing description for when to use this custom Codex agent";
       })) { } "Custom Codex agents written to ~/.codex/agents/*.toml";
 
-      extraToml = lib.mkOption {
-        type = lib.types.lines;
-        default = "";
-        description = "Extra TOML lines appended to config.toml";
-      };
+      extraToml = mkLinesOption "" "Extra TOML lines appended to config.toml";
     };
 
     # === Gemini Options ===
