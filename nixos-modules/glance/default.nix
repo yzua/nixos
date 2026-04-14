@@ -21,6 +21,9 @@
         let
           searchBangs = import ./_search-bangs.nix;
           bookmarkGroups = import ./_bookmarks.nix;
+          marketSymbols = import ./_markets.nix;
+          serverStats = import ./_server-stats.nix;
+          githubRepos = import ./_github-releases.nix;
 
           searchWidget = {
             type = "search";
@@ -72,28 +75,7 @@
                 {
                   type = "markets";
                   hide-header = true;
-                  markets = [
-                    {
-                      symbol = "BTC-USD";
-                      name = "Bitcoin";
-                    }
-                    {
-                      symbol = "LTC-USD";
-                      name = "Litecoin";
-                    }
-                    {
-                      symbol = "XMR-USD";
-                      name = "Monero";
-                    }
-                    {
-                      symbol = "GC=F";
-                      name = "Gold";
-                    }
-                    {
-                      symbol = "SI=F";
-                      name = "Silver";
-                    }
-                  ];
+                  markets = marketSymbols;
                 }
               ];
 
@@ -148,20 +130,7 @@
                     # System stats
                     {
                       type = "server-stats";
-                      servers = [
-                        {
-                          type = "local";
-                          name = "PC";
-                          mountpoints = {
-                            "/" = {
-                              name = "Root";
-                            };
-                            "/home" = {
-                              name = "Home";
-                            };
-                          };
-                        }
-                      ];
+                      servers = serverStats;
                     }
 
                     # Bookmarks
@@ -174,12 +143,7 @@
                       show-source-icon = true;
                       limit = 6;
                       collapse-after = 3;
-                      repositories = [
-                        "rust-lang/rust"
-                        "YaLTeR/niri"
-                        "neovim/neovim"
-                        "glanceapp/glance"
-                      ];
+                      repositories = githubRepos;
                     }
                   ];
                 }
