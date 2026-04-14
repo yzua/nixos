@@ -11,8 +11,6 @@ _:
     rejectPackets = false; # Drop instead of reject for stealth
     allowedTCPPorts = [ 53317 ]; # LocalSend
     allowedUDPPorts = [ 53317 ]; # LocalSend
-    allowedTCPPortRanges = [ ];
-    allowedUDPPortRanges = [ ];
 
     extraCommands = ''
       # === Hostname Leak Prevention (iptables — kernel nf_tables handles both) ===

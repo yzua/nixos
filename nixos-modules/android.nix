@@ -103,12 +103,4 @@ in
     SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", MODE="0660", GROUP="users"
     SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", ENV{ID_MM_DEVICE_IGNORE}="1"
   '';
-
-  # TPROXY kernel modules for mitmproxy transparent proxy mode
-  boot.kernelModules = [
-    "xt_TPROXY"
-    "nf_tproxy_ipv4"
-    "nf_tproxy_ipv6"
-    "nf_conntrack"
-  ];
 }

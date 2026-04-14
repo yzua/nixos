@@ -46,26 +46,6 @@
 
         log_level = 0; # Critical errors only
         block_ipv6 = true;
-
-        # # === Ad/Tracker/Malware Blocking ===
-        # # System-wide DNS blocking — catches ALL apps, not just browser.
-        # # Uses AdGuard blocklist sources via dnscrypt-proxy's built-in cloaking.
-        # blocked_names = {
-        #   blocked_names_file = "/etc/dnscrypt-proxy/blocked-ips.txt";
-        # };
-
-        # sources = {
-        #   adguard = {
-        #     urls = [
-        #       "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt"
-        #       "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt"
-        #     ];
-        #     cache_file = "adguard-cache.txt";
-        #     minisign_key = "RWQf5jNPnpOIzIzR5oEjRFYmP5MjxYEKHm9Y6qfhFyNuVdMU4fRJkBXs";
-        #     refresh_delay = 72; # hours
-        #     prefix = "adguard";
-        #   };
-        # };
       };
     };
   };

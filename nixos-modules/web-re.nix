@@ -19,7 +19,6 @@
       nuclei # Fast vuln scanner with community CVE templates (ProjectDiscovery)
       nikto # Web server vulnerability scanner
       sqlmap # SQL injection detection and exploitation
-      nmap # Network/port scanner, service fingerprinting
       subfinder # Passive subdomain discovery
 
       # === Web reconnaissance ===
@@ -38,5 +37,13 @@
       # nuclei templates directory (default location after first `nuclei -update-templates`)
       NUCLEI_TEMPLATES_PATH = "$HOME/.local/share/nuclei-templates";
     };
+
+    # TPROXY kernel modules for mitmproxy transparent proxy mode
+    boot.kernelModules = [
+      "xt_TPROXY"
+      "nf_tproxy_ipv4"
+      "nf_tproxy_ipv6"
+      "nf_conntrack"
+    ];
   };
 }
