@@ -4,6 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
+# shellcheck source=scripts/ai/_agent-registry.sh
+source "${SCRIPT_DIR}/_agent-registry.sh"
 
 usage() {
 	cat <<'EOF'
@@ -20,75 +22,15 @@ Notes:
 EOF
 }
 
-require_secret_file() {
-	local path="$1"
-	if [[ ! -f "${path}" ]]; then
-		print_error "${path} not found. Run 'just nixos' to decrypt secrets."
-		exit 1
-	fi
-}
+# require_secret_file provided by _agent-registry.sh
 
-zai_key_path() {
-	printf '%s\n' "${ZAI_API_KEY_FILE:-/run/secrets/zai_api_key}"
-}
+# zai_key_path provided by _agent-registry.sh
 
-is_supported_base_alias() {
-	case "$1" in
-	cl | clu | clglm | ocl | hcl | gem | cx | cxu | lcx | mcx | hcx | xcx | oc | ocglm | ocgem | ocgpt | locgpt | mocgpt | xocgpt | ocs | oczen)
-		return 0
-		;;
-	*)
-		return 1
-		;;
-	esac
-}
+# is_supported_base_alias provided by _agent-registry.sh
 
-split_alias_suffix() {
-	local alias_name="$1"
-	local suffix
-	local candidate
+# split_alias_suffix provided by _agent-registry.sh
 
-	for suffix in cm rf fx sa du bp md; do
-		if [[ "${alias_name}" == *"${suffix}" ]]; then
-			candidate="${alias_name%"${suffix}"}"
-			if is_supported_base_alias "${candidate}"; then
-				printf '%s|%s\n' "${candidate}" "${suffix}"
-				return 0
-			fi
-		fi
-	done
-
-	printf '%s|\n' "${alias_name}"
-}
-
-resolve_workflow_prompt() {
-	case "$1" in
-	cm)
-		printf '%s\n' "${COMMIT_SPLIT_PROMPT:-}"
-		;;
-	rf)
-		printf '%s\n' "${REFACTOR_MAINTAINABILITY_PROMPT:-}"
-		;;
-	fx)
-		printf '%s\n' "${BUGFIX_ROOT_CAUSE_PROMPT:-}"
-		;;
-	sa)
-		printf '%s\n' "${SECURITY_AUDIT_PROMPT:-}"
-		;;
-	du)
-		printf '%s\n' "${DEPENDENCY_UPGRADE_PROMPT:-}"
-		;;
-	bp)
-		printf '%s\n' "${BUILD_PERFORMANCE_PROMPT:-}"
-		;;
-	md)
-		printf '%s\n' "${MARKDOWN_SYNC_PROMPT:-}"
-		;;
-	*)
-		printf '%s\n' ""
-		;;
-	esac
-}
+# resolve_workflow_prompt provided by _agent-registry.sh
 
 collect_prompt() {
 	if [[ $# -eq 0 ]]; then
@@ -103,83 +45,33 @@ collect_prompt() {
 	printf '%s\n' "$*"
 }
 
+# Run a single headless iteration of an agent using AGENT_ITER_REGISTRY.
 run_agent_once() {
 	local alias_name="$1"
 	local prompt="$2"
 
-	case "${alias_name}" in
-	cl)
-		claude --print "${prompt}"
-		;;
-	clu)
-		claude --dangerously-skip-permissions --print "${prompt}"
-		;;
-	ocl)
-		claude --model opus --print "${prompt}"
-		;;
-	hcl)
-		claude --model haiku --print "${prompt}"
-		;;
-	clglm)
-		local key_path
-		key_path="$(zai_key_path)"
-		require_secret_file "${key_path}"
-		ANTHROPIC_AUTH_TOKEN="$(<"${key_path}")" \
-		ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-		API_TIMEOUT_MS="3000000" \
-		ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5-turbo" \
-		ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
-		ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
-			claude --dangerously-skip-permissions --print "${prompt}"
-		;;
-	gem)
-		gemini --approval-mode=yolo --prompt "${prompt}"
-		;;
-	cx | cxu)
-		codex exec --dangerously-bypass-approvals-and-sandbox "${prompt}"
-		;;
-	lcx)
-		codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="low"' "${prompt}"
-		;;
-	mcx)
-		codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="medium"' "${prompt}"
-		;;
-	hcx)
-		codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="high"' "${prompt}"
-		;;
-	xcx)
-		codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort="xhigh"' "${prompt}"
-		;;
-	oc)
-		opencode run "${prompt}"
-		;;
-	ocglm)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-glm" opencode run "${prompt}"
-		;;
-	ocgem)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-gemini" opencode run "${prompt}"
-		;;
-	ocgpt)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-gpt" opencode run "${prompt}"
-		;;
-	locgpt)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-gpt" opencode run --model openai/gpt-5.4-spark "${prompt}"
-		;;
-	mocgpt)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-gpt" opencode run --model openai/gpt-5.4 "${prompt}"
-		;;
-	xocgpt)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-gpt" opencode run --model openai/gpt-5.1-codex-max "${prompt}"
-		;;
-	ocs)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-sonnet" opencode run "${prompt}"
-		;;
-	oczen)
-		OPENCODE_CONFIG_DIR="${HOME}/.config/opencode-zen" opencode run "${prompt}"
-		;;
-	*)
+	local entry="${AGENT_ITER_REGISTRY[$alias_name]:-}"
+	if [[ -z "$entry" ]]; then
 		print_error "Unsupported alias for iter: ${alias_name}"
 		exit 1
+	fi
+
+	local env_marker="${entry%%|*}"
+	local command="${entry#*|}"
+
+	# Resolve env vars and execute
+	case "$env_marker" in
+	"-")
+		# shellcheck disable=SC2086
+		$command "${prompt}"
+		;;
+	"ZAI")
+		# shellcheck disable=SC2086,SC2046
+		env $(zai_claude_env) $command "${prompt}"
+		;;
+	*)
+		# shellcheck disable=SC2086
+		env $env_marker $command "${prompt}"
 		;;
 	esac
 }

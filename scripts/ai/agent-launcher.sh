@@ -6,14 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../lib/logging.sh"
 # shellcheck source=scripts/lib/fzf-theme.sh
 source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
-
-COMMIT_SPLIT_PROMPT="${COMMIT_SPLIT_PROMPT:-}"
-REFACTOR_MAINTAINABILITY_PROMPT="${REFACTOR_MAINTAINABILITY_PROMPT:-}"
-BUGFIX_ROOT_CAUSE_PROMPT="${BUGFIX_ROOT_CAUSE_PROMPT:-}"
-SECURITY_AUDIT_PROMPT="${SECURITY_AUDIT_PROMPT:-}"
-DEPENDENCY_UPGRADE_PROMPT="${DEPENDENCY_UPGRADE_PROMPT:-}"
-BUILD_PERFORMANCE_PROMPT="${BUILD_PERFORMANCE_PROMPT:-}"
-MARKDOWN_SYNC_PROMPT="${MARKDOWN_SYNC_PROMPT:-}"
+# shellcheck source=scripts/ai/_agent-registry.sh
+source "${SCRIPT_DIR}/_agent-registry.sh"
 
 if ! command -v fzf >/dev/null 2>&1; then
 	print_error "fzf is required"
@@ -37,81 +31,7 @@ usage() {
 	echo "  -s, --simple: flat prefix picker mode"
 }
 
-# --- Agent registry ---
-#
-# Each entry:  "alias|env|command_prefix|extra_args..."
-#   env:  environment variable assignments (space-separated KEY=VAL pairs), or "-"
-#   command_prefix: the base command (everything before --prompt)
-#   extra_args: any additional flags after the command but before the prompt
-#
-# Aliases that need custom logic (clglm, cxu, gem) use case-branch fallbacks.
-
-declare -A AGENT_REGISTRY
-
-# Claude Code
-AGENT_REGISTRY[cl]="-|claude --dangerously-skip-permissions"
-AGENT_REGISTRY[clu]="-|claude --dangerously-skip-permissions"
-AGENT_REGISTRY[ocl]="-|claude --dangerously-skip-permissions --model opus"
-AGENT_REGISTRY[hcl]="-|claude --dangerously-skip-permissions --model haiku"
-
-# Codex
-AGENT_REGISTRY[cx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"
-AGENT_REGISTRY[cxu]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"
-AGENT_REGISTRY[lcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"
-AGENT_REGISTRY[mcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"
-AGENT_REGISTRY[hcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"
-AGENT_REGISTRY[xcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"xhigh\"'"
-
-# OpenCode (default and profiles)
-AGENT_REGISTRY[oc]="-|opencode"
-AGENT_REGISTRY[ocglm]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-glm|opencode"
-AGENT_REGISTRY[ocgem]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gemini|opencode"
-AGENT_REGISTRY[ocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode"
-AGENT_REGISTRY[locgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode --model openai/gpt-5.4-spark"
-AGENT_REGISTRY[mocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode --model openai/gpt-5.4"
-AGENT_REGISTRY[xocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode --model openai/gpt-5.1-codex-max"
-AGENT_REGISTRY[ocs]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-sonnet|opencode"
-AGENT_REGISTRY[oczen]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-zen|opencode"
-
-supports_workflow_suffix() {
-	case "$1" in
-	cl | clu | clglm | ocl | hcl | cx | cxu | lcx | mcx | hcx | xcx | oc | ocglm | ocgem | ocgpt | locgpt | mocgpt | xocgpt | ocs | oczen)
-		return 0
-		;;
-	*)
-		return 1
-		;;
-	esac
-}
-
-resolve_workflow_prompt() {
-	case "$1" in
-	cm)
-		echo "$COMMIT_SPLIT_PROMPT"
-		;;
-	rf)
-		echo "$REFACTOR_MAINTAINABILITY_PROMPT"
-		;;
-	fx)
-		echo "$BUGFIX_ROOT_CAUSE_PROMPT"
-		;;
-	sa)
-		echo "$SECURITY_AUDIT_PROMPT"
-		;;
-	du)
-		echo "$DEPENDENCY_UPGRADE_PROMPT"
-		;;
-	bp)
-		echo "$BUILD_PERFORMANCE_PROMPT"
-		;;
-	md)
-		echo "$MARKDOWN_SYNC_PROMPT"
-		;;
-	*)
-		return 1
-		;;
-	esac
-}
+# resolve_workflow_prompt is provided by _agent-registry.sh
 
 workflow_label() {
 	case "$1" in
@@ -145,7 +65,7 @@ workflow_label() {
 workflow_display_lines() {
 	echo "none"
 	local suffix
-	for suffix in cm rf fx sa du bp md; do
+	for suffix in "${WORKFLOW_SUFFIXES[@]}"; do
 		workflow_label "$suffix"
 	done
 }
@@ -158,7 +78,7 @@ workflow_suffix_from_selection() {
 	fi
 
 	local suffix
-	for suffix in cm rf fx sa du bp md; do
+	for suffix in "${WORKFLOW_SUFFIXES[@]}"; do
 		if [[ "$selection" == "$(workflow_label "$suffix")" ]]; then
 			echo "$suffix"
 			return 0
@@ -172,7 +92,7 @@ choose_workflow_suffix() {
 	local base_alias="$1"
 	local selection suffix
 
-	if ! supports_workflow_suffix "$base_alias"; then
+	if ! is_supported_base_alias "$base_alias"; then
 		echo "none"
 		return 0
 	fi
@@ -187,8 +107,7 @@ choose_workflow_suffix() {
 	echo "$suffix"
 }
 
-# Execute a registered agent by looking up its config in AGENT_REGISTRY.
-# For agents with custom logic (clglm, cxu, gem), falls through to case branches.
+# Execute a registered agent by looking up its config in the shared AGENT_REGISTRY.
 execute_agent() {
 	local agent_alias="$1"
 	local workflow_suffix="$2"
@@ -198,76 +117,48 @@ execute_agent() {
 		prompt="$(resolve_workflow_prompt "$workflow_suffix")"
 	fi
 
-	# Special-case agents with custom env or non-standard exec logic
-	case "$agent_alias" in
-	clglm)
-		local key_file key
-		key_file="${ZAI_API_KEY_FILE:-/run/secrets/zai_api_key}"
-		if [[ ! -f "$key_file" ]]; then
-			print_error "$key_file not found. Run 'just nixos' to decrypt secrets."
-			exit 1
-		fi
-		key="$(cat "$key_file")"
-		if [[ -z "$prompt" ]]; then
-			exec env \
-				ANTHROPIC_AUTH_TOKEN="$key" \
-				ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-				API_TIMEOUT_MS="3000000" \
-				ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5-turbo" \
-				ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
-				ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
-				claude --dangerously-skip-permissions
-		else
-			exec env \
-				ANTHROPIC_AUTH_TOKEN="$key" \
-				ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-				API_TIMEOUT_MS="3000000" \
-				ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5-turbo" \
-				ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
-				ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
-				claude --dangerously-skip-permissions "$prompt"
-		fi
-		;;
-	gem)
-		if [[ -z "$prompt" ]]; then
-			exec gemini --approval-mode=yolo
-		else
-			exec gemini --approval-mode=yolo "$prompt"
-		fi
-		;;
-	esac
-
-	# Registry-based execution
 	local entry="${AGENT_REGISTRY[$agent_alias]:-}"
 	if [[ -z "$entry" ]]; then
 		print_error "Unsupported alias: $agent_alias"
 		exit 1
 	fi
 
-	local env_vars command_prefix
-	env_vars="${entry%%|*}"
-	command_prefix="${entry#*|}"
+	local env_marker="${entry%%|*}"
+	local command_prefix="${entry#*|}"
 
-	# Determine how to pass the prompt (different agents use different flags)
+	# Resolve env vars
+	local resolved_env=""
+	case "$env_marker" in
+	"-") ;;
+	"ZAI") resolved_env="$(zai_claude_env | tr '\n' ' ')" ;;
+	*) resolved_env="$env_marker" ;;
+	esac
+
+	# Determine how to pass the prompt (OpenCode uses --prompt flag)
 	local prompt_flag=""
 	if [[ "$command_prefix" == opencode* ]]; then
 		prompt_flag="--prompt"
 	fi
 
-	if [[ "$env_vars" != "-" ]]; then
+	# Execute
+	if [[ -n "$resolved_env" ]]; then
 		if [[ -z "$prompt" ]]; then
 			# shellcheck disable=SC2086
-			exec env $env_vars $command_prefix
+			exec env $resolved_env $command_prefix
 		else
-			# shellcheck disable=SC2086
-			exec env $env_vars $command_prefix $prompt_flag "$prompt"
+			if [[ -n "$prompt_flag" ]]; then
+				# shellcheck disable=SC2086
+				exec env $resolved_env $command_prefix $prompt_flag "$prompt"
+			else
+				# shellcheck disable=SC2086
+				exec env $resolved_env $command_prefix "$prompt"
+			fi
 		fi
 	else
 		if [[ -z "$prompt" ]]; then
 			# shellcheck disable=SC2086
 			exec $command_prefix
 		else
-			# Claude and Codex pass prompt as positional arg (no flag)
 			if [[ -n "$prompt_flag" ]]; then
 				# shellcheck disable=SC2086
 				exec $command_prefix $prompt_flag "$prompt"
