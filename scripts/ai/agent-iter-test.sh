@@ -141,4 +141,72 @@ assert_eq "${unlimited_status}" "17" "unlimited mode returns failing exit status
 assert_eq "${unlimited_runs}" "3" "unlimited mode repeats until failure"
 assert_contains "${unlimited_output}" "Iteration 3/unlimited failed with exit code 17" "unlimited mode reports failure"
 
+# --- Rate-limit retry test ---
+# Stub that outputs a 429 error to stderr on first two invocations, then succeeds.
+cat >"${tmp_dir}/bin/claude-rl" <<'STUB'
+#!/usr/bin/env bash
+count_file="${ITER_COUNT_DIR:?}/rl.count"
+count=0
+[[ -f "${count_file}" ]] && count="$(cat "${count_file}")"
+count=$((count + 1))
+printf '%s\n' "${count}" >"${count_file}"
+
+if (( count < 3 )); then
+  printf 'API Error: 429 {"error":{"code":"1302","message":"Rate limit reached"}}\n' >&2
+  exit 1
+fi
+printf '%s|ARGS=%s\n' "claude" "$(printf '%q ' "$@")" >>"${ITER_LOG_FILE:?}"
+STUB
+chmod +x "${tmp_dir}/bin/claude-rl"
+ln -sf "${tmp_dir}/bin/claude-rl" "${tmp_dir}/bin/claude"
+
+rl_log="${tmp_dir}/rl.log"
+: >"${rl_log}"
+set +e
+rl_output="$({
+	ITER_RATE_LIMIT_BASE_WAIT=1 \
+	ITER_RATE_LIMIT_RETRIES=3 \
+	PATH="${tmp_dir}/bin:${PATH}" \
+	ITER_LOG_FILE="${rl_log}" \
+	ITER_COUNT_DIR="${tmp_dir}/counts" \
+	ZAI_API_KEY_FILE="${tmp_dir}/zai_api_key" \
+		bash "${TARGET}" 1 clglm "test prompt"
+} 2>&1)"
+rl_status=$?
+set -e
+
+assert_eq "${rl_status}" "0" "rate-limit retry: succeeds after retries"
+assert_contains "${rl_output}" "Rate limit hit (attempt 1/3)" "rate-limit retry: first attempt logged"
+assert_contains "${rl_output}" "Rate limit hit (attempt 2/3)" "rate-limit retry: second attempt logged"
+assert_contains "${rl_output}" "Completed 1/1 iterations" "rate-limit retry: reports completion"
+
+# --- Rate-limit retry exhaustion test ---
+cat >"${tmp_dir}/bin/claude-rlx" <<'STUB2'
+#!/usr/bin/env bash
+printf '429 Rate limit reached for requests\n' >&2
+exit 1
+STUB2
+chmod +x "${tmp_dir}/bin/claude-rlx"
+ln -sf "${tmp_dir}/bin/claude-rlx" "${tmp_dir}/bin/claude"
+
+rlx_log="${tmp_dir}/rlx.log"
+: >"${rlx_log}"
+set +e
+rlx_output="$({
+	ITER_RATE_LIMIT_BASE_WAIT=1 \
+	ITER_RATE_LIMIT_RETRIES=2 \
+	PATH="${tmp_dir}/bin:${PATH}" \
+	ITER_LOG_FILE="${rlx_log}" \
+	ITER_COUNT_DIR="${tmp_dir}/counts" \
+	ZAI_API_KEY_FILE="${tmp_dir}/zai_api_key" \
+		bash "${TARGET}" clglm "test"
+} 2>&1)"
+rlx_status=$?
+set -e
+assert_eq "${rlx_status}" "1" "rate-limit exhaustion: exits with original error code"
+assert_contains "${rlx_output}" "Rate-limit retry limit (2) exceeded" "rate-limit exhaustion: reports limit exceeded"
+
+# Restore normal claude symlink
+ln -sf "${tmp_dir}/bin/agent-stub" "${tmp_dir}/bin/claude"
+
 echo "All agent iter tests passed."

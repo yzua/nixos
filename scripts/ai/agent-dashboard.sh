@@ -49,7 +49,7 @@ while true; do
 		read -r -p "Press Enter..."
 		;;
 	"Error Patterns")
-		ai-agent-patterns
+		ai-agent-analyze patterns
 		read -r -p "Press Enter..."
 		;;
 	"Exit" | "")

@@ -134,40 +134,27 @@ execute_agent() {
 	*) resolved_env="$env_marker" ;;
 	esac
 
-	# Determine how to pass the prompt (OpenCode uses --prompt flag)
-	local prompt_flag=""
-	if [[ "$command_prefix" == opencode* ]]; then
-		prompt_flag="--prompt"
+	# Build command array for safe execution
+	local -a cmd=()
+
+	if [[ -n "$resolved_env" ]]; then
+		# shellcheck disable=SC2206
+		local -a env_args=($resolved_env)
+		cmd+=(env "${env_args[@]}")
 	fi
 
-	# Execute
-	if [[ -n "$resolved_env" ]]; then
-		if [[ -z "$prompt" ]]; then
-			# shellcheck disable=SC2086
-			exec env $resolved_env $command_prefix
-		else
-			if [[ -n "$prompt_flag" ]]; then
-				# shellcheck disable=SC2086
-				exec env $resolved_env $command_prefix $prompt_flag "$prompt"
-			else
-				# shellcheck disable=SC2086
-				exec env $resolved_env $command_prefix "$prompt"
-			fi
+	# shellcheck disable=SC2206
+	local -a prefix_args=($command_prefix)
+	cmd+=("${prefix_args[@]}")
+
+	if [[ -n "$prompt" ]]; then
+		if [[ "$command_prefix" == opencode* ]]; then
+			cmd+=("--prompt")
 		fi
-	else
-		if [[ -z "$prompt" ]]; then
-			# shellcheck disable=SC2086
-			exec $command_prefix
-		else
-			if [[ -n "$prompt_flag" ]]; then
-				# shellcheck disable=SC2086
-				exec $command_prefix $prompt_flag "$prompt"
-			else
-				# shellcheck disable=SC2086
-				exec $command_prefix "$prompt"
-			fi
-		fi
+		cmd+=("$prompt")
 	fi
+
+	exec "${cmd[@]}"
 }
 
 pick_codex_effort_alias() {
@@ -314,6 +301,4 @@ main() {
 	execute_agent "$agent_alias" "$workflow_suffix"
 }
 
-if [[ "${AI_AGENT_LAUNCHER_SOURCE_ONLY:-0}" != "1" ]]; then
-	main "$@"
-fi
+main "$@"

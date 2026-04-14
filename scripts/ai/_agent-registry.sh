@@ -4,7 +4,8 @@
 # ZAI key handling.
 #
 # Single source of truth for all agent aliases.  Adding a new alias only
-# requires editing this file (plus any fzf picker menus in agent-launcher.sh).
+# requires editing the _def calls below (plus any fzf picker menus in
+# agent-launcher.sh).
 #
 # Source this file from agent-launcher.sh and agent-iter.sh.
 # Requires: logging.sh sourced before this file.
@@ -35,68 +36,45 @@ WORKFLOW_SUFFIXES=(cm rf fx sa du bp md)
 #     Full command with flags for the given mode.  Prompt is appended
 #     positionally (except in launcher mode where OpenCode uses --prompt).
 
-declare -A AGENT_REGISTRY=(
-  # Claude Code
-  [cl]="-|claude --dangerously-skip-permissions"
-  [clu]="-|claude --dangerously-skip-permissions"
-  [ocl]="-|claude --dangerously-skip-permissions --model opus"
-  [hcl]="-|claude --dangerously-skip-permissions --model haiku"
-  [clglm]="ZAI|claude --dangerously-skip-permissions"
+# Single-source definition: each alias registers both interactive and headless commands.
+# Usage: _def ALIAS ENV_MARKER INTERACTIVE_CMD HEADLESS_CMD
+_def() {
+  AGENT_REGISTRY["$1"]="$2|$3"
+  AGENT_ITER_REGISTRY["$1"]="$2|$4"
+}
 
-  # Codex
-  [cx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"
-  [cxu]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"
-  [lcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"
-  [mcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"
-  [hcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"
-  [xcx]="-|codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"xhigh\"'"
-
-  # OpenCode (default and profiles)
-  [oc]="-|opencode"
-  [ocglm]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-glm|opencode"
-  [ocgem]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gemini|opencode"
-  [ocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode"
-  [locgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode --model openai/gpt-5.4-spark"
-  [mocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode --model openai/gpt-5.4"
-  [xocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode --model openai/gpt-5.1-codex-max"
-  [ocs]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-sonnet|opencode"
-  [oczen]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-zen|opencode"
-
-  # Gemini
-  [gem]="-|gemini --approval-mode=yolo"
-)
-
+declare -A AGENT_REGISTRY=()
 # shellcheck disable=SC2034
-declare -A AGENT_ITER_REGISTRY=(
-  # Claude Code (headless: --print mode)
-  [cl]="-|claude --print"
-  [clu]="-|claude --dangerously-skip-permissions --print"
-  [ocl]="-|claude --model opus --print"
-  [hcl]="-|claude --model haiku --print"
-  [clglm]="ZAI|claude --dangerously-skip-permissions --print"
+declare -A AGENT_ITER_REGISTRY=()
 
-  # Codex (headless: exec subcommand)
-  [cx]="-|codex exec --dangerously-bypass-approvals-and-sandbox"
-  [cxu]="-|codex exec --dangerously-bypass-approvals-and-sandbox"
-  [lcx]="-|codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"
-  [mcx]="-|codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"
-  [hcx]="-|codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"
-  [xcx]="-|codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"xhigh\"'"
+# Claude Code
+_def cl    -    "claude --dangerously-skip-permissions"                          "claude --print"
+_def clu   -    "claude --dangerously-skip-permissions"                          "claude --dangerously-skip-permissions --print"
+_def ocl   -    "claude --dangerously-skip-permissions --model opus"             "claude --model opus --print"
+_def hcl   -    "claude --dangerously-skip-permissions --model haiku"            "claude --model haiku --print"
+_def clglm ZAI  "claude --dangerously-skip-permissions"                          "claude --dangerously-skip-permissions --print"
 
-  # OpenCode (headless: run subcommand)
-  [oc]="-|opencode run"
-  [ocglm]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-glm|opencode run"
-  [ocgem]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gemini|opencode run"
-  [ocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode run"
-  [locgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode run --model openai/gpt-5.4-spark"
-  [mocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode run --model openai/gpt-5.4"
-  [xocgpt]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt|opencode run --model openai/gpt-5.1-codex-max"
-  [ocs]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-sonnet|opencode run"
-  [oczen]="OPENCODE_CONFIG_DIR=$HOME/.config/opencode-zen|opencode run"
+# Codex
+_def cx    -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"                                            "codex exec --dangerously-bypass-approvals-and-sandbox"
+_def cxu   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"                                            "codex exec --dangerously-bypass-approvals-and-sandbox"
+_def lcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"       "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"
+_def mcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"     "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"
+_def hcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"       "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"
+_def xcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"xhigh\"'"      "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"xhigh\"'"
 
-  # Gemini (headless: --prompt flag is part of command_prefix)
-  [gem]="-|gemini --approval-mode=yolo --prompt"
-)
+# OpenCode (default and profiles)
+_def oc      -                                      "opencode"                       "opencode run"
+_def ocglm   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-glm"     "opencode"         "opencode run"
+_def ocgem   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gemini"  "opencode"         "opencode run"
+_def ocgpt   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt"    "opencode"         "opencode run"
+_def locgpt  "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt"    "opencode --model openai/gpt-5.4-spark"     "opencode run --model openai/gpt-5.4-spark"
+_def mocgpt  "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt"    "opencode --model openai/gpt-5.4"           "opencode run --model openai/gpt-5.4"
+_def xocgpt  "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt"    "opencode --model openai/gpt-5.1-codex-max" "opencode run --model openai/gpt-5.1-codex-max"
+_def ocs     "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-sonnet" "opencode"         "opencode run"
+_def oczen   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-zen"    "opencode"         "opencode run"
+
+# Gemini
+_def gem   -    "gemini --approval-mode=yolo"         "gemini --approval-mode=yolo --prompt"
 
 # --- Supported base aliases ---
 

@@ -10,38 +10,7 @@ source "${SCRIPT_DIR}/../lib/log-dirs.sh"
 source "${SCRIPT_DIR}/../lib/error-patterns.sh"
 
 find_logs() {
-	local agent="$1"
-	local max_depth_args=()
-	local -a roots=()
-
-	case "$agent" in
-	claude)
-		roots+=("$LOG_DIR")
-		;;
-	opencode)
-		roots+=("$LOG_DIR" "$OPENCODE_LOG_DIR")
-		;;
-	codex)
-		roots+=("$LOG_DIR" "$CODEX_LOG_DIR")
-		;;
-	gemini)
-		roots+=("$LOG_DIR")
-		;;
-	*)
-		return 0
-		;;
-	esac
-
-	local root
-	for root in "${roots[@]}"; do
-		[[ -d "$root" ]] || continue
-		if [[ "$root" == "$LOG_DIR" ]]; then
-			max_depth_args=(-maxdepth 1)
-		else
-			max_depth_args=()
-		fi
-		find "$root" "${max_depth_args[@]}" -type f -name '*.log' -mtime -7 2>/dev/null
-	done | sort -u
+	find_agent_logs "$1" -7
 }
 
 find_all_logs() {
@@ -79,6 +48,7 @@ usage() {
 	echo "Commands:"
 	echo "  stats           Show statistics for all agents"
 	echo "  errors [agent]  Show recent errors (optionally filter by agent)"
+	echo "  patterns        Show error pattern frequency and top exit codes"
 	echo "  sessions        Show session activity timeline"
 	echo "  search <term>   Search logs for a term"
 	echo "  tail [agent]    Live tail logs (optionally filter by agent)"
@@ -185,9 +155,32 @@ report() {
 	find_all_logs | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -20
 }
 
+patterns() {
+	print_info "Analyzing error patterns..."
+	echo "----------------------------------------------------------------"
+
+	if find_all_logs | grep -q .; then
+		find_all_logs | xargs -r rg --no-filename -o -i "${ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
+			sort | uniq -c | sort -rn | head -20
+	else
+		print_warning "No log files found."
+	fi
+
+	echo ""
+	echo "----------------------------------------------------------------"
+	print_info "Top exit codes:"
+	if find_all_logs | grep -q .; then
+		find_all_logs | xargs -r grep -h "exited with code" 2>/dev/null |
+			grep -oE "code [0-9]+" | sort | uniq -c | sort -rn | head -10 || true
+	else
+		print_warning "No log files found."
+	fi
+}
+
 case "${1:-help}" in
 stats) stats ;;
 errors) errors "${2:-}" ;;
+patterns) patterns ;;
 sessions) sessions ;;
 search) search_logs "${2:?$(print_error "Search term required")}" ;;
 tail) tail_logs "${2:-}" ;;

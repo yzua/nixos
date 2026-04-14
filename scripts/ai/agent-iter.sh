@@ -45,7 +45,16 @@ collect_prompt() {
 	printf '%s\n' "$*"
 }
 
+# Check if stderr output indicates a rate-limit (transient) error.
+# Matches: 429 status codes, "Rate limit", "Too Many Requests", etc.
+is_rate_limit_error() {
+	local output="$1"
+	[[ "$output" =~ (429|Rate[_ ]limit|rate[_ ]limit|Too[_ ]Many[_ ]Requests|overloaded|capacity) ]]
+}
+
 # Run a single headless iteration of an agent using AGENT_ITER_REGISTRY.
+# Returns 0 on success, 1 on rate-limit error (stderr captured in _ITER_LAST_STDERR),
+# or the agent's raw exit code for other failures.
 run_agent_once() {
 	local alias_name="$1"
 	local prompt="$2"
@@ -58,22 +67,33 @@ run_agent_once() {
 
 	local env_marker="${entry%%|*}"
 	local command="${entry#*|}"
+	local stderr_file
+	stderr_file="$(mktemp)"
 
-	# Resolve env vars and execute
+	local rc=0
+	# Resolve env vars and execute, capturing stderr for rate-limit detection
 	case "$env_marker" in
 	"-")
 		# shellcheck disable=SC2086
-		$command "${prompt}"
+		$command "${prompt}" 2>"${stderr_file}" || rc=$?
 		;;
 	"ZAI")
 		# shellcheck disable=SC2086,SC2046
-		env $(zai_claude_env) $command "${prompt}"
+		env $(zai_claude_env) $command "${prompt}" 2>"${stderr_file}" || rc=$?
 		;;
 	*)
 		# shellcheck disable=SC2086
-		env $env_marker $command "${prompt}"
+		env $env_marker $command "${prompt}" 2>"${stderr_file}" || rc=$?
 		;;
 	esac
+
+	_ITER_LAST_STDERR="$(cat "${stderr_file}")"
+	rm -f "${stderr_file}"
+
+	if ((rc != 0)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
+		return 1
+	fi
+	return "${rc}"
 }
 
 if [[ $# -eq 0 ]]; then
@@ -116,10 +136,15 @@ if [[ -z "${prompt}" ]]; then
 	exit 1
 fi
 
+rate_limit_retries="${ITER_RATE_LIMIT_RETRIES:-5}"
+rate_limit_base_wait="${ITER_RATE_LIMIT_BASE_WAIT:-10}"
 iteration=1
+rate_limit_attempts=0
+
 while true; do
 	print_info "Iteration ${iteration}/${iteration_limit}"
 	if run_agent_once "${agent_alias}" "${prompt}"; then
+		rate_limit_attempts=0
 		if [[ "${iteration_limit}" != "unlimited" ]] && ((iteration >= iteration_limit)); then
 			break
 		fi
@@ -127,6 +152,19 @@ while true; do
 		continue
 	else
 		status=$?
+	fi
+
+	if ((status == 1)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
+		rate_limit_attempts=$((rate_limit_attempts + 1))
+		if ((rate_limit_attempts > rate_limit_retries)); then
+			print_error "Rate-limit retry limit (${rate_limit_retries}) exceeded"
+			print_error "Iteration ${iteration}/${iteration_limit} failed with exit code ${status}"
+			exit "${status}"
+		fi
+		wait_secs=$((rate_limit_base_wait * (2 ** (rate_limit_attempts - 1))))
+		print_warning "Rate limit hit (attempt ${rate_limit_attempts}/${rate_limit_retries}), retrying in ${wait_secs}s..."
+		sleep "${wait_secs}"
+		continue
 	fi
 
 	print_error "Iteration ${iteration}/${iteration_limit} failed with exit code ${status}"
