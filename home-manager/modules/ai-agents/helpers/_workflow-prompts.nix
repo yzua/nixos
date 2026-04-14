@@ -1,7 +1,36 @@
 # Workflow prompt constants used by AI agent shell aliases.
+# Optionally accepts `constants` from shared/constants.nix for user identity.
+# Falls back to git config lookup if not provided.
+
+{
+  constants ? null,
+}:
 
 let
+  # Extract user info from constants if available, otherwise use defaults
+  userInfo =
+    if constants != null && constants ? user then
+      (builtins.removeAttrs constants.user [ "githubEmail" ])
+    else
+      null;
   joinSections = sections: builtins.concatStringsSep "\n\n" sections;
+
+  # Git user identity - extracted from constants when available
+  userIdentity =
+    if userInfo != null then
+      ''
+        Git user identity (use for commits):
+        - Name: ${userInfo.handle}
+        - Email: ${userInfo.email}
+        - GPG signing key: ${userInfo.signingKey}
+        - Use GIT_AUTHOR_NAME/GIT_AUTHOR_EMAIL/GIT_COMMITTER_NAME/GIT_COMMITTER_EMAIL or `git commit --author` for correct attribution.
+        - If commits fail GPG signing due to timeout, use `-c commit.gpgsign=false` as fallback but note the issue.
+      ''
+    else
+      ''
+        Git user identity:
+        - Use those values with GIT_AUTHOR_NAME/GIT_AUTHOR_EMAIL or `git commit --author` for correct attribution.
+      '';
 
   repoDiscovery = ''
     Repository discovery:
@@ -97,6 +126,7 @@ in
       - Stage only the exact files and hunks needed for the current commit. Never use `git add .` or broad staging commands that could sweep in unrelated work.
       - Exclude generated artifacts, local noise, lockfile churn without cause, secrets, credentials, env files, and unrelated formatting unless they are required for the commit to be valid.
     ''
+    userIdentity
     repoDiscovery
     validationDiscovery
     evidenceDiscipline

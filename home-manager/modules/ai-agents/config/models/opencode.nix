@@ -7,7 +7,7 @@
 }:
 
 let
-  workflowPrompts = import ../../helpers/_workflow-prompts.nix;
+  workflowPrompts = import ../../helpers/_workflow-prompts.nix {};
   androidRePrompt = import ../../android-re/_prompt.nix {
     inherit lib;
     homeDir = config.home.homeDirectory;

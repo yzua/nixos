@@ -8,7 +8,7 @@
 }:
 
 let
-  workflowPrompts = import ./_workflow-prompts.nix;
+  workflowPrompts = import ./_workflow-prompts.nix {};
   commitSplitPrompt = workflowPrompts.commitSplit;
   refactorMaintainabilityPrompt = workflowPrompts.refactorMaintainability;
   securityAuditPrompt = workflowPrompts.securityAudit;
