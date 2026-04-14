@@ -26,15 +26,6 @@ log_with_level() {
 	timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 	local formatted="${color}[${level}]${NC} ${timestamp} - ${msg}"
 
-	if [[ -n "${LOG_FILE:-}" ]]; then
-		if [[ "$stream" == "stderr" ]]; then
-			printf '%b\n' "$formatted" | tee -a "$LOG_FILE" >&2
-		else
-			printf '%b\n' "$formatted" | tee -a "$LOG_FILE"
-		fi
-		return
-	fi
-
 	if [[ "$stream" == "stderr" ]]; then
 		printf '%b\n' "$formatted" >&2
 	else

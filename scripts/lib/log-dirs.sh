@@ -42,3 +42,50 @@ find_all_agent_logs() {
 		find "$root" "${max_depth_args[@]}" -type f -name '*.log' -mtime "$mtime" 2>/dev/null
 	done | sort -u
 }
+
+# Find log files for a specific agent by name.
+# Args: $1 — agent name (claude, opencode, codex, gemini)
+#        $2 — mtime filter (default: -7)
+find_agent_logs() {
+	local agent="$1"
+	local mtime="${2:--7}"
+	local -a roots=()
+
+	case "$agent" in
+	claude | gemini)
+		roots+=("$LOG_DIR")
+		;;
+	opencode)
+		roots+=("$LOG_DIR" "$OPENCODE_LOG_DIR")
+		;;
+	codex)
+		roots+=("$LOG_DIR" "$CODEX_LOG_DIR")
+		;;
+	*)
+		return 0
+		;;
+	esac
+
+	local root
+	local -a seen_roots=()
+	local max_depth_args=()
+	for root in "${roots[@]}"; do
+		[[ -d "$root" ]] || continue
+		local skip=false
+		local prev
+		for prev in "${seen_roots[@]}"; do
+			if [[ "$root" == "$prev" ]]; then
+				skip=true
+				break
+			fi
+		done
+		$skip && continue
+		seen_roots+=("$root")
+		if [[ "$root" == "$LOG_DIR" ]]; then
+			max_depth_args=(-maxdepth 1)
+		else
+			max_depth_args=()
+		fi
+		find "$root" "${max_depth_args[@]}" -type f -name '*.log' -mtime "$mtime" 2>/dev/null
+	done | sort -u
+}

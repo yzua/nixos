@@ -38,17 +38,6 @@ assert_not_contains() {
 	echo "PASS: ${msg}"
 }
 
-# Assert a command fails (returns non-zero).
-assert_cmd_fail() {
-	local msg="$1"
-	shift
-	if "$@" >/dev/null 2>&1; then
-		echo "FAIL: ${msg} (expected failure)"
-		exit 1
-	fi
-	echo "PASS: ${msg}"
-}
-
 # Assert a command succeeds (returns zero).
 assert_true() {
 	local msg="$1"

@@ -52,15 +52,6 @@ query_api() {
 	echo ""
 }
 
-query_prometheus() {
-	local query="$1"
-	local result
-	result=$(query_api "http://127.0.0.1:9090/api/v1/query?query=$(jq -rn --arg q "$query" '$q|@uri')")
-	if [[ -n "$result" ]]; then
-		echo "$result" | jq -r '.data.result[0].value[1] // empty' 2>/dev/null || echo ""
-	fi
-}
-
 query_loki() {
 	local query="$1" start="$2"
 	local result
