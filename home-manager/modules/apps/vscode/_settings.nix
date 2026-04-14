@@ -6,6 +6,15 @@
 }:
 
 let
+  # Directories to exclude from file tree, watcher, and search.
+  # Add new directories here instead of editing three separate settings.
+  ignoredDirs = [
+    "node_modules"
+    "result"
+    "target"
+    ".zig-cache"
+  ];
+
   mkFormatterEntries =
     formatter: languages:
     builtins.listToAttrs (
@@ -75,20 +84,24 @@ in
   "files.exclude" = {
     "**/.git" = true;
     "**/.DS_Store" = true;
-    "**/node_modules" = true;
     "**/__pycache__" = true;
     "**/.pytest_cache" = true;
-    "**/result" = true;
-    "**/.zig-cache" = true;
-    "**/target" = true;
-  };
+  }
+  // builtins.listToAttrs (
+    map (d: {
+      name = "**/${d}";
+      value = true;
+    }) ignoredDirs
+  );
   "files.watcherExclude" = {
-    "**/node_modules/**" = true;
     "**/.git/objects/**" = true;
-    "**/result/**" = true;
-    "**/target/**" = true;
-    "**/.zig-cache/**" = true;
-  };
+  }
+  // builtins.listToAttrs (
+    map (d: {
+      name = "**/${d}/**";
+      value = true;
+    }) ignoredDirs
+  );
   "terminal.integrated.fontFamily" = "'${constants.font.mono}'";
   "terminal.integrated.fontSize" = constants.font.size;
   "terminal.integrated.defaultProfile.linux" = "zsh";
@@ -99,12 +112,14 @@ in
   "explorer.sortOrder" = "type";
   "explorer.compactFolders" = false;
   "search.exclude" = {
-    "**/node_modules" = true;
-    "**/result" = true;
     "**/.direnv" = true;
-    "**/target" = true;
-    "**/.zig-cache" = true;
-  };
+  }
+  // builtins.listToAttrs (
+    map (d: {
+      name = "**/${d}";
+      value = true;
+    }) ignoredDirs
+  );
   "git.autofetch" = true;
   "git.confirmSync" = false;
   "git.enableSmartCommit" = true;
