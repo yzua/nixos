@@ -21,48 +21,23 @@ check_dependencies() {
 	done
 }
 
-parse_imports() {
-	local default_file="$1"
-	local awk_script="$2"
-	awk -f "$awk_script" "$default_file"
-}
-
-parse_manual_helpers() {
-	local default_file="$1"
-	awk '
-		{
-			line = $0
-			lower_line = tolower(line)
-			is_manual = (line ~ /#/ && (lower_line ~ /modules-check:[[:space:]]*manual-helper/ || lower_line ~ /imported manually/))
-
-			if (is_manual) {
-				while (match(line, /\.\/[[:alnum:]_./-]+\.nix/)) {
-					path = substr(line, RSTART + 2, RLENGTH - 2)
-					sub(/^.*\//, "", path)
-					print path
-					line = substr(line, RSTART + RLENGTH)
-				}
-			}
-		}
-	' "$default_file"
-}
-
-collect_unique_nonempty_lines() {
-	awk 'NF && !seen[$0]++'
-}
-
 validate_import_path() {
 	local dir="$1"
 	local import_path="$2"
-	local resolved_path
-	resolved_path="$(cd "$dir" 2>/dev/null && realpath -m "$import_path" 2>/dev/null || echo "${dir}/${import_path}")"
+	local target
+	target="$(cd "$dir" && realpath -m "$import_path" 2>/dev/null)" || true
 
-	if [[ -f "$resolved_path" ]]; then
+	if [[ -z "$target" ]]; then
+		echo "✗  Bad import (cannot resolve path): $dir/$import_path" >&2
+		return 1
+	fi
+
+	if [[ -f "$target" ]]; then
 		return 0
 	fi
 
-	if [[ -d "$resolved_path" ]]; then
-		if [[ ! -f "${resolved_path}/default.nix" ]]; then
+	if [[ -d "$target" ]]; then
+		if [[ ! -f "${target}/default.nix" ]]; then
 			echo "✗  Bad import (directory import missing default.nix): $dir/$import_path" >&2
 			return 1
 		fi
@@ -73,14 +48,8 @@ validate_import_path() {
 	return 1
 }
 
-main() {
-	local error_count=0
-	check_dependencies
-
-	# Build combined AWK script: shared utils + import parsing logic
-	local parse_awk_script
-	parse_awk_script="$(mktemp)"
-	trap 'rm -f "${parse_awk_script:-}"' EXIT
+# Build the batch AWK script that processes all default.nix files at once
+write_batch_awk() {
 	{
 		cat "$SHARED_AWK"
 		cat <<'AWK'
@@ -89,7 +58,7 @@ function extract_nix_paths(line,    remaining, path, start) {
 	while (match(remaining, /\.\.\/[[:alnum:]_./-]+\.nix|\.\/[[:alnum:]_./-]+\.nix/)) {
 		start = RSTART
 		path = substr(remaining, start, RLENGTH)
-		print path
+		print norm_file "\tnix\t" path
 		remaining = substr(remaining, start + RLENGTH)
 	}
 }
@@ -100,29 +69,32 @@ function extract_directory_imports(line,    remaining, path, start) {
 		start = RSTART
 		path = substr(remaining, start, RLENGTH)
 		if (path !~ /\.nix$/) {
-			print path
+			print norm_file "\tdir\t" path
 		}
 		remaining = substr(remaining, start + RLENGTH)
 	}
 }
 
+FNR == 1 {
+	in_imports = 0
+	bracket_depth = 0
+	waiting_for_open_bracket = 0
+	norm_file = FILENAME
+	sub(/^\.\//, "", norm_file)
+}
+
 {
 	raw_line = $0
 	extract_nix_paths(raw_line)
-
 	line = raw_line
 	sub(/#.*/, "", line)
-
 	if (!in_imports) {
 		if (line ~ /imports[[:space:]]*=/) {
 			if (index(line, "[") > 0) {
 				in_imports = 1
 				bracket_depth = count_char(line, "[") - count_char(line, "]")
 				extract_directory_imports(line)
-				if (bracket_depth <= 0) {
-					in_imports = 0
-					bracket_depth = 0
-				}
+				if (bracket_depth <= 0) { in_imports = 0; bracket_depth = 0 }
 			} else {
 				waiting_for_open_bracket = 1
 			}
@@ -131,23 +103,45 @@ function extract_directory_imports(line,    remaining, path, start) {
 			waiting_for_open_bracket = 0
 			bracket_depth = count_char(line, "[") - count_char(line, "]")
 			extract_directory_imports(line)
-			if (bracket_depth <= 0) {
-				in_imports = 0
-				bracket_depth = 0
-			}
+			if (bracket_depth <= 0) { in_imports = 0; bracket_depth = 0 }
 		}
 		next
 	}
-
 	extract_directory_imports(line)
 	bracket_depth += count_char(line, "[") - count_char(line, "]")
-	if (bracket_depth <= 0) {
-		in_imports = 0
-		bracket_depth = 0
+	if (bracket_depth <= 0) { in_imports = 0; bracket_depth = 0 }
+}
+AWK
+	} >"${TMP_DIR}/batch-awk"
+}
+
+write_manual_awk() {
+	cat >"${TMP_DIR}/manual-awk.awk" <<'AWK'
+{
+	line = $0; lower_line = tolower(line)
+	is_manual = (line ~ /#/ && (lower_line ~ /modules-check:[[:space:]]*manual-helper/ || lower_line ~ /imported manually/))
+	if (is_manual) {
+		norm_file = FILENAME; sub(/^\.\//, "", norm_file)
+		while (match(line, /\.\/[[:alnum:]_./-]+\.nix/)) {
+			path = substr(line, RSTART + 2, RLENGTH - 2)
+			sub(/^.*\//, "", path)
+			print norm_file "\tmanual\t" path
+			line = substr(line, RSTART + RLENGTH)
+		}
 	}
 }
 AWK
-	} > "$parse_awk_script"
+}
+
+main() {
+	local error_count=0
+	check_dependencies
+
+	TMP_DIR=$(mktemp -d)
+	trap 'rm -f "${TMP_DIR}/batch-awk" "${TMP_DIR}/manual-awk.awk"; rm -rf "${TMP_DIR:-}"' EXIT
+
+	write_batch_awk
+	write_manual_awk
 
 	local -a defaults=()
 	mapfile -t defaults < <(find . -type f -name default.nix | sort)
@@ -157,45 +151,79 @@ AWK
 		return 0
 	fi
 
-	local default
+	# Batch extraction: one AWK for imports + one xargs awk for manual helpers
+	{
+		awk -f "${TMP_DIR}/batch-awk" "${defaults[@]}" 2>/dev/null || true
+
+		printf '%s\0' "${defaults[@]}" \
+			| xargs -0 awk -f "${TMP_DIR}/manual-awk.awk" 2>/dev/null || true
+	} | sort -u >"${TMP_DIR}/all-extracts.txt"
+
+	# Pre-build indexed extract files (one per default.nix, using numeric index)
+	local idx=0
+	for default in "${defaults[@]}"; do
+		local pattern
+		pattern="$(printf '%s' "$default" | sed 's|^\./||')"
+		grep "^${pattern}"$'\t' "${TMP_DIR}/all-extracts.txt" >"${TMP_DIR}/extracts-${idx}.txt" 2>/dev/null || true
+		((idx++)) || true
+	done
+
+	# Batch find all local modules across all directories at once
+	local -a all_local_modules=()
+	mapfile -t all_local_modules < <(
+		for default in "${defaults[@]}"; do
+			dirname "$default"
+		done | sort -u | xargs -I{} find {} -maxdepth 1 -type f -name '*.nix' \
+			! -name default.nix ! -name '_*.nix' -printf '%h\t%f\n' 2>/dev/null
+	)
+
+	# Process results grouped by default.nix
+	local proc_idx=0
 	for default in "${defaults[@]}"; do
 		local dir
 		dir=$(dirname "$default")
 		echo "⟳ Checking $default" >&2
 
 		local -a imported=()
-		mapfile -t imported < <(parse_imports "$default" "$parse_awk_script")
-
 		local -a manual_helpers=()
-		mapfile -t manual_helpers < <(parse_manual_helpers "$default")
-		unset manual_helper_set
+		local -a unique_imports=()
+
+		local extract_file="${TMP_DIR}/extracts-${proc_idx}"
+		[[ -f "$extract_file" ]] || { ((proc_idx++)) || true; continue; }
+		while IFS=$'\t' read -r _ type path; do
+			if [[ "$type" == "manual" ]]; then
+				manual_helpers+=("$path")
+			else
+				imported+=("$path")
+			fi
+		done <"$extract_file"
+
+		# Build imported set (including basenames for directory imports)
+		declare -A imported_set=()
+		mapfile -t unique_imports < <(printf '%s\n' "${imported[@]}" | awk 'NF && !seen[$0]++')
+		local import_path
+		for import_path in "${unique_imports[@]}"; do
+			imported_set["$import_path"]=1
+			local basename="${import_path##*/}"
+			imported_set["$basename"]=1
+		done
+
+		# Build manual helper set
 		declare -A manual_helper_set=()
 		local helper_name
 		for helper_name in "${manual_helpers[@]}"; do
 			manual_helper_set["$helper_name"]=1
 		done
 
-		unset imported_set
-		declare -A imported_set=()
-		local -a unique_imports=()
-		mapfile -t unique_imports < <(printf '%s\n' "${imported[@]}" | collect_unique_nonempty_lines)
-
-		local import_path
-		for import_path in "${unique_imports[@]}"; do
-			if [[ -z "${imported_set[$import_path]:-}" ]]; then
-				imported_set["$import_path"]=1
-				local basename
-				basename="${import_path##*/}"
-				imported_set["$basename"]=1
-			fi
-		done
-
+		# Get local modules from pre-built map
 		local -a local_modules=()
-		mapfile -t local_modules < <(
-			find "$dir" -maxdepth 1 -type f -name '*.nix' \
-				! -name default.nix ! -name '_*.nix' -printf '%f\n' | sort
-		)
+		while IFS=$'\t' read -r ldir lfile; do
+			if [[ "$ldir" == "$dir" ]]; then
+				local_modules+=("$lfile")
+			fi
+		done <<< "$(printf '%s\n' "${all_local_modules[@]}")"
 
+		# Check for missing imports
 		local module_file
 		for module_file in "${local_modules[@]}"; do
 			if [[ -n "${manual_helper_set[$module_file]:-}" ]]; then
@@ -207,11 +235,15 @@ AWK
 			fi
 		done
 
+		# Validate import paths
 		for import_path in "${unique_imports[@]}"; do
 			if ! validate_import_path "$dir" "$import_path"; then
 				((error_count++))
 			fi
 		done
+
+		unset imported_set manual_helper_set
+		((proc_idx++)) || true
 	done
 
 	if ((error_count > 0)); then
