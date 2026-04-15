@@ -68,7 +68,9 @@ Run these commands before committing changes to any terminal tool:
 
 ```bash
 just modules   # Verify import structure
+just pkgs      # Check for duplicate packages and ownership conflicts
 just lint      # Check shell scripts and Nix syntax
 just format    # Ensure consistent nixfmt-tree formatting
+just check     # Full flake evaluation
 just home      # Safe user-level deployment
 ```

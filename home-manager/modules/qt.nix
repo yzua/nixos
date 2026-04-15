@@ -7,35 +7,27 @@
   ...
 }:
 
+let
+  qt5ctSettings = {
+    Appearance = {
+      custom_palette = false;
+      icon_theme = "Gruvbox-Plus-Dark";
+      standard_dialogs = "default";
+      style = "kvantum";
+    };
+    Fonts = {
+      fixed = "\"${constants.font.mono},${toString constants.font.sizeApplications}\"";
+      general = "\"Noto Sans,${toString constants.font.sizeApplications}\"";
+    };
+  };
+  qt6ctSettings = qt5ctSettings;
+in
 {
   qt = {
     enable = true;
     platformTheme.name = "qtct";
     style.name = lib.mkForce "kvantum";
-    qt5ctSettings = {
-      Appearance = {
-        custom_palette = false;
-        icon_theme = "Gruvbox-Plus-Dark";
-        standard_dialogs = "default";
-        style = "kvantum";
-      };
-      Fonts = {
-        fixed = "\"${constants.font.mono},${toString constants.font.sizeApplications}\"";
-        general = "\"Noto Sans,${toString constants.font.sizeApplications}\"";
-      };
-    };
-    qt6ctSettings = {
-      Appearance = {
-        custom_palette = false;
-        icon_theme = "Gruvbox-Plus-Dark";
-        standard_dialogs = "default";
-        style = "kvantum";
-      };
-      Fonts = {
-        fixed = "\"${constants.font.mono},${toString constants.font.sizeApplications}\"";
-        general = "\"Noto Sans,${toString constants.font.sizeApplications}\"";
-      };
-    };
+    inherit qt5ctSettings qt6ctSettings;
   };
 
   home.packages = with pkgs; [

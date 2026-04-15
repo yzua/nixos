@@ -2,10 +2,13 @@
 
 { config, pkgs, ... }:
 
+let
+  scriptsDir = "${config.home.homeDirectory}/System/scripts";
+in
 {
   home.packages = with pkgs; [
     (writeShellScriptBin "nvidia-fans" ''
-      exec ${config.home.homeDirectory}/System/scripts/hardware/nvidia-fans.sh "$@"
+      exec ${scriptsDir}/hardware/nvidia-fans.sh "$@"
     '')
     (writeShellScriptBin "zellij-main" ''
             set -euo pipefail

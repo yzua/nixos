@@ -5,6 +5,9 @@
   ...
 }:
 
+let
+  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
+in
 {
   programs =
     let
@@ -131,8 +134,5 @@
       }
       // devTemplateAliases;
     in
-    {
-      zsh.shellAliases = shellAliases;
-      bash.shellAliases = shellAliases;
-    };
+    mkShellAliasPrograms { inherit shellAliases; };
 }

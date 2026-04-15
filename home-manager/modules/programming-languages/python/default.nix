@@ -8,7 +8,7 @@
 }:
 
 let
-  mkShellAliasPrograms = import ../_alias-helpers.nix;
+  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
 in
 {
   programs =
@@ -88,7 +88,6 @@ in
       PYTHONPATH = "${config.home.homeDirectory}/Projects/python";
       PYTHONSTARTUP = "${config.home.homeDirectory}/.pythonrc";
       PYTHONUTF8 = "1";
-      PYTHONLEGACYWINDOWSSTDIO = "";
       VIRTUAL_ENV_DISABLE_PROMPT = "1";
       JUPYTER_CONFIG_DIR = "${config.home.homeDirectory}/.jupyter";
       JUPYTER_PLATFORM_DIRS = "1";

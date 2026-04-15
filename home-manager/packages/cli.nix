@@ -103,17 +103,5 @@
     ++ [
       # Git identity management (flake input)
       inputs.gitanon.packages.${pkgs.stdenv.hostPlatform.system}.default
-
-      # Chrome DevTools MCP CLI
-      (pkgs.writeShellApplication {
-        name = "chrome-devtools";
-        runtimeInputs = [
-          pkgs.nodejs
-          pkgs.google-chrome
-        ];
-        text = ''
-          npx -y chrome-devtools-mcp@latest --executablePath ${pkgs.google-chrome}/bin/google-chrome-stable "$@"
-        '';
-      })
     ];
 }

@@ -5,6 +5,7 @@
     ./applications.nix # Desktop apps and GTK theming
     ./cli.nix # CLI tools: file mgmt, text processing, search
     ./custom/beads.nix # Beads git-backed issue tracker (bd CLI)
+    ./custom/chrome-devtools.nix # Chrome DevTools MCP CLI wrapper
     ./custom/cursor.nix # Cursor terminal agent CLI
     ./custom/kiro.nix # Kiro CLI for agentic workflows
     ./custom/prayer.nix # Custom prayer times indicator

@@ -7,7 +7,7 @@
 }:
 
 let
-  mkShellAliasPrograms = import ../_alias-helpers.nix;
+  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
 in
 {
   programs =

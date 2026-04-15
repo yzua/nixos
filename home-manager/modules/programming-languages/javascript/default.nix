@@ -8,7 +8,7 @@
 }:
 
 let
-  mkShellAliasPrograms = import ../_alias-helpers.nix;
+  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
   bunGlobalPackages = [
     "@anthropic-ai/claude-code"
     "@google/gemini-cli"
@@ -18,8 +18,6 @@ let
     "agent-browser"
     "agent-device"
     "@playwright/cli"
-  ];
-  npmGlobalPackages = [
   ];
   homeDir = config.home.homeDirectory;
   npmGlobalDir = "${homeDir}/.npm-global";
@@ -120,20 +118,6 @@ in
 
       # Remove Bun's t3 shim so the npm-managed binary can take precedence cleanly.
       $DRY_RUN_CMD ${pkgs.bun}/bin/bun remove --global --cwd "$HOME" t3 >/dev/null 2>&1 || true
-
-      ${
-        if npmGlobalPackages == [ ] then
-          ""
-        else
-          ''
-            # t3 depends on node-pty, and Bun global installs currently miss its native binary.
-            echo "📦 Managing native Node CLI packages with npm..."
-            $DRY_RUN_CMD env \
-              PATH="${pkgs.nodejs}/bin:${pkgs.python3}/bin:${pkgs.gcc}/bin:${pkgs.gnumake}/bin:$PATH" \
-              PYTHON="${pkgs.python3}/bin/python3" \
-              ${pkgs.nodejs}/bin/npm install --global --prefix "$HOME/.npm-global" ${lib.escapeShellArgs npmGlobalPackages} || echo "❌ Failed to manage npm global packages"
-          ''
-      }
 
       echo "✔ Global packages management completed"
     '';

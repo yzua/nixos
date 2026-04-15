@@ -10,7 +10,6 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 | Directory/File               | Purpose                                                                                    |
 | ---------------------------- | ------------------------------------------------------------------------------------------ |
 | `default.nix`                | Import hub for language modules                                                            |
-| `_alias-helpers.nix`         | Shared helper for zsh/bash alias wiring                                                    |
 | `python/`                    | Python toolchain, uv/poetry aliases, env/session vars, managed `.pythonrc`, workspace dirs |
 | `python/_gitignores.nix`     | Python-specific `.gitignore` patterns (helper, imported by `default.nix`)                  |
 | `javascript/`                | Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper, global package bootstrap       |
@@ -27,7 +26,7 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 - Put runtime binaries in `home.packages`; put shell/session wiring in `home.sessionVariables` and `home.sessionPath`.
 - Activation hooks are allowed for workspace/bootstrap tasks (`lib.hm.dag.entryAfter [ "writeBoundary" ]`).
 - `mise` is configured with Python disabled (`disable_tools = [ "python" ]`); Python ownership stays in `python/`.
-- Each language gets its own subdirectory. Shared helpers (`_alias-helpers.nix`) stay at this level.
+- Each language gets its own subdirectory. Shared alias wiring is at repo-root `shared/_alias-helpers.nix` (imported via `../../../../shared/_alias-helpers.nix` from each language module).
 
 ---
 
