@@ -22,20 +22,21 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 ## Your Workspaces
 
-Six named workspaces are preconfigured, five reachable by key:
+Six named workspaces are preconfigured, plus unnamed numeric slots:
 
-| #   | Workspace   | Apps                           | Access    |
-| --- | ----------- | ------------------------------ | --------- |
-| 1   | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1` |
-| 2   | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2` |
-| 3   | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3` |
-| 4   | 󰎆 media     | Music/Video players (rules)    | `Super+4` |
-| 5   | _(unnamed)_ | General purpose                | `Super+5` |
-| 6   | 󰀲 android   | Android tools (rules only)     | `Super+6` |
+| #   | Workspace   | Apps                           | Access                           |
+| --- | ----------- | ------------------------------ | -------------------------------- |
+| 1   | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`                        |
+| 2   | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`                        |
+| 3   | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`                        |
+| 4   | 󰎆 media     | Music/Video players (rules)    | `Super+4`                        |
+| —   | 󰦝 vpn       | VPN tools (window rules only)  | Overview / `Page_Up`/`Page_Down` |
+| 5   | _(unnamed)_ | General use                    | `Super+5`                        |
+| 6   | 󰀲 android   | Android tools (rules only)     | `Super+6`                        |
 
-The 󰦝 **vpn** workspace exists but is only reachable via window rules — Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open there. There is no keybinding to focus or move windows to it directly.
+The 󰦝 **vpn** workspace has no `Super+<number>` binding — it is a named workspace that sits between media and android in the internal layout. Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open there via window rules. Navigate to it with `Super+Grave` (overview) or `Super+Page_Up`/`Super+Page_Down`.
 
-Workspaces 7–9 are available as unnamed extras (`Super+7` through `Super+9`).
+Workspaces 7–9 are unnamed extras (accessible via their number keys).
 
 Apps are assigned to workspaces via window rules — when Brave opens, it goes to browser workspace automatically. You never have to manually place them.
 
@@ -650,15 +651,17 @@ Column 2 holds two windows stacked vertically (merged with `Super+Comma`/`Super+
 
 ## Configuration Files
 
-| File                                    | What It Controls                                      |
-| --------------------------------------- | ----------------------------------------------------- |
-| `home-manager/modules/niri/main.nix`    | Workspaces, autostart, environment, animations        |
-| `home-manager/modules/niri/binds.nix`   | All keybindings and imported helper scripts           |
-| `home-manager/modules/niri/input.nix`   | Keyboard, mouse, touchpad, trackpoint                 |
-| `home-manager/modules/niri/layout.nix`  | Gaps, columns, focus behavior                         |
-| `home-manager/modules/niri/rules.nix`   | Window rules, opacity, floating, workspace assignment |
-| `home-manager/modules/niri/idle.nix`    | Idle timeouts (dim → lock → DPMS)                     |
-| `home-manager/modules/niri/lock.nix`    | Swaylock fallback configuration                       |
-| `home-manager/modules/niri/default.nix` | Module imports and Niri flake integration             |
+| File                                             | What It Controls                                           |
+| ------------------------------------------------ | ---------------------------------------------------------- |
+| `home-manager/modules/niri/main.nix`             | Workspaces, autostart, environment, animations             |
+| `home-manager/modules/niri/binds.nix`            | All keybindings and imported helper scripts                |
+| `home-manager/modules/niri/input.nix`            | Keyboard, mouse, touchpad, trackpoint                      |
+| `home-manager/modules/niri/layout.nix`           | Gaps, columns, focus behavior                              |
+| `home-manager/modules/niri/rules.nix`            | Window rules, opacity, floating, workspace assignment      |
+| `home-manager/modules/niri/idle.nix`             | Idle timeouts (dim → lock → DPMS)                          |
+| `home-manager/modules/niri/lock.nix`             | Swaylock fallback configuration                            |
+| `home-manager/modules/niri/default.nix`          | Module imports and Niri flake integration                  |
+| `home-manager/modules/niri/_workspace-names.nix` | Named workspace definitions (imported by main/binds/rules) |
+| `home-manager/modules/niri/scripts/`             | Helper scripts (color-picker, open-books, screenshot)      |
 
 To apply changes after editing: `just home` (rebuilds Home Manager configuration).

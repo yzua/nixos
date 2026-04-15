@@ -65,7 +65,10 @@ ai-agents/
 │   ├── _services-shell-aliases.nix       # Shell alias definitions for agent services
 │   ├── _services-systemd.nix             # Systemd user service/timer definitions
 │   ├── _formatters.nix                   # Formatter registry (shared by claude hooks + gemini config)
-│   └── _impeccable-commands.nix          # Impeccable skill command definitions and text renderer
+│   ├── _impeccable-commands.nix          # Impeccable skill command definitions and text renderer
+│   ├── _models.nix                       # Shared model/provider constants (names, aliases)
+│   ├── _git-clone-update.nix             # Git clone/update helper for plugin repos
+│   └── _scripts-dir.nix                  # Scripts directory path resolver
 ├── activation/              # Home Manager activation scripts
 │   ├── default.nix          # Aggregation: wires all activation steps
 │   ├── secrets.nix          # Secret patching (placeholder → real key injection)

@@ -31,7 +31,10 @@ modules/
 │   │   ├── _services-shell-aliases.nix  # Shell alias definitions for agent services
 │   │   ├── _services-systemd.nix        # Systemd user service/timer definitions
 │   │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
-│   │   └── _impeccable-commands.nix # Impeccable slash command definitions
+│   │   ├── _impeccable-commands.nix # Impeccable slash command definitions
+│   │   ├── _models.nix           # Shared model/provider constants (names, aliases)
+│   │   ├── _git-clone-update.nix # Git clone/update helper for plugin repos
+│   │   └── _scripts-dir.nix      # Scripts directory path resolver
 │   ├── activation/     # Home Manager activation scripts
 │   │   ├── default.nix      # Aggregation hub
 │   │   ├── secrets.nix      # Secret patching (placeholder → real key injection)
@@ -47,7 +50,7 @@ modules/
 │   ├── android-re/     # Android RE workflow prompts and config
 │   │   └── _prompt.nix # Prompt templates (not a module, imported by services)
 │   └── config/         # Split configuration values
-│       ├── default.nix      # Import hub (claude + models + flat files)
+│       ├── default.nix      # Import hub (defaults, mcp-servers, models, claude)
 │       ├── defaults.nix     # Default values for agent options
 │       ├── global-instructions.md # Global instructions text (not a module)
 │       ├── _skills.nix      # Skill installations and omissions (not a module)
@@ -62,9 +65,9 @@ modules/
 │       │   └── _permission-rules.nix # Claude allow/deny rules (not a module)
 │       └── models/          # Model/provider registries
 │           ├── default.nix  # Import hub + shared toggles (agencyAgents, impeccable)
-│           ├── codex.nix    # Codex CLI model config
-│           ├── gemini.nix   # Gemini CLI model config + mkModelAlias/mkThinkingAlias
-│           ├── opencode.nix # OpenCode model config (owns all let bindings)
+│           ├── codex.nix    # Codex CLI config (model, profiles, custom agents, developer instructions)
+│           ├── gemini.nix   # Gemini CLI config (settings, theming, model aliases, auto-format hooks)
+│           ├── opencode.nix # OpenCode config (agents, LSP, providers)
 │           └── _opencode-lsp.nix # OpenCode LSP tool configuration
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
@@ -79,6 +82,7 @@ modules/
 │   ├── metadata-scrubber.nix # Automatic metadata scrubbing (mat2/exiftool)
 │   ├── syncthing.nix   # Syncthing local file sync
 │   ├── _desktop-local-bin-wrappers.nix # Desktop local bin wrappers (helper, not in default.nix)
+│   ├── _mk-wayland-browser-wrapper.nix # Shared Wayland browser wrapper (helper, not in default.nix)
 │   ├── vscode/         # VS Code editor
 │   │   ├── default.nix      # Import hub (enable, package, mutableExtensionsDir)
 │   │   ├── extensions.nix   # Extensions (nixpkgs + marketplace)
@@ -107,13 +111,12 @@ modules/
 │       ├── color-picker.nix  # Wayland color picker (grim + slurp + imagemagick)
 │       ├── open-books.nix    # Book launcher (find + wofi + zathura)
 │       └── screenshot.nix    # Screenshot annotator (grim + slurp + swappy)
-├── noctalia/           # Noctalia Shell (bar, launcher, notifications, lock, wallpaper, OSD, GruvboxAlt colorscheme)
-│   ├── default.nix     # Import hub, status-notifier-watcher
+├── noctalia/           # Noctalia Shell (bar, launcher, notifications, wallpaper, OSD, GruvboxAlt colorscheme)
+│   ├── default.nix     # Import hub, status-notifier-watcher (SNI protocol)
 │   ├── activation.nix  # Activation script (wallpaper deployment, plugin compilation)
 │   ├── bar.nix         # Bar widgets (left, center, right panels)
-│   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, hooks)
-│   ├── colorschemes/   # Custom color schemes (GruvboxAlt)
-│   │   └── GruvboxAlt.json # Gruvbox palette for Noctalia
+│   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, lock command, hooks)
+│   ├── _colorscheme.nix # GruvboxAlt colorscheme generator (produces JSON at activation)
 │   └── plugins/        # Noctalia shell plugins
 │       ├── browser-launcher/  # Browser profile launcher (QML)
 │       ├── keybind-cheatsheet/ # Keyboard shortcut overlay (QML)
@@ -125,7 +128,6 @@ modules/
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)
 │   └── plugins/        # Plugin-specific configs (wakatime)
 ├── programming-languages/ # Language tooling (Go, JS, Python, Mise)
-│   ├── _alias-helpers.nix # Shared zsh/bash alias wiring (helper, not a module)
 │   ├── go/              # Go runtime, aliases, GOPATH/GOBIN/session settings
 │   │   └── default.nix
 │   ├── javascript/      # Node/Bun/Deno toolchain, JS/TS aliases, Playwright wrapper
@@ -152,7 +154,7 @@ modules/
 │   │   ├── config.nix  # Zsh settings and initialization
 │   │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)
 │   │   └── local-vars.nix # Local shell variables
-│   └── tools/          # CLI tools (atuin, bat, btop, cava, carapace, eza, fzf, gh, git, htop, lazygit, mpv, starship, yazi, zathura, zoxide — 16 entries)
+│   └── tools/          # CLI tools (atuin, bat, btop, cava, carapace, eza, fzf, gh, git, lazygit, mpv, starship, yazi, zathura, zoxide — 15 entries)
 │       └── git/        # Git (identity from constants, GPG signing, aliases, hooks)
 │           ├── default.nix # Import hub
 │           ├── config.nix  # Git settings, aliases, includes
@@ -178,7 +180,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-12 domain chunks + 4 custom chunks: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/cursor`, `custom/kiro`, `custom/prayer`.
+12 domain chunks + 5 custom chunks: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`.
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 

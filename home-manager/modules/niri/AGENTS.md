@@ -1,6 +1,6 @@
 # Niri Compositor Configuration
 
-Scrollable tiling Wayland compositor. 7 local modules plus 1 shared helper (`_workspace-names.nix`) and 3 helper scripts (and 2 imported flake modules).
+Scrollable tiling Wayland compositor. 8 local modules plus 1 shared helper (`_workspace-names.nix`) and 3 helper scripts (and 2 imported flake modules).
 Configures `programs.niri.settings` — all settings live under that namespace.
 
 ---
@@ -9,7 +9,7 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 
 | File                   | Configures                            | Key Details                                                                                    |
 | ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `default.nix`          | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 7 local modules |
+| `default.nix`          | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 8 local modules |
 | `main.nix`             | Workspaces, autostart, environment    | 6 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC                                  |
 | `binds.nix`            | Keybindings                           | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/`                        |
 | `input.nix`            | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp`                               |

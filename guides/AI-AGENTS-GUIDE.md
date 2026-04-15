@@ -260,50 +260,49 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Quick Reference
 
-| Alias/Function                 | What It Runs                                                       | Notes                                                                     |
-| ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `cl`                           | `claude`                                                           | Claude Code default                                                       |
-| `ocl`                          | `claude --model opus`                                              | Claude Code forced Opus model                                             |
-| `hcl`                          | `claude --model haiku`                                             | Claude Code forced Haiku model                                            |
-| `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                        |
-| `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                               |
-| `oc`                           | `opencode`                                                         | Default OpenCode                                                          |
-| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile                                               |
-| `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                              |
-| `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                 |
-| `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                              |
-| `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                            |
-| `gem`                          | `gemini --approval-mode=yolo`                                      | Gemini CLI default YOLO launcher                                          |
-| `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                               |
-| `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                        |
-| `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                     |
-| `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                       |
-| `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                 |
-| `cxu`                          | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Alias of `cx` (identical command)                                         |
-| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                  |
-| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                     |
-| `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                 |
-| `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix     |
-| `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries              |
-| `iter`                         | `iter [count] <agent> [prompt...]`                                 | Headless Ralph-style reruns; no count means unlimited until failure       |
-| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                       |
-| `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                              |
-| `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)          |
-| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt              |
-| `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                    |
-| `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`              |
-| `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`           |
-| `opencode_gpt` (`ocgpt`)       | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`              |
-| `opencode_sonnet` (`ocs`)      | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`           |
-| `opencode_zen` (`oczen`)       | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`              |
-| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                   | Function: loads OpenRouter key from sops, sets config dir                 |
-| `occm`                         | `opencode --prompt '<commit-split prompt>'`                        | Split-stage current git changes into logical commits with `git commit -S` |
-| `ocbp`                         | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas     |
-| `cprf`                         | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`)        |
+| Alias/Function                 | What It Runs                                                       | Notes                                                                              |
+| ------------------------------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `cl`                           | `claude`                                                           | Claude Code default                                                                |
+| `ocl`                          | `claude --model opus`                                              | Claude Code forced Opus model                                                      |
+| `hcl`                          | `claude --model haiku`                                             | Claude Code forced Haiku model                                                     |
+| `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                                 |
+| `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                                        |
+| `oc`                           | `opencode`                                                         | Default OpenCode                                                                   |
+| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile                                                        |
+| `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                                       |
+| `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                          |
+| `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                                       |
+| `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                                     |
+| `gem`                          | `gemini --approval-mode=yolo`                                      | Gemini CLI default YOLO launcher                                                   |
+| `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                                        |
+| `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                                 |
+| `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                              |
+| `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                                |
+| `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                          |
+| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                           |
+| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                              |
+| `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                          |
+| `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix              |
+| `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries                       |
+| `iter`                         | `iter [count] <agent> [prompt...]`                                 | Headless Ralph-style reruns; no count means unlimited until failure                |
+| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                                |
+| `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                                       |
+| `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)                   |
+| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt                       |
+| `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                             |
+| `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`                       |
+| `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`                    |
+| `opencode_gpt` (`ocgpt`)       | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`                       |
+| `opencode_sonnet` (`ocs`)      | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`                    |
+| `opencode_zen` (`oczen`)       | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`                       |
+| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                   | Function: loads OpenRouter key from sops, sets config dir                          |
+| `occm`                         | `opencode --prompt '<commit-split prompt>'`                        | Split-stage current git changes into logical commits with `git commit -S`          |
+| `ocbp`                         | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas              |
+| `cprf`                         | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpfx`, `cpsa`, `cpdu`, `cpbp`, `cpmd`) |
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `cxu`, `ais`, `ait`, `occm`, `ocbp`, `oc-port`, `ai-mcp-scan`, etc.) are defined in `home-manager/modules/ai-agents/services.nix` and `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*sa`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpsa`, `cpbp`, `cpmd`) are generated automatically.
+- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `ais`, `ait`, `occm`, `ocbp`, `ocor`, `oc-port`, `ai-mcp-scan`, etc.) are generated by `helpers/_aliases.nix` and merged into shell scope via `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*fx`, `*sa`, `*du`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpfx`, `cpsa`, `cpdu`, `cpbp`, `cpmd`) are generated automatically.
 - **Packages** (`agents-search`, `iter`) are `writeShellScriptBin` wrappers added to `home.packages` in `home-manager/modules/ai-agents/services.nix`.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 
@@ -398,7 +397,10 @@ ai-agents/
 │   ├── _mk-cli-autoupdate-script.nix # Auto-update script builder
 │   ├── _android-re-launchers.nix # Android RE agent launcher helpers
 │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
-│   └── _impeccable-commands.nix # Impeccable slash command definitions
+│   ├── _impeccable-commands.nix # Impeccable slash command definitions
+│   ├── _models.nix           # Shared model/provider constants (names, aliases)
+│   ├── _git-clone-update.nix # Git clone/update helper for plugin repos
+│   └── _scripts-dir.nix      # Scripts directory path resolver
 ├── activation/              # Activation scripts (secret patching, Codex/Claude setup, plugin installs)
 │   ├── default.nix            # Aggregation hub
 │   ├── codex-setup.nix        # Codex config.toml + ~/.codex/agents generation
@@ -581,13 +583,13 @@ Also passes `--dangerously-skip-permissions` for autonomous operation.
 
 ### GLM Model Reference
 
-| Model ID      | Parameters            | Context | Use Case                    |
-| ------------- | --------------------- | ------- | --------------------------- |
-| glm-5.1       | 744B (40B active MoE) | 200K    | Flagship reasoning          |
-| glm-4.7       | —                     | —       | Previous gen, stable coding |
-| glm-4.7-flash | —                     | —       | Fast/cheap variant          |
-| glm-5-turbo   | —                     | —       | Fast reasoning, haiku tier  |
-| glm-4.6v      | —                     | —       | Vision variant              |
+| Model ID      | Parameters            | Context | Use Case                    | In Config?    |
+| ------------- | --------------------- | ------- | --------------------------- | ------------- |
+| glm-5.1       | 744B (40B active MoE) | 200K    | Flagship reasoning          | Yes           |
+| glm-5-turbo   | —                     | —       | Fast reasoning, haiku tier  | Yes           |
+| glm-4.7       | —                     | —       | Previous gen, stable coding | Platform-only |
+| glm-4.7-flash | —                     | —       | Fast/cheap variant          | Platform-only |
+| glm-4.6v      | —                     | —       | Vision variant              | Platform-only |
 
 Provider prefixes: `zai-coding-plan/` (premium), `zai/` (standard), `opencode/` (free tier).
 
@@ -783,12 +785,12 @@ PostToolUse hooks auto-format files after edits:
 
 PreToolUse hooks enforce safety guardrails:
 
-- Block system-destructive commands (`rm -rf /`, `mkfs`, `dd`, `shutdown`)
+- Block system-destructive commands (`rm -rf /`, `rm -rf ~`, `rm -rf /*`, `mkfs`, `dd`, `shutdown`, `reboot`, `poweroff`)
 - Warn on destructive DB commands (`DROP`, `DELETE FROM`, `truncate`)
 - Pre-commit lint check (triggers `just lint` / `pre-commit run` / `npm run lint` / `cargo check`)
 - Dev server tmux recommendation (suggests `npm/pnpm/yarn/bun run dev` in tmux)
 - Session persistence recommendation (for long-running tasks like `npm install/test`, `cargo`, `just`)
-- Block destructive git commands (`push --force`, `reset --hard`, `clean -fd`)
+- Block destructive git commands (`push --force`, `push -f`, `reset --hard`, `clean -fd`, `clean -fdx`)
 
 ---
 

@@ -74,7 +74,6 @@ Set `hostProfile` first, then override as needed:
 | Option                       | Description                                                               |
 | ---------------------------- | ------------------------------------------------------------------------- |
 | `hostProfile`                | `"desktop"` or `"laptop"` — sets defaults below                           |
-| `hostInfo.enable`            | Hostname + stateVersion from flake args                                   |
 | `nvidia.enable`              | NVIDIA drivers, CUDA, Wayland                                             |
 | `fwupd.enable`               | Firmware updates (LVFS)                                                   |
 | `gaming.enable`              | Steam, Lutris, Wine, MangoHud                                             |
@@ -115,6 +114,8 @@ Set `hostProfile` first, then override as needed:
 | `fail2ban.enable`            | fail2ban intrusion prevention                                             |
 | `aide.enable`                | AIDE file integrity monitoring (default: on)                              |
 | `metadataScrubber.enable`    | System-side metadata scrubber tooling (`mat2`/`exiftool`/`inotify-tools`) |
+| `monitoring.enable`          | System monitoring tools (iotop, sysstat, sensors, vnStat, bandwhich)      |
+| `lynis.enable`               | Weekly Lynis security audit                                               |
 | `kdeconnect.enable`          | KDE Connect phone integration                                             |
 | `vnc.enable`                 | VNC remote access                                                         |
 | `secureBoot.enable`          | Secure Boot preparation with sbctl                                        |
@@ -173,26 +174,26 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### System Services & Features
 
-| Service/Feature                         | Toggle                           | Notes                               |
-| --------------------------------------- | -------------------------------- | ----------------------------------- |
-| NVIDIA drivers + CUDA                   | `mySystem.nvidia.enable`         | Proprietary NVIDIA stack            |
-| Firmware updates (fwupd)                | `mySystem.fwupd.enable`          | LVFS firmware updates               |
-| Bluetooth + Blueman                     | `mySystem.bluetooth.enable`      | Desktop Bluetooth management        |
-| Flatpak + Flathub                       | `mySystem.flatpak.enable`        | Additional app ecosystem            |
-| CUPS printing                           | `mySystem.printing.enable`       | Local/network printer support       |
-| GNOME Files integration                 | `mySystem.nautilus.enable`       | File manager + thumbnailers         |
-| Dynamic linker for non-Nix binaries     | `mySystem.nixLd.enable`          | Compatibility for external binaries |
-| Docker + libvirt/QEMU                   | `mySystem.virtualisation.enable` | Containers and VMs                  |
-| Waydroid                                | `mySystem.waydroid.enable`       | Android container runtime           |
-| greetd + tuigreet                       | `mySystem.greetd.enable`         | Display manager/login UI            |
-| OpenSnitch firewall                     | `mySystem.opensnitch.enable`     | Outbound app firewalling            |
-| KDE Connect                             | `mySystem.kdeconnect.enable`     | Phone integration                   |
-| VNC stack (x11vnc + noVNC + websockify) | `mySystem.vnc.enable`            | Remote desktop access               |
-| Cleanup timers                          | `mySystem.cleanup.enable`        | Downloads/cache retention jobs      |
-| Restic backup jobs                      | `mySystem.backup.enable`         | Scheduled backups with pruning      |
-| fail2ban intrusion prevention           | `mySystem.fail2ban.enable`       | SSH/auth log monitoring             |
-| Secure Boot preparation                 | `mySystem.secureBoot.enable`     | sbctl for Secure Boot setup         |
-| Web RE/security tools                   | `mySystem.webRe.enable`          | Nuclei, Nikto, SQLMap, Nmap, etc.   |
+| Service/Feature                         | Toggle                           | Notes                                     |
+| --------------------------------------- | -------------------------------- | ----------------------------------------- |
+| NVIDIA drivers + CUDA                   | `mySystem.nvidia.enable`         | Proprietary NVIDIA stack                  |
+| Firmware updates (fwupd)                | `mySystem.fwupd.enable`          | LVFS firmware updates                     |
+| Bluetooth + Blueman                     | `mySystem.bluetooth.enable`      | Desktop Bluetooth management              |
+| Flatpak + Flathub                       | `mySystem.flatpak.enable`        | Additional app ecosystem                  |
+| CUPS printing                           | `mySystem.printing.enable`       | Local/network printer support             |
+| GNOME Files integration                 | `mySystem.nautilus.enable`       | File manager + thumbnailers               |
+| Dynamic linker for non-Nix binaries     | `mySystem.nixLd.enable`          | Compatibility for external binaries       |
+| Docker + libvirt/QEMU                   | `mySystem.virtualisation.enable` | Containers and VMs                        |
+| Waydroid                                | `mySystem.waydroid.enable`       | Android container runtime                 |
+| greetd + tuigreet                       | `mySystem.greetd.enable`         | Display manager/login UI                  |
+| OpenSnitch firewall                     | `mySystem.opensnitch.enable`     | Outbound app firewalling                  |
+| KDE Connect                             | `mySystem.kdeconnect.enable`     | Phone integration                         |
+| VNC stack (x11vnc + noVNC + websockify) | `mySystem.vnc.enable`            | Remote desktop access                     |
+| Cleanup timers                          | `mySystem.cleanup.enable`        | Downloads/cache retention jobs            |
+| Restic backup jobs                      | `mySystem.backup.enable`         | Scheduled backups with pruning            |
+| fail2ban intrusion prevention           | `mySystem.fail2ban.enable`       | SSH/auth log monitoring                   |
+| Secure Boot preparation                 | `mySystem.secureBoot.enable`     | sbctl for Secure Boot setup               |
+| Web RE/security tools                   | `mySystem.webRe.enable`          | Nuclei, Nikto, SQLMap, Subfinder, WhatWeb |
 
 ### User-level (Home Manager)
 
@@ -213,10 +214,9 @@ nixos-modules/                # Shared system modules (56 imports in hub)
 home-manager/                 # User-level modules + packages
 scripts/                      # Utility scripts
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
-dev-shells/                   # Per-language dev environments
+dev-shells/                   # Per-language dev shell templates (nix flake init -t)
 guides/                       # User-facing tool guides (Niri, Neovim, Zellij, etc.)
-skills/                       # AI agent skill definitions
-themes/                       # Theme assets
+themes/                       # LibreWolf browser theme CSS overrides
 ```
 
 Area-specific guidance in `AGENTS.md` files throughout the repo.
