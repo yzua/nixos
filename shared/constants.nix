@@ -43,6 +43,7 @@
 
     # Foreground shades
     fg0 = "#ebdbb2"; # base06 (primary light foreground)
+    fg_light = "#fbf1c7"; # base05 (bright foreground / light-mode background)
     fg_dark = "#665c54"; # bg3
     fg = "#7c6f64"; # bg4
 
