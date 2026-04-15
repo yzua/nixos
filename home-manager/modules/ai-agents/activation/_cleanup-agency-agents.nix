@@ -3,8 +3,12 @@
 {
   cfg,
   lib,
+  preservedClaudeAgents,
 }:
 
+let
+  preservePattern = lib.concatStringsSep "|" preservedClaudeAgents;
+in
 {
   cleanupDisabledAgencyAgents = lib.mkIf (!cfg.agencyAgents.enable) (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -23,7 +27,7 @@
         for agent_file in "$CLAUDE_AGENTS_DIR"/*.md; do
           [[ -e "$agent_file" ]] || continue
           case "$(basename "$agent_file")" in
-            implementation-engineer.md|protocol-triage.md|security-reviewer.md|static-recon.md|release-notes.md)
+            ${preservePattern})
               ;;
             *)
               rm -f "$agent_file"

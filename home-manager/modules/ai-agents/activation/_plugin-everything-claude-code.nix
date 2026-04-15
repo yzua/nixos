@@ -10,6 +10,7 @@
 let
   eccCfg = cfg.everythingClaudeCode;
   opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
+  gitCloneUpdate = import ../helpers/_git-clone-update.nix { inherit pkgs; };
 in
 
 {
@@ -18,14 +19,10 @@ in
       # Keep ECC intentionally curated here instead of emulating upstream install.sh.
       # This repo wants declarative, low-risk agent assets without broad hooks,
       # MCP imports, or other impure setup side effects.
-      if [[ -d "$HOME/.local/share/everything-claude-code/.git" ]]; then
-        echo "📦 Updating everything-claude-code..."
-        ${pkgs.git}/bin/git -C "$HOME/.local/share/everything-claude-code" pull --ff-only 2>/dev/null || true
-      else
-        echo "📦 Cloning everything-claude-code..."
-        rm -rf "$HOME/.local/share/everything-claude-code"
-        ${pkgs.git}/bin/git clone --depth 1 https://github.com/affaan-m/everything-claude-code.git "$HOME/.local/share/everything-claude-code" 2>/dev/null || true
-      fi
+      ${gitCloneUpdate {
+        name = "everything-claude-code";
+        url = "https://github.com/affaan-m/everything-claude-code.git";
+      }}
       ECC_DIR="$HOME/.local/share/everything-claude-code"
 
       copy_ecc_file() {

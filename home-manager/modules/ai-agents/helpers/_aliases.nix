@@ -8,6 +8,8 @@
 }:
 
 let
+  scriptsDir = import ./_scripts-dir.nix { inherit config; };
+  models = import ./_models.nix;
   workflowPrompts = import ./_workflow-prompts.nix { };
   commitSplitPrompt = workflowPrompts.commitSplit;
   refactorMaintainabilityPrompt = workflowPrompts.refactorMaintainability;
@@ -15,13 +17,14 @@ let
   bugfixRootCausePrompt = workflowPrompts.bugfixRootCause;
   dependencyUpgradePrompt = workflowPrompts.dependencyUpgrade;
   buildPerformancePrompt = workflowPrompts.buildPerformance;
+  runtimePerformancePrompt = workflowPrompts.runtimePerformance;
   markdownSyncPrompt = workflowPrompts.markdownSync;
 
   codexBase = "command codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox";
 
-  gptLowModel = "openai/gpt-5.4-spark";
-  gptMedModel = "openai/gpt-5.4";
-  gptXHighModel = "openai/gpt-5.1-codex-max";
+  gptLowModel = models.gpt-low;
+  gptMedModel = models.gpt-default;
+  gptXHighModel = models.gpt-xhigh;
 
   mkAliasAttrs =
     aliasSpecs:
@@ -166,6 +169,10 @@ let
       prompt = buildPerformancePrompt;
     }
     {
+      suffix = "rp";
+      prompt = runtimePerformancePrompt;
+    }
+    {
       suffix = "md";
       prompt = markdownSyncPrompt;
     }
@@ -206,12 +213,13 @@ let
     SECURITY_AUDIT_PROMPT=${lib.escapeShellArg securityAuditPrompt} \
     DEPENDENCY_UPGRADE_PROMPT=${lib.escapeShellArg dependencyUpgradePrompt} \
     BUILD_PERFORMANCE_PROMPT=${lib.escapeShellArg buildPerformancePrompt} \
+    RUNTIME_PERFORMANCE_PROMPT=${lib.escapeShellArg runtimePerformancePrompt} \
     MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg markdownSyncPrompt} \
     exec ${targetScript} "$@"
   '';
 
   aiAgentLauncher = pkgs.writeShellScriptBin "ai-agent-launcher" (
-    mkWorkflowEnvVars "${config.home.homeDirectory}/System/scripts/ai/agent-launcher.sh"
+    mkWorkflowEnvVars "${scriptsDir}/ai/agent-launcher.sh"
   );
 in
 {
@@ -222,6 +230,6 @@ in
     mkWorkflowEnvVars
     ;
   aiAgentInventory = pkgs.writeShellScriptBin "ai-agent-inventory" ''
-    exec ${config.home.homeDirectory}/System/scripts/ai/agent-inventory.sh "$@"
+    exec ${scriptsDir}/ai/agent-inventory.sh "$@"
   '';
 }

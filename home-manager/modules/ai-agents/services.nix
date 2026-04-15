@@ -9,17 +9,18 @@
 
 let
   cfg = config.programs.aiAgents;
+  scriptsDir = import ./helpers/_scripts-dir.nix { inherit config; };
 
   agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
     AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
       AI_AGENT_NOTIFY_ON_ERROR=${if cfg.logging.notifyOnError then "true" else "false"} \
-      exec ${config.home.homeDirectory}/System/scripts/ai/agent-log-wrapper.sh "$@"
+      exec ${scriptsDir}/ai/agent-log-wrapper.sh "$@"
   '';
   agentIter = pkgs.writeShellScriptBin "iter" (
-    aliasLib.mkWorkflowEnvVars "bash ${config.home.homeDirectory}/System/scripts/ai/agent-iter.sh"
+    aliasLib.mkWorkflowEnvVars "bash ${scriptsDir}/ai/agent-iter.sh"
   );
   agentsSearch = pkgs.writeShellScriptBin "agents-search" ''
-    exec ${config.home.homeDirectory}/System/scripts/ai/agents-search.sh "$@"
+    exec ${scriptsDir}/ai/agents-search.sh "$@"
   '';
   androidReLaunchers = import ./helpers/_android-re-launchers.nix {
     inherit config lib pkgs;
@@ -81,8 +82,7 @@ in
       OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
     };
 
-    programs.zsh.shellAliases = shellAliases;
-    programs.bash.shellAliases = shellAliases;
+    programs = import ../../../shared/_alias-helpers.nix { inherit shellAliases; };
 
     systemd.user = aiSystemdUser;
   };

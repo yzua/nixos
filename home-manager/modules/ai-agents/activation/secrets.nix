@@ -26,110 +26,104 @@ lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "set
     printf '%s\n' "$1" | ${pkgs.gnused}/bin/sed 's/[&/\]/\\&/g'
   }
 
+  # Patch a secret value into all agent config files.
+  # Args: secret jq_arg_name opencode_filter [claude_filter] [gemini_filter] [toml_placeholder] [toml_append_section] [label]
+  patch_secret_to_all_configs() {
+    local secret="$1" jq_arg="$2" opencode_filter="$3"
+    local claude_filter="''${4:-}" gemini_filter="''${5:-}"
+    local toml_placeholder="''${6:-}" toml_append="''${7:-}" label="''${8:-}"
+
+    for OPENCODE_CFG in ${opencodeConfigPathList}; do
+      if [[ -f "$OPENCODE_CFG" ]]; then
+        patch_json_file "$OPENCODE_CFG" "$jq_arg" "$secret" "$opencode_filter"
+        echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with $label"
+      fi
+    done
+
+    if [[ -n "$claude_filter" ]] && [[ -f "$HOME/.mcp.json" ]]; then
+      patch_json_file "$HOME/.mcp.json" "$jq_arg" "$secret" "$claude_filter"
+      echo "✓ Patched .mcp.json with $label"
+    fi
+
+    if [[ -n "$toml_placeholder" ]] && [[ -f "$HOME/.codex/config.toml" ]]; then
+      local escaped
+      escaped="$(escape_sed_replacement "$secret")"
+      ${pkgs.gnused}/bin/sed -i "s/$toml_placeholder/$escaped/g" "$HOME/.codex/config.toml"
+      if [[ -n "$toml_append" ]] && grep -q "$toml_append" "$HOME/.codex/config.toml"; then
+        ${pkgs.gnused}/bin/sed -i "/$toml_append/a Z_AI_API_KEY = \"$escaped\"" "$HOME/.codex/config.toml"
+      fi
+      echo "✓ Patched codex config.toml with $label"
+    fi
+
+    if [[ -n "$gemini_filter" ]] && [[ -f "$HOME/.gemini/settings.json" ]]; then
+      patch_json_file "$HOME/.gemini/settings.json" "$jq_arg" "$secret" "$gemini_filter"
+      echo "✓ Patched gemini settings.json with $label"
+    fi
+  }
+
+  # --- Z.AI ---
   if [[ -n "${cfg.secrets.zaiApiKeyFile or ""}" ]]; then
     if [[ -f "${cfg.secrets.zaiApiKeyFile}" ]]; then
       ZAI_KEY="$(cat "${cfg.secrets.zaiApiKeyFile}")"
-
-      for OPENCODE_CFG in ${opencodeConfigPathList}; do
-        if [[ -f "$OPENCODE_CFG" ]]; then
-          patch_json_file "$OPENCODE_CFG" key "$ZAI_KEY" ${lib.escapeShellArg opencodeZaiFilter}
-          echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Z.AI API key"
-        fi
-      done
-
-      CLAUDE_MCP="$HOME/.mcp.json"
-      if [[ -f "$CLAUDE_MCP" ]]; then
-        patch_json_file "$CLAUDE_MCP" key "$ZAI_KEY" ${lib.escapeShellArg claudeZaiFilter}
-        echo "✓ Patched .mcp.json with Z.AI API key + remote MCPs"
-      fi
-
-      CODEX_CFG="$HOME/.codex/config.toml"
-      if [[ -f "$CODEX_CFG" ]]; then
-        ESCAPED_ZAI="$(escape_sed_replacement "$ZAI_KEY")"
-        ${pkgs.gnused}/bin/sed -i "s/__ZAI_API_KEY_PLACEHOLDER__/$ESCAPED_ZAI/g" "$CODEX_CFG"
-        if grep -q '\[mcp_servers.zai-mcp-server.env\]' "$CODEX_CFG"; then
-          ${pkgs.gnused}/bin/sed -i "/\[mcp_servers.zai-mcp-server.env\]/a Z_AI_API_KEY = \"$ESCAPED_ZAI\"" "$CODEX_CFG"
-        fi
-        unset ESCAPED_ZAI
-        echo "✓ Patched codex config.toml with Z.AI API key"
-      fi
-
-      GEMINI_CFG="$HOME/.gemini/settings.json"
-      if [[ -f "$GEMINI_CFG" ]]; then
-        patch_json_file "$GEMINI_CFG" key "$ZAI_KEY" ${lib.escapeShellArg geminiZaiFilter}
-        echo "✓ Patched gemini settings.json with Z.AI API key + remote MCPs"
-      fi
-
+      patch_secret_to_all_configs \
+        "$ZAI_KEY" key \
+        ${lib.escapeShellArg opencodeZaiFilter} \
+        ${lib.escapeShellArg claudeZaiFilter} \
+        ${lib.escapeShellArg geminiZaiFilter} \
+        "__ZAI_API_KEY_PLACEHOLDER__" \
+        '\[mcp_servers.zai-mcp-server.env\]' \
+        "Z.AI API key + remote MCPs"
+      unset ZAI_KEY
     else
       echo "⚠ ${cfg.secrets.zaiApiKeyFile} not found - run 'just nixos' first"
     fi
   fi
 
+  # --- OpenRouter ---
   if [[ -n "${cfg.secrets.openrouterApiKeyFile or ""}" ]]; then
     if [[ -f "${cfg.secrets.openrouterApiKeyFile}" ]]; then
       OPENROUTER_KEY="$(cat "${cfg.secrets.openrouterApiKeyFile}")"
-      for OPENCODE_CFG in ${opencodeConfigPathList}; do
-        if [[ -f "$OPENCODE_CFG" ]]; then
-          patch_json_file "$OPENCODE_CFG" key "$OPENROUTER_KEY" ${lib.escapeShellArg openrouterPlaceholderFilter}
-          echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with OpenRouter API key"
-        fi
-      done
+      patch_secret_to_all_configs \
+        "$OPENROUTER_KEY" key \
+        ${lib.escapeShellArg openrouterPlaceholderFilter} \
+        "" "" "" "" \
+        "OpenRouter API key"
       unset OPENROUTER_KEY
     else
       echo "⚠ ${cfg.secrets.openrouterApiKeyFile} not found - run 'just nixos' first"
     fi
   fi
 
+  # --- Context7 ---
   if [[ -n "${cfg.secrets.context7ApiKeyFile or ""}" ]]; then
     if [[ -f "${cfg.secrets.context7ApiKeyFile}" ]]; then
       CONTEXT7_KEY="$(cat "${cfg.secrets.context7ApiKeyFile}")"
-      for OPENCODE_CFG in ${opencodeConfigPathList}; do
-        if [[ -f "$OPENCODE_CFG" ]]; then
-          patch_json_file "$OPENCODE_CFG" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
-          echo "✓ Patched $(basename "$(dirname "$OPENCODE_CFG")")/opencode.json with Context7 API key"
-        fi
-      done
-      if [[ -f "$HOME/.mcp.json" ]]; then
-        patch_json_file "$HOME/.mcp.json" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
-        echo "✓ Patched .mcp.json with Context7 API key"
-      fi
-      if [[ -f "$HOME/.codex/config.toml" ]]; then
-        ESCAPED_CONTEXT7="$(escape_sed_replacement "$CONTEXT7_KEY")"
-        ${pkgs.gnused}/bin/sed -i "s/__CONTEXT7_API_KEY_PLACEHOLDER__/$ESCAPED_CONTEXT7/g" "$HOME/.codex/config.toml"
-        unset ESCAPED_CONTEXT7
-        echo "✓ Patched codex config.toml with Context7 API key"
-      fi
-      if [[ -f "$HOME/.gemini/settings.json" ]]; then
-        patch_json_file "$HOME/.gemini/settings.json" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
-        echo "✓ Patched gemini settings.json with Context7 API key"
-      fi
+      patch_secret_to_all_configs \
+        "$CONTEXT7_KEY" key \
+        ${lib.escapeShellArg context7PlaceholderFilter} \
+        ${lib.escapeShellArg context7PlaceholderFilter} \
+        ${lib.escapeShellArg context7PlaceholderFilter} \
+        "__CONTEXT7_API_KEY_PLACEHOLDER__" \
+        "" \
+        "Context7 API key"
       unset CONTEXT7_KEY
     else
       echo "⚠ ${cfg.secrets.context7ApiKeyFile} not found - run 'just nixos' first"
     fi
   fi
 
-  # Inject GitHub token from gh CLI into all agent configs
+  # --- GitHub (from gh CLI) ---
   if ${pkgs.gh}/bin/gh auth status &> /dev/null; then
     GH_TOKEN="$(${pkgs.gh}/bin/gh auth token)"
-    # SECURITY: Use jq for JSON files (safe handling of special chars in tokens)
-    for OPENCODE_CFG in ${opencodeConfigPathList}; do
-      if [[ -f "$OPENCODE_CFG" ]]; then
-        patch_json_file "$OPENCODE_CFG" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
-      fi
-    done
-    if [[ -f "$HOME/.mcp.json" ]]; then
-      patch_json_file "$HOME/.mcp.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
-    fi
-    if [[ -f "$HOME/.codex/config.toml" ]]; then
-      ESCAPED_TOKEN="$(escape_sed_replacement "$GH_TOKEN")"
-      ${pkgs.gnused}/bin/sed -i "s/__GITHUB_TOKEN_PLACEHOLDER__/$ESCAPED_TOKEN/g" "$HOME/.codex/config.toml"
-    fi
-    if [[ -f "$HOME/.gemini/settings.json" ]]; then
-      patch_json_file "$HOME/.gemini/settings.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
-    fi
+    patch_secret_to_all_configs \
+      "$GH_TOKEN" token \
+      ${lib.escapeShellArg githubPlaceholderFilter} \
+      ${lib.escapeShellArg githubPlaceholderFilter} \
+      ${lib.escapeShellArg githubPlaceholderFilter} \
+      "__GITHUB_TOKEN_PLACEHOLDER__" \
+      "" \
+      "GitHub token from gh CLI"
     unset GH_TOKEN
-    echo "✓ Patched GitHub token from gh CLI into all agent configs"
   else
     echo "⚠ gh CLI not authenticated - GitHub MCP will not work (run 'gh auth login')"
   fi

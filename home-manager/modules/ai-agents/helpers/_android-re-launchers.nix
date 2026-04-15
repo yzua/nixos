@@ -4,7 +4,8 @@
   pkgs,
 }:
 let
-  launcherScript = "${config.home.homeDirectory}/System/scripts/ai/android-re/opencode-android-re.sh";
+  scriptsDir = import ./_scripts-dir.nix { inherit config; };
+  launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
   mkAndroidReLauncher =
     {
       name,

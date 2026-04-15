@@ -13,10 +13,18 @@ let
       Authorization = "Bearer {env:ZAI_API_KEY}";
     };
   };
+
+  # Derive Z.AI MCP server entries from the services registry — single source of truth.
+  zaiMcpServers = builtins.listToAttrs (
+    map (svc: {
+      name = svc.mcpKey;
+      value = mkZaiRemoteMcp svc.name;
+    }) zai.services
+  );
 in
 {
   programs.aiAgents = {
-    mcpServers = {
+    mcpServers = zaiMcpServers // {
       context7 = {
         enable = true;
         command = "bunx";
@@ -27,10 +35,6 @@ in
           CONTEXT7_API_KEY = "__CONTEXT7_API_KEY_PLACEHOLDER__"; # patched at activation from sops secret
         };
       };
-
-      web-search-prime = mkZaiRemoteMcp "web_search_prime";
-      web-reader = mkZaiRemoteMcp "web_reader";
-      zread = mkZaiRemoteMcp "zread";
 
       github = {
         enable = true;

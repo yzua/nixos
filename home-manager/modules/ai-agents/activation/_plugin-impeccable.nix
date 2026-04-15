@@ -9,19 +9,16 @@
 
 let
   opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
+  gitCloneUpdate = import ../helpers/_git-clone-update.nix { inherit pkgs; };
 in
 
 {
   installImpeccable = lib.mkIf cfg.impeccable.enable (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [[ -d "$HOME/.local/share/impeccable/.git" ]]; then
-        echo "📦 Updating impeccable..."
-        ${pkgs.git}/bin/git -C "$HOME/.local/share/impeccable" pull --ff-only 2>/dev/null || true
-      else
-        echo "📦 Cloning impeccable..."
-        rm -rf "$HOME/.local/share/impeccable"
-        ${pkgs.git}/bin/git clone --depth 1 https://github.com/pbakaus/impeccable.git "$HOME/.local/share/impeccable" 2>/dev/null || true
-      fi
+      ${gitCloneUpdate {
+        name = "impeccable";
+        url = "https://github.com/pbakaus/impeccable.git";
+      }}
       IMPECCABLE_DIR="$HOME/.local/share/impeccable"
 
       if [[ -d "$IMPECCABLE_DIR" ]]; then

@@ -14,6 +14,7 @@ let
   fileTemplates = import ./helpers/_file-templates.nix;
   geminiPolicies = import ./helpers/_gemini-policies.nix;
   impeccable = import ./helpers/_impeccable-commands.nix;
+  models = import ./helpers/_models.nix;
   settingsBuilders = import ./helpers/_settings-builders.nix { inherit config lib; };
   inherit (settingsBuilders)
     geminiSettings
@@ -73,32 +74,34 @@ in
       # === Claude Agent Definitions ===
       (lib.mkIf cfg.claude.enable (mkTextFiles ".claude/agents" fileTemplates.claudeAgents))
 
+      # === Aider Configuration (independent of any agent enable gate) ===
+      {
+        ".aider.conf.yml".text = builtins.toJSON {
+          model = models.aider-model;
+          editor-model = models.aider-editor;
+          auto-commits = false;
+          dirty-commits = false;
+          attribute-author = false;
+          attribute-committer = false;
+          dark-mode = true;
+          pretty = true;
+          stream = true;
+          map-tokens = 2048;
+          map-refresh = "auto";
+          auto-lint = true;
+          lint-cmd = "just lint";
+          auto-test = false;
+          test-cmd = "just check";
+          suggest-shell-commands = false;
+        };
+      }
+
       # === Gemini Files (Settings, Commands, Skills) ===
       (lib.mkIf cfg.gemini.enable (
         {
           ".gemini/settings.json" = {
             text = toJSON geminiSettings;
             force = true;
-          };
-
-          # Aider configuration
-          ".aider.conf.yml".text = builtins.toJSON {
-            model = "claude-sonnet-4-6";
-            editor-model = "claude-haiku-4-5";
-            auto-commits = false;
-            dirty-commits = false;
-            attribute-author = false;
-            attribute-committer = false;
-            dark-mode = true;
-            pretty = true;
-            stream = true;
-            map-tokens = 2048;
-            map-refresh = "auto";
-            auto-lint = true;
-            lint-cmd = "just lint";
-            auto-test = false;
-            test-cmd = "just check";
-            suggest-shell-commands = false;
           };
         }
         // (mkTextFiles ".gemini/commands" fileTemplates.geminiCommands)

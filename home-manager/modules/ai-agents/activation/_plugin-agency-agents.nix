@@ -6,17 +6,17 @@
   lib,
 }:
 
+let
+  gitCloneUpdate = import ../helpers/_git-clone-update.nix { inherit pkgs; };
+in
+
 {
   installAgencyAgents = lib.mkIf cfg.agencyAgents.enable (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      if [[ -d "$HOME/.local/share/agency-agents/.git" ]]; then
-        echo "📦 Updating agency-agents..."
-        ${pkgs.git}/bin/git -C "$HOME/.local/share/agency-agents" pull --ff-only 2>/dev/null || true
-      else
-        echo "📦 Cloning agency-agents..."
-        rm -rf "$HOME/.local/share/agency-agents"
-        ${pkgs.git}/bin/git clone --depth 1 https://github.com/msitarzewski/agency-agents.git "$HOME/.local/share/agency-agents" 2>/dev/null || true
-      fi
+      ${gitCloneUpdate {
+        name = "agency-agents";
+        url = "https://github.com/msitarzewski/agency-agents.git";
+      }}
       AGENCY_DIR="$HOME/.local/share/agency-agents"
 
       if [[ -d "$AGENCY_DIR" && "${if cfg.claude.enable then "1" else "0"}" == "1" ]]; then

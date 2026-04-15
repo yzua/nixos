@@ -10,6 +10,9 @@
 }:
 
 let
+  fileTemplates = import ../helpers/_file-templates.nix;
+  preservedClaudeAgents = builtins.attrNames fileTemplates.claudeAgents;
+
   impeccable = import ./_plugin-impeccable.nix {
     inherit
       cfg
@@ -30,7 +33,7 @@ let
       ;
   };
   cleanupAgencyAgents = import ./_cleanup-agency-agents.nix {
-    inherit cfg lib;
+    inherit cfg lib preservedClaudeAgents;
   };
   cleanupEverythingClaudeCode = import ./_cleanup-everything-claude-code.nix {
     inherit cfg config lib;

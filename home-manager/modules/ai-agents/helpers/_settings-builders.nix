@@ -10,8 +10,8 @@ let
   cfg = config.programs.aiAgents;
   mcpTransforms = import ./_mcp-transforms.nix { inherit config lib; };
   formatterRegistry = import ./_formatters.nix;
+  models = import ./_models.nix;
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
-  sonnetModel = "anthropic/claude-sonnet-4-6";
   opencodeFormatterSettings = builtins.listToAttrs (
     map (formatter: {
       name = formatter.tool;
@@ -86,8 +86,6 @@ let
   })
   // (lib.optionalAttrs (cfg.gemini.extraSettings != { }) cfg.gemini.extraSettings);
 
-  openrouterModel = "openrouter/openrouter/hunter-alpha";
-
   mkProfileSettings =
     { model }:
     {
@@ -97,25 +95,11 @@ let
     };
 
   profiles = {
-    glm = mkProfileSettings {
-      model = "zai-coding-plan/glm-5.1";
-    };
-
-    gemini = mkProfileSettings {
-      model = "google/gemini-3-pro-preview";
-    };
-
-    gpt = mkProfileSettings {
-      model = "openai/gpt-5.4";
-    };
-
-    openrouter = mkProfileSettings {
-      model = openrouterModel;
-    };
-
-    zen = mkProfileSettings {
-      model = "opencode/minimax-m2.5-free";
-    };
+    glm = mkProfileSettings { model = models.glm; };
+    gemini = mkProfileSettings { model = models.gemini; };
+    gpt = mkProfileSettings { model = models.gpt-default; };
+    openrouter = mkProfileSettings { model = models.openrouter; };
+    zen = mkProfileSettings { model = models.zen; };
   };
 
   # Profile variant settings keyed by profile name (matching _opencode-profiles.nix names).
@@ -126,7 +110,7 @@ let
     "opencode-gpt" = profiles.gpt.opencode;
     "opencode-openrouter" = profiles.openrouter.opencode;
     "opencode-sonnet" = opencodeSettings // {
-      model = sonnetModel;
+      model = models.claude-sonnet;
     };
     "opencode-zen" = profiles.zen.opencode;
   };

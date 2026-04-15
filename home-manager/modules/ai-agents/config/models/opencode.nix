@@ -7,6 +7,7 @@
 }:
 
 let
+  models = import ../../helpers/_models.nix;
   workflowPrompts = import ../../helpers/_workflow-prompts.nix { };
   androidRePrompt = import ../../android-re/_prompt.nix {
     inherit lib;
@@ -69,7 +70,7 @@ in
 {
   programs.aiAgents.opencode = {
     enable = true;
-    model = "anthropic/claude-opus-4-6";
+    model = models.claude-opus;
     defaultAgent = "build";
     permission = yoloPermission;
 
@@ -102,6 +103,12 @@ in
         subtask = true;
         template = workflowPrompts.buildPerformance;
       };
+      "runtime-perf" = {
+        description = "Measure and improve runtime/code bottlenecks";
+        agent = "optimize";
+        subtask = true;
+        template = workflowPrompts.runtimePerformance;
+      };
       "markdown-sync" = {
         description = "Sync docs with current repository behavior";
         agent = "patch";
@@ -112,7 +119,7 @@ in
 
     agent = {
       plan = {
-        model = "anthropic/claude-sonnet-4-6";
+        model = models.claude-sonnet;
         description = "Primary planning agent for specs, decomposition, and research-backed execution plans.";
         mode = "primary";
         steps = 8;
@@ -124,7 +131,7 @@ in
         '';
       };
       build = {
-        model = "anthropic/claude-opus-4-6";
+        model = models.claude-opus;
         description = "Primary implementation agent for coding work with repo-native validation.";
         mode = "primary";
         steps = 20;
@@ -136,7 +143,7 @@ in
         '';
       };
       review = {
-        model = "anthropic/claude-sonnet-4-6";
+        model = models.claude-sonnet;
         description = "Subagent for bugs, regressions, security issues, and test gaps.";
         mode = "subagent";
         color = "warning";
@@ -149,7 +156,7 @@ in
         '';
       };
       recon = {
-        model = "openai/gpt-5.4";
+        model = models.gpt-default;
         description = "Subagent for reverse-engineering triage, static inspection, and evidence gathering.";
         mode = "subagent";
         color = "info";
@@ -162,7 +169,7 @@ in
         '';
       };
       patch = {
-        model = "anthropic/claude-sonnet-4-6";
+        model = models.claude-sonnet;
         description = "Subagent for bounded edits, validation passes, and commit shaping.";
         mode = "subagent";
         color = "accent";
@@ -174,8 +181,21 @@ in
           After edits, run the narrowest relevant validation and summarize residual risk.
         '';
       };
+      optimize = {
+        model = models.claude-opus;
+        description = "Subagent for performance profiling, bottleneck analysis, and low-risk speedups across codebases.";
+        mode = "subagent";
+        color = "accent";
+        steps = 14;
+        permission = yoloPermission;
+        prompt = ''
+          Optimize runtime performance with evidence, not guesses.
+          Measure the real hot path first, prefer the highest-impact low-risk change, and preserve correctness plus repository conventions.
+          Report before-and-after performance evidence, correctness validation, and any tradeoffs left in place.
+        '';
+      };
       "android-re" = {
-        model = "anthropic/claude-opus-4-6";
+        model = models.claude-opus;
         description = "Primary Android reverse-engineering agent for rooted emulator workflows, Frida instrumentation, proxy triage, and static APK inspection.";
         mode = "primary";
         steps = 24;
@@ -233,7 +253,7 @@ in
     extraSettings = {
       share = "disabled";
       autoupdate = true;
-      small_model = "anthropic/claude-haiku-4-5"; # Cheap model for titles, summaries
+      small_model = models.claude-haiku; # Cheap model for titles, summaries
       compaction = {
         auto = true;
         prune = true; # Remove old tool outputs during compaction

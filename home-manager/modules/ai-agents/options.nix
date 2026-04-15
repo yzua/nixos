@@ -156,9 +156,6 @@ in
         installInstructions = mkBoolOption true "Install the upstream OpenCode instruction bundle from Everything Claude Code";
       };
 
-      gemini = {
-        enable = mkBoolOption false "Reserved for future Gemini-specific Everything Claude Code integration";
-      };
     };
 
     mcpServers = lib.mkOption {

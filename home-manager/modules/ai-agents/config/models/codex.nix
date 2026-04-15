@@ -5,10 +5,13 @@
   ...
 }:
 
+let
+  models = import ../../helpers/_models.nix;
+in
 {
   programs.aiAgents.codex = {
     enable = true;
-    model = "gpt-5.4";
+    model = models.gpt-default;
     sandboxMode = "workspace-write";
     enableSearch = false;
     personality = "pragmatic";
