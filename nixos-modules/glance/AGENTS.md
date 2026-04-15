@@ -17,6 +17,7 @@ Self-hosted dashboard at `localhost:8082` with Gruvbox theme. Aggregates feeds, 
 | `_youtube-channels.nix` | YouTube subscriptions feed                               |
 | `_github-releases.nix`  | GitHub release tracker (rust, niri, neovim, glance)      |
 | `_markets.nix`          | Market indices widget data                               |
+| `_color-helpers.nix`    | Shared color utility functions                           |
 | `_server-stats.nix`     | Server stats widget (disk mountpoints)                   |
 
 Helper files (prefixed `_`) are imported via `import ./_file.nix` — not listed in any `default.nix`.

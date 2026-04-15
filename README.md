@@ -151,6 +151,7 @@ All local, no cloud. Toggle via `mySystem.*`:
 | Prometheus   | 9090  | Metrics collection/alerting   |
 | Alertmanager | 9093  | Alert routing                 |
 | ntfy bridge  | 8090  | Push notifications to ntfy.sh |
+| InfluxDB2    | 8086  | Scrutiny metrics backend      |
 
 ### Log Aggregation
 
@@ -197,10 +198,11 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### User-level (Home Manager)
 
-| Service       | Port | Purpose              |
-| ------------- | ---- | -------------------- |
-| ActivityWatch | 5600 | App usage tracking   |
-| Syncthing     | 8384 | File synchronization |
+| Service       | Port  | Purpose                      |
+| ------------- | ----- | ---------------------------- |
+| ActivityWatch | 5600  | App usage tracking           |
+| Syncthing     | 8384  | File synchronization         |
+| LocalSend     | 53317 | Local file sharing (TCP/UDP) |
 
 ---
 
@@ -215,8 +217,8 @@ home-manager/                 # User-level modules + packages
 scripts/                      # Utility scripts
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
 dev-shells/                   # Per-language dev shell templates (nix flake init -t)
-guides/                       # User-facing tool guides (Niri, Neovim, Zellij, etc.)
-themes/                       # LibreWolf browser theme CSS overrides
+guides/                       # User-facing tool guides (AI Agents, Ghostty, Niri, Neovim, Yazi, Zellij)
+themes/                       # GruvboxAlt theme overrides (LibreWolf, Telegram Desktop, YouTube Music)
 ```
 
 Area-specific guidance in `AGENTS.md` files throughout the repo.

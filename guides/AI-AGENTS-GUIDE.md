@@ -486,6 +486,7 @@ Primary and subagents generated into OpenCode config:
 - `review`: bug/regression/security review subagent
 - `recon`: reverse-engineering and static triage subagent
 - `patch`: bounded edit and validation subagent
+- `optimize`: performance profiling and bottleneck analysis subagent
 - `android-re`: Android reverse-engineering and security analysis subagent
 
 Custom OpenCode slash commands generated from workflow prompts:
@@ -494,6 +495,7 @@ Custom OpenCode slash commands generated from workflow prompts:
 - `/refactor`
 - `/security-audit`
 - `/build-perf`
+- `/runtime-perf`
 - `/markdown-sync`
 
 The repo now models these through first-class OpenCode options in `programs.aiAgents.opencode.*` instead of parking them under `extraSettings`.
@@ -605,10 +607,11 @@ Uses a separate config directory (`~/.config/opencode-gemini/`) with the model o
 
 ### Gemini Model Reference
 
-| Model ID         | Context | Thinking Variants | Use Case                                 |
-| ---------------- | ------- | ----------------- | ---------------------------------------- |
-| gemini-2.5-pro   | 1M      | high              | Flagship reasoning, coding, architecture |
-| gemini-2.5-flash | 1M      | minimal, medium   | Fast coding, search, writing             |
+| Model ID              | Context | Thinking Variants | Use Case                              |
+| --------------------- | ------- | ----------------- | ------------------------------------- |
+| gemini-3-pro-preview  | 1M      | HIGH              | Default model; flagship coding and RE |
+| gemini-2.5-flash      | 1M      | minimal, medium   | Fast coding, search, writing          |
+| gemini-2.5-flash-lite | 1M      | —                 | Low-latency fast responses            |
 
 ---
 

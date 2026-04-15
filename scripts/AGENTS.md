@@ -56,7 +56,8 @@ scripts/
 │   ├── test-helpers.sh      # Shared test utilities (assertions, mocking)
 │   ├── awk-utils.awk        # Shared AWK helper functions
 │   ├── extract-nix-shell.awk # Extract shell snippets from Nix files
-│   └── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
+│   ├── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
+│   └── require.sh           # Shared dependency assertion helpers
 ├── sops/
 │   ├── editor-code-wait.sh  # VS Code wait wrapper for sops editing
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)

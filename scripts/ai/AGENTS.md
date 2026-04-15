@@ -1,0 +1,52 @@
+# AI Agent Orchestration Scripts
+
+AI agent launching, iterating, logging, analyzing, and inventorying across Claude Code, Codex, OpenCode, and Gemini CLI with a unified alias system and shared workflow suffixes.
+
+Parent: `scripts/AGENTS.md`
+
+---
+
+## Files
+
+| File                     | Purpose                                                                                                   |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `_agent-registry.sh`     | Single source of truth for all agent aliases, workflow suffixes, ZAI key resolution                       |
+| `agent-launcher.sh`      | Interactive fzf-based multi-provider AI agent launcher                                                    |
+| `agent-launcher-test.sh` | Unit tests for agent-launcher.sh                                                                          |
+| `agent-log-wrapper.sh`   | Timestamped log splitting (stdout `.log`, stderr `-errors.log`), optional desktop notification on failure |
+| `agent-analyze.sh`       | CLI log analyzer: stats, errors, sessions, search, tail, report, patterns                                 |
+| `agent-dashboard.sh`     | fzf-driven interactive dashboard looping over analyzer commands                                           |
+| `agent-inventory.sh`     | Dynamic inventory browser for AI tools (profiles, models, MCP, hooks, skills, agents)                     |
+| `agents-search.sh`       | Scans project trees for directories needing AGENTS.md                                                     |
+| `agent-iter.sh`          | Headless iterative agent runner with rate-limit retry                                                     |
+| `agent-iter-test.sh`     | Unit tests for agent-iter.sh                                                                              |
+| `skills-sync.sh`         | Syncs 28 AI skills from GitHub repos to `~/.local/share/skills/`                                          |
+| `android-re/`            | Android RE toolkit (see `android-re/AGENTS.md`)                                                           |
+
+---
+
+## Conventions
+
+- `_agent-registry.sh` is the single source of truth — both `agent-launcher.sh` (interactive) and `agent-iter.sh` (headless) source it.
+- Two registries: `AGENT_REGISTRY` (interactive with `--dangerously-skip-permissions` etc.) and `AGENT_ITER_REGISTRY` (headless `--print`/`exec`/`run`).
+- Workflow suffixes (`cm`, `rf`, `fx`, `sa`, `du`, `bp`, `rp`, `md`) are appended to base aliases (e.g., `clglmcm` = Claude GLM + commit-split).
+- fzf is mandatory for interactive scripts. All use shared `fzf-theme.sh` from `../lib/`.
+- Test files use `AI_AGENT_LAUNCHER_SOURCE_ONLY=1` to source scripts without executing `main()`.
+
+---
+
+## Gotchas
+
+- `_agent-registry.sh` must be sourced AFTER `logging.sh` (it calls logging functions).
+- `_agent-registry.sh` does NOT have `set -euo pipefail` — it is a sourced library.
+- `AGENT_ITER_REGISTRY` uses `SC2034` suppression because it is consumed by `agent-iter.sh`, not by the registry file itself.
+- Workflow suffix env vars (`COMMIT_SPLIT_PROMPT`, etc.) are set externally by Nix wrappers or shell env, not defined here.
+- `agent-iter.sh` rejects interactive-only aliases (like plain `cl`) without a prompt — headless-only.
+- ZAI API key for Claude GLM variants is resolved from `/run/secrets/zai_api_key`.
+
+---
+
+## Dependencies
+
+- `../lib/logging.sh`, `../lib/log-dirs.sh`, `../lib/fzf-theme.sh`, `../lib/error-patterns.sh`, `../lib/test-helpers.sh`
+- Nix wrappers in `home-manager/modules/ai-agents/` wrap several scripts via `writeShellApplication`
