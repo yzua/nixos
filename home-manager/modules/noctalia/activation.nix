@@ -20,7 +20,7 @@
         fi
       done
 
-      for PLUGIN_ID in keybind-cheatsheet mawaqit model-usage music-search; do
+      for PLUGIN_ID in keybind-cheatsheet mawaqit model-usage; do
         PLUGIN_DIR="$HOME/.config/noctalia/plugins/$PLUGIN_ID"
         if [ -e "$PLUGIN_DIR" ] && [ ! -L "$PLUGIN_DIR" ]; then
           chmod -R u+w "$PLUGIN_DIR" 2>/dev/null || true
@@ -36,7 +36,7 @@
     materializeNoctaliaPlugins = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       PLUGIN_STATE_DIR="$HOME/.local/state/noctalia/plugin-settings"
 
-      for PLUGIN_ID in keybind-cheatsheet mawaqit model-usage music-search; do
+      for PLUGIN_ID in keybind-cheatsheet mawaqit model-usage; do
         PLUGIN_DIR="$HOME/.config/noctalia/plugins/$PLUGIN_ID"
 
         if [ ! -e "$PLUGIN_DIR" ]; then

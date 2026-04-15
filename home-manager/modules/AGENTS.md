@@ -122,7 +122,6 @@ modules/
 │       ├── keybind-cheatsheet/ # Keyboard shortcut overlay (QML)
 │       ├── mawaqit/           # Prayer time widget (QML)
 │       ├── model-usage/       # AI model usage tracker (QML)
-│       └── music-search/      # Music search/player widget (QML)
 ├── neovim/             # Neovim editor with LSP, completion, and modern plugins
 │   ├── default.nix     # Plugin declarations, treesitter, Lua config loading
 │   ├── lua/            # Lua configuration (options, keymaps, LSP, plugins)

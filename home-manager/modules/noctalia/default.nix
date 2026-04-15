@@ -44,7 +44,6 @@ let
           "model-usage"
           "keybind-cheatsheet"
           "mawaqit"
-          "music-search"
           "browser-launcher"
         ]
     );
@@ -80,10 +79,6 @@ in
     };
     ".config/noctalia/plugins/mawaqit" = {
       source = ./plugins/mawaqit;
-      force = true;
-    };
-    ".config/noctalia/plugins/music-search" = {
-      source = ./plugins/music-search;
       force = true;
     };
     ".config/noctalia/plugins/browser-launcher" = {

@@ -288,7 +288,6 @@ in
       "Mod+Alt+Shift+Page_Down".action.move-workspace-to-monitor-down = [ ];
 
       "Mod+F1".action.spawn = noctalia "plugin:keybind-cheatsheet toggle";
-      "Mod+P".action.spawn = noctalia "plugin:music-search toggle";
       "Mod+Shift+P".action.power-off-monitors = [ ];
     }
     // workspaceFocusBinds

@@ -1,7 +1,7 @@
 # Noctalia Shell
 
 Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, control center.
-4 modules + custom color scheme + 5 QML plugins. **Stylix-exempt** — manages own theming (colors set explicitly in `settings.nix` and generated from `shared/constants.nix`).
+4 modules + custom color scheme + 4 QML plugins. **Stylix-exempt** — manages own theming (colors set explicitly in `settings.nix` and generated from `shared/constants.nix`).
 
 ---
 
@@ -15,15 +15,14 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 | `activation.nix`   | Activation   | Home Manager activation scripts for Noctalia setup                                                                     |
 | `_colorscheme.nix` | Color scheme | Generates GruvboxAlt JSON from `shared/constants.nix` (dark scheme auto-syncs, light scheme inline)                    |
 
-### `plugins/` (5 QML plugins)
+### `plugins/` (4 QML plugins)
 
-| Plugin                | Purpose                    |
-| --------------------- | -------------------------- |
-| `browser-launcher/`   | Browser profile launcher   |
-| `keybind-cheatsheet/` | Keyboard shortcut overlay  |
-| `mawaqit/`            | Prayer time widget         |
-| `model-usage/`        | AI model usage tracker     |
-| `music-search/`       | Music search/player widget |
+| Plugin                | Purpose                   |
+| --------------------- | ------------------------- |
+| `browser-launcher/`   | Browser profile launcher  |
+| `keybind-cheatsheet/` | Keyboard shortcut overlay |
+| `mawaqit/`            | Prayer time widget        |
+| `model-usage/`        | AI model usage tracker    |
 
 ---
 
