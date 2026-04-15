@@ -1,6 +1,6 @@
 # Application Configurations
 
-11 root app config files + 1 helper + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
+11 root app config files + 2 helpers + 3 subdirectory modules (VS Code, Brave, LibreWolf). Each app gets one `.nix` file or subdirectory.
 No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configFile`, `dconf.settings`.
 
 ---
@@ -21,6 +21,7 @@ No custom options — uses `programs.*`, `services.*`, `home.file`, `xdg.configF
 | `syncthing.nix`                   | Syncthing                  | `services.syncthing` (local file sync)             |
 | `metadata-scrubber.nix`           | Metadata scrubber          | inotifywait watcher + weekly full scrub via `mat2` |
 | `_desktop-local-bin-wrappers.nix` | Desktop bin wrappers       | Helper, imported manually (not in import hub)      |
+| `_mk-wayland-browser-wrapper.nix` | Wayland browser wrapper    | Helper, imported manually (not in import hub)      |
 
 ## Subdirectory Modules
 

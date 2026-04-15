@@ -3,10 +3,13 @@
 {
   inputs,
   pkgs,
+  constants,
   ...
 }:
 
 let
+  colorschemeJson = import ./_colorscheme.nix { inherit constants; };
+
   pluginUrl = "https://github.com/noctalia-dev/noctalia-plugins";
   patchedNoctaliaPackage =
     inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
@@ -66,7 +69,7 @@ in
   xdg.configFile."noctalia/settings.json".force = true;
 
   home.file = {
-    ".config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json".source = ./colorschemes/GruvboxAlt.json;
+    ".config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json".text = colorschemeJson;
     ".config/noctalia/plugins/model-usage" = {
       source = ./plugins/model-usage;
       force = true;

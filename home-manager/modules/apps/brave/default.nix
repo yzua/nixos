@@ -7,6 +7,7 @@
   ...
 }:
 let
+  inherit (import ../_mk-wayland-browser-wrapper.nix) mkWaylandBrowserWrapper;
   inherit (constants.proxies) brave;
 in
 {
@@ -19,30 +20,13 @@ in
     package = pkgs.brave;
   };
 
-  # Stable launch wrapper: avoid Wayland broken pipe crashes + KWallet DBus noise.
-  home.file.".local/bin/brave" = {
-    executable = true;
-    text = ''
-      #!/usr/bin/env bash
-      set -euo pipefail
-      exec ${pkgs.brave}/bin/brave \
-        --ozone-platform=x11 \
-        --password-store=basic \
-        "$@"
-    '';
+  home.file.".local/bin/brave" = mkWaylandBrowserWrapper {
+    bin = "${pkgs.brave}/bin/brave";
   };
 
   # Proxy launcher - Finland via Mullvad SOCKS5
-  home.file.".local/bin/brave-proxy" = {
-    executable = true;
-    text = ''
-      #!/usr/bin/env bash
-      set -euo pipefail
-      exec ${pkgs.brave}/bin/brave \
-        --ozone-platform=x11 \
-        --password-store=basic \
-        --proxy-server="socks5://${brave.personal}:1080" \
-        "$@"
-    '';
+  home.file.".local/bin/brave-proxy" = mkWaylandBrowserWrapper {
+    bin = "${pkgs.brave}/bin/brave";
+    extraFlags = [ ''--proxy-server="socks5://${brave.personal}:1080"'' ];
   };
 }

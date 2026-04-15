@@ -1,17 +1,12 @@
-# Chromium launch wrapper with Wayland crash workaround.
+# Chromium launch wrapper with Wayland-native support.
 
 { pkgs, ... }:
 
+let
+  inherit (import ./_mk-wayland-browser-wrapper.nix) mkWaylandBrowserWrapper;
+in
 {
-  home.file.".local/bin/chromium" = {
-    executable = true;
-    text = ''
-      #!/usr/bin/env bash
-      set -euo pipefail
-      exec ${pkgs.ungoogled-chromium}/bin/chromium \
-        --ozone-platform=x11 \
-        --password-store=basic \
-        "$@"
-    '';
+  home.file.".local/bin/chromium" = mkWaylandBrowserWrapper {
+    bin = "${pkgs.ungoogled-chromium}/bin/chromium";
   };
 }

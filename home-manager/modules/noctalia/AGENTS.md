@@ -1,18 +1,19 @@
 # Noctalia Shell
 
 Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, control center.
-4 modules + custom color scheme + 5 QML plugins. **Stylix-exempt** — manages own theming (colors set explicitly in `settings.nix` and `colorschemes/GruvboxAlt.json`).
+4 modules + custom color scheme + 5 QML plugins. **Stylix-exempt** — manages own theming (colors set explicitly in `settings.nix` and generated from `shared/constants.nix`).
 
 ---
 
 ## Module Map
 
-| File             | Purpose      | Key Details                                                                                                            |
-| ---------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `default.nix`    | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings, activation; `status-notifier-watcher`                |
-| `bar.nix`        | Bar widgets  | Left (clock, system monitor), center (workspace widget), right (media, network, tray, plugins, volume, control center) |
-| `settings.nix`   | Shell config | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks                               |
-| `activation.nix` | Activation   | Home Manager activation scripts for Noctalia setup                                                                     |
+| File               | Purpose      | Key Details                                                                                                            |
+| ------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `default.nix`      | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings, activation; `status-notifier-watcher`                |
+| `bar.nix`          | Bar widgets  | Left (clock, system monitor), center (workspace widget), right (media, network, tray, plugins, volume, control center) |
+| `settings.nix`     | Shell config | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks                               |
+| `activation.nix`   | Activation   | Home Manager activation scripts for Noctalia setup                                                                     |
+| `_colorscheme.nix` | Color scheme | Generates GruvboxAlt JSON from `shared/constants.nix` (dark scheme auto-syncs, light scheme inline)                    |
 
 ### `plugins/` (5 QML plugins)
 
@@ -39,17 +40,15 @@ Used for launcher, clipboard, notifications, session menu, and related shell act
 
 ## Theming (Stylix-Exempt)
 
-Noctalia ignores Stylix auto-theming. Colors come from a custom GruvboxAlt color scheme:
+Noctalia ignores Stylix auto-theming. Colors derive from `shared/constants.nix` via `_colorscheme.nix`:
 
-- Scheme file: `colorschemes/GruvboxAlt.json` (placed at `~/.config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json`)
+- Helper: `_colorscheme.nix` generates the full GruvboxAlt JSON from `constants.color`
+- Dark scheme: fully derived from constants (single source of truth)
+- Light scheme: uses constants where colors overlap; light-mode-specific values are inline
 - Selected via `predefinedScheme = "GruvboxAlt"` in `settings.nix`
-- Background: `#282828` / `#3c3836`
-- Foreground: `#ebdbb2` / `#fbf1c7`
-- Outline: `#57514e`
-- Hover/Accent: `#83a598`
 - QML plugin files use the same palette via hardcoded color properties
 
-When the scheme changes, update `colorschemes/GruvboxAlt.json`, the QML plugin colors, and `shared/constants.nix` (if accent colors shift).
+When the scheme changes, update `shared/constants.nix` and (if accent colors shift) the QML plugin colors. No manual JSON editing needed.
 
 ---
 

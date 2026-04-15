@@ -16,5 +16,7 @@
     ./librewolf # LibreWolf browser with declarative profile settings and policies
     ./obsidian.nix # Obsidian Markdown notes app defaults
     ./metadata-scrubber.nix # Automatic metadata scrubbing (inotifywait watcher + weekly full scrub)
+    # modules-check: manual-helper ./_mk-wayland-browser-wrapper.nix
+    # modules-check: manual-helper ./_desktop-local-bin-wrappers.nix
   ];
 }

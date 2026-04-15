@@ -24,6 +24,7 @@
           marketSymbols = import ./_markets.nix;
           serverStats = import ./_server-stats.nix;
           githubRepos = import ./_github-releases.nix;
+          hexToGlanceHsl = import ./_color-helpers.nix;
 
           searchWidget = {
             type = "search";
@@ -57,12 +58,12 @@
             app-background-color = constants.color.bg;
           };
 
-          # Gruvbox Dark theme
+          # Gruvbox Dark theme — derived from shared/constants.nix
           theme = {
-            background-color = "0 0 16";
-            primary-color = "43 59 81";
-            positive-color = "61 66 44";
-            negative-color = "6 96 59";
+            background-color = hexToGlanceHsl constants.color.bg;
+            primary-color = hexToGlanceHsl constants.color.fg0;
+            positive-color = hexToGlanceHsl constants.color.green;
+            negative-color = hexToGlanceHsl constants.color.red;
             contrast-multiplier = 1.1;
           };
 
