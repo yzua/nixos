@@ -10,7 +10,7 @@ Use this directory only for laptop-only behavior (power, thermals, Optimus, kern
 | File          | Purpose                                                                     |
 | ------------- | --------------------------------------------------------------------------- |
 | `default.nix` | Import hub for all laptop-only modules                                      |
-| `boot.nix`    | Kernel params (`acpi_backlight=native`, `nvidia_drm.fbdev=1`)               |
+| `boot.nix`    | Kernel params (`acpi_backlight=native`)                                     |
 | `nvidia.nix`  | NVIDIA Optimus offload + `mySystem.nvidia.{intelBusId,nvidiaBusId}` options |
 | `tlp.nix`     | TLP policy + battery charge thresholds via `mySystem.laptop.battery.*`      |
 | `thermal.nix` | Enables `services.thermald`                                                 |

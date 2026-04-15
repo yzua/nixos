@@ -88,7 +88,6 @@
               echo "   cargo check    # Check for errors"
               echo "   cargo clippy   # Lint code"
               echo "   cargo test     # Run tests"
-              echo "   rustup override set nightly  # Ensure nightly toolchain"
             fi
           '';
         };

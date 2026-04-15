@@ -1,0 +1,6 @@
+build/
+cmake-build-*/
+*.o
+*.out
+result
+.direnv/

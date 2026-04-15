@@ -3,20 +3,10 @@
 {
   description = "A collection of flake templates";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
   outputs =
-    { nixpkgs, ... }:
+    _:
 
-    let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
-    in
     {
-      devShells.${pkgs.stdenv.hostPlatform.system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [ ];
-      };
-
       templates = {
         python-venv = {
           path = ./python-venv;
