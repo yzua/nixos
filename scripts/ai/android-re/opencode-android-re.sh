@@ -14,6 +14,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 PROFILE="${ANDROID_RE_OPENCODE_PROFILE:-default}"
 START_LOG="${START_LOG:-${HOME}/Downloads/android-re-tools/re-avd-start.log}"
 
@@ -25,8 +26,10 @@ else
 fi
 
 # Focus the android workspace in niri — window rule by title "^android-re" places it correctly
+# shellcheck source=scripts/ai/android-re/_helpers.sh
+source "${SCRIPT_DIR}/_helpers.sh"
+NIRI_WS_REF="$(resolve_niri_android_workspace)"
 if command -v niri >/dev/null 2>&1 && niri msg version >/dev/null 2>&1; then
-	NIRI_WS_REF="$(niri msg workspaces 2>/dev/null | sed -n 's/.*"\([^"]*android[^"]*\)".*/\1/p' | head -n1)"
 	if [[ -n "${NIRI_WS_REF}" ]]; then
 		niri msg action focus-workspace "${NIRI_WS_REF}" >/dev/null 2>&1 || true
 		sleep 0.3

@@ -3,6 +3,8 @@
 
 # shellcheck source=scripts/lib/error-patterns.sh
 source "${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../..}"/scripts/lib/error-patterns.sh
+# shellcheck source=scripts/lib/log-dirs.sh
+source "${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../..}"/scripts/lib/log-dirs.sh
 
 scan_error_log_count() {
 	local mtime_filter="$1"
@@ -159,12 +161,10 @@ collect_nix_builds() {
 collect_ai_agents() {
 	section "AI Agent Errors"
 
-	local user_home="${HOME:-/home/${REPORT_USER}}"
-	local primary_dir="${AI_AGENT_LOG_DIR:-${user_home}/.local/share/ai-agents/logs}"
 	local -a candidate_dirs=(
-		"$primary_dir"
-		"${user_home}/.local/share/opencode/log"
-		"${user_home}/.codex/log"
+		"$LOG_DIR"
+		"$OPENCODE_LOG_DIR"
+		"$CODEX_LOG_DIR"
 	)
 	local -a log_dirs=()
 

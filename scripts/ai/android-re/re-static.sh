@@ -47,11 +47,7 @@ hashes() {
 
 inventory() {
 	for tool in apktool jadx jadx-gui ghidra binwalk radare2 cutter scrcpy; do
-		if command -v "$tool" >/dev/null 2>&1; then
-			log_success "tool present: ${tool} -> $(command -v "$tool")"
-		else
-			log_warning "tool missing: ${tool}"
-		fi
+		check_tool "$tool"
 	done
 }
 

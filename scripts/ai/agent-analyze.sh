@@ -126,7 +126,7 @@ tail_logs() {
 	echo "---------------------------------------------------------------"
 
 	if [[ "$agent" == "*" ]]; then
-		tail -f "$LOG_DIR"/*.log "$OPENCODE_LOG_DIR"/*.log "$CODEX_LOG_DIR"/*.log 2>/dev/null
+		find_all_logs | xargs -r tail -f 2>/dev/null
 	else
 		find_logs "$agent" | xargs -r tail -f 2>/dev/null
 	fi

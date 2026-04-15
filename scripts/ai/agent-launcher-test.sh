@@ -15,6 +15,7 @@ launcher_output="$({
 assert_contains "${launcher_output}" "commit split (cm) — Splits working tree into logical commits with validated, minimal staging." "workflow picker shows commit split label"
 assert_contains "${launcher_output}" "refactor maintainability (rf) — Improves structure and clarity without changing behavior, APIs, or workflows." "workflow picker shows refactor label"
 assert_contains "${launcher_output}" "dependency upgrade (du) — Upgrades dependencies safely, handles breaking changes, validates compatibility, reports blockers." "workflow picker shows dependency upgrade label"
+assert_contains "${launcher_output}" "runtime performance (rp) — Measures real code-path bottlenecks, applies low-risk optimizations, and verifies before-and-after latency, throughput, or memory gains." "workflow picker shows runtime performance label"
 
 commit_suffix="$({
 	# shellcheck disable=SC1091
@@ -29,5 +30,12 @@ none_suffix="$({
 	workflow_suffix_from_selection "none"
 } 2>&1)"
 assert_eq "${none_suffix}" "none" "none label maps back to none suffix"
+
+runtime_perf_suffix="$({
+	# shellcheck disable=SC1091
+	AI_AGENT_LAUNCHER_SOURCE_ONLY=1 source "${SCRIPT_DIR}/agent-launcher.sh"
+	workflow_suffix_from_selection "runtime performance (rp) — Measures real code-path bottlenecks, applies low-risk optimizations, and verifies before-and-after latency, throughput, or memory gains."
+} 2>&1)"
+assert_eq "${runtime_perf_suffix}" "rp" "workflow label maps back to rp suffix"
 
 echo "All agent launcher tests passed."

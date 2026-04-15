@@ -17,10 +17,30 @@ BUGFIX_ROOT_CAUSE_PROMPT="${BUGFIX_ROOT_CAUSE_PROMPT:-}"
 SECURITY_AUDIT_PROMPT="${SECURITY_AUDIT_PROMPT:-}"
 DEPENDENCY_UPGRADE_PROMPT="${DEPENDENCY_UPGRADE_PROMPT:-}"
 BUILD_PERFORMANCE_PROMPT="${BUILD_PERFORMANCE_PROMPT:-}"
+RUNTIME_PERFORMANCE_PROMPT="${RUNTIME_PERFORMANCE_PROMPT:-}"
 MARKDOWN_SYNC_PROMPT="${MARKDOWN_SYNC_PROMPT:-}"
 
 # All recognized workflow suffixes.
-WORKFLOW_SUFFIXES=(cm rf fx sa du bp md)
+WORKFLOW_SUFFIXES=(cm rf fx sa du bp rp md)
+
+# Workflow metadata: suffix -> "label|env_var"
+declare -A WORKFLOW_MAP=(
+  [cm]="commit split (cm) — Splits working tree into logical commits with validated, minimal staging.|COMMIT_SPLIT_PROMPT"
+  [rf]="refactor maintainability (rf) — Improves structure and clarity without changing behavior, APIs, or workflows.|REFACTOR_MAINTAINABILITY_PROMPT"
+  [fx]="bugfix root cause (fx) — Reproduces bugs, proves root cause, fixes minimally, validates regressions afterward.|BUGFIX_ROOT_CAUSE_PROMPT"
+  [sa]="security audit (sa) — Finds evidence-backed security weaknesses across code, configs, dependencies, infrastructure surfaces.|SECURITY_AUDIT_PROMPT"
+  [du]="dependency upgrade (du) — Upgrades dependencies safely, handles breaking changes, validates compatibility, reports blockers.|DEPENDENCY_UPGRADE_PROMPT"
+  [bp]="build performance (bp) — Measures bottlenecks, applies low-risk optimizations, compares before-and-after performance evidence clearly.|BUILD_PERFORMANCE_PROMPT"
+  [rp]="runtime performance (rp) — Measures real code-path bottlenecks, applies low-risk optimizations, and verifies before-and-after latency, throughput, or memory gains.|RUNTIME_PERFORMANCE_PROMPT"
+  [md]="markdown sync (md) — Synchronizes documentation with repository reality, removing drift, ambiguity, stale instructions.|MARKDOWN_SYNC_PROMPT"
+)
+
+# Human-readable labels for workflow suffixes.
+workflow_label() {
+  local entry="${WORKFLOW_MAP[$1]:-}"
+  [[ -n "$entry" ]] || return 1
+  echo "${entry%%|*}"
+}
 
 # --- Agent registries --------------------------------------------------------
 #
@@ -119,32 +139,13 @@ zai_claude_env() {
 # --- Workflow suffix resolution ---
 
 resolve_workflow_prompt() {
-  case "$1" in
-  cm)
-    printf '%s\n' "${COMMIT_SPLIT_PROMPT:-}"
-    ;;
-  rf)
-    printf '%s\n' "${REFACTOR_MAINTAINABILITY_PROMPT:-}"
-    ;;
-  fx)
-    printf '%s\n' "${BUGFIX_ROOT_CAUSE_PROMPT:-}"
-    ;;
-  sa)
-    printf '%s\n' "${SECURITY_AUDIT_PROMPT:-}"
-    ;;
-  du)
-    printf '%s\n' "${DEPENDENCY_UPGRADE_PROMPT:-}"
-    ;;
-  bp)
-    printf '%s\n' "${BUILD_PERFORMANCE_PROMPT:-}"
-    ;;
-  md)
-    printf '%s\n' "${MARKDOWN_SYNC_PROMPT:-}"
-    ;;
-  *)
+  local entry="${WORKFLOW_MAP[$1]:-}"
+  if [[ -n "$entry" ]]; then
+    local env_var="${entry##*|}"
+    printf '%s\n' "${!env_var:-}"
+  else
     printf '%s\n' ""
-    ;;
-  esac
+  fi
 }
 
 # --- Alias/suffix splitting ---

@@ -95,6 +95,20 @@ workflow_log_contents="$(cat "${workflow_log}")"
 assert_contains "${workflow_log_contents}" "claude|ARGS=--dangerously-skip-permissions --print sync\\ docs\\ please" "workflow alias resolves built-in prompt"
 assert_contains "${workflow_output}" "Completed 2/2 iterations" "workflow alias runs to completion"
 
+runtime_perf_log="${tmp_dir}/runtime-perf.log"
+: >"${runtime_perf_log}"
+runtime_perf_output="$({
+	PATH="${tmp_dir}/bin:${PATH}" \
+		ITER_LOG_FILE="${runtime_perf_log}" \
+		ITER_COUNT_DIR="${tmp_dir}/counts" \
+		ZAI_API_KEY_FILE="${tmp_dir}/zai_api_key" \
+		RUNTIME_PERFORMANCE_PROMPT="speed up the hot path" \
+		bash "${TARGET}" 1 clglmrp
+} 2>&1)"
+runtime_perf_log_contents="$(cat "${runtime_perf_log}")"
+assert_contains "${runtime_perf_log_contents}" "claude|ARGS=--dangerously-skip-permissions --print speed\\ up\\ the\\ hot\\ path" "runtime performance workflow alias resolves built-in prompt"
+assert_contains "${runtime_perf_output}" "Completed 1/1 iterations" "runtime performance workflow alias runs to completion"
+
 codex_log="${tmp_dir}/codex.log"
 : >"${codex_log}"
 codex_output="$({

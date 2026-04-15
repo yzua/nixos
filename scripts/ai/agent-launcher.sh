@@ -31,36 +31,7 @@ usage() {
 	echo "  -s, --simple: flat prefix picker mode"
 }
 
-# resolve_workflow_prompt is provided by _agent-registry.sh
-
-workflow_label() {
-	case "$1" in
-	cm)
-		echo "commit split (cm) — Splits working tree into logical commits with validated, minimal staging."
-		;;
-	rf)
-		echo "refactor maintainability (rf) — Improves structure and clarity without changing behavior, APIs, or workflows."
-		;;
-	fx)
-		echo "bugfix root cause (fx) — Reproduces bugs, proves root cause, fixes minimally, validates regressions afterward."
-		;;
-	sa)
-		echo "security audit (sa) — Finds evidence-backed security weaknesses across code, configs, dependencies, infrastructure surfaces."
-		;;
-	du)
-		echo "dependency upgrade (du) — Upgrades dependencies safely, handles breaking changes, validates compatibility, reports blockers."
-		;;
-	bp)
-		echo "build performance (bp) — Measures bottlenecks, applies low-risk optimizations, compares before-and-after performance evidence clearly."
-		;;
-	md)
-		echo "markdown sync (md) — Synchronizes documentation with repository reality, removing drift, ambiguity, stale instructions."
-		;;
-	*)
-		return 1
-		;;
-	esac
-}
+# resolve_workflow_prompt and workflow_label are provided by _agent-registry.sh
 
 workflow_display_lines() {
 	echo "none"
@@ -157,30 +128,30 @@ execute_agent() {
 	exec "${cmd[@]}"
 }
 
-pick_codex_effort_alias() {
+# Generic effort alias picker: pick from fzf, map to alias.
+# Args: $1=header $2=default_alias $3=low_alias $4=medium_alias $5=high_alias $6=xhigh_alias
+_pick_effort_alias() {
+	local header="$1"
+	shift
+	local default_alias="$1" low_alias="$2" med_alias="$3" high_alias="$4" xhigh_alias="$5"
 	local effort
-	effort="$(pick "Codex Reasoning Effort" default low medium high xhigh)"
+	effort="$(pick "$header" default low medium high xhigh)"
 	case "$effort" in
-	default) echo "cx" ;;
-	low) echo "lcx" ;;
-	medium) echo "mcx" ;;
-	high) echo "hcx" ;;
-	xhigh) echo "xcx" ;;
+	default) echo "$default_alias" ;;
+	low) echo "$low_alias" ;;
+	medium) echo "$med_alias" ;;
+	high) echo "$high_alias" ;;
+	xhigh) echo "$xhigh_alias" ;;
 	"") return 1 ;;
 	esac
 }
 
+pick_codex_effort_alias() {
+	_pick_effort_alias "Codex Reasoning Effort" cx lcx mcx hcx xcx
+}
+
 pick_ocgpt_effort_alias() {
-	local effort
-	effort="$(pick "OpenCode GPT Reasoning Effort" default low medium high xhigh)"
-	case "$effort" in
-	default) echo "ocgpt" ;;
-	low) echo "locgpt" ;;
-	medium) echo "mocgpt" ;;
-	high) echo "xocgpt" ;;
-	xhigh) echo "xocgpt" ;;
-	"") return 1 ;;
-	esac
+	_pick_effort_alias "OpenCode GPT Reasoning Effort" ocgpt locgpt mocgpt xocgpt xocgpt
 }
 
 run_simple_mode() {
@@ -301,4 +272,7 @@ main() {
 	execute_agent "$agent_alias" "$workflow_suffix"
 }
 
-main "$@"
+# Allow test scripts to source this file without executing main.
+if [[ -z "${AI_AGENT_LAUNCHER_SOURCE_ONLY:-}" ]]; then
+  main "$@"
+fi

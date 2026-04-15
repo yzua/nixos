@@ -62,6 +62,13 @@ json_keys() {
 	jq -r "$expr" "$file" 2>/dev/null || true
 }
 
+# Infer MCP server type: explicit type field, else "http" if url present, else "local".
+mcp_type_for() {
+	local file="$1"
+	local key="$2"
+	jq -r --arg k "$key" '.mcpServers[$k].type // (if .mcpServers[$k].url then "http" else "local" end)' "$file" 2>/dev/null || echo "local"
+}
+
 list_hook_rows_with_unconfigured() {
 	local scope="$1"
 	local source_file="$2"
@@ -309,7 +316,7 @@ collect_claude() {
 		while IFS= read -r server; do
 			[[ -n "$server" ]] || continue
 			local mcp_type
-			mcp_type="$(jq -r --arg k "$server" '.mcpServers[$k].type // (if .mcpServers[$k].url then "http" else "local" end)' "$mcp_cfg" 2>/dev/null || echo "local")"
+			mcp_type="$(mcp_type_for "$mcp_cfg" "$server")"
 			row "claude" "mcp" "$server" "$mcp_type" "$mcp_cfg"
 		done < <(json_keys "$mcp_cfg" '.mcpServers // {} | keys[]')
 	fi
@@ -404,7 +411,7 @@ collect_gemini() {
 		while IFS= read -r mcp; do
 			[[ -n "$mcp" ]] || continue
 			local mcp_type
-			mcp_type="$(jq -r --arg k "$mcp" '.mcpServers[$k].type // (if .mcpServers[$k].url then "http" else "local" end)' "$cfg" 2>/dev/null || echo "local")"
+			mcp_type="$(mcp_type_for "$cfg" "$mcp")"
 			row "gemini" "mcp" "$mcp" "$mcp_type" "$cfg"
 		done < <(json_keys "$cfg" '.mcpServers // {} | keys[]')
 	fi

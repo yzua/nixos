@@ -11,8 +11,9 @@ trap 'log_error "command failed at line ${LINENO}: ${BASH_COMMAND}"' ERR
 AVD_NAME="${AVD_NAME:-re-pixel7-api34}"
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}"
 ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
-FRIDA_BIN="${FRIDA_BIN:-${HOME}/Downloads/android-re-tools/frida/frida-server-17.5.1-android-x86_64}"
-FRIDA_TARGET="${FRIDA_TARGET:-/data/local/tmp/frida-server-17.5.1}"
+FRIDA_VERSION="${FRIDA_VERSION:-17.5.1}"
+FRIDA_BIN="${FRIDA_BIN:-${HOME}/Downloads/android-re-tools/frida/frida-server-${FRIDA_VERSION}-android-x86_64}"
+FRIDA_TARGET="${FRIDA_TARGET:-/data/local/tmp/frida-server-${FRIDA_VERSION}}"
 FRIDA_LOG_PATH="${FRIDA_LOG_PATH:-/data/local/tmp/frida.log}"
 FRIDA_PS_BIN="${FRIDA_PS_BIN:-}"
 FRIDA_WAIT_TIMEOUT="${FRIDA_WAIT_TIMEOUT:-10}"
@@ -228,18 +229,7 @@ mitm_command() {
 }
 
 resolve_re_workspace_ref() {
-	local ref
-	if ! command -v niri >/dev/null 2>&1; then
-		printf '%s\n' "${RE_WORKSPACE}"
-		return 0
-	fi
-
-	ref="$(niri msg workspaces 2>/dev/null | sed -n 's/.*"\([^"]*android[^"]*\)".*/\1/p' | head -n1)"
-	if [[ -n "${ref}" ]]; then
-		printf '%s\n' "${ref}"
-	else
-		printf '%s\n' "${RE_WORKSPACE}"
-	fi
+	resolve_niri_android_workspace "${RE_WORKSPACE}"
 }
 
 focus_re_workspace() {

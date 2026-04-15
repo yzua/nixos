@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Helper functions for system report generation (section, query_api, safe_cmd, etc.) and JSON summary.
 
+# Service endpoints — single source of truth for observability URLs.
+# shellcheck disable=SC2034
+NETDATA_URL="http://127.0.0.1:19999"
+LOKI_URL="http://127.0.0.1:3100"
+SCRUTINY_URL="http://127.0.0.1:8080"
+
 section() { printf '\n## %s\n\n' "$1"; }
 
 print_table_header() {
@@ -55,7 +61,7 @@ query_api() {
 query_loki() {
 	local query="$1" start="$2"
 	local result
-	result=$(query_api "http://127.0.0.1:3100/loki/api/v1/query_range?query=$(jq -rn --arg q "$query" '$q|@uri')&start=${start}&end=$(date +%s)&step=3600")
+	result=$(query_api "${LOKI_URL}/loki/api/v1/query_range?query=$(jq -rn --arg q "$query" '$q|@uri')&start=${start}&end=$(date +%s)&step=3600")
 	if [[ -n "$result" ]]; then
 		echo "$result" | jq -r '.data.result' 2>/dev/null || echo ""
 	fi

@@ -4,7 +4,7 @@
 netdata_chart() {
 	local chart="$1" after="${2:--300}" points="${3:-1}"
 	local result
-	result=$(query_api "http://127.0.0.1:19999/api/v1/data?chart=${chart}&after=${after}&points=${points}&format=json&options=absolute")
+	result=$(query_api "${NETDATA_URL}/api/v1/data?chart=${chart}&after=${after}&points=${points}&format=json&options=absolute")
 	if [[ -n "$result" ]]; then
 		echo "$result"
 	fi
@@ -97,7 +97,7 @@ collect_netdata_alarms() {
 	fi
 
 	local alarms
-	alarms=$(query_api "http://127.0.0.1:19999/api/v1/alarms?active")
+	alarms=$(query_api "${NETDATA_URL}/api/v1/alarms?active")
 
 	if [[ -z "$alarms" ]]; then
 		echo "[unavailable] Could not reach Netdata."
@@ -125,7 +125,7 @@ collect_scrutiny_health() {
 	fi
 
 	local summary
-	summary=$(query_api "http://127.0.0.1:8080/api/summary")
+	summary=$(query_api "${SCRUTINY_URL}/api/summary")
 
 	if [[ -z "$summary" ]]; then
 		echo "[unavailable] Could not reach Scrutiny."
