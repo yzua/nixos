@@ -1,4 +1,4 @@
-# Operational security (kexec, metadata stripping, zram, NTS time).
+# Operational security (kexec, session locking, zram, NTS time).
 
 { lib, ... }:
 
@@ -7,15 +7,17 @@
     "kernel.kexec_load_disabled" = 1; # Prevent runtime kernel replacement
   };
 
-  # RAM-only swap — prevents sensitive data leaking to unencrypted partitions
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 50;
-  };
-
+  # Session lock on idle and lid-close — physical access protection
   # Chrony with NTS (authenticated time) replaces systemd-timesyncd
   services = {
+    logind.settings.Login = {
+      IdleAction = "lock";
+      IdleActionSec = 300; # seconds
+      HandleLidSwitch = "lock";
+      HandleLidSwitchExternalPower = "lock";
+      HandleLidSwitchDocked = "lock";
+    };
+
     timesyncd.enable = lib.mkForce false;
     chrony = {
       enable = true;
@@ -27,5 +29,12 @@
         makestep 1.0 3
       '';
     };
+  };
+
+  # RAM-only swap — prevents sensitive data leaking to unencrypted partitions
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
   };
 }

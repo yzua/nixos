@@ -82,11 +82,22 @@
     hardware.nvidia-container-toolkit.enable =
       config.mySystem.nvidia.enable && (config.mySystem.hostProfile == "desktop");
 
-    networking.firewall.trustedInterfaces = [ "docker0" ];
-
-    # Let Docker manage its own FORWARD/NAT chains.
-    # NixOS firewall blocks forwarded traffic by default — this breaks Docker bridges.
-    networking.firewall.filterForward = false;
+    networking.firewall = {
+      trustedInterfaces = [ "docker0" ];
+      # Let Docker manage its own FORWARD/NAT chains.
+      # NixOS firewall blocks forwarded traffic by default — this breaks Docker bridges.
+      filterForward = false;
+      # Docker bridge forwarding (iptables via nf_tables compat layer)
+      extraCommands = ''
+        # === Docker bridge forwarding ===
+        iptables -A FORWARD -i docker0 -j ACCEPT
+        iptables -A FORWARD -o docker0 -j ACCEPT
+        iptables -A FORWARD -i br-+ -j ACCEPT
+        iptables -A FORWARD -o br-+ -j ACCEPT
+        iptables -A INPUT -i docker0 -j ACCEPT
+        iptables -A INPUT -i br-+ -j ACCEPT
+      '';
+    };
 
     environment.systemPackages = with pkgsStable; [
       virt-manager

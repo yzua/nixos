@@ -1,6 +1,6 @@
 # Kernel and system security hardening (sysctl, AppArmor, PAM, hidepid).
 
-{ lib, ... }:
+_:
 
 {
   # graphene-hardened removed — crashes glycin/bwrap image loaders (Loupe, Nautilus
@@ -74,10 +74,6 @@
 
       "net.ipv4.conf.all.log_martians" = 1; # Log spoofed packets
 
-      # IPv6 privacy extensions (defense-in-depth — IPv6 disabled in networking.nix)
-      "net.ipv6.conf.all.use_tempaddr" = lib.mkForce 2;
-      "net.ipv6.conf.default.use_tempaddr" = lib.mkForce 2;
-
       # === Kernel Protection ===
       "kernel.kptr_restrict" = 2; # Hide kernel pointers
       "kernel.dmesg_restrict" = 1; # Root-only dmesg
@@ -117,14 +113,6 @@
       "vm.mmap_rnd_bits" = 28;
       "vm.mmap_rnd_compat_bits" = 8;
     };
-  };
-
-  services.logind.settings.Login = {
-    IdleAction = "lock";
-    IdleActionSec = 300; # seconds
-    HandleLidSwitch = "lock"; # Lock on lid close (laptop)
-    HandleLidSwitchExternalPower = "lock";
-    HandleLidSwitchDocked = "lock";
   };
 
   security = {

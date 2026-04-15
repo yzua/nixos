@@ -1,7 +1,9 @@
 # Environment variables and session settings.
 
 {
+  config,
   constants,
+  lib,
   ...
 }:
 
@@ -24,7 +26,7 @@ in
 
     # Force GTK4 apps to use GL renderer instead of Vulkan.
     # Fixes black/broken windows with NVIDIA (VK_ERROR_OUT_OF_DATE_KHR).
-    GSK_RENDERER = "gl";
+    GSK_RENDERER = lib.mkIf config.mySystem.nvidia.enable "gl";
 
     # XDG Base Directory specification for user binaries
     XDG_BIN_HOME = xdgBinHome;

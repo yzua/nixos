@@ -20,7 +20,8 @@
     DefaultTimeoutStopSec=30s
   '';
 
-  # PAM session limits (consolidated — includes core dump disable from security/hardening.nix)
+  # PAM session limits. Core dump limit (hard core=0) complements kernel.core_pattern
+  # and systemd.coredump.disable in security/hardening.nix (defense-in-depth).
   security.pam.loginLimits = [
     {
       domain = "*";

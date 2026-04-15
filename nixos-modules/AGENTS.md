@@ -78,14 +78,14 @@ We use `host-defaults.nix` to reduce boilerplate. Setting `mySystem.hostProfile`
 
 Modules are grouped into these namespaces:
 
-- **Core**: Boot, nix, users, timezone, i18n, environment, stability, hostname.
-- **Hardware**: GPU, audio, bluetooth, input, power, firmware updates.
-- **Desktop**: Niri, greetd, xserver, portals, file manager.
+- **Core**: Boot, nix, users, timezone, i18n, environment, stability, hostname, performance, resource limits.
+- **Hardware**: GPU, audio, bluetooth, input, power (UPower), firmware updates.
+- **Desktop**: Niri, greetd, xserver, portals, file manager (Nautilus).
 - **Networking**: NetworkManager, encrypted DNS, VPNs, Tor, I2P, mesh networks.
 - **Security**: Hardening, application firewall, secure boot, secrets.
-- **Apps**: Gaming, flatpak, printing, android, web RE tools, browser deps, phone sync, remote access.
+- **Apps**: Gaming, flatpak, printing, android, web RE tools, browser deps, KDE Connect, remote access.
 - **Virtualization**: Docker, VMs, android containers, dynamic linker.
 - **Notifications**: Alertmanager → ntfy.sh push bridge.
 - **Observability**: Metrics, dashboards, logs, health reports, alerts.
 - **Boot optimization**: Deferred service startup.
-- **Maintenance**: Cleanup timers, backups, Nix Helper.
+- **Maintenance**: Cleanup timers, backups, Nix Helper (`nh`).

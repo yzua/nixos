@@ -1,6 +1,6 @@
 # System Security Hardening
 
-5 always-on sub-modules plus 3 guarded modules (`fail2ban.nix`, `metadata-scrubber.nix`, `aide.nix`). Split from monolithic `security.nix` for maintainability. Each submodule owns its own packages in `environment.systemPackages`.
+4 always-on sub-modules plus 4 guarded modules (`fail2ban.nix`, `lynis.nix`, `metadata-scrubber.nix`, `aide.nix`). Split from monolithic `security.nix` for maintainability. Each submodule owns its own packages in `environment.systemPackages`.
 
 Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable security features outside this directory.
 
@@ -13,7 +13,7 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 | `hardening.nix`         | Kernel sysctl, AppArmor, PAM core dumps, sudo, hidepid=2, coredump                                           | Always-on                          |
 | `firewall.nix`          | nftables firewall, LLMNR/NetBIOS/SMB hostname leak prevention                                                | Always-on                          |
 | `services.nix`          | dbus-broker and journald hardening                                                                           | Always-on                          |
-| `lynis.nix`             | Weekly Lynis security audit timer + service (owns `lynis` package)                                           | Always-on                          |
+| `lynis.nix`             | Weekly Lynis security audit timer + service (owns `lynis` package)                                           | `mySystem.lynis.enable`            |
 | `fail2ban.nix`          | Intrusion prevention (5 retries, 1h ban, exponential backoff, owns `audit` package)                          | `mySystem.fail2ban.enable`         |
 | `metadata-scrubber.nix` | System-side metadata scrubber tooling (`mat2`, `exiftool`, `inotify-tools`) for the user-level watcher/timer | `mySystem.metadataScrubber.enable` |
 | `opsec.nix`             | kexec disable, zram swap, Chrony NTS                                                                         | Always-on                          |

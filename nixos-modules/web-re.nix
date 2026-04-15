@@ -23,11 +23,6 @@
 
       # === Web reconnaissance ===
       whatweb # Website technology fingerprinter
-      jq # JSON processing for API response analysis
-
-      # === JS / web analysis ===
-      nodejs # Node.js runtime (for js-beautify, source-map-explorer, etc.)
-      python3 # Python runtime (for scripts, requests, beautifulsoup4)
 
       # === Crypto / cert analysis ===
       # openssl — already in home-manager/packages/networking.nix

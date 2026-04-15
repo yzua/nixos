@@ -56,7 +56,6 @@ in
       aide.enable = mkDefaultTrue; # Weekly AIDE file integrity monitoring
       lynis.enable = mkDefaultTrue; # Weekly Lynis security audit
       secureBoot.enable = mkDefaultTrue; # Secure Boot preparation with sbctl
-      hostInfo.enable = mkDefaultTrue; # Hostname and state version from flake args
       vnc.enable = mkDefaultFalse; # On-demand remote access
 
       # Profile-dependent defaults
@@ -70,6 +69,5 @@ in
         powerOnBoot = mkDefaultFalse;
       };
     };
-    environment.systemPackages = lib.mkDefault [ ];
   };
 }

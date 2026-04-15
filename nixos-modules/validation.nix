@@ -72,13 +72,22 @@
       assertion = config.security.apparmor.enable;
       message = "AppArmor must be enabled (security.apparmor.enable = true) for mandatory access control.";
     }
+
+    # === Observability Stack Dependencies ===
+    {
+      assertion = !config.mySystem.ntfy.enable || config.mySystem.observability.enable;
+      message = "ntfy alert bridge requires observability stack (mySystem.observability.enable = true) for Alertmanager integration. Either enable observability or disable ntfy.";
+    }
+
+    {
+      assertion = !config.mySystem.observability.enable || config.mySystem.loki.enable;
+      message = "Observability stack requires Loki (mySystem.loki.enable = true) for log aggregation. Grafana provisions a Loki datasource that would be unreachable without it.";
+    }
   ];
 
-  warnings =
-    lib.optional config.services.prometheus.exporters.node.enable "prometheus.exporters.node was removed due to service failures. Use Netdata (mySystem.netdata.enable) instead."
-    ++ lib.optional (builtins.pathExists /etc/nixos/configuration.nix) ''
-      Legacy /etc/nixos/configuration.nix exists alongside your flake config.
-      This file may conflict with your flake-based configuration (different kernel, GNOME vs niri, etc.).
-      Consider removing it: sudo mv /etc/nixos/configuration.nix /etc/nixos/configuration.nix.bak
-    '';
+  warnings = lib.optional (builtins.pathExists /etc/nixos/configuration.nix) ''
+    Legacy /etc/nixos/configuration.nix exists alongside your flake config.
+    This file may conflict with your flake-based configuration (different kernel, GNOME vs niri, etc.).
+    Consider removing it: sudo mv /etc/nixos/configuration.nix /etc/nixos/configuration.nix.bak
+  '';
 }

@@ -9,6 +9,6 @@
     ./hardening.nix # Kernel and system hardening (sysctl, PAM, AppArmor, hidepid, coredump)
     ./metadata-scrubber.nix # Automatic metadata scrubbing for user files
     ./opsec.nix # Operational security (MAC, kexec, metadata, zram, NTS, Thunderbolt)
-    ./services.nix # Security-related services (Avahi, dbus, audit)
+    ./services.nix # dbus-broker and journald hardening
   ];
 }
