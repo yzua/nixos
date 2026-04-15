@@ -14,8 +14,8 @@ Item {
 
     readonly property var geometryPlaceholder: panelContainer
     readonly property bool allowAttach: true
-    property real contentPreferredWidth: 400 * Style.uiScaleRatio
-    property real contentPreferredHeight: 560 * Style.uiScaleRatio
+    property real contentPreferredWidth: 460 * Style.uiScaleRatio
+    property real contentPreferredHeight: 640 * Style.uiScaleRatio
 
     anchors.fill: parent
 
@@ -25,6 +25,77 @@ Item {
         if (ep.length === 0)
             return null;
         return ep[Math.min(selectedTabIndex, ep.length - 1)];
+    }
+
+    function percentLeftText(value) {
+        if (!(value >= 0))
+            return "—";
+        return Math.max(0, 100 - Math.round(value * 100)) + "% left";
+    }
+
+    function percentUsedText(value) {
+        if (!(value >= 0))
+            return "";
+        return Math.round(value * 100) + "% used";
+    }
+
+    function limitResetSummary(provider, isoTimestamp) {
+        if (!isoTimestamp)
+            return "";
+        const relative = provider?.formatResetTime(isoTimestamp) ?? "";
+        return relative ? ("Resets in " + relative) : "";
+    }
+
+    function overviewItems(provider) {
+        if (!provider)
+            return [];
+
+        const items = [];
+        const accountValue = provider.accountLabel ?? "";
+        const planValue = provider.planLabel || provider.tierLabel || "";
+        const modelValue = provider.currentModelLabel || provider.authModeLabel || "";
+
+        if (accountValue) {
+            items.push({
+                label: "Account",
+                value: accountValue,
+                detail: provider.accountEmail && provider.accountEmail !== accountValue ? provider.accountEmail : (provider.organizationLabel ?? "")
+            });
+        }
+
+        if (planValue) {
+            items.push({
+                label: "Plan",
+                value: planValue,
+                detail: provider.planDetail ?? ""
+            });
+        }
+
+        if (modelValue) {
+            items.push({
+                label: provider.currentModelLabel ? "Model" : "Auth",
+                value: modelValue,
+                detail: provider.currentModelLabel && provider.authModeLabel ? provider.authModeLabel : ""
+            });
+        }
+
+        if ((provider.rateLimitPercent ?? -1) >= 0) {
+            items.push({
+                label: provider.rateLimitLabel ?? "Limit",
+                value: percentLeftText(provider.rateLimitPercent),
+                detail: (provider.rateLimitDetailText ?? "") || (percentUsedText(provider.rateLimitPercent) + (limitResetSummary(provider, provider.rateLimitResetAt) ? (" • " + limitResetSummary(provider, provider.rateLimitResetAt)) : ""))
+            });
+        }
+
+        if ((provider.secondaryRateLimitPercent ?? -1) >= 0) {
+            items.push({
+                label: provider.secondaryRateLimitLabel ?? "Secondary limit",
+                value: percentLeftText(provider.secondaryRateLimitPercent),
+                detail: (provider.secondaryRateLimitDetailText ?? "") || (percentUsedText(provider.secondaryRateLimitPercent) + (limitResetSummary(provider, provider.secondaryRateLimitResetAt) ? (" • " + limitResetSummary(provider, provider.secondaryRateLimitResetAt)) : ""))
+            });
+        }
+
+        return items;
     }
 
     Rectangle {
@@ -171,6 +242,153 @@ Item {
                                 text: root.selectedProvider?.authHelpText ?? ""
                                 pointSize: Style.fontSizeXS
                                 color: Color.mOnSurfaceVariant
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        visible: root.overviewItems(root.selectedProvider).length > 0
+                        Layout.fillWidth: true
+                        color: root.sectionBackgroundColor
+                        radius: Style.radiusS
+                        implicitHeight: overviewColumn.implicitHeight + Style.marginXL
+
+                        ColumnLayout {
+                            id: overviewColumn
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                                margins: Style.marginL
+                            }
+                            spacing: Style.marginM
+
+                            NText {
+                                text: "Overview"
+                                pointSize: Style.fontSizeL
+                                font.weight: Style.fontWeightSemiBold
+                                color: Color.mPrimary
+                            }
+
+                            GridLayout {
+                                Layout.fillWidth: true
+                                columns: 2
+                                columnSpacing: Style.marginM
+                                rowSpacing: Style.marginM
+
+                                Repeater {
+                                    model: root.overviewItems(root.selectedProvider)
+
+                                    Rectangle {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        color: Qt.alpha(Color.mSurface, 0.42)
+                                        radius: Style.radiusS
+                                        implicitHeight: overviewCardColumn.implicitHeight + Style.marginL
+
+                                        ColumnLayout {
+                                            id: overviewCardColumn
+                                            anchors {
+                                                left: parent.left
+                                                right: parent.right
+                                                top: parent.top
+                                                margins: Style.marginM
+                                            }
+                                            spacing: Style.marginXXS
+
+                                            NText {
+                                                text: modelData.label ?? ""
+                                                pointSize: Style.fontSizeXS
+                                                color: Color.mOnSurfaceVariant
+                                            }
+
+                                            NText {
+                                                text: modelData.value ?? ""
+                                                pointSize: Style.fontSizeM
+                                                font.weight: Style.fontWeightBold
+                                                color: Color.mOnSurface
+                                                wrapMode: Text.Wrap
+                                            }
+
+                                            NText {
+                                                visible: (modelData.detail ?? "") !== ""
+                                                text: modelData.detail ?? ""
+                                                pointSize: Style.fontSizeXS
+                                                color: Color.mOnSurfaceVariant
+                                                wrapMode: Text.Wrap
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        visible: (root.selectedProvider?.accountItems ?? []).length > 0
+                        Layout.fillWidth: true
+                        color: root.sectionBackgroundColor
+                        radius: Style.radiusS
+                        implicitHeight: accountColumn.implicitHeight + Style.marginXL
+
+                        ColumnLayout {
+                            id: accountColumn
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                top: parent.top
+                                margins: Style.marginL
+                            }
+                            spacing: Style.marginM
+
+                            NText {
+                                text: "Account & Access"
+                                pointSize: Style.fontSizeL
+                                font.weight: Style.fontWeightSemiBold
+                                color: Color.mPrimary
+                            }
+
+                            Repeater {
+                                model: root.selectedProvider?.accountItems ?? []
+
+                                ColumnLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: Style.marginXXS
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: Style.marginS
+
+                                        NText {
+                                            text: modelData.label ?? ""
+                                            pointSize: Style.fontSizeS
+                                            color: Color.mOnSurfaceVariant
+                                        }
+
+                                        Item {
+                                            Layout.fillWidth: true
+                                        }
+
+                                        NText {
+                                            text: modelData.value ?? ""
+                                            pointSize: Style.fontSizeS
+                                            font.weight: Style.fontWeightSemiBold
+                                            color: Color.mOnSurface
+                                            wrapMode: Text.Wrap
+                                            horizontalAlignment: Text.AlignRight
+                                        }
+                                    }
+
+                                    NText {
+                                        visible: (modelData.detail ?? "") !== ""
+                                        text: modelData.detail ?? ""
+                                        pointSize: Style.fontSizeXS
+                                        color: Color.mOnSurfaceVariant
+                                        wrapMode: Text.Wrap
+                                    }
+                                }
                             }
                         }
                     }

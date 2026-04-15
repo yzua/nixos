@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../ProviderUtils.js" as PU
 
 Item {
     id: root
@@ -37,31 +38,83 @@ Item {
     property string authHelpText: "Run `codex` to authenticate."
     property bool hasLocalStats: true
 
+    property string accountLabel: ""
+    property string accountName: ""
+    property string accountEmail: ""
+    property string accountId: ""
+    property string authModeLabel: ""
+    property string planLabel: ""
+    property string planDetail: ""
+    property string currentModelLabel: ""
+    property var accountItems: []
+
     property string configModel: ""
     property var providerSettings: ({})
 
-    function resolvePath(p) {
-        if (p && p.startsWith("~"))
-            return (Quickshell.env("HOME") ?? "/home") + p.substring(1);
-        return p;
+    readonly property string _home: Quickshell.env("HOME") ?? "/home"
+
+    function resolvePath(p) { return PU.resolvePath(p, _home) }
+    function localDateString() { return PU.localDateString() }
+    function dateDaysAgoString(daysAgo) { return PU.dateDaysAgoString(daysAgo) }
+
+    function humanizeAuthMode(mode) {
+        if (!mode)
+            return "";
+        if (mode === "chatgpt")
+            return "ChatGPT";
+        return PU.humanizeIdentifier(mode);
     }
 
-    function localDateString() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        const d = String(now.getDate()).padStart(2, "0");
-        return y + "-" + m + "-" + d;
+    function humanizePlan(plan) {
+        if (!plan)
+            return "";
+        if (plan === "team")
+            return "Team";
+        if (plan === "business")
+            return "Business";
+        if (plan === "enterprise")
+            return "Enterprise";
+        if (plan === "plus")
+            return "Plus";
+        if (plan === "pro")
+            return "Pro";
+        return PU.humanizeIdentifier(plan);
     }
 
-    function dateDaysAgoString(daysAgo) {
-        const dt = new Date();
-        dt.setHours(0, 0, 0, 0);
-        dt.setDate(dt.getDate() - daysAgo);
-        const y = dt.getFullYear();
-        const m = String(dt.getMonth() + 1).padStart(2, "0");
-        const d = String(dt.getDate()).padStart(2, "0");
-        return y + "-" + m + "-" + d;
+    function updateAccountItems() {
+        const items = [];
+        if (root.accountName)
+            items.push({
+                label: "Name",
+                value: root.accountName
+            });
+        if (root.accountEmail)
+            items.push({
+                label: "Email",
+                value: root.accountEmail
+            });
+        if (root.authModeLabel)
+            items.push({
+                label: "Auth",
+                value: root.authModeLabel
+            });
+        if (root.currentModelLabel)
+            items.push({
+                label: "Model",
+                value: root.currentModelLabel
+            });
+        if (root.accountId)
+            items.push({
+                label: "Account ID",
+                value: PU.shortId(root.accountId),
+                detail: root.accountId
+            });
+        if (root.planDetail)
+            items.push({
+                label: "Billing window",
+                value: root.planDetail
+            });
+        root.accountItems = items;
     }
 
     function labelForWindow(windowMinutes) {
@@ -221,8 +274,11 @@ Item {
     function parseConfig(content) {
         try {
             const match = content.match(/model\s*=\s*"([^"]+)"/);
-            if (match)
+            if (match) {
                 root.configModel = match[1];
+                root.currentModelLabel = match[1];
+                root.updateAccountItems();
+            }
         } catch (e) {
             console.log("model-usage/codex", "Failed to parse config.toml:", e);
         }
@@ -231,8 +287,27 @@ Item {
     function parseAuth(content) {
         try {
             const data = JSON.parse(content);
-            if (data.auth_mode)
-                root.tierLabel = data.auth_mode;
+            const idPayload = PU.parseJwtPayload(data.tokens?.id_token ?? "") ?? {};
+            const accessPayload = PU.parseJwtPayload(data.tokens?.access_token ?? "") ?? {};
+            const authPayload = idPayload["https://api.openai.com/auth"] ?? accessPayload["https://api.openai.com/auth"] ?? {};
+            const profilePayload = accessPayload["https://api.openai.com/profile"] ?? {};
+
+            root.authModeLabel = root.humanizeAuthMode(data.auth_mode ?? "");
+            root.accountName = idPayload.name ?? "";
+            root.accountEmail = idPayload.email ?? profilePayload.email ?? "";
+            root.accountId = authPayload.chatgpt_account_id ?? data.tokens?.account_id ?? "";
+            root.accountLabel = root.accountEmail || root.accountName || root.authModeLabel;
+
+            const jwtPlan = authPayload.chatgpt_plan_type ?? "";
+            if (jwtPlan) {
+                root.planLabel = root.humanizePlan(jwtPlan);
+                root.tierLabel = root.planLabel;
+            } else if (root.authModeLabel && !root.tierLabel) {
+                root.tierLabel = root.authModeLabel;
+            }
+
+            root.planDetail = PU.formatDateRange(authPayload.chatgpt_subscription_active_start ?? "", authPayload.chatgpt_subscription_active_until ?? "");
+            root.updateAccountItems();
         } catch (e) {
             console.log("model-usage/codex", "Failed to parse auth.json:", e);
         }
@@ -327,14 +402,16 @@ Item {
                 return;
             }
 
-            if (!root.tierLabel && latestPlanType)
-                root.tierLabel = latestPlanType;
+            if (latestPlanType) {
+                root.planLabel = root.humanizePlan(latestPlanType);
+                root.tierLabel = root.planLabel;
+            }
 
             const primary = latestRateLimits?.primary ?? null;
             if (primary) {
                 root.rateLimitPercent = (primary.used_percent ?? 0) / 100;
                 root.rateLimitLabel = root.labelForWindow(primary.window_minutes);
-                root.rateLimitDetailText = Math.round((primary.used_percent ?? 0)) + "% used";
+                root.rateLimitDetailText = Math.round((primary.used_percent ?? 0)) + "% used • " + Math.max(0, 100 - Math.round(primary.used_percent ?? 0)) + "% left";
                 root.rateLimitResetAt = primary.resets_at ? new Date(primary.resets_at * 1000).toISOString() : "";
             } else {
                 root.rateLimitPercent = -1;
@@ -347,7 +424,7 @@ Item {
             if (secondary) {
                 root.secondaryRateLimitPercent = (secondary.used_percent ?? 0) / 100;
                 root.secondaryRateLimitLabel = root.labelForWindow(secondary.window_minutes);
-                root.secondaryRateLimitDetailText = Math.round((secondary.used_percent ?? 0)) + "% used";
+                root.secondaryRateLimitDetailText = Math.round((secondary.used_percent ?? 0)) + "% used • " + Math.max(0, 100 - Math.round(secondary.used_percent ?? 0)) + "% left";
                 root.secondaryRateLimitResetAt = secondary.resets_at ? new Date(secondary.resets_at * 1000).toISOString() : "";
             } else {
                 root.secondaryRateLimitPercent = -1;
@@ -377,6 +454,8 @@ Item {
                 };
             }
 
+            root.updateAccountItems();
+
             root.sessionSearchInProgress = false;
         } catch (e) {
             console.log("model-usage/codex", "Failed to parse session data:", e);
@@ -391,20 +470,5 @@ Item {
         root.scanSessions();
     }
 
-    function formatResetTime(isoTimestamp) {
-        if (!isoTimestamp)
-            return "";
-        const reset = new Date(isoTimestamp);
-        const now = new Date();
-        const diffMs = reset.getTime() - now.getTime();
-        if (diffMs <= 0)
-            return "now";
-        const hours = Math.floor(diffMs / 3600000);
-        const mins = Math.floor((diffMs % 3600000) / 60000);
-        if (hours > 24)
-            return Math.floor(hours / 24) + "d " + (hours % 24) + "h";
-        if (hours > 0)
-            return hours + "h " + mins + "m";
-        return mins + "m";
-    }
+    function formatResetTime(isoTimestamp) { return PU.formatResetTime(isoTimestamp) }
 }

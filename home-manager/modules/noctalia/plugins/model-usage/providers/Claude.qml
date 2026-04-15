@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../ProviderUtils.js" as PU
 
 Item {
     id: root
@@ -30,10 +31,21 @@ Item {
     property int totalSessions: 0
     property var modelUsage: ({})
     property var dailyActivity: []
+    property string rateLimitDetailText: ""
+    property string secondaryRateLimitDetailText: ""
 
     property string tierLabel: ""
     property string authHelpText: "Run `claude auth login` to restore authoritative usage."
     property bool hasLocalStats: true
+
+    property string accountLabel: ""
+    property string accountEmail: ""
+    property string organizationLabel: ""
+    property string organizationId: ""
+    property string authModeLabel: ""
+    property string planLabel: ""
+    property string planDetail: ""
+    property var accountItems: []
 
     property string oauthAccessToken: ""
     property double oauthExpiresAtMs: 0
@@ -47,11 +59,9 @@ Item {
 
     property var providerSettings: ({})
 
-    function resolvePath(p) {
-        if (p && p.startsWith("~"))
-            return (Quickshell.env("HOME") ?? "/home") + p.substring(1);
-        return p;
-    }
+    readonly property string _home: Quickshell.env("HOME") ?? "/home"
+
+    function resolvePath(p) { return PU.resolvePath(p, _home) }
 
     FileView {
         id: statsFile
@@ -96,12 +106,42 @@ Item {
         onTriggered: root.probeRateLimits()
     }
 
-    function localDateString() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        const d = String(now.getDate()).padStart(2, "0");
-        return y + "-" + m + "-" + d;
+    function localDateString() { return PU.localDateString() }
+
+    function updateAccountItems() {
+        const items = [];
+        if (root.accountEmail)
+            items.push({
+                label: "Email",
+                value: root.accountEmail
+            });
+        if (root.organizationLabel)
+            items.push({
+                label: "Organization",
+                value: root.organizationLabel
+            });
+        if (root.authModeLabel)
+            items.push({
+                label: "Auth",
+                value: root.authModeLabel
+            });
+        if (root.rateLimitTier)
+            items.push({
+                label: "Rate tier",
+                value: PU.humanizeIdentifier(root.rateLimitTier.replace(/^default_/, ""))
+            });
+        if (root.planDetail)
+            items.push({
+                label: "Token expires",
+                value: root.planDetail
+            });
+        if (root.organizationId)
+            items.push({
+                label: "Org ID",
+                value: PU.shortId(root.organizationId),
+                detail: root.organizationId
+            });
+        root.accountItems = items;
     }
 
     function parseStats(content) {
@@ -180,7 +220,11 @@ Item {
 
             root.subscriptionType = oauth.subscriptionType ?? "";
             root.rateLimitTier = oauth.rateLimitTier ?? "";
-            root.tierLabel = formatTier();
+            root.planLabel = formatTier();
+            root.tierLabel = root.planLabel;
+            root.planDetail = PU.formatShortDate(root.oauthExpiresAtMs);
+            root.authModeLabel = fileHasOAuth ? "claude.ai OAuth" : "No auth";
+            root.updateAccountItems();
 
             if (root.oauthAccessToken && !root.oauthTokenExpired()) {
                 root.clearUsageStatus();
@@ -207,7 +251,7 @@ Item {
             return "Max " + match[1];
         if (root.subscriptionType)
             return root.subscriptionType.charAt(0).toUpperCase() + root.subscriptionType.slice(1);
-        return "";
+        return PU.humanizeIdentifier(root.rateLimitTier.replace(/^default_/, ""));
     }
 
     function normalizeExpiresAtMs(value) {
@@ -228,13 +272,35 @@ Item {
         root.rateLimitPercent = -1;
         root.rateLimitLabel = "Weekly (7-day)";
         root.rateLimitResetAt = "";
+        root.rateLimitDetailText = "";
         root.secondaryRateLimitPercent = -1;
         root.secondaryRateLimitLabel = "Session (5-hour)";
         root.secondaryRateLimitResetAt = "";
+        root.secondaryRateLimitDetailText = "";
     }
 
     function clearUsageStatus() {
         root.usageStatusText = "";
+    }
+
+    function parseAuthStatus(rawText) {
+        try {
+            const data = JSON.parse(rawText ?? "{}");
+            root.accountEmail = data.email ?? root.accountEmail;
+            root.organizationLabel = data.orgName ?? "";
+            root.organizationId = data.orgId ?? "";
+            root.accountLabel = root.accountEmail || root.organizationLabel || "Claude account";
+            if (data.subscriptionType) {
+                root.subscriptionType = data.subscriptionType;
+                root.planLabel = root.formatTier();
+                root.tierLabel = root.planLabel;
+            }
+            if (data.authMethod)
+                root.authModeLabel = data.authMethod === "claude.ai" ? "claude.ai OAuth" : PU.humanizeIdentifier(data.authMethod);
+            root.updateAccountItems();
+        } catch (e) {
+            console.log("model-usage/claude", "Failed to parse auth status:", e);
+        }
     }
 
     function parseNumber(value) {
@@ -252,25 +318,7 @@ Item {
         return Math.min(1, n);
     }
 
-    function normalizeResetAt(value) {
-        if (value === null || value === undefined)
-            return "";
-        const raw = String(value).trim();
-        if (raw === "")
-            return "";
-        if (/^\d+$/.test(raw)) {
-            let ts = parseInt(raw, 10);
-            if (ts < 1e12)
-                ts = ts * 1000;
-            const d = new Date(ts);
-            if (!isNaN(d.getTime()))
-                return d.toISOString();
-        }
-        const parsed = new Date(raw);
-        if (!isNaN(parsed.getTime()))
-            return parsed.toISOString();
-        return raw;
-    }
+    function normalizeResetAt(value) { return PU.normalizeResetAt(value) }
 
     function oauthUsageBucket(payload, key) {
         const bucket = payload?.[key];
@@ -330,6 +378,8 @@ Item {
                     const sessionBucket = root.oauthUsageBucket(payload, "five_hour");
 
                     if (root.applyAuthoritativeRateLimits(weeklyBucket?.utilization, weeklyBucket?.resets_at, sessionBucket?.utilization, sessionBucket?.resets_at, "")) {
+                        root.rateLimitDetailText = root.rateLimitPercent >= 0 ? (Math.round(root.rateLimitPercent * 100) + "% used • " + Math.max(0, 100 - Math.round(root.rateLimitPercent * 100)) + "% left") : "";
+                        root.secondaryRateLimitDetailText = root.secondaryRateLimitPercent >= 0 ? (Math.round(root.secondaryRateLimitPercent * 100) + "% used • " + Math.max(0, 100 - Math.round(root.secondaryRateLimitPercent * 100)) + "% left") : "";
                         root.clearUsageStatus();
                         return;
                     }
@@ -355,24 +405,10 @@ Item {
         statsFile.reload();
         historyFile.reload();
         credentialsFile.reload();
+        authStatusProcess.running = true;
     }
 
-    function formatResetTime(isoTimestamp) {
-        if (!isoTimestamp)
-            return "";
-        const reset = new Date(isoTimestamp);
-        const now = new Date();
-        const diffMs = reset.getTime() - now.getTime();
-        if (diffMs <= 0)
-            return "now";
-        const hours = Math.floor(diffMs / 3600000);
-        const mins = Math.floor((diffMs % 3600000) / 60000);
-        if (hours > 24)
-            return Math.floor(hours / 24) + "d " + (hours % 24) + "h";
-        if (hours > 0)
-            return hours + "h " + mins + "m";
-        return mins + "m";
-    }
+    function formatResetTime(isoTimestamp) { return PU.formatResetTime(isoTimestamp) }
 
     function probeRateLimits() {
         if (!root.oauthAccessToken || root.authMode !== "oauth") {
@@ -393,5 +429,21 @@ Item {
         root.lastProbeAtMs = nowMs;
 
         root.probeOAuthUsage();
+    }
+
+    Process {
+        id: authStatusProcess
+        command: ["claude", "auth", "status"]
+        running: false
+        stdout: StdioCollector {}
+        onExited: function(exitCode) {
+            if (exitCode === 0 && stdout.text.trim())
+                root.parseAuthStatus(stdout.text);
+        }
+    }
+
+    onEnabledChanged: {
+        if (enabled)
+            authStatusProcess.running = true;
     }
 }

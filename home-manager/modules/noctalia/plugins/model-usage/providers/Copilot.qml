@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../ProviderUtils.js" as PU
 
 Item {
     id: root
@@ -193,14 +194,7 @@ Item {
         root.secondaryRateLimitResetAt = "";
     }
 
-    function normalizeResetAt(value) {
-        if (value === null || value === undefined || value === "")
-            return "";
-        const d = new Date(String(value));
-        if (!isNaN(d.getTime()))
-            return d.toISOString();
-        return "";
-    }
+    function normalizeResetAt(value) { return PU.normalizeResetAt(value) }
 
     function refresh() {
         const now = Date.now();
@@ -210,20 +204,5 @@ Item {
         refreshToken();
     }
 
-    function formatResetTime(isoTimestamp) {
-        if (!isoTimestamp)
-            return "";
-        const reset = new Date(isoTimestamp);
-        const now = new Date();
-        const diffMs = reset.getTime() - now.getTime();
-        if (diffMs <= 0)
-            return "now";
-        const hours = Math.floor(diffMs / 3600000);
-        const mins = Math.floor((diffMs % 3600000) / 60000);
-        if (hours > 24)
-            return Math.floor(hours / 24) + "d " + (hours % 24) + "h";
-        if (hours > 0)
-            return hours + "h " + mins + "m";
-        return mins + "m";
-    }
+    function formatResetTime(isoTimestamp) { return PU.formatResetTime(isoTimestamp) }
 }

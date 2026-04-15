@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../ProviderUtils.js" as PU
 
 Item {
     id: root
@@ -41,6 +42,11 @@ Item {
     property bool hasLocalStats: false
     property string extraUsageTitle: "MCP tools"
     property var extraUsageItems: []
+    property string accountLabel: ""
+    property string authModeLabel: "API key"
+    property string planLabel: ""
+    property string planDetail: ""
+    property var accountItems: []
 
     property var providerSettings: ({})
     property string apiKeyPath: providerSettings?.apiKeyPath ?? "/run/secrets/zai_api_key"
@@ -50,11 +56,9 @@ Item {
 
     readonly property string endpoint: "https://api.z.ai/api/monitor/usage/quota/limit"
 
-    function resolvePath(p) {
-        if (p && p.startsWith("~"))
-            return (Quickshell.env("HOME") ?? "/home") + p.substring(1);
-        return p;
-    }
+    readonly property string _home: Quickshell.env("HOME") ?? "/home"
+
+    function resolvePath(p) { return PU.resolvePath(p, _home) }
 
     Process {
         id: keyReader
@@ -139,6 +143,8 @@ Item {
 
         const data = resp.data;
         root.tierLabel = data.level || "";
+        root.planLabel = data.level ? PU.humanizeIdentifier(data.level) : "";
+        root.accountLabel = root.planLabel ? (root.planLabel + " key") : "API key";
         root.usageStatusText = "";
 
         let tokenLimit = null;
@@ -162,7 +168,7 @@ Item {
             const pct = tokenLimit.percentage ?? 0;
             root.rateLimitPercent = pct / 100;
             root.rateLimitLabel = "5h coding quota";
-            root.rateLimitDetailText = Math.round(pct) + "% used";
+            root.rateLimitDetailText = Math.round(pct) + "% used • " + Math.max(0, 100 - Math.round(pct)) + "% left";
 
             if (tokenLimit.nextResetTime) {
                 root.rateLimitResetAt = new Date(tokenLimit.nextResetTime).toISOString();
@@ -205,6 +211,17 @@ Item {
         root.todaySessions = 0;
         root.recentPrompts = root.todayPrompts;
         root.recentSessions = 0;
+        root.planDetail = root.rateLimitResetAt ? ("Coding reset " + PU.formatShortDate(root.rateLimitResetAt)) : "";
+        root.accountItems = [{
+            label: "Credential",
+            value: root.authModeLabel
+        }, {
+            label: "Key path",
+            value: root.apiKeyPath
+        }, {
+            label: "Endpoint",
+            value: root.endpoint.replace(/^https:\/\//, "")
+        }];
         root.ready = true;
     }
 
@@ -217,21 +234,5 @@ Item {
         keyReader.running = true;
     }
 
-    function formatResetTime(isoTimestamp) {
-        if (!isoTimestamp)
-            return "";
-        const reset = new Date(isoTimestamp);
-        const now = new Date();
-        const diffMs = reset.getTime() - now.getTime();
-        if (diffMs <= 0)
-            return "now";
-        const hours = Math.floor(diffMs / 3600000);
-        const mins = Math.floor((diffMs % 3600000) / 60000);
-        const days = Math.floor(hours / 24);
-        if (days > 0)
-            return days + "d " + (hours % 24) + "h";
-        if (hours > 0)
-            return hours + "h " + mins + "m";
-        return mins + "m";
-    }
+    function formatResetTime(isoTimestamp) { return PU.formatResetTime(isoTimestamp) }
 }

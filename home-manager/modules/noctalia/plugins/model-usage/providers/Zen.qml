@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import "../ProviderUtils.js" as PU
 
 Item {
     id: root
@@ -198,20 +199,5 @@ Item {
             updateState();
     }
 
-    function formatResetTime(isoTimestamp) {
-        if (!isoTimestamp)
-            return "";
-        const reset = new Date(isoTimestamp);
-        const now = new Date();
-        const diffMs = reset.getTime() - now.getTime();
-        if (diffMs <= 0)
-            return "now";
-        const hours = Math.floor(diffMs / 3600000);
-        const mins = Math.floor((diffMs % 3600000) / 60000);
-        if (hours > 24)
-            return Math.floor(hours / 24) + "d " + (hours % 24) + "h";
-        if (hours > 0)
-            return hours + "h " + mins + "m";
-        return mins + "m";
-    }
+    function formatResetTime(isoTimestamp) { return PU.formatResetTime(isoTimestamp) }
 }
