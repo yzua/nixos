@@ -25,16 +25,18 @@ _add_unique_root() {
 	return 0
 }
 
-# Find all agent log files across standard directories.
-# Args: $1 — mtime filter (default: -7, i.e. last 7 days)
+# Core log discovery across a list of root directories.
+# Args: $1 — mtime filter (default: -7)
+#       remaining args — root directories to scan
 # Output: sorted unique list of log file paths
-find_all_agent_logs() {
-	local mtime="${1:--7}"
+_find_logs_in_roots() {
+	local mtime="$1"
+	shift
 	local root
 	local -a seen_roots=()
 	local max_depth_args=()
 
-	for root in "$LOG_DIR" "$OPENCODE_LOG_DIR" "$CODEX_LOG_DIR"; do
+	for root in "$@"; do
 		[[ -d "$root" ]] || continue
 		_add_unique_root "$root" || continue
 		if [[ "$root" == "$LOG_DIR" ]]; then
@@ -46,40 +48,30 @@ find_all_agent_logs() {
 	done | sort -u
 }
 
+# Find all agent log files across standard directories.
+# Args: $1 — mtime filter (default: -7, i.e. last 7 days)
+# Output: sorted unique list of log file paths
+find_all_agent_logs() {
+	local mtime="${1:--7}"
+	_find_logs_in_roots "$mtime" "$LOG_DIR" "$OPENCODE_LOG_DIR" "$CODEX_LOG_DIR"
+}
+
 # Find log files for a specific agent by name.
 # Args: $1 — agent name (claude, opencode, codex, gemini)
 #        $2 — mtime filter (default: -7)
 find_agent_logs() {
 	local agent="$1"
 	local mtime="${2:--7}"
-	local -a roots=()
 
 	case "$agent" in
 	claude | gemini)
-		roots+=("$LOG_DIR")
+		_find_logs_in_roots "$mtime" "$LOG_DIR"
 		;;
 	opencode)
-		roots+=("$LOG_DIR" "$OPENCODE_LOG_DIR")
+		_find_logs_in_roots "$mtime" "$LOG_DIR" "$OPENCODE_LOG_DIR"
 		;;
 	codex)
-		roots+=("$LOG_DIR" "$CODEX_LOG_DIR")
-		;;
-	*)
-		return 0
+		_find_logs_in_roots "$mtime" "$LOG_DIR" "$CODEX_LOG_DIR"
 		;;
 	esac
-
-	local root
-	local -a seen_roots=()
-	local max_depth_args=()
-	for root in "${roots[@]}"; do
-		[[ -d "$root" ]] || continue
-		_add_unique_root "$root" || continue
-		if [[ "$root" == "$LOG_DIR" ]]; then
-			max_depth_args=(-maxdepth 1)
-		else
-			max_depth_args=()
-		fi
-		find "$root" "${max_depth_args[@]}" -type f -name '*.log' -mtime "$mtime" 2>/dev/null
-	done | sort -u
 }

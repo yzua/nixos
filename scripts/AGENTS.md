@@ -37,7 +37,7 @@ scripts/
 ├── apps/
 │   ├── browser-select.sh    # Browser profile selector (wofi menu)
 │   ├── element-desktop-keyring.sh # Element Desktop keyring helper
-│   ├── playwright-cli-mcp-wrapper.sh # Playwright CLI MCP server wrapper
+│   ├── playwright-cli-mcp-wrapper.sh # Playwright CLI local bin wrapper
 │   ├── xdg-open-wrapper.sh  # XDG open wrapper for Wayland
 │   └── youtube-mpv.sh       # YouTube URL opener via mpv
 ├── build/
@@ -54,6 +54,8 @@ scripts/
 │   ├── log-dirs.sh          # Log directory path resolution
 │   ├── error-patterns.sh    # Shared error keyword pattern for AI agent log analysis
 │   ├── test-helpers.sh      # Shared test utilities (assertions, mocking)
+│   ├── awk-utils.awk        # Shared AWK helper functions
+│   ├── extract-nix-shell.awk # Extract shell snippets from Nix files
 │   └── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
 ├── sops/
 │   ├── editor-code-wait.sh  # VS Code wait wrapper for sops editing
@@ -95,11 +97,7 @@ source "$(dirname "$0")/../lib/logging.sh"
 ### Functions
 
 - **Colored Output**: `print_info`, `print_success`, `print_warning`, `print_error`. These use emojis and ANSI colors for terminal visibility.
-- **Timestamped Logging**: `log_info`, `log_success`, `log_warning`, `log_error`. These add ISO-style timestamps and log to `stderr` for warnings/errors.
-
-### File Logging
-
-If the `LOG_FILE` environment variable is set, all `log_*` functions will append their output to that file using `tee`, ensuring logs are captured both in the terminal and on disk.
+- **Timestamped Logging**: `log_info`, `log_success` (stdout), `log_warning`, `log_error` (stderr). These add ISO-style timestamps.
 
 ---
 
@@ -139,12 +137,13 @@ If the `LOG_FILE` environment variable is set, all `log_*` functions will append
 | `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-inventory` wrapper)                                     |
 | `ai/agent-iter.sh`                                 | `home-manager/modules/ai-agents/services.nix` (iterative agent loop wrapper)                                             |
 | `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/config/models/opencode.nix` (prompt docs), called at runtime by `opencode-android-re.sh` |
+| `ai/android-re/opencode-android-re.sh`             | `home-manager/modules/ai-agents/helpers/_android-re-launchers.nix` (launcher for `oc*are` wrapper binaries)              |
 | `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                                                         |
 | `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                                                          |
 | `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                                                            |
 | `apps/browser-select.sh`                           | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (`browser-select` wrapper)                                   |
 | `apps/element-desktop-keyring.sh`                  | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                          |
-| `apps/playwright-cli-mcp-wrapper.sh`               | `home-manager/modules/programming-languages/javascript/default.nix` (MCP server)                                         |
+| `apps/playwright-cli-mcp-wrapper.sh`               | `home-manager/modules/programming-languages/javascript/default.nix` (local bin wrapper)                                  |
 | `apps/xdg-open-wrapper.sh`                         | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                          |
 | `apps/youtube-mpv.sh`                              | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                          |
 | `hardware/nvidia-fans.sh`                          | `home-manager/modules/terminal/scripts.nix` (`nvidia-fans` wrapper)                                                      |

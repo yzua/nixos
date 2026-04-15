@@ -49,6 +49,17 @@ assert_true() {
 	echo "PASS: ${msg}"
 }
 
+# Assert a command fails (returns non-zero).
+assert_false() {
+	local msg="$1"
+	shift
+	if "$@" >/dev/null 2>&1; then
+		echo "FAIL: ${msg} (expected non-zero exit)"
+		exit 1
+	fi
+	echo "PASS: ${msg}"
+}
+
 # Assert value matches a regex pattern.
 assert_regex() {
 	local value="$1"
