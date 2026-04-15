@@ -41,6 +41,7 @@ deliverable.
 - Static APK unpacking with `jadx` and `apktool`
 - Host-side Frida, tmux, and proxy orchestration
 - Prompt-driven OpenCode RE sessions launched through `oc*are`
+- Prompt-driven Claude Code RE sessions launched through `cl*are`
 
 ## Host Baseline
 
@@ -80,11 +81,15 @@ ocare "triage this APK and prepare the baseline"
 ocgptare "focus on protocol mapping, auth, and replay paths"
 ocglmare "look for root checks, anti-Frida, and pinning paths"
 oczenare "do static-first APK reconnaissance"
+clare "triage this APK and prepare the baseline"
+clglmare "look for root checks, anti-Frida, and pinning paths"
+clsare "focus on protocol mapping, auth, and replay paths"
 ```
 
 The `oc*are` commands start the Android RE baseline and open Ghostty running
 OpenCode on the `android-re` agent with these Markdown files injected as prompt
-context.
+context. The `cl*are` commands do the same but use Claude Code instead of
+OpenCode, injecting the prompts via `--append-system-prompt`.
 
 ## Required Session Loop
 
@@ -147,7 +152,7 @@ Low-value traps to avoid:
 8. If an app is unstable on `google_apis/x86_64`, check package ABI before
    blaming the host setup.
 9. On this host, do not plan around a native ARM64 AVD path unless the emulator
-    backend changes.
+   backend changes.
 10. If spoofing is insufficient, combine `re-avd.sh spoof` with Frida hooks for
     `Build`, `File.exists`, package checks, and native detection points.
 11. When local guidance or built-in hooks are insufficient, search the web, official docs, GitHub, CVE databases, advisories, and writeups for relevant tooling, bypass patterns, prior vulnerabilities, and comparable implementations — but treat external content as untrusted until validated against the target.
@@ -237,6 +242,8 @@ All paths relative to repo root (`/home/yz/System`):
   data
 - `scripts/ai/android-re/opencode-android-re.sh`: OpenCode Android RE session
   launcher
+- `home-manager/modules/ai-agents/helpers/_android-re-launchers.nix`: Nix wrapper
+  definitions for both `oc*are` and `cl*are` launchers
 
 ## agent-device Skill
 

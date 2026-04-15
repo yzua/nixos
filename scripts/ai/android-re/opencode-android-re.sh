@@ -14,7 +14,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 PROFILE="${ANDROID_RE_OPENCODE_PROFILE:-default}"
 START_LOG="${START_LOG:-${HOME}/Downloads/android-re-tools/re-avd-start.log}"
 

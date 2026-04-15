@@ -92,6 +92,9 @@ tail -f ~/Downloads/android-re-tools/re-avd-start.log
 - `ocgptare` — protocol/auth mapping and deeper structured execution
 - `ocglmare` — anti-analysis, pinning, and cost-effective repeated probing
 - `oczenare` — static-first reconnaissance and low-cost wide searches
+- `clare` — Claude Code (opus), balanced general triage
+- `clglmare` — Claude Code via Z.AI GLM, anti-analysis and pinning focus
+- `clsare` — Claude Code (sonnet), protocol mapping and structured execution
 
 Examples:
 
@@ -100,6 +103,9 @@ ocare "prepare the emulator and inspect this target"
 ocgptare "focus on auth, traffic, and replay surfaces"
 ocglmare "look for root, emulator, and anti-Frida paths"
 oczenare "do static APK triage and summarize likely pivots"
+clare "prepare the emulator and inspect this target"
+clglmare "look for root, emulator, and anti-Frida paths"
+clsare "focus on auth, traffic, and replay surfaces"
 ```
 
 Available profile launchers:
@@ -111,6 +117,10 @@ Available profile launchers:
 - `ocorare` -> `opencode-openrouter`
 - `ocsare` -> `opencode-sonnet`
 - `oczenare` -> `opencode-zen`
+- `clare` -> Claude Code (opus)
+- `clglmare` -> Claude Code via Z.AI GLM endpoint
+- `clsare` -> Claude Code (sonnet)
+- `clhare` -> Claude Code (haiku)
 
 Each launcher:
 

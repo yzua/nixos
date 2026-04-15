@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   ...
@@ -23,7 +24,12 @@ let
     exec ${scriptsDir}/ai/agents-search.sh "$@"
   '';
   androidReLaunchers = import ./helpers/_android-re-launchers.nix {
-    inherit config lib pkgs;
+    inherit
+      config
+      constants
+      lib
+      pkgs
+      ;
   };
 
   aliasLib = import ./helpers/_aliases.nix { inherit config lib pkgs; };

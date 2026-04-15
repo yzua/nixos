@@ -2,7 +2,7 @@
 # Shared helper functions for Android RE scripts.
 # Source this file after sourcing logging.sh.
 
-REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
 # shellcheck disable=SC1091
 source "${REPO_ROOT}/scripts/lib/require.sh"
 
