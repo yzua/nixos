@@ -28,7 +28,7 @@ Each host sets `mySystem.hostProfile` for profile-based defaults (via `host-defa
 hosts/<hostname>/
 ├── configuration.nix          # Main config: imports + mySystem.* options
 ├── hardware-configuration.nix # Auto-generated (NEVER edit)
-├── local-packages.nix         # Host-specific packages
+├── local-packages.nix         # Host-specific packages (optional; omit if empty)
 └── modules/
     ├── default.nix            # Host module aggregation
     └── *.nix                  # Hardware-specific modules
@@ -95,7 +95,7 @@ Every host `configuration.nix` follows the same structure:
 {
   imports = [
     ./hardware-configuration.nix  # Auto-generated
-    ./local-packages.nix          # Host packages
+    ./local-packages.nix          # Host packages (omit if not needed)
     ../../nixos-modules           # Shared modules
     ./modules                     # Host-specific modules
   ];

@@ -1,6 +1,6 @@
 # Keybind Cheatsheet — i18n
 
-Internationalization strings for the keybind-cheatsheet plugin. 21 locale files with identical JSON structure.
+Internationalization strings for the keybind-cheatsheet plugin. 20 locale files with identical JSON structure.
 
 ---
 
@@ -23,7 +23,7 @@ All files share four top-level keys: `default-category`, `error`, `panel`, `sett
 
 ## Gotchas
 
-- Always edit `en.json` first, then propagate to all 20 other locales.
+- Always edit `en.json` first, then propagate to all 19 other locales.
 - `settings.keybind-example-hyprland` and `settings.keybind-example-niri` contain actual shell commands — must match real IPC syntax.
 - Do NOT change JSON key names — QML references them via `pluginApi.tr("key.path")`.
 - `panel.workspace-switching`, `panel.workspace-moving`, `panel.workspace-mouse` are used only for Hyprland's Polish locale category splitting.

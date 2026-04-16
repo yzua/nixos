@@ -15,7 +15,7 @@ Keyboard shortcut overlay for the Noctalia shell. Auto-detects the running compo
 | `BarWidget.qml` | Bar capsule button with "keyboard" icon                                                 |
 | `Panel.qml`     | Popup panel: multi-column keybind display, color-coded badges, auto-height              |
 | `Settings.qml`  | Settings: window size, column count (1-4), config file paths, mod key, refresh          |
-| `i18n/`         | 21 locale files (see `i18n/AGENTS.md`)                                                  |
+| `i18n/`         | 20 locale files (see `i18n/AGENTS.md`)                                                  |
 
 ---
 
@@ -31,7 +31,7 @@ Keyboard shortcut overlay for the Noctalia shell. Auto-detects the running compo
 
 ## Gotchas
 
-- `en.json` is the canonical key set — all 20 other locales must match its structure.
+- `en.json` is the canonical key set — all 19 other locales must match its structure.
 - Hyprland workspace category splitting is hardcoded for the Polish category name `"OBSZARY ROBOCZE"`.
 - Niri parser handles multiline binds with brace-depth tracking — fragile if KDL syntax changes.
 - Glob expansion uses a shell `for` loop capped at 100 files per pattern; line reading capped at 10,000 lines per file.

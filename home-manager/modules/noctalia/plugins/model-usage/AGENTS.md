@@ -8,14 +8,15 @@ QML plugin for the Noctalia shell that tracks AI coding assistant usage (Claude 
 
 ## Structure
 
-| File            | Purpose                                                                                                |
-| --------------- | ------------------------------------------------------------------------------------------------------ |
-| `manifest.json` | Plugin metadata, entry points, default settings for all 6 providers                                    |
-| `Main.qml`      | Plugin controller: loads providers via `Loader`, manages active/cycle mode, format helpers             |
-| `BarWidget.qml` | Bar capsule: provider icon + metric, right-click context menu, tooltip                                 |
-| `Panel.qml`     | Detail panel: tabbed per-provider view with rate limit bars, today stats, 7-day chart, model breakdown |
-| `Settings.qml`  | Settings: bar mode, cycle interval, metric, refresh interval, per-provider toggles, API key inputs     |
-| `providers/`    | 6 provider data-source implementations (see `providers/AGENTS.md`)                                     |
+| File               | Purpose                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------ |
+| `manifest.json`    | Plugin metadata, entry points, default settings for all 6 providers                                    |
+| `Main.qml`         | Plugin controller: loads providers via `Loader`, manages active/cycle mode, format helpers             |
+| `BarWidget.qml`    | Bar capsule: provider icon + metric, right-click context menu, tooltip                                 |
+| `Panel.qml`        | Detail panel: tabbed per-provider view with rate limit bars, today stats, 7-day chart, model breakdown |
+| `Settings.qml`     | Settings: bar mode, cycle interval, metric, refresh interval, per-provider toggles, API key inputs     |
+| `ProviderUtils.js` | Shared utility: `formatResetTime()` and common formatting helpers used across all providers            |
+| `providers/`       | 6 provider data-source implementations (see `providers/AGENTS.md`)                                     |
 
 ---
 
@@ -37,6 +38,6 @@ Each provider in `providers/` exposes a fixed property interface: `providerId`, 
 ## Gotchas
 
 - Adding a new provider requires: QML file with full property interface, `Loader` in `Main.qml`, entry in `providers` and `enabledProviders` arrays (both must match), toggle in `Settings.qml`, defaults in `manifest.json`.
-- `formatResetTime()` is duplicated across all 6 providers — any fix must be replicated 6 times.
+- `formatResetTime()` is extracted into `ProviderUtils.js` — changes to shared formatting logic should go there.
 - `providers` array in `Main.qml` uses a hardcoded filter order (codex, zai, claude, copilot, openrouter, zen).
 - No Nix files in this directory — the plugin is purely QML.

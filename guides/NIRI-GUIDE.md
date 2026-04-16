@@ -283,7 +283,6 @@ Noctalia Shell provides the bar, launcher, notifications, lock screen, wallpaper
 | `Super+Shift+C`      | Toggle control center                   |
 | `Super+Shift+D`      | Toggle dark mode                        |
 | `Super+F1`           | Toggle keybind cheatsheet               |
-| `Super+P`            | Music search (toggle)                   |
 | `Super+Shift+Escape` | Session menu (logout, shutdown, reboot) |
 
 ---
@@ -628,7 +627,6 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | `Super+Shift+D`      | Toggle dark mode          |
 | `Super+V`            | Clipboard history         |
 | `Super+F1`           | Toggle keybind cheatsheet |
-| `Super+P`            | Music search (toggle)     |
 
 ### Niri Column Model Legend
 

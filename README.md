@@ -210,7 +210,10 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ```
 flake.nix                     # Entry point
-shared/constants.nix          # User identity, terminal, editor, fonts
+flake.lock                    # Pinned input versions
+justfile                      # Build/deploy commands (`just --list`)
+AGENTS.md                     # Agent-facing repo conventions
+shared/                       # Shared identity, helpers, option/secret utilities
 hosts/<hostname>/             # Per-host config + hardware modules
 nixos-modules/                # Shared system modules (56 imports in hub)
 home-manager/                 # User-level modules + packages
@@ -218,7 +221,8 @@ scripts/                      # Utility scripts
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
 dev-shells/                   # Per-language dev shell templates (nix flake init -t)
 guides/                       # User-facing tool guides (AI Agents, Ghostty, Niri, Neovim, Yazi, Zellij)
-themes/                       # GruvboxAlt theme overrides (LibreWolf, Telegram Desktop, YouTube Music)
+skills/                       # AI agent skill packs (symlinks; populated by `just skills-sync`)
+themes/                       # GruvboxAlt theme overrides (LibreWolf CSS, Telegram Desktop, YouTube Music)
 ```
 
 Area-specific guidance in `AGENTS.md` files throughout the repo.
