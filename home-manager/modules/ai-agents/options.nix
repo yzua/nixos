@@ -4,12 +4,12 @@
   config,
   constants,
   lib,
+  optionHelpers,
   ...
 }:
 
 let
-  opt = import ../../../shared/_option-helpers.nix { inherit lib; };
-  inherit (opt)
+  inherit (optionHelpers)
     mkTypedOption
     mkStrOption
     mkBoolOption

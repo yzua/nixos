@@ -68,20 +68,13 @@
 
   # --- PostToolUseFailure Hooks ---
   PostToolUseFailure = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            INPUT=$(cat)
-            TOOL=$(echo "$INPUT" | jq -r '.tool_name // .tool // "unknown"')
-            ERROR=$(echo "$INPUT" | jq -r '.error // "no error"' | head -5)
-            echo "[Hook] Tool FAILED: $TOOL — $ERROR" >&2
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
+    (mkPassthroughHook {
+      body = ''
+        TOOL=$(echo "$INPUT" | jq -r '.tool_name // .tool // "unknown"')
+        ERROR=$(echo "$INPUT" | jq -r '.error // "no error"' | head -5)
+        echo "[Hook] Tool FAILED: $TOOL — $ERROR" >&2
+      '';
+    })
   ];
 
   # --- Session Lifecycle Hooks ---
@@ -104,26 +97,19 @@
   ];
 
   SessionEnd = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            SESSION_DIR="$HOME/.claude/session-state"
-            mkdir -p "$SESSION_DIR"
-            INPUT=$(cat)
-            GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-            echo "$INPUT" | jq --arg cwd "$PWD" --arg branch "$GIT_BRANCH" '{
-              timestamp: now,
-              reason: (.reason // .stop_reason // "other"),
-              cwd: $cwd,
-              git_branch: $branch
-            }' > "$SESSION_DIR/last-session.json" 2>/dev/null || true
-            echo "$INPUT"
-          '';
-        }
-      ];
-    }
+    (mkPassthroughHook {
+      body = ''
+        SESSION_DIR="$HOME/.claude/session-state"
+        mkdir -p "$SESSION_DIR"
+        GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+        echo "$INPUT" | jq --arg cwd "$PWD" --arg branch "$GIT_BRANCH" '{
+          timestamp: now,
+          reason: (.reason // .stop_reason // "other"),
+          cwd: $cwd,
+          git_branch: $branch
+        }' > "$SESSION_DIR/last-session.json" 2>/dev/null || true
+      '';
+    })
   ];
 
   SubagentStop = [
@@ -138,20 +124,14 @@
 
   # --- PreCompact Hook ---
   PreCompact = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            SESSION_DIR="$HOME/.claude/session-state"
-            mkdir -p "$SESSION_DIR"
-            echo "[Hook] Saving state before compaction..." >&2
-            date -Iseconds > "$SESSION_DIR/last-compact.txt"
-            cat
-          '';
-        }
-      ];
-    }
+    (mkPassthroughHook {
+      body = ''
+        SESSION_DIR="$HOME/.claude/session-state"
+        mkdir -p "$SESSION_DIR"
+        echo "[Hook] Saving state before compaction..." >&2
+        date -Iseconds > "$SESSION_DIR/last-compact.txt"
+      '';
+    })
   ];
 
   PostCompact = [

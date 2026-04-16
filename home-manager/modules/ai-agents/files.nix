@@ -24,38 +24,45 @@ let
   opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   opencodeProfileNames = opencodeProfiles.names;
 
-  opencodeConfigFiles = lib.foldl' (
-    acc: name:
-    acc
-    // {
-      "${name}/opencode.json" = {
-        text = toJSON opencodeSettingsByProfile.${name};
-        force = true;
-      };
-      "${name}/tui.json" = {
-        text = toJSON {
-          theme = "gruvbox";
-        };
-        force = true;
-      };
-    }
-  ) { } opencodeProfileNames;
+  opencodeConfigFiles = builtins.listToAttrs (
+    lib.flatten (
+      map (name: [
+        {
+          name = "${name}/opencode.json";
+          value = {
+            text = toJSON opencodeSettingsByProfile.${name};
+            force = true;
+          };
+        }
+        {
+          name = "${name}/tui.json";
+          value = {
+            text = toJSON {
+              theme = "gruvbox";
+            };
+            force = true;
+          };
+        }
+      ]) opencodeProfileNames
+    )
+  );
 
   opencodeImpeccableCommandFiles =
     if cfg.impeccable.enable then
-      lib.foldl' (
-        acc: profile:
-        acc
-        // builtins.listToAttrs (
-          map (cmd: {
-            name = "${profile}/commands/${cmd.name}.md";
-            value = {
-              text = impeccable.mkImpeccableCommandText cmd;
-              force = true;
-            };
-          }) impeccable.impeccableCommandDefs
+      builtins.listToAttrs (
+        lib.flatten (
+          map (
+            profile:
+            map (cmd: {
+              name = "${profile}/commands/${cmd.name}.md";
+              value = {
+                text = impeccable.mkImpeccableCommandText cmd;
+                force = true;
+              };
+            }) impeccable.impeccableCommandDefs
+          ) opencodeProfileNames
         )
-      ) { } opencodeProfileNames
+      )
     else
       { };
 

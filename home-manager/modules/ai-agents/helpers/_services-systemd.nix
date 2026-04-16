@@ -5,9 +5,16 @@
   pkgs,
   logCleanupCommand,
   mkCliAutoupdateScript,
-  mkWeeklyTimer,
 }:
 let
+  mkWeeklyTimer = description: {
+    Unit.Description = description;
+    Timer = {
+      OnCalendar = "weekly";
+      Persistent = true;
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
   autoUpdateTools = [
     {
       binary = "claude";

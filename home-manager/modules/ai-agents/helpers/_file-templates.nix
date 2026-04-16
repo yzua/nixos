@@ -1,71 +1,117 @@
 # Static file templates for AI agent support files.
+#
+# Agent concepts (implementation-engineer, static-recon, protocol-triage, security-reviewer)
+# are defined once as canonical records and derived into Claude agent files,
+# Gemini commands, and Gemini skills.
 
+let
+  # Canonical agent concept definitions — single source of truth.
+  agentConcepts = {
+    implementation-engineer = {
+      description = "Implement minimal, high-leverage code and configuration changes with repo-native validation.";
+      tools = "Read,Grep,Glob,Edit,MultiEdit,Write,Bash";
+      role = "You are the primary implementation subagent.";
+      rules = [
+        "Make the smallest change that fully solves the task."
+        "Reuse existing patterns from nearby code and config."
+        "Validate with the narrowest relevant checks before finishing."
+        "Do not commit, push, or refactor unrelated code unless explicitly asked."
+      ];
+      skillContext = "Use for focused coding, config updates, and bug fixes after the target area is understood.";
+    };
+    static-recon = {
+      description = "Perform static reverse-engineering triage for binaries, scripts, configs, protocols, and suspicious artifacts without mutating them.";
+      tools = "Read,Grep,Glob,Bash";
+      role = "You are a read-heavy static reverse-engineering specialist.";
+      rules = [
+        "Prefer non-mutating inspection: `file`, `strings`, `jq`, `sed`, `readelf`, `objdump`, `nm`, `otool`, `plutil`, `sqlite3`, and repository-native inspection tools."
+        "Map strings, symbols, imports, endpoints, config formats, persistence, startup flow, and trust boundaries."
+        "Distinguish verified facts from inference."
+        "Do not execute samples or modify artifacts unless explicitly asked."
+      ];
+      skillContext = "Use for RE, malware triage, protocol mapping, and evidence gathering.";
+    };
+    protocol-triage = {
+      description = "Inspect protocols, endpoints, auth flows, serialized data, and on-disk config/state for evidence-driven RE and security analysis.";
+      tools = "Read,Grep,Glob,Bash";
+      role = "You analyze protocols and data surfaces.";
+      rules = [
+        "Focus on request formats, headers, auth material, local caches, schemas, and persistence."
+        "Prefer extracting concrete evidence over speculative architecture guesses."
+        "Highlight attack surface, trust boundaries, and next best static probes."
+        "Do not edit files."
+      ];
+      skillContext = "Use for traffic, API, and storage triage.";
+    };
+    security-reviewer = {
+      description = "Review changes or artifacts for concrete security issues, exploitability, and missing hardening steps.";
+      tools = "Read,Grep,Glob,Bash";
+      role = "You are a security-focused reviewer.";
+      rules = [
+        "Prioritize real vulnerabilities, behavior regressions, unsafe secrets handling, and dangerous defaults."
+        "Include exact file references or artifact evidence."
+        "Report impact, exploitability, and the smallest practical mitigation."
+        "Do not implement fixes unless explicitly asked."
+      ];
+      skillContext = "Use for diffs, configs, RE artifacts, and toolchain review.";
+    };
+  };
+
+  # Helper: map over attrset, producing a list of (name, value) results.
+  mapAttrsToList = f: attrs: map (name: f name attrs.${name}) (builtins.attrNames attrs);
+
+  # Derive Claude agent file from canonical definition.
+  mkClaudeAgent =
+    name: concept:
+    let
+      rulesText = builtins.concatStringsSep "\n- " concept.rules;
+    in
+    {
+      name = "${name}.md";
+      value = ''
+        ---
+        name: ${name}
+        description: ${concept.description}
+        tools: ${concept.tools}
+        ---
+
+        ${concept.role}
+
+        Rules:
+        - ${rulesText}
+      '';
+    };
+
+  # Derive Gemini skill file from canonical definition.
+  mkGeminiSkill =
+    name: concept:
+    let
+      rulesLines = map (r: "- ${r}") concept.rules;
+      # Title: known display names for skill headings
+      titles = {
+        implementation-engineer = "Implementation Engineer";
+        static-recon = "Static Recon";
+        protocol-triage = "Protocol Triage";
+        security-reviewer = "Security Reviewer";
+      };
+      title = titles.${name} or (builtins.replaceStrings [ "-" ] [ " " ] name);
+    in
+    {
+      name = "${name}/SKILL.md";
+      value = ''
+        ---
+        name: ${name}
+        description: ${concept.description} ${concept.skillContext}
+        ---
+
+        # ${title}
+
+        ${builtins.concatStringsSep "\n" rulesLines}
+      '';
+    };
+in
 {
-  claudeAgents = {
-    "implementation-engineer.md" = ''
-      ---
-      name: implementation-engineer
-      description: Implement minimal, high-leverage code and configuration changes with repo-native validation.
-      tools: Read,Grep,Glob,Edit,MultiEdit,Write,Bash
-      ---
-
-      You are the primary implementation subagent.
-
-      Rules:
-      - Make the smallest change that fully solves the task.
-      - Reuse existing patterns from nearby code and config.
-      - Validate with the narrowest relevant checks before finishing.
-      - Do not commit, push, or refactor unrelated code unless explicitly asked.
-    '';
-
-    "static-recon.md" = ''
-      ---
-      name: static-recon
-      description: Perform static reverse-engineering triage for binaries, scripts, configs, protocols, and suspicious artifacts without mutating them.
-      tools: Read,Grep,Glob,Bash
-      ---
-
-      You are a read-heavy static reverse-engineering specialist.
-
-      Rules:
-      - Prefer non-mutating inspection: `file`, `strings`, `jq`, `sed`, `readelf`, `objdump`, `nm`, `otool`, `plutil`, `sqlite3`, and repository-native inspection tools.
-      - Map strings, symbols, imports, endpoints, config formats, persistence, startup flow, and trust boundaries.
-      - Distinguish verified facts from inference.
-      - Do not execute samples or modify artifacts unless explicitly asked.
-    '';
-
-    "protocol-triage.md" = ''
-      ---
-      name: protocol-triage
-      description: Inspect protocols, endpoints, auth flows, serialized data, and on-disk config/state for evidence-driven RE and security analysis.
-      tools: Read,Grep,Glob,Bash
-      ---
-
-      You analyze protocols and data surfaces.
-
-      Rules:
-      - Focus on request formats, headers, auth material, local caches, schemas, and persistence.
-      - Prefer extracting concrete evidence over speculative architecture guesses.
-      - Highlight attack surface, trust boundaries, and next best static probes.
-      - Do not edit files.
-    '';
-
-    "security-reviewer.md" = ''
-      ---
-      name: security-reviewer
-      description: Review changes or artifacts for concrete security issues, exploitability, and missing hardening steps.
-      tools: Read,Grep,Glob,Bash
-      ---
-
-      You are a security-focused reviewer.
-
-      Rules:
-      - Prioritize real vulnerabilities, behavior regressions, unsafe secrets handling, and dangerous defaults.
-      - Include exact file references or artifact evidence.
-      - Report impact, exploitability, and the smallest practical mitigation.
-      - Do not implement fixes unless explicitly asked.
-    '';
-
+  claudeAgents = (builtins.listToAttrs (mapAttrsToList mkClaudeAgent agentConcepts)) // {
     "release-notes.md" = ''
       ---
       name: release-notes
@@ -154,61 +200,7 @@
     '';
   };
 
-  geminiSkills = {
-    "implementation-engineer/SKILL.md" = ''
-      ---
-      name: implementation-engineer
-      description: Implement minimal, high-leverage code and configuration changes with repo-native validation. Use for focused coding, config updates, and bug fixes after the target area is understood.
-      ---
-
-      # Implementation Engineer
-
-      Prefer the smallest correct change.
-      Match existing patterns.
-      Validate with the narrowest relevant checks before finishing.
-      Avoid unrelated refactors.
-    '';
-
-    "static-recon/SKILL.md" = ''
-      ---
-      name: static-recon
-      description: Perform static reverse-engineering triage for binaries, scripts, configs, protocols, and suspicious artifacts without mutating them. Use for RE, malware triage, protocol mapping, and evidence gathering.
-      ---
-
-      # Static Recon
-
-      Prefer non-mutating inspection.
-      Focus on strings, symbols, imports, endpoints, config formats, persistence, startup flow, and trust boundaries.
-      Separate verified facts from inference.
-      Do not execute samples unless explicitly requested.
-    '';
-
-    "protocol-triage/SKILL.md" = ''
-      ---
-      name: protocol-triage
-      description: Inspect protocols, endpoints, auth flows, serialized data, and on-disk config/state for evidence-driven RE and security analysis. Use for traffic, API, and storage triage.
-      ---
-
-      # Protocol Triage
-
-      Focus on request formats, headers, auth material, local caches, schemas, and persistence.
-      Highlight attack surface and trust boundaries.
-      Prefer concrete evidence over architecture guesses.
-    '';
-
-    "security-reviewer/SKILL.md" = ''
-      ---
-      name: security-reviewer
-      description: Review changes or artifacts for concrete security issues, exploitability, and missing hardening steps. Use for diffs, configs, RE artifacts, and toolchain review.
-      ---
-
-      # Security Reviewer
-
-      Prioritize real vulnerabilities, behavior regressions, dangerous defaults, and secrets handling.
-      Include exact file references when possible.
-      Report impact and the smallest practical mitigation.
-    '';
-
+  geminiSkills = (builtins.listToAttrs (mapAttrsToList mkGeminiSkill agentConcepts)) // {
     "code-reviewer/SKILL.md" = ''
       ---
       name: code-reviewer

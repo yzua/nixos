@@ -1,11 +1,40 @@
 # Zsh initContent: shell functions, environment setup, and sops-enabled agent wrappers.
 
-{ constants, ... }:
+{ constants, lib, ... }:
 
 let
   inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
   inherit (constants.services.zai) timeout;
   inherit (constants.services.zai.models) haiku sonnet opus;
+
+  # Simple opencode wrappers: name, profile dir, zellij tab name
+  simpleOpenCodeWrappers = [
+    {
+      name = "glm";
+      profile = "glm";
+      tab = "ocglm";
+    }
+    {
+      name = "gemini";
+      profile = "gemini";
+      tab = "ocgem";
+    }
+    {
+      name = "gpt";
+      profile = "gpt";
+      tab = "ocgpt";
+    }
+    {
+      name = "sonnet";
+      profile = "sonnet";
+      tab = "ocs";
+    }
+    {
+      name = "zen";
+      profile = "zen";
+      tab = "oczen";
+    }
+  ];
 in
 
 {
@@ -70,29 +99,17 @@ in
       OPENCODE_CONFIG_DIR="$HOME/.config/opencode-$profile" opencode "$@"
     }
 
-    opencode_glm() {
-      _opencode_profile "glm" "ocglm" "$@"
-    }
-
-    opencode_gemini() {
-      _opencode_profile "gemini" "ocgem" "$@"
-    }
-
-    opencode_gpt() {
-      _opencode_profile "gpt" "ocgpt" "$@"
-    }
+    ${lib.concatStringsSep "\n\n" (
+      map (w: ''
+        opencode_${w.name}() {
+          _opencode_profile "${w.profile}" "${w.tab}" "$@"
+        }
+      '') simpleOpenCodeWrappers
+    )}
 
     opencode_openrouter() {
       local key; key="$(_load_openrouter_key)" || return 1
       OPENROUTER_API_KEY="$key" _opencode_profile "openrouter" "ocor" "$@"
-    }
-
-    opencode_sonnet() {
-      _opencode_profile "sonnet" "ocs" "$@"
-    }
-
-    opencode_zen() {
-      _opencode_profile "zen" "oczen" "$@"
     }
 
     # === AI multi-pane launcher ===

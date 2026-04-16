@@ -52,15 +52,6 @@ let
     find "$HOME/.codex/log" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete 2>/dev/null || true
   '';
 
-  mkWeeklyTimer = description: {
-    Unit.Description = description;
-    Timer = {
-      OnCalendar = "weekly";
-      Persistent = true;
-    };
-    Install.WantedBy = [ "timers.target" ];
-  };
-
   aiSystemdUser = import ./helpers/_services-systemd.nix {
     inherit
       cfg
@@ -69,7 +60,6 @@ let
       pkgs
       logCleanupCommand
       mkCliAutoupdateScript
-      mkWeeklyTimer
       ;
   };
 in

@@ -5,6 +5,11 @@
 let
   sharedMcpServers = cfg.mcpServers;
 
+  # Headers are shared across all remote transforms — apply once in the factory.
+  withOptionalHeaders =
+    attrs: server:
+    attrs // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+
   mkMcpTransform =
     {
       localAttrs,
@@ -15,7 +20,7 @@ let
       _: server:
       let
         isLocal = (server.type or "local") == "local";
-        base = if isLocal then localAttrs server else remoteAttrs server;
+        base = if isLocal then localAttrs server else withOptionalHeaders (remoteAttrs server) server;
         envAttrs = lib.optionalAttrs (server.env or { } != { }) {
           ${envKey} = server.env;
         };
@@ -28,13 +33,10 @@ let
       inherit (server) command;
       args = server.args or [ ];
     };
-    remoteAttrs =
-      server:
-      {
-        type = "http";
-        inherit (server) url;
-      }
-      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+    remoteAttrs = server: {
+      type = "http";
+      inherit (server) url;
+    };
   };
 
   opencodeMcpServers = mkMcpTransform {
@@ -42,13 +44,10 @@ let
       type = "local";
       command = [ server.command ] ++ (server.args or [ ]);
     };
-    remoteAttrs =
-      server:
-      {
-        type = "remote";
-        inherit (server) url;
-      }
-      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+    remoteAttrs = server: {
+      type = "remote";
+      inherit (server) url;
+    };
     envKey = "environment";
   };
 
@@ -57,12 +56,9 @@ let
       inherit (server) command;
       args = server.args or [ ];
     };
-    remoteAttrs =
-      server:
-      {
-        httpUrl = server.url;
-      }
-      // (lib.optionalAttrs (server.headers or null != null) { inherit (server) headers; });
+    remoteAttrs = server: {
+      httpUrl = server.url;
+    };
   };
 
 in
