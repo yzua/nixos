@@ -125,11 +125,10 @@ in
   "git.enableSmartCommit" = true;
   "git.enableCommitSigning" = true;
   "nix.enableLanguageServer" = true;
-  "nix.serverPath" = "nil";
+  "nix.serverPath" = "nixd";
   "nix.serverSettings" = {
-    nil = {
+    nixd = {
       formatting.command = [ "nixfmt" ];
-      nix.flake.autoArchive = true;
     };
   };
   "python.analysis.typeCheckingMode" = "basic";

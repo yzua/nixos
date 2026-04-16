@@ -4,7 +4,7 @@
 {
   home.packages = with pkgs; [
     # High Priority (Python packages handled in python.nix)
-    nil # Nix language server
+    nixd # Nix language server
     bash-language-server # Bash scripts (scripts/ directory)
     nodePackages.yaml-language-server # YAML configs
     nodePackages.svelte-language-server # Svelte framework
