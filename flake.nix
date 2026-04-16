@@ -55,7 +55,7 @@
     let
       system = "x86_64-linux";
       homeStateVersion = "25.11";
-      user = "yz";
+      user = constants.user.handle;
 
       hosts = import ./hosts/_inventory.nix;
 
@@ -99,6 +99,7 @@
               constants
               ;
             systemdHelpers = import ./nixos-modules/helpers/_systemd-helpers.nix { inherit (nixpkgs) lib; };
+            optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
           };
           modules = [ ./hosts/${hostname}/configuration.nix ];
         };
@@ -119,6 +120,7 @@
               pkgsStable
               constants
               ;
+            optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
             inherit (host) hostname;
           };
           modules = [

@@ -1,6 +1,11 @@
 # Tor SOCKS proxy and onion routing.
 
-{ config, lib, ... }:
+{
+  config,
+  constants,
+  lib,
+  ...
+}:
 
 {
   options.mySystem.tor = {
@@ -28,7 +33,7 @@
         DNSPort = [
           {
             addr = "127.0.0.1";
-            port = 9053;
+            port = constants.ports.tor-dns;
           }
         ];
         AutomapHostsOnResolve = true;

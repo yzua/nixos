@@ -119,11 +119,19 @@
     otel = 4317;
     vnc = 5900;
     vnc-web = 6080;
+    localsend = 53317;
+    tor-dns = 9053;
+    cups = 631;
   };
+
+  # Docker default bridge gateway IP.
+  # Used by dnscrypt-proxy (listen address) and Docker daemon (DNS).
+  dockerBridge = "172.17.0.1";
 
   # Paths relative to HOME for repo-local resources.
   paths = {
     scripts = "System/scripts";
+    screens = "Screens";
   };
 
   # External service API endpoints.

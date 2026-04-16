@@ -3,7 +3,7 @@
 {
   config,
   lib,
-  constants,
+  user,
   ...
 }:
 
@@ -36,6 +36,6 @@
     };
 
     # Allow the primary user to query the local admin socket with yggdrasilctl.
-    users.users.${constants.user.handle}.extraGroups = [ "yggdrasil" ];
+    users.users.${user}.extraGroups = [ "yggdrasil" ];
   };
 }

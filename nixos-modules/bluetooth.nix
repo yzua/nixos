@@ -4,11 +4,11 @@
   config,
   lib,
   pkgsStable,
+  optionHelpers,
   ...
 }:
 
 let
-  optionHelpers = import ../shared/_option-helpers.nix { inherit lib; };
   inherit (optionHelpers) mkBoolOption;
 in
 
@@ -43,6 +43,25 @@ in
 
     # Enable Blueman Bluetooth manager service (includes blueman package automatically)
     services.blueman.enable = true;
+
+    # High-quality Bluetooth audio codecs (aptX, aptX-HD, LDAC, AAC, SBC-XQ)
+    services.pipewire.wireplumber.extraConfig."10-bluez" = {
+      "monitor.bluez.properties" = {
+        "bluez5.enable-sbc-xq" = true;
+        "bluez5.enable-msbc" = true;
+        "bluez5.enable-hw-volume" = true;
+        "bluez5.codecs" = [
+          "sbc"
+          "sbc_xq"
+          "aac"
+          "ldac"
+          "aptx"
+          "aptx_hd"
+        ];
+      };
+    };
+
+    environment.systemPackages = [ pkgsStable.libfreeaptx ];
 
     # === Bluetooth Auto-Disable ===
     # Power off Bluetooth adapter when no devices are connected for 5 minutes.

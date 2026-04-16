@@ -33,6 +33,10 @@ in
       GBM_BACKEND = "nvidia-drm";
       __GLX_VENDOR_LIBRARY_NAME = "nvidia";
 
+      # Force GTK4 apps to use GL renderer instead of Vulkan.
+      # Fixes black/broken windows with NVIDIA (VK_ERROR_OUT_OF_DATE_KHR).
+      GSK_RENDERER = "gl";
+
       # ELECTRON_OZONE_PLATFORM_HINT is set in niri/main.nix (compositor-level)
       __GL_GSYNC_ALLOWED = "1";
       __GL_VRR_ALLOWED = "1";

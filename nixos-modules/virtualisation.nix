@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   pkgsStable,
   user,
@@ -44,7 +45,7 @@
           setSocketVariable = true;
         };
         daemon.settings = {
-          dns = [ "172.17.0.1" ];
+          dns = [ constants.dockerBridge ];
           ipv6 = false;
           iptables = true;
         };

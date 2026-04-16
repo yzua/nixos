@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   systemdHelpers,
@@ -49,7 +50,7 @@ in
       (mkFindCleanupTimer {
         name = "screenshots";
         description = "Clean up old screenshots";
-        path = "${home}/Screens";
+        path = "${home}/${constants.paths.screens}";
         mtimeDays = 14;
         calendar = "monthly";
         delay = "2h";
@@ -77,9 +78,9 @@ in
         system.activationScripts.createUserDirs = {
           text = ''
             mkdir -p /home/${user}/Downloads/Telegram\ Desktop
-            mkdir -p /home/${user}/Screens
+            mkdir -p /home/${user}/${constants.paths.screens}
             chown ${user}:users /home/${user}/Downloads/Telegram\ Desktop
-            chown ${user}:users /home/${user}/Screens
+            chown ${user}:users /home/${user}/${constants.paths.screens}
           '';
           deps = [ ];
         };

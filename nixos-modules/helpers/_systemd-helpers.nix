@@ -49,12 +49,14 @@
     {
       description,
       execStart,
+      remainAfterExit ? true,
       extraServiceConfig ? { },
     }:
     {
       inherit description;
       serviceConfig = {
         Type = "oneshot";
+        RemainAfterExit = remainAfterExit;
         ExecStart = execStart;
       }
       // extraServiceConfig;

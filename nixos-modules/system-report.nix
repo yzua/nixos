@@ -5,12 +5,13 @@
   lib,
   pkgs,
   systemdHelpers,
+  optionHelpers,
   user,
   ...
 }:
 
 let
-  inherit (import ../shared/_option-helpers.nix { inherit lib; })
+  inherit (optionHelpers)
     mkStrOption
     mkIntOption
     ;

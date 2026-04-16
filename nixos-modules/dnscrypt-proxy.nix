@@ -1,6 +1,11 @@
 # Encrypted DNS via DNSCrypt-Proxy (DoH/DoT with DNSSEC) with ad/tracker blocking.
 
-{ config, lib, ... }:
+{
+  config,
+  constants,
+  lib,
+  ...
+}:
 
 {
   options.mySystem.dnscryptProxy = {
@@ -14,7 +19,7 @@
       settings = {
         listen_addresses = [
           "127.0.0.1:53"
-          "172.17.0.1:53"
+          "${constants.dockerBridge}:53"
         ];
 
         # Diversified resolvers — prevents single-provider compromise

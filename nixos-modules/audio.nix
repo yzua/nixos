@@ -1,12 +1,6 @@
-# PipeWire audio stack (ALSA, PulseAudio compat, JACK, RNNoise, Bluetooth codecs).
+# PipeWire audio stack (ALSA, PulseAudio compat, JACK, RNNoise).
 
-{
-  config,
-  lib,
-  pkgs,
-  pkgsStable,
-  ...
-}:
+{ pkgs, ... }:
 
 let
   rnnoise = pkgs.rnnoise-plugin;
@@ -23,25 +17,6 @@ in
       alsa.support32Bit = true;
       pulse.enable = true;
       jack.enable = true;
-
-      # High-quality Bluetooth audio codecs (aptX, aptX-HD, LDAC, AAC, SBC-XQ)
-      wireplumber.extraConfig = lib.mkIf config.mySystem.bluetooth.enable {
-        "10-bluez" = {
-          "monitor.bluez.properties" = {
-            "bluez5.enable-sbc-xq" = true;
-            "bluez5.enable-msbc" = true;
-            "bluez5.enable-hw-volume" = true;
-            "bluez5.codecs" = [
-              "sbc"
-              "sbc_xq"
-              "aac"
-              "ldac"
-              "aptx"
-              "aptx_hd"
-            ];
-          };
-        };
-      };
 
       extraConfig.pipewire = {
         # Increase buffer size to reduce audio stuttering in Electron apps (pear-desktop).
@@ -90,8 +65,5 @@ in
     };
   };
 
-  environment.systemPackages = [
-    pkgs.rnnoise-plugin
-  ]
-  ++ lib.optionals config.mySystem.bluetooth.enable [ pkgsStable.libfreeaptx ];
+  environment.systemPackages = [ pkgs.rnnoise-plugin ];
 }

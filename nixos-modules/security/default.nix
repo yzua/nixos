@@ -8,7 +8,7 @@
     ./firewall.nix # Network firewall configuration
     ./hardening.nix # Kernel and system hardening (sysctl, PAM, AppArmor, hidepid, coredump)
     ./metadata-scrubber.nix # Automatic metadata scrubbing for user files
-    ./opsec.nix # Operational security (MAC, kexec, metadata, zram, NTS, Thunderbolt)
+    ./opsec.nix # Operational security (session lock, zram swap, Chrony NTS)
     ./services.nix # dbus-broker and journald hardening
   ];
 }

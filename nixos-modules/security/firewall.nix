@@ -2,15 +2,15 @@
 # Kill switch handled by Mullvad lockdown mode (nftables), not iptables.
 # All rules use nftables for consistency with Mullvad and OpenSnitch.
 
-_:
+{ constants, ... }:
 
 {
   networking.firewall = {
     enable = true;
     logRefusedConnections = true;
     rejectPackets = false; # Drop instead of reject for stealth
-    allowedTCPPorts = [ 53317 ]; # LocalSend
-    allowedUDPPorts = [ 53317 ]; # LocalSend
+    allowedTCPPorts = [ constants.ports.localsend ];
+    allowedUDPPorts = [ constants.ports.localsend ];
 
     extraCommands = ''
       # === Hostname Leak Prevention (iptables — kernel nf_tables handles both) ===
