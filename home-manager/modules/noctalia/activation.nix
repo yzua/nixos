@@ -1,18 +1,20 @@
 # Noctalia activation scripts: plugin state management, location patching, model-usage setup.
 
+let
+  plugins = import ./_plugins.nix;
+in
 {
   lib,
   pkgs,
   ...
 }:
-
 {
   home.activation = {
     backupNoctaliaPluginSettings = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
       PLUGIN_STATE_DIR="$HOME/.local/state/noctalia/plugin-settings"
       mkdir -p "$PLUGIN_STATE_DIR"
 
-      for PLUGIN_ID in mawaqit model-usage; do
+      for PLUGIN_ID in ${lib.concatStringsSep " " plugins.needsBackup}; do
         PLUGIN_DIR="$HOME/.config/noctalia/plugins/$PLUGIN_ID"
         SETTINGS_PATH="$PLUGIN_DIR/settings.json"
         if [ -f "$SETTINGS_PATH" ]; then
@@ -20,7 +22,7 @@
         fi
       done
 
-      for PLUGIN_ID in keybind-cheatsheet mawaqit model-usage; do
+      for PLUGIN_ID in ${lib.concatStringsSep " " plugins.needsMaterialization}; do
         PLUGIN_DIR="$HOME/.config/noctalia/plugins/$PLUGIN_ID"
         if [ -e "$PLUGIN_DIR" ] && [ ! -L "$PLUGIN_DIR" ]; then
           chmod -R u+w "$PLUGIN_DIR" 2>/dev/null || true
@@ -36,7 +38,7 @@
     materializeNoctaliaPlugins = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       PLUGIN_STATE_DIR="$HOME/.local/state/noctalia/plugin-settings"
 
-      for PLUGIN_ID in keybind-cheatsheet mawaqit model-usage; do
+      for PLUGIN_ID in ${lib.concatStringsSep " " plugins.needsMaterialization}; do
         PLUGIN_DIR="$HOME/.config/noctalia/plugins/$PLUGIN_ID"
 
         if [ ! -e "$PLUGIN_DIR" ]; then

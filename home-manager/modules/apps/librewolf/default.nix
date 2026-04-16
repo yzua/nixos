@@ -3,6 +3,7 @@
 
 {
   pkgsStable,
+  lib,
   constants,
   ...
 }:
@@ -115,9 +116,15 @@ let
       // (spec.extraSettings or { });
   };
 
-  librewolfProfileFiles = builtins.foldl' (
-    acc: spec: acc // (mkLauncher spec.name spec.path) // (mkChromeFiles spec.path)
-  ) { } profileSpecs;
+  librewolfProfileFiles = builtins.listToAttrs (
+    lib.flatten (
+      map (
+        spec:
+        (lib.mapAttrsToList (name: value: { inherit name value; }) (mkLauncher spec.name spec.path))
+        ++ (lib.mapAttrsToList (name: value: { inherit name value; }) (mkChromeFiles spec.path))
+      ) profileSpecs
+    )
+  );
 
   generatedProfiles = builtins.listToAttrs (
     map (spec: {

@@ -9,6 +9,7 @@
 
 let
   colorschemeJson = import ./_colorscheme.nix { inherit constants; };
+  plugins = import ./_plugins.nix;
 
   pluginUrl = "https://github.com/noctalia-dev/noctalia-plugins";
   patchedNoctaliaPackage =
@@ -32,20 +33,13 @@ let
       }
     ];
     states = builtins.listToAttrs (
-      map
-        (name: {
-          inherit name;
-          value = {
-            enabled = true;
-            sourceUrl = pluginUrl;
-          };
-        })
-        [
-          "model-usage"
-          "keybind-cheatsheet"
-          "mawaqit"
-          "browser-launcher"
-        ]
+      map (name: {
+        inherit name;
+        value = {
+          enabled = true;
+          sourceUrl = pluginUrl;
+        };
+      }) plugins.all
     );
   };
 in
@@ -69,22 +63,17 @@ in
 
   home.file = {
     ".config/noctalia/colorschemes/GruvboxAlt/GruvboxAlt.json".text = colorschemeJson;
-    ".config/noctalia/plugins/model-usage" = {
-      source = ./plugins/model-usage;
-      force = true;
-    };
-    ".config/noctalia/plugins/keybind-cheatsheet" = {
-      source = ./plugins/keybind-cheatsheet;
-      force = true;
-    };
-    ".config/noctalia/plugins/mawaqit" = {
-      source = ./plugins/mawaqit;
-      force = true;
-    };
-    ".config/noctalia/plugins/browser-launcher" = {
-      source = ./plugins/browser-launcher;
-      force = true;
-    };
+  }
+  // builtins.listToAttrs (
+    map (name: {
+      name = ".config/noctalia/plugins/${name}";
+      value = {
+        source = ./plugins/${name};
+        force = true;
+      };
+    }) plugins.all
+  )
+  // {
     ".config/noctalia/plugins.json".text = pluginsJson;
   };
 }

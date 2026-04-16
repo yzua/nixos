@@ -39,6 +39,12 @@ let
     "css"
     "scss"
   ];
+
+  simpleFormatterEntries =
+    mkFormatterEntries "svelte.svelte-vscode" [ "svelte" ]
+    // mkFormatterEntries "yzhang.markdown-all-in-one" [ "markdown" ]
+    // mkFormatterEntries "tamasfe.even-better-toml" [ "toml" ]
+    // mkFormatterEntries "vscode.html-language-features" [ "html" ];
 in
 
 {
@@ -135,7 +141,6 @@ in
   "python.analysis.autoImportCompletions" = true;
   "[python]" = {
     "editor.defaultFormatter" = "charliermarsh.ruff";
-    "editor.formatOnSave" = true;
     "editor.codeActionsOnSave" = {
       "source.fixAll.ruff" = "explicit";
       "source.organizeImports.ruff" = "explicit";
@@ -147,7 +152,6 @@ in
   "go.useLanguageServer" = true;
   "[go]" = {
     "editor.defaultFormatter" = "golang.go";
-    "editor.formatOnSave" = true;
     "editor.codeActionsOnSave"."source.organizeImports" = "explicit";
   };
   "deno.enable" = false;
@@ -155,7 +159,6 @@ in
   "zig.zls.path" = "zls";
   "[zig]" = {
     "editor.defaultFormatter" = "ziglang.vscode-zig";
-    "editor.formatOnSave" = true;
     "editor.tabSize" = 4;
   };
   "rust-analyzer.check.command" = "clippy";
@@ -163,24 +166,16 @@ in
   "rust-analyzer.inlayHints.typeHints.enable" = true;
   "[rust]" = {
     "editor.defaultFormatter" = "rust-lang.rust-analyzer";
-    "editor.formatOnSave" = true;
     "editor.tabSize" = 4;
   };
   "[svelte]"."editor.defaultFormatter" = "svelte.svelte-vscode";
-  "[html]" = {
-    "editor.defaultFormatter" = "vscode.html-language-features";
-    "editor.tabSize" = 2;
-  };
   "css.lint.unknownAtRules" = "ignore";
   "[markdown]" = {
-    "editor.defaultFormatter" = "yzhang.markdown-all-in-one";
     "editor.wordWrap" = "on";
     "files.trimTrailingWhitespace" = false;
   };
   "shellcheck.executablePath" = "${pkgs.shellcheck}/bin/shellcheck";
-  "[shellscript]"."editor.tabSize" = 2;
   "[yaml]" = {
-    "editor.tabSize" = 2;
     "editor.autoIndent" = "advanced";
   };
   "yaml.schemas" = {
@@ -188,7 +183,6 @@ in
     "https://json.schemastore.org/github-action.json" = ".github/actions/*/action.{yml,yaml}";
     "https://json.schemastore.org/docker-compose.json" = "docker-compose*.{yml,yaml}";
   };
-  "[toml]"."editor.defaultFormatter" = "tamasfe.even-better-toml";
   "[dockerfile]"."editor.tabSize" = 4;
   "tailwindCSS.emmetCompletions" = true;
   "tailwindCSS.classAttributes" = [
@@ -231,3 +225,4 @@ in
 }
 // biomeFormatterEntries
 // cssFormatterEntries
+// simpleFormatterEntries

@@ -86,6 +86,16 @@
       }
 
       (mkFloatingRule [ { title = "^Picture-in-Picture$"; } ])
+      {
+        matches = [ { title = "^Picture-in-Picture$"; } ];
+        default-floating-position = {
+          x = 32;
+          y = 32;
+          relative-to = "bottom-right";
+        };
+        default-column-width.fixed = 480;
+        default-window-height.fixed = 270;
+      }
       (mkFloatingRule [ (appIdMatch "^scratchpad$") ])
       {
         matches = [ { app-id = "^(${constants.terminalAppId}|kitty|foot)$"; } ];
@@ -109,16 +119,6 @@
       {
         matches = [ { is-active = false; } ];
         opacity = 0.95;
-      }
-      {
-        matches = [ { title = "^Picture-in-Picture$"; } ];
-        default-floating-position = {
-          x = 32;
-          y = 32;
-          relative-to = "bottom-right";
-        };
-        default-column-width.fixed = 480;
-        default-window-height.fixed = 270;
       }
 
       {
@@ -163,20 +163,15 @@
         open-on-workspace = ws.browser;
         default-column-width.proportion = 1.0;
       }
-      {
-        matches = [ (appIdMatch "^librewolf-i2pd$") ];
-        open-on-workspace = ws.vpn;
+      (mkWorkspaceAppIdRule "^librewolf-i2pd$" ws.vpn {
         default-column-width.proportion = 1.0;
-      }
+      })
 
       (mkWorkspaceAppIdRule "^(brave|brave-browser)$" ws.browser {
         default-column-width.proportion = 1.0;
       })
 
-      {
-        matches = [ { app-id = "^(${constants.editorAppId})$"; } ];
-        open-on-workspace = ws.editor;
-      }
+      (mkWorkspaceAppIdRule "^(${constants.editorAppId})$" ws.editor { })
 
       {
         matches = [ { app-id = "^(${constants.terminalAppId})$"; } ];
@@ -184,10 +179,7 @@
         open-on-workspace = ws.editor;
       }
 
-      {
-        matches = [ { app-id = "^vesktop$"; } ];
-        open-on-workspace = ws.social;
-      }
+      (mkWorkspaceAppIdRule "^vesktop$" ws.social { })
 
       {
         matches = [ { app-id = "^org\\.telegram\\.desktop$"; } ];

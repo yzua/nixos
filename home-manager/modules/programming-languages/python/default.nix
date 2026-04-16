@@ -35,7 +35,6 @@ in
 
       shellAliases = {
         py = "python3";
-        py2 = "python2";
         pyi = "python3 -i";
         pym = "python3 -m";
         uvinit = "uv init";
@@ -50,9 +49,6 @@ in
         rufff = "ruff format";
         ruffl = "ruff check";
         rufffi = "ruff format --check";
-        blackf = "black --line-length 88";
-        isortf = "isort --profile black";
-        flake8l = "flake8 --max-line-length 88";
         mypyl = "mypy --ignore-missing-imports";
         pytestr = "pytest -v";
         pytestrw = "pytest -v --tb=short";
@@ -101,7 +97,6 @@ in
       UV_PYTHON_INSTALL_DIR = "${config.xdg.dataHome}/uv/python";
       UV_COMPILE_BYTECODE = "1";
       UV_LINK_MODE = "copy";
-      PYTHONDEVMODE = "";
       PYTHONWARNINGS = "default";
     };
 
