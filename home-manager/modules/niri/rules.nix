@@ -21,6 +21,22 @@
       mkWorkspaceAppIdRule =
         pattern: workspace: extra:
         mkWorkspaceRule [ (appIdMatch pattern) ] workspace extra;
+
+      # LibreWolf profile app-ids derived from _profiles.nix (single source of truth).
+      lwProfiles = import ../apps/librewolf/_profiles.nix { inherit constants; };
+      lwProfileNames = map (p: "librewolf-${p.name}") lwProfiles;
+      lwBaseAppIds = [
+        "librewolf"
+        "librewolf-main"
+      ];
+      lwAllAppIds = lwBaseAppIds ++ lwProfileNames;
+      lwNonI2pdAppIds =
+        lwBaseAppIds ++ map (p: "librewolf-${p.name}") (builtins.filter (p: p.name != "i2pd") lwProfiles);
+
+      # Build alternation regex from a list of literal strings: "^(a|b|c)$"
+      mkAltRegex = ids: "^(${builtins.concatStringsSep "|" ids})$";
+      # Without trailing $ anchor (for scroll-factor which also matches brave etc.)
+      mkAltRegexOpen = ids: "^(${builtins.concatStringsSep "|" ids})";
     in
     [
       {
@@ -76,10 +92,6 @@
         opacity = 0.92;
       }
       {
-        matches = [ { app-id = "^(librewolf|librewolf-main|librewolf-i2pd)$"; } ];
-      }
-
-      {
         matches = [ { app-id = "^1password$"; } ];
         block-out-from = "screen-capture";
       }
@@ -127,7 +139,15 @@
       {
         matches = [
           {
-            app-id = "^(brave|brave-browser|firefox|chromium|librewolf|librewolf-main|librewolf-personal|librewolf-work|librewolf-banking|librewolf-shopping|librewolf-illegal|librewolf-i2pd)";
+            app-id = mkAltRegexOpen (
+              [
+                "brave"
+                "brave-browser"
+                "firefox"
+                "chromium"
+              ]
+              ++ lwAllAppIds
+            );
           }
         ];
         scroll-factor = 0.75;
@@ -137,7 +157,7 @@
       {
         matches = [
           {
-            app-id = "^(librewolf|librewolf-main|librewolf-personal|librewolf-work|librewolf-banking|librewolf-shopping|librewolf-illegal)$";
+            app-id = mkAltRegex lwNonI2pdAppIds;
           }
         ];
         open-on-workspace = ws.browser;

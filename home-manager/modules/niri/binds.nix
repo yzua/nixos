@@ -18,6 +18,7 @@ let
       ''
         if ! ${config.home.profileDirectory}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1; then
           ${pkgs.coreutils}/bin/nohup ${config.home.profileDirectory}/bin/noctalia-shell >/dev/null 2>&1 &
+          # Wait for shell to initialize before retrying IPC; may need adjustment if startup slows.
           ${pkgs.coreutils}/bin/sleep 0.35
           ${config.home.profileDirectory}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
         fi
@@ -30,6 +31,22 @@ let
   screenshotAnnotate = import ./scripts/screenshot.nix { inherit pkgsStable; };
   colorPicker = import ./scripts/color-picker.nix { inherit pkgsStable; };
   ws = import ./_workspace-names.nix;
+
+  # Shared volume commands — keep Mod+ and XF86Audio step sizes synchronized.
+  volumeUp = [
+    "${pkgs.wireplumber}/bin/wpctl"
+    "set-volume"
+    "-l"
+    "1"
+    "@DEFAULT_AUDIO_SINK@"
+    "5%+"
+  ];
+  volumeDown = [
+    "${pkgs.wireplumber}/bin/wpctl"
+    "set-volume"
+    "@DEFAULT_AUDIO_SINK@"
+    "5%-"
+  ];
 in
 {
   home.packages = [
@@ -180,40 +197,16 @@ in
       "Mod+O".action.spawn = [ "${booksScript}/bin/open_books" ];
 
       # Volume
-      "Mod+Equal".action.spawn = [
-        "${pkgs.wireplumber}/bin/wpctl"
-        "set-volume"
-        "-l"
-        "1"
-        "@DEFAULT_AUDIO_SINK@"
-        "5%+"
-      ];
-      "Mod+Minus".action.spawn = [
-        "${pkgs.wireplumber}/bin/wpctl"
-        "set-volume"
-        "@DEFAULT_AUDIO_SINK@"
-        "5%-"
-      ];
+      "Mod+Equal".action.spawn = volumeUp;
+      "Mod+Minus".action.spawn = volumeDown;
 
       "XF86AudioRaiseVolume" = {
         allow-when-locked = true;
-        action.spawn = [
-          "${pkgs.wireplumber}/bin/wpctl"
-          "set-volume"
-          "-l"
-          "1"
-          "@DEFAULT_AUDIO_SINK@"
-          "5%+"
-        ];
+        action.spawn = volumeUp;
       };
       "XF86AudioLowerVolume" = {
         allow-when-locked = true;
-        action.spawn = [
-          "${pkgs.wireplumber}/bin/wpctl"
-          "set-volume"
-          "@DEFAULT_AUDIO_SINK@"
-          "5%-"
-        ];
+        action.spawn = volumeDown;
       };
       "XF86AudioMute" = {
         allow-when-locked = true;
