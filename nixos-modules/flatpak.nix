@@ -4,11 +4,12 @@
 {
   config,
   lib,
+  systemdHelpers,
   ...
 }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+  inherit (systemdHelpers) mkServiceHardening;
 in
 
 {

@@ -98,6 +98,7 @@
               pkgConfig
               constants
               ;
+            systemdHelpers = import ./nixos-modules/helpers/_systemd-helpers.nix { inherit (nixpkgs) lib; };
           };
           modules = [ ./hosts/${hostname}/configuration.nix ];
         };

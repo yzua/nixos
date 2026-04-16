@@ -4,12 +4,20 @@
   config,
   lib,
   pkgs,
+  systemdHelpers,
   user,
   ...
 }:
 
 let
-  cleanupLib = import ./_lib.nix { inherit pkgs lib user; };
+  cleanupLib = import ./_lib.nix {
+    inherit
+      pkgs
+      lib
+      systemdHelpers
+      user
+      ;
+  };
   inherit (cleanupLib)
     mkCleanupTimer
     mkFindCleanupTimer

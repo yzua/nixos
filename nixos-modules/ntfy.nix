@@ -6,12 +6,13 @@
   lib,
   pkgs,
   pkgsStable,
+  systemdHelpers,
   ...
 }:
 
 let
   cfg = config.mySystem.ntfy;
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+  inherit (systemdHelpers) mkServiceHardening;
 
   # Config template for alertmanager-ntfy bridge.
   # Topic placeholder is replaced at runtime from sops secret.

@@ -4,12 +4,13 @@
   config,
   lib,
   pkgs,
+  systemdHelpers,
   user,
   ...
 }:
 
 let
-  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; })
+  inherit (systemdHelpers)
     mkOneshotService
     mkPersistentTimer
     ;

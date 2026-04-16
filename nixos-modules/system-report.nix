@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  systemdHelpers,
   user,
   ...
 }:
@@ -13,7 +14,7 @@ let
     mkStrOption
     mkIntOption
     ;
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
+  inherit (systemdHelpers)
     mkServiceHardening
     mkOneshotService
     mkPersistentTimer

@@ -5,11 +5,12 @@
   lib,
   pkgs,
   constants,
+  systemdHelpers,
   ...
 }:
 
 let
-  inherit (import ../helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+  inherit (systemdHelpers) mkServiceHardening;
 
   localhost = "127.0.0.1";
   inherit (constants) ports;

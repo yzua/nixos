@@ -4,11 +4,12 @@
   config,
   lib,
   pkgsStable,
+  systemdHelpers,
   ...
 }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+  inherit (systemdHelpers) mkServiceHardening;
 in
 {
   options.mySystem.greetd = {

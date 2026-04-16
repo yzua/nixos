@@ -5,11 +5,12 @@
   lib,
   pkgs,
   constants,
+  systemdHelpers,
   ...
 }:
 
 let
-  inherit (import ./helpers/_systemd-helpers.nix { inherit lib; })
+  inherit (systemdHelpers)
     mkServiceHardening
     mkOneshotService
     mkPersistentTimer
