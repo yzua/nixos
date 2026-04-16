@@ -21,7 +21,7 @@ in
     isDefault = true;
     path = "personal.default";
     proxyHost = personal;
-    homepage = "http://127.0.0.1:8082/search";
+    homepage = "http://127.0.0.1:${toString constants.ports.glance}/search";
   }
   {
     name = "work";
