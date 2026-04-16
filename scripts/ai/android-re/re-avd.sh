@@ -13,11 +13,6 @@ ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${HOME}/Android/Sdk}"
 ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}"
 RUNTIME_LOG="${RUNTIME_LOG:-${HOME}/Downloads/android-re-tools/emulator-runtime.log}"
 
-adb_run() {
-	need_cmd adb
-	adb "$@"
-}
-
 # shellcheck source=scripts/ai/android-re/_helpers.sh
 source "${SCRIPT_DIR}/_helpers.sh"
 # shellcheck source=scripts/ai/android-re/_spoof-table.sh

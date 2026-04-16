@@ -71,22 +71,18 @@ run_agent_once() {
 	stderr_file="$(mktemp)"
 	trap 'rm -f "${stderr_file}"' RETURN
 
+	local resolved_env
+	resolved_env="$(resolve_env_marker "$env_marker")"
+
 	local rc=0
-	# Resolve env vars and execute, capturing stderr for rate-limit detection
-	case "$env_marker" in
-	"-")
+	# Execute with resolved env, capturing stderr for rate-limit detection
+	if [[ -n "$resolved_env" ]]; then
+		# shellcheck disable=SC2086,SC2046
+		env $resolved_env $command "${prompt}" 2>"${stderr_file}" || rc=$?
+	else
 		# shellcheck disable=SC2086
 		$command "${prompt}" 2>"${stderr_file}" || rc=$?
-		;;
-	"ZAI")
-		# shellcheck disable=SC2086,SC2046
-		env $(zai_claude_env) $command "${prompt}" 2>"${stderr_file}" || rc=$?
-		;;
-	*)
-		# shellcheck disable=SC2086
-		env $env_marker $command "${prompt}" 2>"${stderr_file}" || rc=$?
-		;;
-	esac
+	fi
 
 	_ITER_LAST_STDERR="$(cat "${stderr_file}")"
 

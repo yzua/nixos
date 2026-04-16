@@ -48,13 +48,13 @@ kill_mitm_listeners() {
 	pkill -f "mitmproxy.*--listen-port ${MITM_PORT}" 2>/dev/null || true
 
 	for _ in $(seq 1 10); do
-		if ! command -v ss >/dev/null 2>&1 || ! ss -ltnH "( sport = :${MITM_PORT} )" | grep -q .; then
+		if ! port_in_use "${MITM_PORT}"; then
 			return 0
 		fi
 		sleep 0.5
 	done
 
-	if command -v ss >/dev/null 2>&1 && ss -ltnH "( sport = :${MITM_PORT} )" | grep -q .; then
+	if port_in_use "${MITM_PORT}"; then
 		log_warning "port ${MITM_PORT} still has a listener after mitm cleanup — killing forcefully"
 		ss -ltnpH "( sport = :${MITM_PORT} )" | grep -oP 'pid=\K[0-9]+' | xargs -r kill -9 2>/dev/null || true
 		sleep 1
@@ -62,7 +62,7 @@ kill_mitm_listeners() {
 }
 
 mitm_listener_ready() {
-	command -v ss >/dev/null 2>&1 && ss -ltnH "( sport = :${MITM_PORT} )" | grep -q .
+	port_in_use "${MITM_PORT}"
 }
 
 mitm_command() {

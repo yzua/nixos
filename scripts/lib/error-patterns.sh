@@ -5,3 +5,7 @@
 
 # shellcheck disable=SC2034
 ERROR_PATTERN='\b(error|panic|fatal|exception|failed|invalid|deprecated|certificate|ssl|tls)\b'
+
+# Codex CLI emits plain " WARN " and " ERROR " prefixes not matched by ERROR_PATTERN.
+# shellcheck disable=SC2034
+CODEX_ERROR_PATTERN="${ERROR_PATTERN}| WARN | ERROR "

@@ -22,7 +22,7 @@ count_errors() {
 			matches="$(rg -i -c "$ERROR_PATTERN" "$file" 2>/dev/null || true)"
 			;;
 		codex)
-			matches="$(rg -i -c "$ERROR_PATTERN| WARN | ERROR " "$file" 2>/dev/null || true)"
+			matches="$(rg -i -c "$CODEX_ERROR_PATTERN" "$file" 2>/dev/null || true)"
 			;;
 		esac
 		matches="${matches:-0}"
@@ -80,12 +80,18 @@ errors() {
 	echo "Recent errors for: $agent"
 	echo "---------------------------------------------------------------"
 
+	local pattern
+	case "$agent" in
+	codex) pattern="$CODEX_ERROR_PATTERN" ;;
+	*) pattern="$ERROR_PATTERN" ;;
+	esac
+
 	if [[ "$agent" == "*" ]]; then
-		find_all_agent_logs -7 | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -100
+		find_all_agent_logs -7 | xargs -r rg -n -i "$CODEX_ERROR_PATTERN" 2>/dev/null | tail -100
 	else
 		find_agent_logs "$agent" -7 | while IFS= read -r file; do
 			[[ -n "$file" ]] || continue
-			rg -n -i "$ERROR_PATTERN" "$file" 2>/dev/null || true
+			rg -n -i "$pattern" "$file" 2>/dev/null || true
 		done | tail -100
 	fi
 }
@@ -144,7 +150,7 @@ report() {
 	echo ""
 
 	echo "Most Recent Errors:"
-	find_all_agent_logs -7 | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -20
+	find_all_agent_logs -7 | xargs -r rg -n -i "$CODEX_ERROR_PATTERN" 2>/dev/null | tail -20
 }
 
 patterns() {
@@ -152,7 +158,7 @@ patterns() {
 	echo "----------------------------------------------------------------"
 
 	if find_all_agent_logs -7 | grep -q .; then
-		find_all_agent_logs -7 | xargs -r rg --no-filename -o -i "${ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
+		find_all_agent_logs -7 | xargs -r rg --no-filename -o -i "${CODEX_ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
 			sort | uniq -c | sort -rn | head -20
 	else
 		print_warning "No log files found."

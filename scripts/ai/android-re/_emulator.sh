@@ -194,7 +194,7 @@ warn_stale_host_proxy() {
 		return 0
 	fi
 
-	if ! ss -ltnH "( sport = :${port} )" | grep -q .; then
+	if ! port_in_use "${port}"; then
 		log_warning "emulator proxy points to ${proxy}, but nothing is listening on host port ${port}"
 		log_warning "run 'bash scripts/ai/android-re/re-avd.sh proxy-clear' or start mitmdump on ${port}"
 	fi

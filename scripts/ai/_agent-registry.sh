@@ -76,7 +76,6 @@ _def clglm ZAI  "claude --dangerously-skip-permissions"                         
 
 # Codex
 _def cx    -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"                                            "codex exec --dangerously-bypass-approvals-and-sandbox"
-_def cxu   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox"                                            "codex exec --dangerously-bypass-approvals-and-sandbox"
 _def lcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"       "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"low\"'"
 _def mcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"     "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"medium\"'"
 _def hcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"       "codex exec --dangerously-bypass-approvals-and-sandbox -c 'model_reasoning_effort=\"high\"'"
@@ -147,6 +146,23 @@ resolve_workflow_prompt() {
   else
     printf '%s\n' ""
   fi
+}
+
+# --- Env marker resolution ---
+
+# Resolve an env_marker from a registry entry into a space-separated env string.
+# Usage: resolved_env="$(resolve_env_marker "$env_marker")"
+#   env_marker:
+#     "-"   = no extra env vars (outputs empty string)
+#     "ZAI" = resolve Z.AI API vars at runtime
+#     otherwise = literal env string (e.g. "FOO=bar BAZ=qux")
+resolve_env_marker() {
+	local env_marker="$1"
+	case "$env_marker" in
+	"-") ;;
+	"ZAI") zai_claude_env | tr '\n' ' ' ;;
+	*) printf '%s' "$env_marker" ;;
+	esac
 }
 
 # --- Alias/suffix splitting ---

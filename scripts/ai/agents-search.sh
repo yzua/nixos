@@ -70,7 +70,7 @@ done
 SCAN_PATH="$(cd "$SCAN_PATH" && pwd)"
 
 if [[ ! -d "$SCAN_PATH" ]]; then
-	echo "Error: '$SCAN_PATH' is not a directory" >&2
+	print_error "'$SCAN_PATH' is not a directory"
 	exit 1
 fi
 
