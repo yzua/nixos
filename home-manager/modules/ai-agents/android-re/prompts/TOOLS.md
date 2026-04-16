@@ -57,6 +57,90 @@ Use the smallest tool that gives a reliable answer:
 - **Need to click through the app reliably?** Use `agent-device`
 - **Need repeated proof?** Write a small Bash/Python/Node/Bun/Frida script
 
+## Fast Vulnerability Playbooks
+
+### Exported component abuse
+
+Goal: prove whether another app or shell-level attacker can reach privileged
+behavior.
+
+Start with:
+
+```bash
+adb shell dumpsys package com.example.target | rg 'exported=|Activity|Service|Receiver|Provider'
+adb shell cmd package resolve-activity --brief -c android.intent.category.LAUNCHER com.example.target
+```
+
+Then try the smallest attacker-style invocation you can justify:
+
+```bash
+adb shell am start -n com.example.target/.SomeActivity
+adb shell am startservice -n com.example.target/.SomeService
+adb shell am broadcast -n com.example.target/.SomeReceiver
+adb shell content query --uri content://com.example.target.provider/
+```
+
+Proof target:
+
+- unauthorized action
+- sensitive data exposure
+- privileged flow without intended caller checks
+
+### Deep link abuse
+
+Goal: prove whether attacker-controlled URLs can drive privileged or unsafe app
+behavior.
+
+```bash
+adb shell dumpsys package com.example.target | rg 'VIEW|BROWSABLE|scheme|host|path'
+adb shell am start -a android.intent.action.VIEW -d 'app://host/path?x=1' com.example.target
+```
+
+Look for:
+
+- auth state confusion
+- hidden screen reachability
+- open redirect behavior
+- WebView reachability
+- attacker-controlled parameters flowing into privileged actions
+
+### Local storage triage
+
+Goal: prove what secrets or attacker-useful state live on device.
+
+```bash
+adb shell 'run-as com.example.target ls -R files shared_prefs databases 2>/dev/null'
+adb shell 'run-as com.example.target cat shared_prefs/*.xml 2>/dev/null'
+adb shell 'run-as com.example.target sqlite3 databases/app.db ".tables" 2>/dev/null'
+adb shell 'su 0 find /data/data/com.example.target -maxdepth 3 | head -100'
+```
+
+Proof target:
+
+- reusable tokens
+- credentials or API keys
+- locally cached sensitive objects
+- weak device binding or trust assumptions
+
+### Auth / replay / IDOR testing
+
+Goal: convert captured traffic into attacker-usable proof.
+
+```bash
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -iE 'authorization|bearer|token|cookie'
+tmux capture-pane -t android-re:mitm -p -S -300 | grep -oP '(?:GET|POST|PUT|DELETE|PATCH) https?://[^ ]+'
+```
+
+Then move to a script or `curl` replay that changes one thing at a time:
+
+- object ID
+- account ID
+- device identifier
+- timestamp / nonce assumptions
+- headers that look like soft binding rather than hard proof
+
+Do not claim replay or IDOR until the modified request proves unauthorized reach.
+
 ## Tmux Session Layout
 
 `re-avd.sh start` creates a tmux session called `android-re` with these windows:
@@ -125,6 +209,15 @@ grep -R "android.intent.action.VIEW\|BROWSABLE\|exported=\"true\"" ~/.cache/andr
 - whether detection is likely Java-only or native-backed
 - whether the package ships significant native libraries
 
+### Native triage cues
+
+Pivot early to native review when static output shows:
+
+- `libcronet`, `cronet`, `boringssl`, `ssl`, `conscrypt`, or custom TLS wrappers
+- JNI methods around auth, trust, crypto, or device checks
+- large `.so` files owning request construction or anti-analysis
+- Java wrappers with little logic beyond `native` declarations
+
 ## mitmproxy Practical Usage
 
 ### Architecture
@@ -166,6 +259,9 @@ tmux capture-pane -t android-re:mitm -p -S -300 | grep -iE 'authorization|bearer
 - `client disconnected` -> app retrying, rejecting, or partially bypassing
 - no output at all -> proxy not set, app not restarted, Cronet/native bypass, or
   app not making requests yet
+
+Do not call it "pinning" until proxy state, listener state, restart, and actual
+network exercise have all been proven.
 
 ### Restart mitmdump with different options
 
@@ -305,6 +401,16 @@ Pivot to native analysis when:
 - the app uses Cronet, BoringSSL, or native TLS
 - URL logging sees nothing but traffic clearly exists
 - pinning bypass attempts do not change behavior
+
+### Logcat triage by symptom
+
+Use logcat as evidence, not background noise. Prioritize strings around:
+
+- SSL / TLS / handshake / trust / cert
+- root / emulator / tamper / integrity
+- okhttp / cronet / quic / socket
+- WebView / chromium / bridge
+- crash stack traces tied to first launch or guarded screens
 
 ## agent-device Practical Usage
 

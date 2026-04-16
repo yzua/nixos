@@ -17,6 +17,18 @@ should produce concrete, operator-usable answers about:
 
 Prefer short proof loops over broad speculation.
 
+## Operator Loop
+
+Run the session as a repeated loop, not a one-way checklist:
+
+1. form the smallest useful hypothesis
+2. choose the cheapest proof step that can confirm or kill it
+3. capture the result with exact evidence
+4. decide the next pivot based on impact, not curiosity alone
+
+If a step does not improve exploitability, trust-boundary understanding, or the
+quality of a proof, question why you are doing it.
+
 ## Assessment Mindset
 
 Act like a senior mobile security researcher operating within authorized scope.
@@ -136,6 +148,22 @@ Low-value traps to avoid:
   traffic or findings
 - listing generic indicators without proving exploitability or impact
 - reporting every anti-analysis check as a vulnerability by default
+- treating successful tool setup as if it were a security result
+- dumping strings, manifests, or hook output without reachability, proof, or a
+  concrete next pivot
+- staying in the Java layer when static and runtime evidence say the interesting
+  logic lives in JNI or native libraries
+
+## High-Value Attack Questions
+
+Keep asking these throughout the session:
+
+- what trust boundary can this app cross on behalf of the attacker?
+- what does this primitive unlock next: traffic, token access, replay, code
+  path control, component abuse, or deeper bypass?
+- can this be turned into unauthorized access, sensitive data exposure,
+  repeatable replay, or a better foothold for the next phase?
+- if this hypothesis is false, what is the next smallest proof step?
 
 ## Agent Workflow Rules
 
@@ -184,7 +212,15 @@ For actual findings, also include:
 - proof artifact: request, command output, log line, hook output, or screenshot
 - exploitability assessment
 - impact statement
+- trust boundary crossed
 - confidence: proven / likely / suspected
+
+Confidence model:
+
+- `proven` -> reproduced with direct evidence and operator-usable steps
+- `likely` -> strong evidence, but one final proof step is still missing
+- `suspected` -> interesting signal that still needs validation
+- `blocked` -> promising path halted by a proven technical blocker
 
 ## Stop Conditions Before Bypass Work
 
@@ -207,6 +243,8 @@ If none of those are true, keep triaging instead of guessing hooks.
 - Prefer one strong, proven finding over ten vague observations.
 - Always ask: can this be turned into unauthorized access, sensitive data
   exposure, code execution, logic bypass, or a repeatable security weakness?
+- If a branch is blocked, report the exact blocker and the next best bypass or
+  validation step instead of padding the result with theory.
 
 ## Safety Rules
 

@@ -20,6 +20,23 @@ Use this workspace when you need to:
 This workspace is not for broad exploit development without target evidence.
 The expectation is: prove each step, then escalate.
 
+## What Great Output Looks Like
+
+The best sessions do not end with "I checked root, Frida, and pinning." They
+end with compact, operator-usable answers such as:
+
+- the login flow uses OkHttp against `api.example.tld`, bearer tokens are stored
+  in SharedPreferences, and request replay appears weakly bound
+- an exported receiver or deep link reaches privileged behavior with minimal
+  attacker prerequisites
+- the app bypasses explicit proxy via Cronet/native TLS, and the next best pivot
+  is JNI/native trust analysis rather than more Java hooks
+- Frida attach works but Java hooks stay silent because the interesting path is
+  native-backed
+
+If the session cannot reach a finding, it should still leave behind a precise
+map of what was proven, what was blocked, and the next highest-value move.
+
 ## What "Good Hacker" Means Here
 
 In this workspace, "good hacker" means:
@@ -147,6 +164,19 @@ Start every target by answering these questions in order:
 
 If you cannot answer a question with evidence, stay in the current phase.
 
+## Launcher Bias Guide
+
+Use the launcher that best fits the current branch, then switch once evidence
+points elsewhere:
+
+- `oczenare` -> cheapest static-first APK reconnaissance and wide search
+- `ocgptare` / `clsare` -> structured auth, protocol, replay, and reporting work
+- `ocglmare` / `clglmare` -> anti-analysis, pinning, and repeated bypass tries
+- `ocare` / `clare` -> balanced default when the target is not yet classified
+
+Do not stay attached to the original launcher choice once the evidence says a
+different branch is now dominant.
+
 ## Vulnerability-First Heuristics
 
 When choosing what to investigate next, prefer this order:
@@ -159,6 +189,19 @@ When choosing what to investigate next, prefer this order:
 6. do I need Frida or anti-analysis bypass to reach one of those outcomes?
 
 This keeps the agent focused on real vulnerability work instead of endless setup.
+
+## Escalation Rules
+
+Escalate deeper when one of these becomes true:
+
+- you found a likely trust-boundary crossing and need a POC script
+- traffic capture is blocked by pinning, Cronet, QUIC, or native TLS
+- Java hooks only hit wrappers or never fire on the exercised path
+- static analysis shows JNI/native ownership of auth, trust, or anti-analysis
+- component, deep-link, or WebView paths look reachable and attacker-usable
+
+De-escalate when a branch has no fresh evidence after repeated small proof
+steps. Switch to the next best proof loop instead of forcing the same tactic.
 
 ## What "Ready" Means
 

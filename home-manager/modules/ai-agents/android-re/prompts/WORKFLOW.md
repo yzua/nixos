@@ -16,6 +16,18 @@ Primary outputs per target:
 - anti-analysis result: root, emulator, Frida, pinning, native guards
 - next best action with proof
 
+## Core Proof Loop
+
+Inside every phase, repeat this loop:
+
+1. state the current hypothesis
+2. run the smallest proof step that could falsify it
+3. capture exact evidence
+4. either escalate, pivot, or kill the branch
+
+Do not advance phases just because a tool succeeded. Advance because a question
+was answered with evidence.
+
 ## Phase 0: Environment Validation
 
 Run:
@@ -135,6 +147,14 @@ Pivot rule:
 - if static analysis shows Cronet, BoringSSL, or native networking, assume Java
   MITM guidance may be insufficient and be ready to pivot to native analysis.
 
+High-value static branches to rank:
+
+1. auth, token, and session ownership paths
+2. exported components, providers, receivers, and deep links
+3. WebView configuration, bridges, and file/origin trust
+4. local storage of tokens, credentials, keys, SQLite, prefs, or cached API data
+5. native libraries that own trust, crypto, auth, or anti-analysis decisions
+
 ## Phase 4: Install, Launch, And Smoke Test
 
 Install and launch cleanly before proxying or hooking.
@@ -239,6 +259,13 @@ Use the screen interaction to answer concrete questions:
 - which domains or hosts appear
 - whether tokens are visible in headers or storage
 - whether runtime defenses trigger only on specific screens
+
+Prioritize these deliberate proof loops:
+
+- login / signup / password reset / refresh-token paths
+- screens that consume deep links, magic links, or external intents
+- flows that hit account, balance, profile, orders, or other object-owned APIs
+- screens backed by WebView, file pickers, or bridge-style native interactions
 
 ## Phase 7: Prepare Frida
 
@@ -348,6 +375,16 @@ Move to native hooks or binary analysis when:
 - pinning appears to live in native libs
 - Java-level bypasses do not change runtime behavior
 
+### Bypass discipline
+
+- bypass only the guard you can name and prove
+- treat root, emulator, Frida, and pinning work as enablers for higher-value
+  proof loops, not as the final result
+- after each bypass attempt, immediately re-run the blocked action and check
+  whether it unlocked traffic, code paths, secrets, or exploitability
+- if a bypass changes nothing observable, stop repeating it and revisit the
+  hypothesis
+
 ## Phase 9: Prove Findings With POC Scripts
 
 When you find interesting behavior, write a script to prove it. Do not stop at
@@ -377,3 +414,19 @@ frida -U -n com.example.target -l /tmp/hook.js -q
 ```
 
 The final deliverable should be operator-usable evidence, not just notes.
+
+## Phase 10: Confidence And Chaining Review
+
+Before ending the session, classify each branch as:
+
+- `proven`
+- `likely`
+- `suspected`
+- `blocked`
+
+Then ask:
+
+- what is the strongest attacker-usable primitive I proved?
+- what trust boundary did it cross?
+- what does it unlock next?
+- what is the next best operator action if the session continues?

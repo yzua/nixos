@@ -245,6 +245,9 @@ If traffic is still absent, suspect:
 - hardcoded proxy rules
 - app never reaching the code path you expected
 
+Do not conclude certificate pinning until proxy state, listener state, restart,
+and exercised code path are all proven first.
+
 ## All Traffic Shows `Client TLS Handshake Failed`
 
 Prove trust state:
@@ -270,6 +273,28 @@ If cert installation looks correct but failures remain, suspect:
 
 Google domains are expected to pin aggressively. Use non-Google domains as the
 baseline signal for whether your CA path works.
+
+## Proxy Is Set But Only Some Traffic Appears
+
+Prove the split behavior:
+
+```bash
+tmux capture-pane -t android-re:mitm -p -S -200
+tmux capture-pane -t android-re:logcat -p -S -200 | rg 'cronet|quic|ssl|socket|okhttp'
+```
+
+Likely causes:
+
+- mixed Java + native networking
+- Cronet or QUIC fallback for selected hosts
+- direct socket path for sensitive endpoints only
+
+Next actions:
+
+- identify which domains appear and which do not
+- compare with static networking indicators
+- block QUIC and restart the exact screen or flow
+- pivot to native/JNI review if the missing traffic maps to sensitive actions
 
 ## mitmproxy Shows Traffic But Responses Are Errors
 
@@ -323,6 +348,9 @@ Next actions:
 - hook `java.io.File.exists`
 - check static analysis for detection helpers or native libs
 
+Do not call emulator detection defeated until the previously blocked screen,
+traffic, or process path actually becomes reachable.
+
 ## Root Checker Says The Device Is Not Rooted
 
 If `adb shell 'su 0 sh -c id'` works but app-side root checks fail, prove the
@@ -359,6 +387,47 @@ Then ask:
 - was the namespace remount applied after the latest start
 - does static analysis point to pinning or native trust logic
 - is the failing domain protected differently from the rest of the app
+
+If only one sensitive domain fails while others decrypt, suspect target-specific
+pinning or a distinct native trust path rather than a broken global CA setup.
+
+## Attach Works But Hooks Stay Silent
+
+Prove the mismatch:
+
+```bash
+tmux capture-pane -t android-re:frida -p -S -120
+tmux capture-pane -t android-re:logcat -p -S -120
+tmux capture-pane -t android-re:mitm -p -S -120
+```
+
+Likely causes:
+
+- hooked the wrong class, overload, or process
+- target logic already ran before attach
+- Java layer is only a wrapper for JNI/native work
+
+Next actions:
+
+- move to spawn mode
+- broaden to reusable recon hooks first
+- confirm package/process identity from static analysis and runtime
+- pivot to native triage if Java hooks still do not correlate with behavior
+
+## Spawn Works But Attach Fails
+
+Interpretation:
+
+- early anti-Frida or timing-sensitive guards are likely
+- target code may run before a stable attach window exists
+
+Next actions:
+
+- keep using spawn for early hooks
+- hook the smallest early decision points first
+- confirm whether bypassing the early guard unlocks traffic or guarded screens
+- do not report Frida detection as a vulnerability unless it creates concrete
+  security impact beyond blocking analysis
 
 ## `agent-device` Cannot Find The Emulator
 
