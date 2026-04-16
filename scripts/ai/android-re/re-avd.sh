@@ -67,7 +67,7 @@ frida_host_probe() {
 log_frida_failure_context() {
 	local remote_log
 
-	remote_log="$(adb shell "su 0 sh -c 'tail -n 20 ${FRIDA_LOG_PATH} 2>/dev/null || true'" 2>/dev/null | tr -d '\r' || true)"
+	remote_log="$(adb_prop "su 0 sh -c 'tail -n 20 ${FRIDA_LOG_PATH} 2>/dev/null || true'")"
 	if [[ -n "${remote_log}" ]]; then
 		log_warning "recent Frida server log from ${FRIDA_LOG_PATH}:"
 		printf '%s\n' "${remote_log}" >&2
@@ -105,7 +105,7 @@ spoof_device() {
 	# Resolve Magisk binary — it acts as a multi-call binary (resetprop, magisk, su, etc.)
 	# On this AVD, Magisk is installed as an app; the binary lives under the app data directory.
 	local resetprop_bin
-	resetprop_bin="$(adb shell 'su 0 sh -c "ls /data/user/0/com.android.shell/Magisk/lib/x86_64/magisk 2>/dev/null || ls /data/adb/magisk/magisk 2>/dev/null || which magisk 2>/dev/null || echo """' 2>/dev/null | tr -d '\r' || true)"
+	resetprop_bin="$(adb_prop 'su 0 sh -c "ls /data/user/0/com.android.shell/Magisk/lib/x86_64/magisk 2>/dev/null || ls /data/adb/magisk/magisk 2>/dev/null || which magisk 2>/dev/null || echo """')"
 	if [[ -z "${resetprop_bin}" ]]; then
 		log_error "cannot find Magisk binary for resetprop"
 		return 1
@@ -116,7 +116,7 @@ spoof_device() {
 	local entry prop value old
 	for entry in "${SPOOF_PROPS[@]}"; do
 		IFS='|' read -r prop value <<<"${entry}"
-		old="$(adb shell "su 0 getprop ${prop}" 2>/dev/null | tr -d '\r' || true)"
+		old="$(adb_prop "su 0 getprop ${prop}")"
 		if [[ "${old}" == "${value}" ]]; then
 			continue
 		fi
@@ -143,7 +143,7 @@ spoof_device() {
 	log_success "device spoof applied (${changed} props changed, ${failed} failed, ${#SPOOF_HIDE_FILES[@]} files hidden, ${#SPOOF_STOP_SERVICES[@]} services stopped)"
 
 	# Quick verification
-	log_info "identity check: hardware=$(adb shell getprop ro.hardware 2>/dev/null | tr -d '\r') model=$(adb shell getprop ro.product.model 2>/dev/null | tr -d '\r') characteristics=$(adb shell getprop ro.build.characteristics 2>/dev/null | tr -d '\r')"
+	log_info "identity check: hardware=$(adb_prop getprop ro.hardware) model=$(adb_prop getprop ro.product.model) characteristics=$(adb_prop getprop ro.build.characteristics)"
 }
 
 unspoof_device() {
@@ -228,16 +228,12 @@ mitm_command() {
 	printf 'mitmdump --set confdir=%q --listen-host %q --listen-port %q --set ssl_insecure=true --set flow_detail=2' "${MITM_CONF_DIR}" "${MITM_HOST}" "${MITM_PORT}"
 }
 
-resolve_re_workspace_ref() {
-	resolve_niri_android_workspace "${RE_WORKSPACE}"
-}
-
 focus_re_workspace() {
 	local workspace_ref
 	if ! command -v niri >/dev/null 2>&1; then
 		return 0
 	fi
-	workspace_ref="$(resolve_re_workspace_ref)"
+	workspace_ref="$(resolve_niri_android_workspace "${RE_WORKSPACE}")"
 
 	if ! niri msg action focus-workspace "${workspace_ref}" >/dev/null 2>&1; then
 		log_warning "failed to focus Niri workspace ${workspace_ref}"
@@ -364,7 +360,7 @@ start_mitm_tmux() {
 
 warn_stale_host_proxy() {
 	local proxy host port
-	proxy="$(adb shell settings get global http_proxy 2>/dev/null | tr -d '\r' || true)"
+	proxy="$(adb_prop settings get global http_proxy)"
 
 	if [[ -z "${proxy}" || "${proxy}" == ":0" || "${proxy}" == "null" ]]; then
 		return 0
@@ -396,7 +392,7 @@ wait_boot() {
 	fi
 
 	local waited=0
-	until [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; do
+	until [[ "$(adb_prop getprop sys.boot_completed)" == "1" ]]; do
 		if ((waited >= BOOT_WAIT_TIMEOUT)); then
 			log_error "emulator boot did not complete within ${BOOT_WAIT_TIMEOUT}s"
 			show_runtime_log_tail
@@ -487,7 +483,7 @@ start_re() {
 	kill_mitm_listeners
 
 	# Kill stale frida server on device (if emulator is reachable)
-	if adb devices 2>/dev/null | grep -q '^emulator-'; then
+	if emulator_online; then
 		adb shell "su 0 sh -c 'pkill -9 frida-server 2>/dev/null || true'" >/dev/null 2>&1 || true
 	fi
 
@@ -533,7 +529,7 @@ start_re() {
 }
 
 stop_emulator() {
-	if adb devices 2>/dev/null | grep -q '^emulator-'; then
+	if emulator_online; then
 		log_info "stopping emulator"
 		adb_run emu kill || true
 	else
@@ -557,7 +553,7 @@ stop_all_emulators() {
 	stop_stale_emulator_processes
 
 	for _ in $(seq 1 20); do
-		if ! adb devices 2>/dev/null | grep -q '^emulator-' && [[ -z "$(list_emulator_pids)" ]]; then
+		if ! emulator_online && [[ -z "$(list_emulator_pids)" ]]; then
 			log_success "all running emulators stopped"
 			return 0
 		fi
@@ -575,7 +571,7 @@ set_selinux_mode() {
 	local mode="$1"
 	local current
 
-	current="$(adb shell getenforce 2>/dev/null | tr -d '\r' || true)"
+	current="$(adb_prop getenforce)"
 
 	if [[ "${mode}" == "permissive" ]]; then
 		if [[ "${current}" != "Permissive" ]]; then
@@ -587,7 +583,7 @@ set_selinux_mode() {
 		fi
 	fi
 
-	log_success "SELinux mode: $(adb shell getenforce 2>/dev/null | tr -d '\r' || true)"
+	log_success "SELinux mode: $(adb_prop getenforce)"
 }
 
 cert_check() {
@@ -661,9 +657,9 @@ status() {
 		fi
 	fi
 	adb devices -l || true
-	if adb devices 2>/dev/null | grep -q '^emulator-'; then
-		log_info "boot=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
-		log_info "device_identity=$(adb shell getprop ro.product.manufacturer 2>/dev/null | tr -d '\r' || true)/$(adb shell getprop ro.product.model 2>/dev/null | tr -d '\r' || true)"
+	if emulator_online; then
+		log_info "boot=$(adb_prop getprop sys.boot_completed)"
+		log_info "device_identity=$(adb_prop getprop ro.product.manufacturer)/$(adb_prop getprop ro.product.model)"
 		if adb shell 'su 0 sh -c id' >/dev/null 2>&1; then
 			log_success "unattended root works"
 		else
@@ -674,7 +670,7 @@ status() {
 		else
 			log_warning "mitmproxy system CA missing"
 		fi
-		log_info "proxy=$(adb shell settings get global http_proxy 2>/dev/null | tr -d '\r' || true)"
+		log_info "proxy=$(adb_prop settings get global http_proxy)"
 		warn_stale_host_proxy
 		if [[ ! -x "${FRIDA_PS_BIN}" ]]; then
 			FRIDA_PS_BIN="$(command -v frida-ps || true)"
@@ -692,11 +688,7 @@ status() {
 doctor() {
 	init_mitm_ca_vars
 	for tool in adb emulator avdmanager sdkmanager mitmproxy mitmdump frida frida-ps apktool jadx sqlite3 unzip xz; do
-		if command -v "$tool" >/dev/null 2>&1; then
-			log_success "tool present: ${tool} -> $(command -v "$tool")"
-		else
-			log_warning "tool missing: ${tool}"
-		fi
+		check_tool "$tool"
 	done
 	if [[ -d "${HOME}/.android/avd/${AVD_NAME}.avd" ]]; then
 		log_success "avd directory exists"

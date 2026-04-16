@@ -8,18 +8,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
+# shellcheck source=scripts/lib/require.sh
+source "${SCRIPT_DIR}/../lib/require.sh"
 SHARED_AWK="${SCRIPT_DIR}/../lib/awk-utils.awk"
-
-# Validate script dependencies
-check_dependencies() {
-	local deps=("awk" "find" "sort")
-	for dep in "${deps[@]}"; do
-		if ! command -v "$dep" >/dev/null 2>&1; then
-			print_error "Required dependency '$dep' not found in PATH" >&2
-			exit 1
-		fi
-	done
-}
 
 validate_import_path() {
 	local dir="$1"
@@ -135,7 +126,9 @@ AWK
 
 main() {
 	local error_count=0
-	check_dependencies
+	need_cmd awk
+	need_cmd find
+	need_cmd sort
 
 	TMP_DIR=$(mktemp -d)
 	trap 'rm -f "${TMP_DIR}/batch-awk" "${TMP_DIR}/manual-awk.awk"; rm -rf "${TMP_DIR:-}"' EXIT

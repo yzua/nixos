@@ -69,6 +69,7 @@ run_agent_once() {
 	local command="${entry#*|}"
 	local stderr_file
 	stderr_file="$(mktemp)"
+	trap 'rm -f "${stderr_file}"' RETURN
 
 	local rc=0
 	# Resolve env vars and execute, capturing stderr for rate-limit detection
@@ -88,7 +89,6 @@ run_agent_once() {
 	esac
 
 	_ITER_LAST_STDERR="$(cat "${stderr_file}")"
-	rm -f "${stderr_file}"
 
 	if ((rc != 0)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
 		return 1

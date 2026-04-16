@@ -9,14 +9,6 @@ source "${SCRIPT_DIR}/../lib/log-dirs.sh"
 # shellcheck source=scripts/lib/error-patterns.sh
 source "${SCRIPT_DIR}/../lib/error-patterns.sh"
 
-find_logs() {
-	find_agent_logs "$1" -7
-}
-
-find_all_logs() {
-	find_all_agent_logs -7
-}
-
 count_errors() {
 	local agent="$1"
 	local count=0
@@ -35,7 +27,7 @@ count_errors() {
 		esac
 		matches="${matches:-0}"
 		count=$((count + matches))
-	done < <(find_logs "$agent")
+	done < <(find_agent_logs "$agent" -7)
 
 	echo "$count"
 }
@@ -64,7 +56,7 @@ stats() {
 	echo ""
 
 	for agent in claude opencode codex gemini; do
-		sessions=$(find_logs "$agent" | wc -l)
+		sessions=$(find_agent_logs "$agent" -7 | wc -l)
 		errors=$(count_errors "$agent")
 
 		if [[ "$sessions" -gt 0 || "$errors" -gt 0 ]]; then
@@ -89,9 +81,9 @@ errors() {
 	echo "---------------------------------------------------------------"
 
 	if [[ "$agent" == "*" ]]; then
-		find_all_logs | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -100
+		find_all_agent_logs -7 | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -100
 	else
-		find_logs "$agent" | while IFS= read -r file; do
+		find_agent_logs "$agent" -7 | while IFS= read -r file; do
 			[[ -n "$file" ]] || continue
 			rg -n -i "$ERROR_PATTERN" "$file" 2>/dev/null || true
 		done | tail -100
@@ -116,7 +108,7 @@ search_logs() {
 	echo "Searching for: $term"
 	echo "---------------------------------------------------------------"
 
-	find_all_logs | xargs -r rg -n --color=always "$term" 2>/dev/null | head -50
+	find_all_agent_logs -7 | xargs -r rg -n --color=always "$term" 2>/dev/null | head -50
 }
 
 tail_logs() {
@@ -126,9 +118,9 @@ tail_logs() {
 	echo "---------------------------------------------------------------"
 
 	if [[ "$agent" == "*" ]]; then
-		find_all_logs | xargs -r tail -f 2>/dev/null
+		find_all_agent_logs -7 | xargs -r tail -f 2>/dev/null
 	else
-		find_logs "$agent" | xargs -r tail -f 2>/dev/null
+		find_agent_logs "$agent" -7 | xargs -r tail -f 2>/dev/null
 	fi
 }
 
@@ -152,15 +144,15 @@ report() {
 	echo ""
 
 	echo "Most Recent Errors:"
-	find_all_logs | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -20
+	find_all_agent_logs -7 | xargs -r rg -n -i "$ERROR_PATTERN" 2>/dev/null | tail -20
 }
 
 patterns() {
 	print_info "Analyzing error patterns..."
 	echo "----------------------------------------------------------------"
 
-	if find_all_logs | grep -q .; then
-		find_all_logs | xargs -r rg --no-filename -o -i "${ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
+	if find_all_agent_logs -7 | grep -q .; then
+		find_all_agent_logs -7 | xargs -r rg --no-filename -o -i "${ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
 			sort | uniq -c | sort -rn | head -20
 	else
 		print_warning "No log files found."
@@ -169,8 +161,8 @@ patterns() {
 	echo ""
 	echo "----------------------------------------------------------------"
 	print_info "Top exit codes:"
-	if find_all_logs | grep -q .; then
-		find_all_logs | xargs -r grep -h "exited with code" 2>/dev/null |
+	if find_all_agent_logs -7 | grep -q .; then
+		find_all_agent_logs -7 | xargs -r grep -h "exited with code" 2>/dev/null |
 			grep -oE "code [0-9]+" | sort | uniq -c | sort -rn | head -10 || true
 	else
 		print_warning "No log files found."

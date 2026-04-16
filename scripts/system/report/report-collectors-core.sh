@@ -2,9 +2,9 @@
 # Core collectors for system report generation.
 
 # shellcheck source=scripts/lib/error-patterns.sh
-source "${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../..}"/scripts/lib/error-patterns.sh
+source "${SCRIPT_DIR}/../../lib/error-patterns.sh"
 # shellcheck source=scripts/lib/log-dirs.sh
-source "${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../..}"/scripts/lib/log-dirs.sh
+source "${SCRIPT_DIR}/../../lib/log-dirs.sh"
 
 scan_error_log_count() {
 	local mtime_filter="$1"

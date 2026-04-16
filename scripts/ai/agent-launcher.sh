@@ -4,15 +4,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
+# shellcheck source=scripts/lib/require.sh
+source "${SCRIPT_DIR}/../lib/require.sh"
 # shellcheck source=scripts/lib/fzf-theme.sh
 source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
 # shellcheck source=scripts/ai/_agent-registry.sh
 source "${SCRIPT_DIR}/_agent-registry.sh"
 
-if ! command -v fzf >/dev/null 2>&1; then
-	print_error "fzf is required"
-	exit 1
-fi
+need_cmd fzf
 
 pick() {
 	local header="$1"
