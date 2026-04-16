@@ -9,8 +9,8 @@
     ./timezone.nix # Timezone (UTC+3)
     ./i18n.nix # Locale, input methods, keyboard layout
     ./environment.nix # Session variables and XDG paths
-    ./stability.nix # Kernel and network sysctl tuning
-    ./performance.nix # SSD trim, OOM protection
+    ./kernel-tuning.nix # Kernel and network sysctl tuning (TCP BBR, inotify, memory)
+    ./system-services.nix # SSD trim, earlyoom OOM protection, notification bus
     ./resource-limits.nix # Systemd timeouts, PAM session limits
     ./host-defaults.nix # Profile-based defaults for mySystem options
     ./host-info.nix # Hostname and state version management

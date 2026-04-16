@@ -1,4 +1,4 @@
-# System performance services: SSD trimming, OOM protection, notification bus.
+# System maintenance services: SSD trimming, OOM protection (earlyoom), notification bus.
 
 { lib, ... }:
 
