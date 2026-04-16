@@ -1,12 +1,8 @@
-# Operational security (kexec, session locking, zram, NTS time).
+# Operational security (session locking, zram, NTS time).
 
 { lib, ... }:
 
 {
-  boot.kernel.sysctl = {
-    "kernel.kexec_load_disabled" = 1; # Prevent runtime kernel replacement
-  };
-
   # Session lock on idle and lid-close — physical access protection
   # Chrony with NTS (authenticated time) replaces systemd-timesyncd
   services = {

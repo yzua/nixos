@@ -1,13 +1,18 @@
 # System-level resource limits: systemd timeouts, PAM session limits.
 
+let
+  # Shared between systemd Manager defaults and PAM login limits.
+  maxOpenFiles = 200000;
+  maxProcesses = 65536;
+in
 {
   systemd.settings.Manager = {
     DefaultTimeoutStopSec = "30s";
     # Avoid greetd/user@ login loops when user manager startup is heavy on cold boot.
     DefaultTimeoutStartSec = "180s";
     DefaultDeviceTimeoutSec = "30s";
-    DefaultLimitNOFILE = 200000;
-    DefaultLimitNPROC = 65536;
+    DefaultLimitNOFILE = maxOpenFiles;
+    DefaultLimitNPROC = maxProcesses;
     # Disable hardware watchdog arming on reboot/shutdown to prevent
     # "watchdog0: watchdog did not stop!" and unnecessary 10-minute fallback timer.
     RuntimeWatchdogSec = "0";
@@ -33,13 +38,13 @@
       domain = "*";
       type = "-";
       item = "nofile";
-      value = 200000;
+      value = maxOpenFiles;
     }
     {
       domain = "*";
       type = "-";
       item = "nproc";
-      value = 65536;
+      value = maxProcesses;
     }
     {
       domain = "*";

@@ -51,7 +51,7 @@ in
 
         powerManagement = {
           enable = true;
-          # finegrained configured in host-specific modules (e.g., hosts/laptop/modules/nvidia.nix)
+          # finegrained configured in host-specific modules
         };
       };
 

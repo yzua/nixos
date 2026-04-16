@@ -75,6 +75,7 @@ _:
       "net.ipv4.conf.all.log_martians" = 1; # Log spoofed packets
 
       # === Kernel Protection ===
+      "kernel.kexec_load_disabled" = 1; # Prevent runtime kernel replacement
       "kernel.kptr_restrict" = 2; # Hide kernel pointers
       "kernel.dmesg_restrict" = 1; # Root-only dmesg
       "kernel.yama.ptrace_scope" = 1; # Parent-only ptrace
