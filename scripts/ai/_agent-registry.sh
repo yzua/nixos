@@ -125,6 +125,7 @@ zai_key() {
 
 # Common Z.AI environment variables for claude --dangerously-skip-permissions.
 # Outputs KEY=VAL lines (one per line) for consumption by env.
+# Source of truth: shared/constants.nix (services.zai.models, services.zai.timeout).
 zai_claude_env() {
   local key
   key="$(zai_key)"

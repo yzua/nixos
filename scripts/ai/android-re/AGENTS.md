@@ -14,8 +14,14 @@ Parent: `scripts/ai/AGENTS.md`
 | `re-avd-test.sh`                     | Unit tests for re-avd.sh                                                                                 |
 | `re-static.sh`                       | Static analysis: `prepare` (apktool+jadx), `hashes`, `inventory`                                         |
 | `opencode-android-re.sh`             | OpenCode session launcher (called by `oc*are` wrappers)                                                  |
-| `_helpers.sh`                        | Shared helper: `resolve_niri_android_workspace()`                                                        |
+| `_helpers.sh`                        | Shared helpers: `adb_prop`, `emulator_online`, `resolve_niri_android_workspace`                          |
 | `_spoof-table.sh`                    | Declarative Pixel 7 spoof: 40+ system properties, 8 files to hide, 6 services to stop                    |
+| `_emulator.sh`                       | Emulator management helpers (sourced library)                                                            |
+| `_frida.sh`                          | Frida helper functions (sourced library)                                                                 |
+| `_mitm.sh`                           | mitmproxy helper functions (sourced library)                                                             |
+| `_spoof.sh`                          | Device spoof helper functions (sourced library)                                                          |
+| `_status.sh`                         | Status check helper functions (sourced library)                                                          |
+| `_tmux.sh`                           | tmux helper functions (sourced library)                                                                  |
 | `frida-spoof-build.js`               | Frida gadget: overrides Build fields to Pixel 7, hides emulator files                                    |
 | `frida-bypass-certificate-pinner.js` | Frida: bypasses OkHttp CertificatePinner + Conscrypt TrustManagerImpl                                    |
 | `frida-hook-build-fields.js`         | Frida: logs android.os.Build fields (read-only diagnostic)                                               |
@@ -28,7 +34,7 @@ Parent: `scripts/ai/AGENTS.md`
 
 ## Conventions
 
-- `_` prefix for sourced libraries (`_helpers.sh`, `_spoof-table.sh`) — no `set -euo pipefail`.
+- `_` prefix for sourced libraries (`_helpers.sh`, `_spoof-table.sh`, `_emulator.sh`, `_frida.sh`, `_mitm.sh`, `_spoof.sh`, `_status.sh`, `_tmux.sh`) — no `set -euo pipefail`.
 - Frida hooks follow: `Java.perform(function() { ... })` with tagged console output (`[cert-bypass]`, `[url-log]`, etc.).
 - Spoof table is the single source of truth for device identity.
 - Environment-variable-driven: ~30 env vars (`AVD_NAME`, `FRIDA_VERSION`, `MITM_PORT`, etc.) with sensible defaults.

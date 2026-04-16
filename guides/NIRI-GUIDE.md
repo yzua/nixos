@@ -24,19 +24,17 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 Six named workspaces are preconfigured, plus unnamed numeric slots:
 
-| #   | Workspace   | Apps                           | Access                           |
-| --- | ----------- | ------------------------------ | -------------------------------- |
-| 1   | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`                        |
-| 2   | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`                        |
-| 3   | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`                        |
-| 4   | 󰎆 media     | Music/Video players (rules)    | `Super+4`                        |
-| —   | 󰦝 vpn       | VPN tools (window rules only)  | Overview / `Page_Up`/`Page_Down` |
-| 5   | _(unnamed)_ | General use                    | `Super+5`                        |
-| 6   | 󰀲 android   | Android tools (rules only)     | `Super+6`                        |
+| #   | Workspace   | Apps                           | Access              |
+| --- | ----------- | ------------------------------ | ------------------- |
+| 1   | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`           |
+| 2   | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`           |
+| 3   | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`           |
+| 4   | 󰎆 media     | Music/Video players (rules)    | `Super+4`           |
+| 5   | 󰦝 vpn       | VPN tools (window rules only)  | `Super+5`           |
+| 6   | 󰀲 android   | Android tools (rules only)     | `Super+6`           |
+| 7–9 | _(unnamed)_ | General use                    | `Super+7`–`Super+9` |
 
-The 󰦝 **vpn** workspace has no `Super+<number>` binding — it is a named workspace that sits between media and android in the internal layout. Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open there via window rules. Navigate to it with `Super+Grave` (overview) or `Super+Page_Up`/`Super+Page_Down`.
-
-Workspaces 7–9 are unnamed extras (accessible via their number keys).
+Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open on the vpn workspace via window rules.
 
 Apps are assigned to workspaces via window rules — when Brave opens, it goes to browser workspace automatically. You never have to manually place them.
 
@@ -52,7 +50,7 @@ Learn these first. Everything else can wait.
 | 2   | `Super+D`            | Open app launcher (Noctalia)   | Launch any app              |
 | 3   | `Super+Q`            | Close focused window           | Done with a window          |
 | 4   | `Super+Left/Right`   | Focus column left/right        | Navigate between windows    |
-| 5   | `Super+1–6`          | Switch to workspace            | Jump to a workspace         |
+| 5   | `Super+1–9`          | Switch to workspace            | Jump to a workspace         |
 | 6   | `Super+F`            | Toggle floating                | Pull a window out of tiling |
 | 7   | `Super+M`            | Maximize column                | Make column fill the screen |
 | 8   | `Super+V`            | Clipboard history              | Paste from history          |
@@ -151,7 +149,7 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+2`         | Go to 󰨞 editor workspace                      |
 | `Super+3`         | Go to 󰍡 social workspace                      |
 | `Super+4`         | Go to 󰎆 media workspace                       |
-| `Super+5`         | Go to unnamed workspace 5                     |
+| `Super+5`         | Go to 󰦝 vpn workspace                         |
 | `Super+6`         | Go to 󰀲 android workspace                     |
 | `Super+7–9`       | Go to unnamed workspaces 7–9                  |
 | `Super+Page_Up`   | Go to workspace above                         |
@@ -167,7 +165,7 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+Shift+2`         | Move column to 󰨞 editor workspace     |
 | `Super+Shift+3`         | Move column to 󰍡 social workspace     |
 | `Super+Shift+4`         | Move column to 󰎆 media workspace      |
-| `Super+Shift+5`         | Move column to unnamed workspace 5    |
+| `Super+Shift+5`         | Move column to 󰦝 vpn workspace        |
 | `Super+Shift+6`         | Move column to 󰀲 android workspace    |
 | `Super+Shift+7–9`       | Move column to unnamed workspaces 7–9 |
 | `Super+Shift+Page_Up`   | Move column to workspace above        |
@@ -575,7 +573,7 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | Key                        | Action                                 |
 | -------------------------- | -------------------------------------- |
 | `Super+1–4`                | Focus named workspaces (browser–media) |
-| `Super+5`                  | Focus unnamed workspace 5              |
+| `Super+5`                  | Focus 󰦝 vpn workspace                  |
 | `Super+6`                  | Focus 󰀲 android workspace              |
 | `Super+7–9`                | Focus unnamed workspaces 7–9           |
 | `Super+Shift+1–9`          | Move column to workspace 1–9           |

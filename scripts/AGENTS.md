@@ -32,8 +32,14 @@ scripts/
 │       ├── frida-hook-shared-prefs.js # Frida: log SharedPreferences reads/writes
 │       ├── frida-hook-url-log.js # Frida: log URL creation and OkHttp requests
 │       ├── frida-hooks-test.sh # Unit tests for Frida hook scripts
-│       ├── _helpers.sh      # Shared Android RE helper functions
-│       └── _spoof-table.sh  # Device fingerprint spoof table
+│       ├── _helpers.sh      # Shared helpers: adb_prop, emulator_online, resolve_niri_android_workspace
+│       ├── _spoof-table.sh  # Device fingerprint spoof table
+│       ├── _emulator.sh     # Emulator management helpers
+│       ├── _frida.sh        # Frida helper functions
+│       ├── _mitm.sh         # mitmproxy helper functions
+│       ├── _spoof.sh        # Device spoof helper functions
+│       ├── _status.sh       # Status check helper functions
+│       └── _tmux.sh         # tmux helper functions
 ├── apps/
 │   ├── browser-select.sh    # Browser profile selector (wofi menu)
 │   ├── element-desktop-keyring.sh # Element Desktop keyring helper

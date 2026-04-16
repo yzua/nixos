@@ -56,7 +56,7 @@ terminal/
 - **Framework**: Oh My Zsh (Starship handles the prompt)
 - **Plugins**: sudo, extract, copypath, copyfile, bgnotify, fzf-tab
 - **Completions**: Carapace (not OMZ completions)
-- **Privacy history**: 20+ patterns filtered (tokens, passwords, API keys, SSH, sops commands)
+- **Privacy history**: 28 patterns filtered (tokens, passwords, API keys, SSH, sops commands)
 - **Custom functions**: `aip` (multi-agent Zellij panes), agent wrappers (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_openrouter`, `opencode_sonnet`, `opencode_zen`)
 - **Agent wrappers**: Load secrets from sops at runtime, launch agents with correct env vars
 
