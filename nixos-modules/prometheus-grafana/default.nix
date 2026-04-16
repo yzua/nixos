@@ -1,9 +1,10 @@
-# Prometheus + Alertmanager + Grafana observability stack (localhost:9090, localhost:9093, localhost:3001).
+# Prometheus + Alertmanager + Grafana observability stack.
 
 {
   config,
   lib,
   pkgs,
+  constants,
   ...
 }:
 
@@ -11,10 +12,11 @@ let
   inherit (import ../helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
 
   localhost = "127.0.0.1";
-  netdataTarget = "${localhost}:19999";
-  lokiTarget = "${localhost}:3100";
-  prometheusTarget = "${localhost}:9090";
-  alertmanagerTarget = "${localhost}:9093";
+  inherit (constants) ports;
+  netdataTarget = "${localhost}:${toString ports.netdata}";
+  lokiTarget = "${localhost}:${toString ports.loki}";
+  prometheusTarget = "${localhost}:${toString ports.prometheus}";
+  alertmanagerTarget = "${localhost}:${toString ports.alertmanager}";
   mkStaticConfig = targets: [ { inherit targets; } ];
   mkDatasource =
     {
@@ -68,7 +70,7 @@ in
       # === Prometheus + Alertmanager ===
       prometheus = {
         enable = true;
-        port = 9090;
+        port = ports.prometheus;
         listenAddress = localhost;
 
         globalConfig = {
@@ -105,7 +107,7 @@ in
         alertmanager = {
           enable = true;
           listenAddress = localhost;
-          port = 9093;
+          port = ports.alertmanager;
           extraFlags = [
             "--cluster.listen-address="
           ];
@@ -127,7 +129,7 @@ in
                 name = "ntfy";
                 webhook_configs = [
                   {
-                    url = "http://127.0.0.1:${toString config.mySystem.ntfy.port}/hook";
+                    url = "http://${localhost}:${toString config.mySystem.ntfy.port}/hook";
                     send_resolved = true;
                   }
                 ];
@@ -144,13 +146,13 @@ in
         settings = {
           server = {
             http_addr = localhost;
-            http_port = 3001;
+            http_port = ports.grafana;
           };
 
           security = {
             admin_user = "admin";
             admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
-            secret_key = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
+            secret_key = "$__file{${config.sops.secrets.grafana_admin_password.path}}"; # TODO: use a dedicated grafana_secret_key sops secret — reusing admin_password means rotating it breaks encrypted datasources
           };
 
           "auth.anonymous".enabled = false;

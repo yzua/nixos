@@ -1,9 +1,15 @@
-# Loki log aggregation with Promtail (localhost:3100).
+# Loki log aggregation with Promtail.
 
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  constants,
+  ...
+}:
 
 let
   inherit (import ./helpers/_systemd-helpers.nix { inherit lib; }) mkServiceHardening;
+  inherit (constants) ports;
 in
 {
   options.mySystem.loki = {
@@ -18,9 +24,9 @@ in
         auth_enabled = false; # Single-tenant, localhost only
 
         server = {
-          http_listen_port = 3100;
+          http_listen_port = ports.loki;
           http_listen_address = "127.0.0.1";
-          grpc_listen_port = 9096;
+          grpc_listen_port = ports.loki-grpc;
           grpc_listen_address = "127.0.0.1";
         };
 
@@ -74,7 +80,7 @@ in
 
       configuration = {
         server = {
-          http_listen_port = 9080;
+          http_listen_port = ports.promtail;
           http_listen_address = "127.0.0.1";
           grpc_listen_port = 0;
         };
@@ -85,7 +91,7 @@ in
 
         clients = [
           {
-            url = "http://127.0.0.1:3100/loki/api/v1/push";
+            url = "http://127.0.0.1:${toString ports.loki}/loki/api/v1/push";
           }
         ];
 

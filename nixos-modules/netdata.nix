@@ -5,6 +5,7 @@
   lib,
   pkgs,
   pkgsStable,
+  constants,
   ...
 }:
 
@@ -24,7 +25,7 @@ in
       config = {
         global = {
           "bind to" = "127.0.0.1";
-          "default port" = "19999";
+          "default port" = "${toString constants.ports.netdata}";
           "memory mode" = "dbengine";
           "page cache size" = "64";
           "dbengine multihost disk space" = "512";

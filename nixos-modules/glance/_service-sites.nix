@@ -1,4 +1,7 @@
-# Glance dashboard service health check endpoints
+# Glance dashboard service health check endpoints.
+# Port numbers are injected from constants.ports to avoid drift.
+
+{ ports }:
 
 let
   mkSite =
@@ -14,47 +17,47 @@ in
 map mkSite [
   {
     title = "Glance";
-    url = "http://localhost:8082";
+    url = "http://localhost:${toString ports.glance}";
     icon = "mdi:view-dashboard-outline";
   }
   {
     title = "Netdata";
-    url = "http://localhost:19999";
+    url = "http://localhost:${toString ports.netdata}";
     icon = "si:netdata";
   }
   {
     title = "Grafana";
-    url = "http://localhost:3001";
+    url = "http://localhost:${toString ports.grafana}";
     icon = "si:grafana";
   }
   {
     title = "Prometheus";
-    url = "http://localhost:9090";
+    url = "http://localhost:${toString ports.prometheus}";
     icon = "si:prometheus";
   }
   {
     title = "Alertmanager";
-    url = "http://localhost:9093";
+    url = "http://localhost:${toString ports.alertmanager}";
     icon = "mdi:alert-outline";
   }
   {
     title = "Scrutiny";
-    url = "http://localhost:8080";
+    url = "http://localhost:${toString ports.scrutiny}";
     icon = "mdi:harddisk";
   }
   {
     title = "I2PD Webconsole";
-    url = "http://localhost:7070";
+    url = "http://localhost:${toString ports.i2pd-webconsole}";
     icon = "mdi:router-network";
   }
   {
     title = "Syncthing";
-    url = "http://localhost:8384";
+    url = "http://localhost:${toString ports.syncthing}";
     icon = "si:syncthing";
   }
   {
     title = "ActivityWatch";
-    url = "http://localhost:5600";
+    url = "http://localhost:${toString ports.activitywatch}";
     icon = "mdi:clock-check-outline";
   }
 ]

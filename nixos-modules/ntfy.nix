@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   pkgsStable,
@@ -40,7 +41,7 @@ in
 
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8090;
+      default = constants.ports.ntfy-bridge;
       description = "Port for the alertmanager-ntfy bridge to listen on.";
     };
   };
