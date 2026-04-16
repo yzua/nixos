@@ -101,7 +101,7 @@ in
       tab name="system" focus=true {
         pane split_direction="horizontal" {
           pane command="${pkgs.btop}/bin/btop"
-          pane command="${pkgs.nvtopPackages.full}/bin/nvtop"
+          pane command="${pkgs.nvtopPackages.nvidia}/bin/nvtop"
         }
       }
 
