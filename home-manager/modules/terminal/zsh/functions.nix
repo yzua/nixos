@@ -2,6 +2,10 @@
 
 { constants, ... }:
 
+let
+  inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
+in
+
 {
   programs.zsh.initContent = ''
     # === LS_COLORS ===
@@ -22,14 +26,7 @@
     fi
 
     # Sops-enabled agent wrappers
-    _load_secret() {
-      local key_file="/run/secrets/$1"
-      if [[ ! -f "$key_file" ]]; then
-        echo "Error: $key_file not found. Run 'just nixos' to decrypt secrets." >&2
-        return 1
-      fi
-      cat "$key_file"
-    }
+    ${loadSecretFn}
 
     _load_zai_key() { _load_secret zai_api_key; }
     _load_openrouter_key() { _load_secret openrouter_api_key; }
