@@ -63,6 +63,39 @@ dead:
     @\time -f "⏱ Completed in %E" deadnix --fail . || nix run nixpkgs#deadnix -- --fail .
     @echo "✔ Deadnix check passed!"
 
+# Run all shell test suites
+test:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    rc=0
+
+    echo -e "\n➤ Running shell tests…"
+
+    REPO_ROOT="$(cd "$(dirname "{{justfile()}}")" && pwd)"
+    export REPO_ROOT
+
+    tests=(
+        "scripts/build/modules-check-test.sh"
+        "scripts/ai/agent-launcher-test.sh"
+        "scripts/ai/agent-iter-test.sh"
+        "scripts/ai/agents-search-test.sh"
+        "scripts/ai/android-re/re-avd-test.sh"
+        "scripts/ai/android-re/frida-hooks-test.sh"
+        "scripts/system/report/report-collectors-test.sh"
+    )
+
+    for t in "${tests[@]}"; do
+        if bash "$REPO_ROOT/$t"; then
+            echo "  ✔ $t"
+        else
+            echo "  ✗ $t"
+            rc=1
+        fi
+    done
+
+    if [ $rc -ne 0 ]; then exit $rc; fi
+    echo "✔ All tests passed!"
+
 # Run nix flake check
 check:
     @echo -e "\n➤ Running nix flake check…"
@@ -118,6 +151,7 @@ all:
 
     # Phase 2: Sequential (format depends on lint, check evaluates everything)
     $JUST format
+    $JUST test
     $JUST check
     $JUST nixos
     $JUST home
