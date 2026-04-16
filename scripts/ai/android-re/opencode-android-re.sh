@@ -39,7 +39,7 @@ fi
 # Boot the emulator baseline if nothing is running.
 # Run start in background so the OpenCode session opens immediately;
 # the agent can check readiness with `re-avd.sh status` or `adb wait-for-device`.
-if ! adb devices 2>/dev/null | grep -q '^emulator-'; then
+if ! emulator_online; then
 	echo "No emulator running — starting Android RE baseline in background (log: ${START_LOG})"
 	nohup bash "${SCRIPT_DIR}/re-avd.sh" start >"${START_LOG}" 2>&1 &
 	START_PID=$!
