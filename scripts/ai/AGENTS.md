@@ -8,20 +8,22 @@ Parent: `scripts/AGENTS.md`
 
 ## Files
 
-| File                     | Purpose                                                                                                   |
-| ------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `_agent-registry.sh`     | Single source of truth for all agent aliases, workflow suffixes, ZAI key resolution                       |
-| `agent-launcher.sh`      | Interactive fzf-based multi-provider AI agent launcher                                                    |
-| `agent-launcher-test.sh` | Unit tests for agent-launcher.sh                                                                          |
-| `agent-log-wrapper.sh`   | Timestamped log splitting (stdout `.log`, stderr `-errors.log`), optional desktop notification on failure |
-| `agent-analyze.sh`       | CLI log analyzer: stats, errors, sessions, search, tail, report, patterns                                 |
-| `agent-dashboard.sh`     | fzf-driven interactive dashboard looping over analyzer commands                                           |
-| `agent-inventory.sh`     | Dynamic inventory browser for AI tools (profiles, models, MCP, hooks, skills, agents)                     |
-| `agents-search.sh`       | Scans project trees for directories needing AGENTS.md                                                     |
-| `agent-iter.sh`          | Headless iterative agent runner with rate-limit retry                                                     |
-| `agent-iter-test.sh`     | Unit tests for agent-iter.sh                                                                              |
-| `skills-sync.sh`         | Syncs 28 AI skills from GitHub repos to `~/.local/share/skills/`                                          |
-| `android-re/`            | Android RE toolkit (see `android-re/AGENTS.md`)                                                           |
+| File                       | Purpose                                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `_agent-registry.sh`       | Single source of truth for all agent aliases, workflow suffixes, ZAI key resolution                       |
+| `agent-launcher.sh`        | Interactive fzf-based multi-provider AI agent launcher                                                    |
+| `agent-launcher-test.sh`   | Unit tests for agent-launcher.sh                                                                          |
+| `agent-log-wrapper.sh`     | Timestamped log splitting (stdout `.log`, stderr `-errors.log`), optional desktop notification on failure |
+| `agent-analyze.sh`         | CLI log analyzer: stats, errors, sessions, search, tail, report, patterns                                 |
+| `agent-dashboard.sh`       | fzf-driven interactive dashboard looping over analyzer commands                                           |
+| `agent-inventory.sh`       | Dynamic inventory browser for AI tools (profiles, models, MCP, hooks, skills, agents)                     |
+| `_inventory-collectors.sh` | Shared inventory data collectors (sourced by agent-inventory.sh)                                          |
+| `_inventory-helpers.sh`    | Shared inventory helper functions (sourced by agent-inventory.sh)                                         |
+| `agents-search.sh`         | Scans project trees for directories needing AGENTS.md                                                     |
+| `agent-iter.sh`            | Headless iterative agent runner with rate-limit retry                                                     |
+| `agent-iter-test.sh`       | Unit tests for agent-iter.sh                                                                              |
+| `skills-sync.sh`           | Syncs 28 AI skills from GitHub repos to `~/.local/share/skills/`                                          |
+| `android-re/`              | Android RE toolkit (see `android-re/AGENTS.md`)                                                           |
 
 ---
 

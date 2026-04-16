@@ -31,8 +31,8 @@ Parent: `scripts/AGENTS.md`
 
 ## Gotchas
 
-- `modules-check.sh` skips `_*.nix` files and `*/custom/*` paths. Comments with `modules-check: manual-helper` or `imported manually` exclude specific modules.
-- `packages-check.sh` has a large inline AWK skip-list of non-package `pkgs.*` attributes — new package namespaces may need adding.
+- `modules-check.sh` skips `_*.nix` files. Comments with `modules-check: manual-helper` or `imported manually` exclude specific modules.
+- `packages-check.sh` skips `_*.nix` files and `*/custom/*` paths, and has a large inline AWK skip-list of non-package `pkgs.*` attributes — new package namespaces may need adding.
 - `shellcheck-nix-inline.sh` excludes SC1114, SC1128, SC2239. Blocks with `${lib.` are skipped entirely (Nix-level conditionals).
 - `pre-commit-hook.sh` hardcodes an exclude for `./home-manager/modules/terminal/zellij/layouts.nix` in deadnix.
 - `pre-push-hook.sh` reads from stdin (git hook protocol: `local_ref local_sha remote_ref remote_sha` per line).

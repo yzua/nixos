@@ -36,4 +36,4 @@
 
 ## Scoped guides
 
-- Read the nearest nested `AGENTS.md` before editing `nixos-modules/`, `home-manager/`, `scripts/`, `hosts/`, or `dev-shells/`.
+- Read the nearest nested `AGENTS.md` before editing `nixos-modules/`, `home-manager/`, `scripts/`, `hosts/`, `dev-shells/`, or `themes/`.

@@ -394,7 +394,7 @@ Available runtimes:
 
 - Bash
 - Python 3.13
-- Node.js 24
+- Node.js 24.13
 - Bun 1.3.10
 - Frida JS
 

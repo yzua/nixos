@@ -32,7 +32,7 @@ Zellij is modal, like Vim. The current mode is shown in the bottom-left of the s
 | **Scroll**  | Aqua         | `Ctrl s`                    | Navigate scrollback with Vim keys      |
 | **Search**  | Purple       | `/` or `s` from Scroll mode | Search through scrollback              |
 | **Session** | Red          | `Ctrl o` (Zellij default)   | Session management (detach/quit)       |
-| **Resize**  | Orange       | (default bindings)          | Resize panes                           |
+| **Resize**  | Blue         | (default bindings)          | Resize panes                           |
 | **Pane**    | Green        | (default bindings)          | Pane management                        |
 | **Tab**     | Blue         | (default bindings)          | Tab management                         |
 | **Move**    | Gold         | (default bindings)          | Move panes around                      |
@@ -197,7 +197,7 @@ zellij -l monitoring
 
 Two tabs for system monitoring:
 
-- **system** (focused): btop and nvtop stacked vertically
+- **system** (focused): btop and nvtop side by side
 - **logs**: Live `journalctl -f` output
 
 ---

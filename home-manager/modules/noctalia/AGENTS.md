@@ -7,13 +7,14 @@ Custom Wayland desktop shell: bar, launcher, notifications, wallpaper, OSD, cont
 
 ## Module Map
 
-| File               | Purpose      | Key Details                                                                                                            |
-| ------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `default.nix`      | Import hub   | Imports `noctalia.homeModules.default` from flake, bar, settings, activation; `status-notifier-watcher`                |
-| `bar.nix`          | Bar widgets  | Left (clock, system monitor), center (workspace widget), right (media, network, tray, plugins, volume, control center) |
-| `settings.nix`     | Shell config | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks                               |
-| `activation.nix`   | Activation   | Home Manager activation scripts for Noctalia setup                                                                     |
-| `_colorscheme.nix` | Color scheme | Generates GruvboxAlt JSON from `shared/constants.nix` (dark scheme auto-syncs, light scheme inline)                    |
+| File               | Purpose         | Key Details                                                                                                            |
+| ------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `default.nix`      | Import hub      | Imports `noctalia.homeModules.default` from flake, bar, settings, activation; `status-notifier-watcher`                |
+| `bar.nix`          | Bar widgets     | Left (clock, system monitor), center (workspace widget), right (media, network, tray, plugins, volume, control center) |
+| `settings.nix`     | Shell config    | Theme colors (GruvboxAlt via custom scheme), dock, wallpaper, OSD, control center, hooks                               |
+| `activation.nix`   | Activation      | Home Manager activation scripts for Noctalia setup                                                                     |
+| `_colorscheme.nix` | Color scheme    | Generates GruvboxAlt JSON from `shared/constants.nix` (dark scheme auto-syncs, light scheme inline)                    |
+| `_plugins.nix`     | Plugin registry | Categorizes all 4 QML plugins by activation behavior (`all`, `needsBackup`, `needsMaterialization`)                    |
 
 ### `plugins/` (4 QML plugins)
 

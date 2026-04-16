@@ -268,7 +268,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                                 |
 | `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                                        |
 | `oc`                           | `opencode`                                                         | Default OpenCode                                                                   |
-| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile; auto-renames current Zellij tab to `ocglm`           |
+| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile; auto-renames current Zellij tab to `ocglm`            |
 | `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                                       |
 | `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                          |
 | `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                                       |
@@ -288,7 +288,7 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                                |
 | `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                                       |
 | `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)                   |
-| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt and names the tab    |
+| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt and names the tab     |
 | `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                             |
 | `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`                       |
 | `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`                    |
@@ -464,7 +464,7 @@ ai-agents/
 | Cleanup           | 14 days          | Auto-delete old sessions                             |
 | Attribution       | Disabled         | No auto-attribution in commits/PRs                   |
 
-Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `nh`, `home-manager`, `cargo`, `docker`, `make`, `go`, `python`, etc. Deny (execution): `rm -rf /`, `rm -rf ~`, `dd`, `mkfs`, `shutdown`, `reboot`, `poweroff`, `git push --force`, `git reset --hard`. Deny (file read): `.env`, `.env.*`, `./secrets/**`, `.ssh/*`, SSH private keys.
+Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `nh`, `home-manager`, `cargo`, `docker`, `make`, `go`, `python`, etc. Deny (execution): `rm -rf /`, `rm -rf ~`, `rm -rf /*`, `dd`, `mkfs`, `shutdown`, `reboot`, `poweroff`, `git push --force`, `git push -f`, `git reset --hard`, `git clean -fd`, `git clean -fdx`. Deny (file read): `.env`, `.env.*`, `./secrets/**`, `.ssh/*`, SSH private keys.
 
 ### OpenCode
 
@@ -793,7 +793,7 @@ PreToolUse hooks enforce safety guardrails:
 - Warn on destructive DB commands (`DROP`, `DELETE FROM`, `truncate`)
 - Pre-commit lint check (triggers `just lint` / `pre-commit run` / `npm run lint` / `cargo check`)
 - Dev server tmux recommendation (suggests `npm/pnpm/yarn/bun run dev` in tmux)
-- Session persistence recommendation (for long-running tasks like `npm install/test`, `cargo`, `just`)
+- Session persistence recommendation (for long-running tasks like `npm install/test`, `pnpm/yarn/bun install/test`, `cargo build/test/check`, `pytest`, `vitest`, `playwright`, `docker`, `just check/lint/format/home/nixos/all`)
 - Block destructive git commands (`push --force`, `push -f`, `reset --hard`, `clean -fd`, `clean -fdx`)
 
 ---

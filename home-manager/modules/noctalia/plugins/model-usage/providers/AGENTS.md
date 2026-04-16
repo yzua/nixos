@@ -28,8 +28,8 @@ Data-source layer for the model-usage plugin. Each file implements the provider 
 
 ## Gotchas
 
-- `formatResetTime()` is copy-pasted identically across all 6 providers.
-- `resolvePath()` is duplicated in Claude, Codex, and Zai.
+- `formatResetTime()` is a thin wrapper in each provider that delegates to `ProviderUtils.js.formatResetTime()`.
+- `resolvePath()` is a thin wrapper in Claude, Codex, and Zai that delegates to `ProviderUtils.js.resolvePath()`.
 - Copilot uses internal GitHub API (`copilot_internal/user`) — undocumented, could break.
 - Zen sends a real API request (POST with `model: "glm-5-free", input: "hi"`) just to validate the key.
 - OpenRouter fires 7 parallel XHR requests for activity data.

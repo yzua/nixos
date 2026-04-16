@@ -107,6 +107,7 @@ ai-agents/
         ├── codex.nix        # Codex CLI configuration
         ├── gemini.nix       # Gemini CLI configuration (imports ../../helpers/_formatters.nix)
         ├── opencode.nix      # OpenCode configuration (agents, LSP, providers)
+        ├── _opencode-android-re.nix # OpenCode Android RE agent definition
         └── _opencode-lsp.nix # OpenCode LSP tool configuration
 ```
 

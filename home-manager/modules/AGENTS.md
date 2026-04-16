@@ -67,6 +67,7 @@ modules/
 │           ├── codex.nix    # Codex CLI config (model, profiles, custom agents, developer instructions)
 │           ├── gemini.nix   # Gemini CLI config (settings, theming, model aliases, auto-format hooks)
 │           ├── opencode.nix # OpenCode config (agents, LSP, providers)
+│           ├── _opencode-android-re.nix # OpenCode Android RE agent definition
 │           └── _opencode-lsp.nix # OpenCode LSP tool configuration
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
