@@ -1,6 +1,6 @@
-# ActivityWatch app usage tracking (Wayland, dashboard at localhost:5600).
+# ActivityWatch app usage tracking (Wayland).
 
-{ pkgs, ... }:
+{ pkgs, constants, ... }:
 
 {
   xdg.configFile."activitywatch/aw-server-rust/config.toml".force = true;
@@ -10,7 +10,7 @@
     package = pkgs.aw-server-rust;
 
     settings = {
-      port = 5600;
+      port = constants.ports.activitywatch;
       host = "127.0.0.1"; # Localhost only — defense-in-depth alongside firewall
     };
 

@@ -188,9 +188,9 @@ let
         alias = "${agent.alias}${workflow.suffix}";
         command =
           if agent.workflowPromptMode == "flag" then
-            "${agent.command} --prompt ${lib.escapeShellArg workflow.prompt}"
+            "_ai_agent_exec ${agent.alias}${workflow.suffix} -- ${agent.command} --prompt ${lib.escapeShellArg workflow.prompt}"
           else
-            "${agent.command} ${lib.escapeShellArg workflow.prompt}";
+            "_ai_agent_exec ${agent.alias}${workflow.suffix} -- ${agent.command} ${lib.escapeShellArg workflow.prompt}";
       }) workflowAgentSpecs
     ) workflowPromptSpecs
   );
@@ -204,7 +204,13 @@ let
       + "&& echo 'Copied ${workflow.suffix} prompt to clipboard'";
   }) workflowPromptSpecs;
 
-  aiAliases = mkAliasAttrs (aiAgentAliasSpecs ++ aiWorkflowAliasSpecs ++ workflowClipboardAliasSpecs);
+  aiAliases = mkAliasAttrs (
+    (map (
+      spec: spec // { command = "_ai_agent_exec ${spec.alias} -- ${spec.command}"; }
+    ) aiAgentAliasSpecs)
+    ++ aiWorkflowAliasSpecs
+    ++ workflowClipboardAliasSpecs
+  );
 
   # Shared env var passthrough for workflow prompts (used by launcher and iter wrappers).
   mkWorkflowEnvVars = targetScript: ''

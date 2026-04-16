@@ -8,6 +8,8 @@ let
   scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
   launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
   inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
+  inherit (constants.services.zai) timeout;
+  inherit (constants.services.zai.models) haiku sonnet opus;
 
   mkAndroidReLauncher =
     {
@@ -87,10 +89,10 @@ let
     key="$(_load_secret zai_api_key)" || return 1
     export ANTHROPIC_AUTH_TOKEN="$key"
     export ANTHROPIC_BASE_URL="${constants.services.zai.apiRoot}/anthropic"
-    export API_TIMEOUT_MS="3000000"
-    export ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-5-turbo"
-    export ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1"
-    export ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1"
+    export API_TIMEOUT_MS="${toString timeout}"
+    export ANTHROPIC_DEFAULT_HAIKU_MODEL="${haiku}"
+    export ANTHROPIC_DEFAULT_SONNET_MODEL="${sonnet}"
+    export ANTHROPIC_DEFAULT_OPUS_MODEL="${opus}"
   '';
 
 in

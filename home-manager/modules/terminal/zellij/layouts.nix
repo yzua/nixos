@@ -38,8 +38,8 @@ let
         mode_move          "#[bg=${constants.color.yellow},fg=${constants.color.bg_hard},bold] 󰆾 MOVE #[bg=${constants.color.bg_soft},fg=${constants.color.yellow}]"
         mode_tmux          "#[bg=${constants.color.aqua_dim},fg=${constants.color.bg_hard},bold]  TMUX #[bg=${constants.color.bg_soft},fg=${constants.color.aqua_dim}]"
 
-        tab_normal              "#[bg=${constants.color.bg0},fg=${constants.color.gray}] {index}{floating_indicator}{fullscreen_indicator} #[bg=${constants.color.bg_soft},fg=${constants.color.bg0}]"
-        tab_active              "#[bg=${constants.color.yellow_dim},fg=${constants.color.bg_hard},bold] {index}{floating_indicator}{fullscreen_indicator} #[bg=${constants.color.bg_soft},fg=${constants.color.yellow_dim}]"
+        tab_normal              "#[bg=${constants.color.bg0},fg=${constants.color.gray}] {name}{floating_indicator}{fullscreen_indicator} #[bg=${constants.color.bg_soft},fg=${constants.color.bg0}]"
+        tab_active              "#[bg=${constants.color.aqua_dim},fg=${constants.color.bg_hard},bold] {name}{floating_indicator}{fullscreen_indicator} #[bg=${constants.color.bg_soft},fg=${constants.color.aqua_dim}]"
         tab_separator           ""
         tab_floating_indicator  " 󰹙"
         tab_fullscreen_indicator " 󰊓"

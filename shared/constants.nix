@@ -130,6 +130,12 @@
   services = {
     zai = {
       apiRoot = "https://api.z.ai/api"; # Z.AI API root (Anthropic-compatible + MCP)
+      timeout = 3000000; # API timeout in ms
+      models = {
+        haiku = "glm-5-turbo";
+        sonnet = "glm-5.1";
+        opus = "glm-5.1";
+      };
     };
   };
 }
