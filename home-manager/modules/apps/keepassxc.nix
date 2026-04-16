@@ -2,14 +2,14 @@
 # Native messaging host for browser integration is managed by KeePassXC itself
 # (Settings → Browser Integration) — NOT declaratively, to avoid read-only symlink conflicts.
 
-{ pkgsStable, ... }:
+{ pkgs, ... }:
 
 {
   xdg.desktopEntries.keepassxc = {
     name = "KeePassXC";
     genericName = "Password Manager";
     comment = "Cross-platform password manager";
-    exec = "${pkgsStable.keepassxc}/bin/keepassxc %f";
+    exec = "${pkgs.keepassxc}/bin/keepassxc %f";
     icon = "keepassxc";
     terminal = false;
     categories = [

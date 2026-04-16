@@ -23,7 +23,6 @@ let
     nixfmt # Nix formatter
     statix # Nix linter
     deadnix # Nix dead code detector
-    nixd # Nix language server
     nix-tree # Nix dependency explorer
     nix-output-monitor # Better Nix build output
     cachix # Binary cache client
@@ -116,12 +115,5 @@ let
   ];
 in
 {
-  home = {
-    packages = latest ++ stable ++ [ pkgs.objection ];
-
-    sessionVariables = {
-      RUSTC_WRAPPER = "sccache"; # Use sccache for faster Rust/C++ rebuilds
-      DOCKER_CONTENT_TRUST = "1"; # SECURITY: Enforce signed Docker images
-    };
-  };
+  home.packages = latest ++ stable ++ [ pkgs.objection ];
 }

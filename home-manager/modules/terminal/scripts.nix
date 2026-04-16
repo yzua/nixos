@@ -1,9 +1,14 @@
 # Custom utility scripts added to user PATH.
 
-{ config, pkgs, ... }:
+{
+  config,
+  constants,
+  pkgs,
+  ...
+}:
 
 let
-  scriptsDir = "${config.home.homeDirectory}/System/scripts";
+  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
 in
 {
   home.packages = with pkgs; [

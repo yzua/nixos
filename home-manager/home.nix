@@ -28,6 +28,10 @@
     QT_ENABLE_HIGHDPI_SCALING = "1";
     GDK_SCALE = "1";
     GDK_DPI_SCALE = "1";
+
+    # Development
+    RUSTC_WRAPPER = "sccache"; # Use sccache for faster Rust/C++ rebuilds
+    DOCKER_CONTENT_TRUST = "1"; # Enforce signed Docker images
   };
 
   programs = {
