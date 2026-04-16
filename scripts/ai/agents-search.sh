@@ -15,6 +15,10 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
+
 # --- Defaults ---
 BASE_FILE_THRESHOLD=4
 BASE_LINE_THRESHOLD=250
@@ -245,21 +249,21 @@ else
 		parent_covered="${results[$((idx + 5))]}"
 
 		if [[ "$has_guide" == "HAS_GUIDE" ]]; then
-			status_str="\033[0;32m✓ has\033[0m"
+			status_str="${GREEN}✓ has${NC}"
 			((has++)) || true
 		else
-			status_str="\033[0;31m✗ needs\033[0m"
+			status_str="${RED}✗ needs${NC}"
 			((missing++)) || true
 		fi
 
 		if [[ "$parent_covered" == "yes" ]]; then
-			parent_str="\033[0;33mcovered\033[0m"
+			parent_str="${YELLOW}covered${NC}"
 		else
-			parent_str="\033[0;34muncovered\033[0m"
+			parent_str="${BLUE}uncovered${NC}"
 		fi
 
 		printf "%-55s %5d %6d %7d  " "$rel_dir" "$file_count" "$file_lines" "$sub_dir_count"
-		echo -e "$status_str  $parent_str"
+		printf '%b  %b\n' "$status_str" "$parent_str"
 	done
 
 	echo ""

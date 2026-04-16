@@ -2,6 +2,10 @@
 # Sync skills from GitHub repos to ~/.local/share/skills/
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/logging.sh
+source "${SCRIPT_DIR}/../lib/logging.sh"
+
 SKILLS_DIR="$HOME/.local/share/skills"
 mkdir -p "$SKILLS_DIR"
 
@@ -59,7 +63,7 @@ for entry in "${SKILLS[@]}"; do
 
 	# Clone the repo
 	if ! git clone --quiet --depth 1 --filter=blob:none --sparse "https://github.com/$repo.git" "$tmpdir/repo" 2>/dev/null; then
-		echo "❌ clone failed"
+		print_error "clone failed for ${skill_name}"
 		failed=$((failed + 1))
 		rm -rf "$tmpdir"
 		continue
@@ -94,10 +98,10 @@ for entry in "${SKILLS[@]}"; do
 	if [[ -n "$skill_dir" && -f "$skill_dir/SKILL.md" ]]; then
 		rm -rf "$target"
 		cp -r "$skill_dir" "$target"
-		echo "✔"
+		print_success "${skill_name}"
 		success=$((success + 1))
 	else
-		echo "⚠ SKILL.md not found"
+		print_warning "SKILL.md not found for ${skill_name}"
 		failed=$((failed + 1))
 	fi
 
@@ -106,6 +110,6 @@ for entry in "${SKILLS[@]}"; do
 done
 
 echo ""
-echo "✓ Synced $success skills ($failed failed) to $SKILLS_DIR"
+	print_success "Synced $success skills ($failed failed) to $SKILLS_DIR"
 echo ""
 echo "Run 'just home' to symlink to opencode profiles."
