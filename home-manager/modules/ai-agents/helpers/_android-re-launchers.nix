@@ -5,8 +5,9 @@
   pkgs,
 }:
 let
-  scriptsDir = import ./_scripts-dir.nix { inherit config; };
+  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
   launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
+  inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
 
   mkAndroidReLauncher =
     {
@@ -82,14 +83,7 @@ let
 
   # Load Z.AI secret for GLM wrapper (mirrors claude_glm from functions.nix)
   glmModelEnv = ''
-    _load_secret() {
-      local key_file="/run/secrets/$1"
-      if [[ ! -f "$key_file" ]]; then
-        echo "Error: $key_file not found. Run 'just nixos' to decrypt secrets." >&2
-        return 1
-      fi
-      cat "$key_file"
-    }
+    ${loadSecretFn}
     key="$(_load_secret zai_api_key)" || return 1
     export ANTHROPIC_AUTH_TOKEN="$key"
     export ANTHROPIC_BASE_URL="${constants.services.zai.apiRoot}/anthropic"

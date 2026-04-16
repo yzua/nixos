@@ -13,10 +13,10 @@ let
 
   inherit (builtins) toJSON;
 
-  mcpTransforms = import ../helpers/_mcp-transforms.nix { inherit config lib; };
+  mcpTransforms = import ../helpers/_mcp-transforms.nix { inherit cfg lib; };
   inherit (mcpTransforms) sharedMcpServers claudeMcpServers;
 
-  settingsBuilders = import ../helpers/_settings-builders.nix { inherit config lib; };
+  settingsBuilders = import ../helpers/_settings-builders.nix { inherit cfg lib; };
   inherit (settingsBuilders) claudeSettings;
 
   opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };

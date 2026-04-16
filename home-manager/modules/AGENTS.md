@@ -33,8 +33,7 @@ modules/
 │   │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
 │   │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   │   ├── _models.nix           # Shared model/provider constants (names, aliases)
-│   │   ├── _git-clone-update.nix # Git clone/update helper for plugin repos
-│   │   └── _scripts-dir.nix      # Scripts directory path resolver
+│   │   └── _git-clone-update.nix # Git clone/update helper for plugin repos
 │   ├── activation/     # Home Manager activation scripts
 │   │   ├── default.nix      # Aggregation hub
 │   │   ├── secrets.nix      # Secret patching (placeholder → real key injection)

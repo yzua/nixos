@@ -100,7 +100,7 @@ Upstream-verified facts:
 
 ## Everything Claude Code (addon)
 
-Installed by `programs.aiAgents.everythingClaudeCode.enable` (default: `false`) via activation scripts from `affaan-m/everything-claude-code`. Provides skills, commands, and agents prefixed `ecc-` for Claude Code, Codex, and OpenCode.
+Installed by `programs.aiAgents.everythingClaudeCode.enable` (option default: `false`; actively enabled in `defaults.nix`) via activation scripts from `affaan-m/everything-claude-code`. Provides skills, commands, and agents prefixed `ecc-` for Claude Code, Codex, and OpenCode.
 
 Installs into:
 
@@ -399,8 +399,7 @@ ai-agents/
 │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
 │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   ├── _models.nix           # Shared model/provider constants (names, aliases)
-│   ├── _git-clone-update.nix # Git clone/update helper for plugin repos
-│   └── _scripts-dir.nix      # Scripts directory path resolver
+│   └── _git-clone-update.nix # Git clone/update helper for plugin repos
 ├── activation/              # Activation scripts (secret patching, Codex/Claude setup, plugin installs)
 │   ├── default.nix            # Aggregation hub
 │   ├── codex-setup.nix        # Codex config.toml + ~/.codex/agents generation
@@ -506,6 +505,7 @@ The repo now models these through first-class OpenCode options in `programs.aiAg
 | --------------------------- | ------------------------------------------------- | ---------------------------------------------------------- |
 | Default model               | `gemini-3-pro-preview`                            | Highest-end currently supported flagship for coding and RE |
 | Default approval mode       | `auto_edit`                                       | Balanced default for coding without full YOLO              |
+| Sandbox mode                | `none`                                            | Sandbox disabled for full tool access                      |
 | Theme                       | `Gruvbox`                                         | Matches system theme                                       |
 | Vim mode                    | Enabled                                           | Consistent with Neovim workflow                            |
 | Auto-update                 | Enabled                                           | Auto-update via npm; notifications enabled                 |

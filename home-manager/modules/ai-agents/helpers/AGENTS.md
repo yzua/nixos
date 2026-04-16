@@ -26,7 +26,6 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | `_mk-cli-autoupdate-script.nix` | Generates shell script for auto-updating a CLI binary via bun/npm                  |
 | `_zai-services.nix`             | Z.AI MCP service registry: service names, MCP keys, base URL                       |
 | `_zai-filters.nix`              | Agent-specific jq filters for Z.AI MCP secret injection                            |
-| `_scripts-dir.nix`              | Resolves scripts directory path (`$HOME/System/scripts`)                           |
 | `_git-clone-update.nix`         | Generates Bash snippet for git clone/update under `~/.local/share/`                |
 | `_android-re-launchers.nix`     | Shell script binaries for Android RE OpenCode launchers                            |
 
@@ -46,5 +45,5 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 - `_settings-builders.nix` imports `_mcp-transforms`, `_formatters`, and `_models` — changes propagate here.
 - `_zai-filters.nix` imports `_zai-services.nix` directly; both must stay in sync.
 - `_gemini-policies.nix` imports `_destructive-rules.nix` directly.
-- `_aliases.nix` and `_android-re-launchers.nix` both import `_scripts-dir.nix` and `_models.nix`.
+- `_aliases.nix` and `_android-re-launchers.nix` both import `_models.nix`.
 - `toHookPattern` in `_destructive-rules.nix` has special-case regex escaping for `rm -rf /`, `rm -rf ~`, `dd` — consider grep regex safety when adding commands.

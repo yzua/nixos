@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   ...
@@ -9,7 +10,7 @@
 
 let
   cfg = config.programs.aiAgents;
-  scriptsDir = import ./helpers/_scripts-dir.nix { inherit config; };
+  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
 
   logAnalyzer = pkgs.writeShellScriptBin "ai-agent-analyze" ''
     AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \

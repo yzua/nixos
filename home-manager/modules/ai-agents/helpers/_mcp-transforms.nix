@@ -1,13 +1,8 @@
 # MCP server transformation functions.
 
-{
-  config,
-  lib,
-  ...
-}:
+{ cfg, lib }:
 
 let
-  cfg = config.programs.aiAgents;
   sharedMcpServers = cfg.mcpServers;
 
   mkMcpTransform =

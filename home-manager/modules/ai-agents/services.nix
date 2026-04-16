@@ -10,7 +10,7 @@
 
 let
   cfg = config.programs.aiAgents;
-  scriptsDir = import ./helpers/_scripts-dir.nix { inherit config; };
+  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
 
   agentLogWrapper = pkgs.writeShellScriptBin "ai-agent-log-wrapper" ''
     AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
@@ -32,7 +32,14 @@ let
       ;
   };
 
-  aliasLib = import ./helpers/_aliases.nix { inherit config lib pkgs; };
+  aliasLib = import ./helpers/_aliases.nix {
+    inherit
+      config
+      constants
+      lib
+      pkgs
+      ;
+  };
   inherit (aliasLib) aiAliases aiAgentLauncher aiAgentInventory;
   mkCliAutoupdateScript = import ./helpers/_mk-cli-autoupdate-script.nix { inherit pkgs; };
   shellAliases = import ./helpers/_services-shell-aliases.nix {

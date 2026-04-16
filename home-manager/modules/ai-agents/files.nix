@@ -15,7 +15,7 @@ let
   geminiPolicies = import ./helpers/_gemini-policies.nix;
   impeccable = import ./helpers/_impeccable-commands.nix;
   models = import ./helpers/_models.nix;
-  settingsBuilders = import ./helpers/_settings-builders.nix { inherit config lib; };
+  settingsBuilders = import ./helpers/_settings-builders.nix { inherit cfg lib; };
   inherit (settingsBuilders)
     geminiSettings
     opencodeSettingsByProfile

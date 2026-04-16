@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   ...
 }:
@@ -187,7 +188,7 @@ in
       directory = mkStrOption "${config.xdg.dataHome}/ai-agents/logs" "Directory for AI agent logs";
       notifyOnError = mkBoolOption true "Send desktop notification on agent errors";
       enableOtel = mkBoolOption false "Enable OpenTelemetry for supported agents";
-      otelEndpoint = mkStrOption "http://localhost:4317" "OpenTelemetry collector endpoint";
+      otelEndpoint = mkStrOption "http://localhost:${toString constants.ports.otel}" "OpenTelemetry collector endpoint";
       otelExporter = mkStrOption "otlp" "OpenTelemetry exporter type";
       retentionDays = mkIntOption 30 "Days to retain log files";
     };

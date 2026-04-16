@@ -1,14 +1,9 @@
 # Per-agent settings builders and profile variant overrides.
 
-{
-  config,
-  lib,
-  ...
-}:
+{ cfg, lib }:
 
 let
-  cfg = config.programs.aiAgents;
-  mcpTransforms = import ./_mcp-transforms.nix { inherit config lib; };
+  mcpTransforms = import ./_mcp-transforms.nix { inherit cfg lib; };
   formatterRegistry = import ./_formatters.nix;
   models = import ./_models.nix;
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;

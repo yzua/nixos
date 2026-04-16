@@ -2,13 +2,14 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   ...
 }:
 
 let
-  scriptsDir = import ./_scripts-dir.nix { inherit config; };
+  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
   models = import ./_models.nix;
   workflowPrompts = import ./_workflow-prompts.nix { };
   commitSplitPrompt = workflowPrompts.commitSplit;
