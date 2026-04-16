@@ -99,6 +99,33 @@
     i2pd = "127.0.0.1"; # Local I2P daemon (port 4447)
   };
 
+  # Service ports — single source of truth for localhost services.
+  # Referenced by NixOS modules and Glance dashboard health checks.
+  ports = {
+    glance = 8082;
+    netdata = 19999;
+    grafana = 3001;
+    prometheus = 9090;
+    alertmanager = 9093;
+    scrutiny = 8080;
+    influxdb = 8086;
+    loki = 3100;
+    loki-grpc = 9096;
+    promtail = 9080;
+    ntfy-bridge = 8090;
+    i2pd-webconsole = 7070;
+    syncthing = 8384;
+    activitywatch = 5600;
+    otel = 4317;
+    vnc = 5900;
+    vnc-web = 6080;
+  };
+
+  # Paths relative to HOME for repo-local resources.
+  paths = {
+    scripts = "System/scripts";
+  };
+
   # External service API endpoints.
   services = {
     zai = {
