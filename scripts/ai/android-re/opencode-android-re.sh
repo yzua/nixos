@@ -20,9 +20,9 @@ START_LOG="${START_LOG:-${HOME}/Downloads/android-re-tools/re-avd-start.log}"
 
 # Resolve config directory for the chosen profile
 if [[ "${PROFILE}" == "default" ]]; then
-	OPENCODE_CONFIG_DIR="$HOME/.config/opencode"
+	BASE_OPENCODE_CONFIG_DIR="$HOME/.config/opencode"
 else
-	OPENCODE_CONFIG_DIR="$HOME/.config/opencode-${PROFILE}"
+	BASE_OPENCODE_CONFIG_DIR="$HOME/.config/opencode-${PROFILE}"
 fi
 
 # Focus the android workspace in niri — window rule by title "^android-re" places it correctly
@@ -50,18 +50,32 @@ else
 	bash "${SCRIPT_DIR}/re-avd.sh" status
 fi
 
-# Launch Ghostty with OpenCode on the android-re agent
-# The niri window rule matches title "^android-re" and opens on workspace 06-android
+# OpenCode TUI currently rejects custom agents passed via top-level --agent in this flow.
+# Use a runtime config overlay that pins default_agent=android-re instead.
+RUNTIME_CONFIG_PARENT="${XDG_CACHE_HOME:-${HOME}/.cache}/opencode-android-re"
+mkdir -p "${RUNTIME_CONFIG_PARENT}"
+RUNTIME_CONFIG_DIR="$(mktemp -d "${RUNTIME_CONFIG_PARENT}/${PROFILE}.XXXXXX")"
+
+if [[ -d "${BASE_OPENCODE_CONFIG_DIR}" ]]; then
+	# Preserve full profile config (tui theme, commands, plugins, etc.) in the runtime overlay.
+	cp -a "${BASE_OPENCODE_CONFIG_DIR}/." "${RUNTIME_CONFIG_DIR}/"
+fi
+
+if [[ -f "${RUNTIME_CONFIG_DIR}/opencode.json" ]] && command -v jq >/dev/null 2>&1; then
+	jq '.default_agent = "android-re"' "${RUNTIME_CONFIG_DIR}/opencode.json" >"${RUNTIME_CONFIG_DIR}/opencode.json.tmp"
+	mv -f "${RUNTIME_CONFIG_DIR}/opencode.json.tmp" "${RUNTIME_CONFIG_DIR}/opencode.json"
+fi
+
 if command -v ghostty >/dev/null 2>&1; then
 	title="android-re"
 	if [[ "${PROFILE}" != "default" ]]; then
 		title="android-re (${PROFILE})"
 	fi
 
-	OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}" \
-		exec ghostty --title="${title}" -e opencode --agent android-re "$@"
+	OPENCODE_CONFIG_DIR="${RUNTIME_CONFIG_DIR}" \
+		exec ghostty --title="${title}" -e opencode "$@"
 else
 	# Fallback: run directly in current terminal
-	OPENCODE_CONFIG_DIR="${OPENCODE_CONFIG_DIR}" \
-		exec opencode --agent android-re "$@"
+	OPENCODE_CONFIG_DIR="${RUNTIME_CONFIG_DIR}" \
+		exec opencode "$@"
 fi
