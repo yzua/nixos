@@ -2,7 +2,6 @@
 # Chain: 3min dim → 8min lock (Noctalia) → 20min DPMS off.
 
 { config, pkgs, ... }:
-
 {
   services.swayidle = {
     enable = true;
