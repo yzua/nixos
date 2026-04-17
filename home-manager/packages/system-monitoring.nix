@@ -30,7 +30,6 @@
     smem
 
     # Performance analysis
-    inotify-tools
     perf-tools
 
     # Storage monitoring

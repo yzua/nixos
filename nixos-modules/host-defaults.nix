@@ -57,6 +57,8 @@ in
       lynis.enable = mkDefaultTrue; # Weekly Lynis security audit
       secureBoot.enable = mkDefaultTrue; # Secure Boot preparation with sbctl
       vnc.enable = mkDefaultFalse; # On-demand remote access
+      android.enable = mkDefaultTrue; # Android Studio, emulator, ADB, Fastboot
+      browserDeps.enable = mkDefaultTrue; # Chromium, Puppeteer headless browser deps
 
       # Profile-dependent defaults
       gaming = {

@@ -9,7 +9,10 @@
     enable = true;
     logRefusedConnections = true;
     rejectPackets = false; # Drop instead of reject for stealth
-    allowedTCPPorts = [ constants.ports.localsend ];
+    allowedTCPPorts = [
+      constants.ports.localsend
+      3000
+    ]; # 3000 = dev servers
     allowedUDPPorts = [ constants.ports.localsend ];
 
     extraCommands = ''

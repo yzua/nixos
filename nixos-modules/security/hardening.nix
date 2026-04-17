@@ -105,9 +105,9 @@ _:
 
       # === Additional Kernel Hardening ===
       "kernel.ftrace_enabled" = 0; # Disable function tracing (exploit tooling uses this)
-      "net.ipv4.tcp_sack" = 0; # Disable TCP SACK (CVE-2019-11478 resource exhaustion)
-      "net.ipv4.tcp_dsack" = 0; # Disable DACK (related to SACK)
-      "net.ipv4.tcp_fack" = 0; # Disable Forward ACK
+      # NOTE: TCP SACK/DACK/FACK were disabled for CVE-2019-11478 (kernel 5.x).
+      # That CVE is patched in all kernels >= 5.2; this system runs 6.x.
+      # Re-enabling avoids TCP throughput degradation over VPN/WireGuard links.
 
       # === Enhanced ASLR ===
       # Maximize address space randomization for 64-bit (28 bits = 256MB range)
@@ -135,7 +135,8 @@ _:
     };
 
     # Audit disabled — AppArmor + auditd kernel interaction causes
-    # audit_log_subj_ctx panics on newer kernels
+    # audit_log_subj_ctx errors spamming dmesg/journal on kernel 6.x.
+    # Re-enabling breaks the graphical session. Track upstream bug.
     auditd.enable = false;
     audit.enable = false;
   };

@@ -39,6 +39,12 @@ in
       TTYVTDisallocate = true;
     }
     # SECURITY: Systemd hardening directives (mkForce to override upstream defaults)
-    // mkServiceHardening { useMkForce = true; };
+    # PrivateDevices must be false — greetd needs access to the real /dev/tty*
+    # for StandardInput=tty to work. PrivateDevices creates a private /dev
+    # namespace that blocks TTY access, causing exit code 208 (STDIN EPERM).
+    // mkServiceHardening { useMkForce = true; }
+    // {
+      PrivateDevices = lib.mkForce false;
+    };
   };
 }

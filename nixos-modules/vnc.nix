@@ -31,19 +31,22 @@
       x11vnc transmits data UNENCRYPTED. Never expose it directly to the network.
 
       CORRECT USAGE (SSH tunnel):
-        1. Start x11vnc on this host (localhost only):
-           x11vnc -display :0 -localhost -rfbport 5900 -nopw -xkb
+        1. Generate a VNC password (first time only):
+           x11vnc -storepasswd ~/.vnc/passwd
 
-        2. From remote machine, create SSH tunnel:
-           ssh -L 5900:localhost:5900 ${user}@<this-host-ip>
+        2. Start x11vnc on this host (localhost only):
+           x11vnc -display :0 -localhost -rfbport ${toString constants.ports.vnc} -rfbauth ~/.vnc/passwd -xkb
 
-        3. Connect VNC viewer to localhost:5900
+        3. From remote machine, create SSH tunnel:
+           ssh -L ${toString constants.ports.vnc}:localhost:${toString constants.ports.vnc} ${user}@<this-host-ip>
+
+        4. Connect VNC viewer to localhost:${toString constants.ports.vnc}
 
       noVNC WEB ACCESS (localhost only):
-        websockify --web=${pkgsStable.novnc}/share/novnc 6080 localhost:5900
-        Then open http://localhost:6080/vnc.html
+        websockify --web=${pkgsStable.novnc}/share/novnc ${toString constants.ports.vnc-web} localhost:${toString constants.ports.vnc}
+        Then open http://localhost:${toString constants.ports.vnc-web}/vnc.html
 
-      NEVER use -nopw without -localhost. NEVER expose port 5900/6080 to the internet.
+      ALWAYS use -rfbauth with a stored password. NEVER expose port ${toString constants.ports.vnc}/${toString constants.ports.vnc-web} to the internet.
     '';
 
     # Firewall: Block VNC ports from external access (SSH tunnel only)

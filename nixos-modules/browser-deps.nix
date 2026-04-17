@@ -1,6 +1,11 @@
 # Chromium browser, Puppeteer dependencies, and privacy flags.
 
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   browserDeps = with pkgs; [
@@ -12,15 +17,21 @@ let
 in
 
 {
-  environment = {
-    systemPackages = browserDeps;
+  options.mySystem.browserDeps = {
+    enable = lib.mkEnableOption "Chromium browser and Puppeteer headless testing dependencies";
+  };
 
-    variables = {
-      CHROME_DEVEL_SANDBOX = "${pkgs.ungoogled-chromium}/bin/chrome-devel-sandbox";
-      PUPPETEER_HEADLESS = "new";
-      # ELECTRON_OZONE_PLATFORM_HINT is set in niri/main.nix
-      # H-03: --metrics-recording-only does NOT disable telemetry — replaced with proper flags
-      CHROMIUM_FLAGS = "--disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-extensions --disable-sync --no-first-run --no-default-browser-check --disable-breakpad --disable-domain-reliability --disable-features=MediaRouter";
+  config = lib.mkIf config.mySystem.browserDeps.enable {
+    environment = {
+      systemPackages = browserDeps;
+
+      variables = {
+        CHROME_DEVEL_SANDBOX = "${pkgs.ungoogled-chromium}/bin/chrome-devel-sandbox";
+        PUPPETEER_HEADLESS = "new";
+        # ELECTRON_OZONE_PLATFORM_HINT is set in niri/main.nix
+        # H-03: --metrics-recording-only does NOT disable telemetry — replaced with proper flags
+        CHROMIUM_FLAGS = "--disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-extensions --disable-sync --no-first-run --no-default-browser-check --disable-breakpad --disable-domain-reliability --disable-features=MediaRouter";
+      };
     };
   };
 }

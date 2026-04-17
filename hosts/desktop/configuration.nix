@@ -11,6 +11,8 @@
 
   mySystem = {
     hostProfile = "desktop";
+    android.enable = true;
+    browserDeps.enable = true;
     waydroid.enable = false;
     flatpak.enable = false;
     kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.

@@ -22,6 +22,14 @@
       ProtectKernelTunables = wrap true;
       ProtectControlGroups = wrap true;
       RestrictSUIDSGID = wrap true;
+      LockPersonality = wrap true;
+      MemoryDenyWriteExecute = wrap true;
+      RestrictNamespaces = wrap true;
+      PrivateDevices = wrap true;
+      ProtectClock = wrap true;
+      ProtectHostname = wrap true;
+      RemoveIPC = wrap true;
+      SystemCallArchitectures = wrap "native";
     }
     // lib.optionalAttrs (protectSystem != null) { ProtectSystem = wrap protectSystem; }
     // lib.optionalAttrs (memoryMax != null) { MemoryMax = memoryMax; }

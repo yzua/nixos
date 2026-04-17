@@ -21,8 +21,7 @@ in
       (wrapWithMesaEgl "mullvad-browser" mullvad-browser)
       (wrapWithMesaEgl "tor-browser" tor-browser)
 
-      # Secure Boot preparation
-      sbctl
+      # Secure Boot preparation (sbctl installed system-wide by nixos-modules/secure-boot.nix)
       tpm2-tools
 
       # Security tools
