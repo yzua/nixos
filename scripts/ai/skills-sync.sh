@@ -110,6 +110,6 @@ for entry in "${SKILLS[@]}"; do
 done
 
 echo ""
-	print_success "Synced $success skills ($failed failed) to $SKILLS_DIR"
+print_success "Synced $success skills ($failed failed) to $SKILLS_DIR"
 echo ""
 echo "Run 'just home' to symlink to opencode profiles."

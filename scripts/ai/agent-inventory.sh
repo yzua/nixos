@@ -56,16 +56,14 @@ while [[ $# -gt 0 ]]; do
 	--tool)
 		shift
 		if [[ $# -eq 0 ]]; then
-			print_error "--tool requires a value"
-			exit 1
+			error_exit "--tool requires a value"
 		fi
 		tool="$1"
 		;;
 	--section)
 		shift
 		if [[ $# -eq 0 ]]; then
-			print_error "--section requires a value"
-			exit 1
+			error_exit "--section requires a value"
 		fi
 		section="$1"
 		section_locked="true"
@@ -74,10 +72,9 @@ while [[ $# -gt 0 ]]; do
 		usage
 		exit 0
 		;;
-	*)
-		print_error "Unknown argument: $1"
+		*)
 		usage >&2
-		exit 1
+		error_exit "Unknown argument: $1"
 		;;
 	esac
 	shift
@@ -97,8 +94,7 @@ trap 'rm -f "$tmp_rows" "$tmp_filtered"' EXIT
 collect_rows_for_tool "$tool" | dedupe_rows | sort -u >"$tmp_rows"
 
 if [[ ! -s "$tmp_rows" ]]; then
-	print_error "No inventory data found for tool: $tool"
-	exit 1
+	error_exit "No inventory data found for tool: $tool"
 fi
 
 while true; do

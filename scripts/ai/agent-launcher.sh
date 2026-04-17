@@ -78,8 +78,7 @@ execute_agent() {
 
 	local entry="${AGENT_REGISTRY[$agent_alias]:-}"
 	if [[ -z "$entry" ]]; then
-		print_error "Unsupported alias: $agent_alias"
-		exit 1
+		error_exit "Unsupported alias: $agent_alias"
 	fi
 
 	local env_marker="${entry%%|*}"

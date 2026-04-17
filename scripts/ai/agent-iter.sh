@@ -4,6 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=scripts/lib/logging.sh
 source "${SCRIPT_DIR}/../lib/logging.sh"
+# shellcheck source=scripts/lib/require.sh
+source "${SCRIPT_DIR}/../lib/require.sh"
 # shellcheck source=scripts/ai/_agent-registry.sh
 source "${SCRIPT_DIR}/_agent-registry.sh"
 
@@ -61,8 +63,7 @@ run_agent_once() {
 
 	local entry="${AGENT_ITER_REGISTRY[$alias_name]:-}"
 	if [[ -z "$entry" ]]; then
-		print_error "Unsupported alias for iter: ${alias_name}"
-		exit 1
+		error_exit "Unsupported alias for iter: ${alias_name}"
 	fi
 
 	local env_marker="${entry%%|*}"
@@ -87,84 +88,88 @@ run_agent_once() {
 	_ITER_LAST_STDERR="$(cat "${stderr_file}")"
 
 	if ((rc != 0)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
+		trap - RETURN
 		return 1
 	fi
+	trap - RETURN
 	return "${rc}"
 }
 
-if [[ $# -eq 0 ]]; then
-	usage
-	exit 1
-fi
+main() {
+	if [[ $# -eq 0 ]]; then
+		usage
+		exit 1
+	fi
 
-iteration_limit="unlimited"
-if [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
-	iteration_limit="$1"
+	iteration_limit="unlimited"
+	if [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+		iteration_limit="$1"
+		shift
+	fi
+
+	if [[ $# -eq 0 ]]; then
+		usage
+		exit 1
+	fi
+
+	alias_spec="$(split_alias_suffix "$1")"
+	agent_alias="${alias_spec%%|*}"
+	workflow_suffix="${alias_spec#*|}"
 	shift
-fi
 
-if [[ $# -eq 0 ]]; then
-	usage
-	exit 1
-fi
-
-alias_spec="$(split_alias_suffix "$1")"
-agent_alias="${alias_spec%%|*}"
-workflow_suffix="${alias_spec#*|}"
-shift
-
-if ! is_supported_base_alias "${agent_alias}"; then
-	print_error "Unsupported alias for iter: ${agent_alias}"
-	exit 1
-fi
-
-workflow_prompt="$(resolve_workflow_prompt "${workflow_suffix}")"
-explicit_prompt="$(collect_prompt "$@")"
-
-if [[ -n "${workflow_prompt}" && -n "${explicit_prompt}" ]]; then
-	print_error "${agent_alias}${workflow_suffix} already includes a workflow prompt; do not pass another prompt"
-	exit 1
-fi
-
-prompt="${explicit_prompt:-${workflow_prompt}}"
-if [[ -z "${prompt}" ]]; then
-	print_error "${agent_alias} requires a prompt or workflow alias"
-	exit 1
-fi
-
-rate_limit_retries="${ITER_RATE_LIMIT_RETRIES:-5}"
-rate_limit_base_wait="${ITER_RATE_LIMIT_BASE_WAIT:-10}"
-iteration=1
-rate_limit_attempts=0
-
-while true; do
-	print_info "Iteration ${iteration}/${iteration_limit}"
-	if run_agent_once "${agent_alias}" "${prompt}"; then
-		rate_limit_attempts=0
-		if [[ "${iteration_limit}" != "unlimited" ]] && ((iteration >= iteration_limit)); then
-			break
-		fi
-		iteration=$((iteration + 1))
-		continue
-	else
-		status=$?
+	if ! is_supported_base_alias "${agent_alias}"; then
+		error_exit "Unsupported alias for iter: ${agent_alias}"
 	fi
 
-	if ((status == 1)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
-		rate_limit_attempts=$((rate_limit_attempts + 1))
-		if ((rate_limit_attempts > rate_limit_retries)); then
-			print_error "Rate-limit retry limit (${rate_limit_retries}) exceeded"
-			print_error "Iteration ${iteration}/${iteration_limit} failed with exit code ${status}"
-			exit "${status}"
-		fi
-		wait_secs=$((rate_limit_base_wait * (2 ** (rate_limit_attempts - 1))))
-		print_warning "Rate limit hit (attempt ${rate_limit_attempts}/${rate_limit_retries}), retrying in ${wait_secs}s..."
-		sleep "${wait_secs}"
-		continue
+	workflow_prompt="$(resolve_workflow_prompt "${workflow_suffix}")"
+	explicit_prompt="$(collect_prompt "$@")"
+
+	if [[ -n "${workflow_prompt}" && -n "${explicit_prompt}" ]]; then
+		error_exit "${agent_alias}${workflow_suffix} already includes a workflow prompt; do not pass another prompt"
 	fi
 
-	print_error "Iteration ${iteration}/${iteration_limit} failed with exit code ${status}"
-	exit "${status}"
-done
+	prompt="${explicit_prompt:-${workflow_prompt}}"
+	if [[ -z "${prompt}" ]]; then
+		error_exit "${agent_alias} requires a prompt or workflow alias"
+	fi
 
-print_success "Completed ${iteration}/${iteration_limit} iterations"
+	local rate_limit_retries="${ITER_RATE_LIMIT_RETRIES:-5}"
+	local rate_limit_base_wait="${ITER_RATE_LIMIT_BASE_WAIT:-10}"
+	local iteration=1
+	local rate_limit_attempts=0
+
+	while true; do
+		print_info "Iteration ${iteration}/${iteration_limit}"
+		if run_agent_once "${agent_alias}" "${prompt}"; then
+			rate_limit_attempts=0
+			if [[ "${iteration_limit}" != "unlimited" ]] && ((iteration >= iteration_limit)); then
+				break
+			fi
+			iteration=$((iteration + 1))
+			continue
+		else
+			status=$?
+		fi
+
+		if ((status == 1)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
+			rate_limit_attempts=$((rate_limit_attempts + 1))
+			if ((rate_limit_attempts > rate_limit_retries)); then
+				print_error "Rate-limit retry limit (${rate_limit_retries}) exceeded"
+				error_exit "Iteration ${iteration}/${iteration_limit} failed with exit code ${status}" "${status}"
+			fi
+			wait_secs=$((rate_limit_base_wait * (2 ** (rate_limit_attempts - 1))))
+			print_warning "Rate limit hit (attempt ${rate_limit_attempts}/${rate_limit_retries}), retrying in ${wait_secs}s..."
+			sleep "${wait_secs}"
+			continue
+		fi
+
+		error_exit "Iteration ${iteration}/${iteration_limit} failed with exit code ${status}" "${status}"
+	done
+
+	print_success "Completed ${iteration}/${iteration_limit} iterations"
+}
+
+# Allow test scripts to source this file without executing main.
+if [[ -z "${AI_AGENT_ITER_SOURCE_ONLY:-}" ]]; then
+  main "$@"
+fi
