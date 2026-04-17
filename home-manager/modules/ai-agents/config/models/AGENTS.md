@@ -13,7 +13,9 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | `default.nix`              | Import hub: imports codex, gemini, opencode                                                 |
 | `codex.nix`                | Codex CLI: model (gpt-5.4), profiles, custom agents, features                               |
 | `gemini.nix`               | Gemini CLI: theme (Gruvbox), model aliases, auto-format hooks, security, experimental flags |
-| `opencode.nix`             | OpenCode: model (claude-opus-4-6), 7 agents, 6 commands, LSP, permissions                   |
+| `opencode.nix`             | OpenCode: model (opencode/claude-opus-4-6), 7 agents, 6 commands, LSP, permissions          |
+| `_opencode-agents.nix`     | OpenCode agent definitions (build, plan, review, recon, patch, optimize, android-re)        |
+| `_opencode-commands.nix`   | OpenCode slash command definitions (commit-split, refactor, security-audit, etc.)           |
 | `_opencode-android-re.nix` | OpenCode Android RE agent definition (imports `../../android-re/_prompt.nix`)               |
 | `_opencode-lsp.nix`        | Plain attrset (not a module): LSP server definitions for 9 languages                        |
 
@@ -32,7 +34,7 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 ## Gotchas
 
 - `gemini.nix` is the largest file (~207 lines) with extensive theme/hook/model alias config.
-- `opencode.nix` imports `_opencode-android-re.nix`, which in turn imports `../../android-re/_prompt.nix` — creates an indirect dependency on the `android-re/` directory.
+- `opencode.nix` imports `_opencode-agents.nix`, `_opencode-commands.nix`, and `_opencode-android-re.nix`. The latter imports `../../android-re/_prompt.nix` — creates an indirect dependency on the `android-re/` directory.
 - `gemini.nix` references `constants.color.*` for theming — from flake-level constants, not options.
 - `codex.nix` sets `trustedProjects` to the System directory path from `config.home.homeDirectory`.
 - `_opencode-lsp.nix` is the only non-module file — imported directly by `opencode.nix` as the `lsp` option value.

@@ -114,7 +114,7 @@ Source: `home-manager/modules/ai-agents/activation/plugins.nix`.
 
 ---
 
-## Verification Snapshot (2026-04-12)
+## Verification Snapshot (2026-04-17)
 
 This guide is verified against the live configuration sources in:
 
@@ -400,6 +400,7 @@ ai-agents/
 │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
 │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   ├── _models.nix           # Shared model/provider constants (names, aliases)
+│   ├── _agent-env.nix       # Agent environment variable bridging
 │   └── _git-clone-update.nix # Git clone/update helper for plugin repos
 ├── activation/              # Activation scripts (secret patching, Codex/Claude setup, plugin installs)
 │   ├── default.nix            # Aggregation hub
@@ -438,6 +439,8 @@ ai-agents/
         ├── codex.nix          # Codex CLI model config
         ├── gemini.nix         # Gemini CLI model config + mkModelAlias/mkThinkingAlias
         ├── opencode.nix       # OpenCode model config (owns all let bindings)
+        ├── _opencode-agents.nix # OpenCode agent definitions
+        ├── _opencode-commands.nix # OpenCode slash command definitions
         ├── _opencode-lsp.nix  # OpenCode LSP tool configuration
         └── _opencode-android-re.nix # OpenCode Android RE agent config
 ```
@@ -471,7 +474,7 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `nh`, `
 
 | Setting             | Value                            | Why                                                           |
 | ------------------- | -------------------------------- | ------------------------------------------------------------- |
-| Model               | `anthropic/claude-opus-4-6`      | Primary coding model                                          |
+| Model               | `opencode/claude-opus-4-6`       | Primary coding model                                          |
 | Default agent       | `build`                          | Implementation-first default                                  |
 | Small model         | `claude-haiku-4-5`               | Cheap model for titles, summaries                             |
 | Compaction          | Auto + prune                     | Remove old tool outputs, reserve 10k tokens                   |

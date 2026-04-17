@@ -19,6 +19,7 @@ scripts/
 │   ├── _inventory-collectors.sh # Shared inventory data collectors (sourced by agent-inventory.sh)
 │   ├── _inventory-helpers.sh # Shared inventory helper functions (sourced by agent-inventory.sh)
 │   ├── agents-search.sh     # Scan project trees for directories needing AGENTS.md
+│   ├── agents-search-test.sh # Unit tests for agents-search.sh
 │   ├── agent-iter.sh        # Run an AI agent command N times (iterative loop)
 │   ├── agent-iter-test.sh   # Unit tests for agent-iter.sh
 │   ├── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/

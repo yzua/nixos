@@ -67,6 +67,7 @@ ai-agents/
 │   ├── _formatters.nix                   # Formatter registry (shared by claude hooks + gemini config)
 │   ├── _impeccable-commands.nix          # Impeccable skill command definitions and text renderer
 │   ├── _models.nix                       # Shared model/provider constants (names, aliases)
+│   ├── _agent-env.nix                    # Agent environment variable bridging
 │   └── _git-clone-update.nix             # Git clone/update helper for plugin repos
 ├── activation/              # Home Manager activation scripts
 │   ├── default.nix          # Aggregation: wires all activation steps
@@ -107,6 +108,8 @@ ai-agents/
         ├── codex.nix        # Codex CLI configuration
         ├── gemini.nix       # Gemini CLI configuration (imports ../../helpers/_formatters.nix)
         ├── opencode.nix      # OpenCode configuration (agents, LSP, providers)
+        ├── _opencode-agents.nix # OpenCode agent definitions
+        ├── _opencode-commands.nix # OpenCode slash command definitions
         ├── _opencode-android-re.nix # OpenCode Android RE agent definition
         └── _opencode-lsp.nix # OpenCode LSP tool configuration
 ```

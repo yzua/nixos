@@ -33,6 +33,7 @@ modules/
 │   │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
 │   │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   │   ├── _models.nix           # Shared model/provider constants (names, aliases)
+│   │   ├── _agent-env.nix       # Agent environment variable bridging
 │   │   └── _git-clone-update.nix # Git clone/update helper for plugin repos
 │   ├── activation/     # Home Manager activation scripts
 │   │   ├── default.nix      # Aggregation hub
@@ -67,6 +68,8 @@ modules/
 │           ├── codex.nix    # Codex CLI config (model, profiles, custom agents, developer instructions)
 │           ├── gemini.nix   # Gemini CLI config (settings, theming, model aliases, auto-format hooks)
 │           ├── opencode.nix # OpenCode config (agents, LSP, providers)
+│           ├── _opencode-agents.nix # OpenCode agent definitions
+│           ├── _opencode-commands.nix # OpenCode slash command definitions
 │           ├── _opencode-android-re.nix # OpenCode Android RE agent definition
 │           └── _opencode-lsp.nix # OpenCode LSP tool configuration
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
@@ -117,6 +120,7 @@ modules/
 │   ├── bar.nix         # Bar widgets (left, center, right panels)
 │   ├── settings.nix    # Shell settings (theme, dock, wallpaper, OSD, control center, lock command, hooks)
 │   ├── _colorscheme.nix # GruvboxAlt colorscheme generator (produces JSON at activation)
+│   ├── _plugins.nix    # Plugin registry and configuration
 │   └── plugins/        # Noctalia shell plugins
 │       ├── browser-launcher/  # Browser profile launcher (QML)
 │       ├── keybind-cheatsheet/ # Keyboard shortcut overlay (QML)
@@ -268,7 +272,7 @@ Read these when working in those areas.
 
 ## Notes
 
-- `home.nix` receives `{ inputs, homeStateVersion, user, pkgsStable, constants, hostname }` via `extraSpecialArgs` from flake
+- `home.nix` receives `{ inputs, homeStateVersion, user, pkgsStable, constants, optionHelpers, hostname }` via `extraSpecialArgs` from flake
 - `hostname` available for host-specific HM config
 - `constants` available from `shared/constants.nix` (terminal, editor, font, theme, keyboard, user identity)
 - Git identity (name, email, signingKey, githubEmail) lives in `constants.user.*` — used by `terminal/tools/git/config.nix`

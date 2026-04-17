@@ -12,10 +12,10 @@ The module system follows a strict layout:
 - **host-defaults.nix**: Sets profile defaults. It handles common settings for desktops and laptops.
 - **host-info.nix**: Hostname and state version management from flake arguments.
 - **validation.nix**: The safety layer. It uses assertions to stop conflicting services.
-- **Feature Modules**: Single files like `gaming.nix` or `nvidia.nix` that manage specific subsystems.
-- **Sub-module Directories**: Paths like `security/` or `cleanup/` that have their own internal hubs.
+- **Feature Modules**: Single files like `gaming.nix`, `nvidia.nix`, or `backup.nix` that manage specific subsystems.
+- **Sub-module Directories**: Paths like `security/`, `cleanup/`, `glance/`, `prometheus-grafana/` that have their own internal hubs.
 - **helpers/**: Systemd helpers (`_systemd-helpers.nix`). Not in the hub; import manually.
-- **`../shared/`**: Cross-cutting helpers (`_option-helpers.nix` for typed option constructors). Lives at repo root, not inside this directory. Import via `../shared/`.
+- **`../shared/`**: Cross-cutting helpers (`constants.nix` for identity/defaults, `_option-helpers.nix` for typed option constructors, `_secret-loader.nix` for secret loading, `_alias-helpers.nix` for alias utilities). Lives at repo root, not inside this directory. Import via `../shared/`.
 
 ## WHERE TO LOOK
 

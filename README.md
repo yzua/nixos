@@ -218,10 +218,9 @@ shared/                       # Shared identity, helpers, option/secret utilitie
 hosts/<hostname>/             # Per-host config + hardware modules
 nixos-modules/                # Shared system modules (56 imports in hub)
 home-manager/                 # User-level modules + packages
-scripts/                      # Utility scripts (ai/, build/, apps/, system/, sops/; shared helpers in lib/)
+scripts/                      # Utility scripts (ai/, build/, apps/, hardware/, system/, sops/; shared helpers in lib/)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
 dev-shells/                   # Per-language dev shell templates (nix flake init -t)
-docs/                        # Placeholder for additional documentation
 guides/                       # User-facing tool guides (AI Agents, Ghostty, Niri, Neovim, Yazi, Zellij)
 skills/                       # AI agent skill symlinks (Nix/NixOS/Shell skills, managed by skills CLI via HM activation)
 themes/                       # GruvboxAlt theme overrides (LibreWolf CSS, Telegram Desktop, YouTube Music)
