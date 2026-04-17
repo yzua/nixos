@@ -1,6 +1,6 @@
 # Unified systemd helpers: service hardening, persistent timers, oneshot services.
 
-{ lib, ... }:
+{ lib }:
 {
   mkServiceHardening =
     {
