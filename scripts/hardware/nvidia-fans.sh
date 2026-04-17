@@ -31,23 +31,17 @@ DISPLAY="${DISPLAY:-:0}"
 # Get XAUTHORITY (default to empty if not set, nvidia-settings will find it)
 XAUTHORITY="${XAUTHORITY:-}"
 
-# Enable manual fan control and set fan speed (suppress all output)
-if [[ -n "$XAUTHORITY" ]]; then
-	sudo -E env "DISPLAY=$DISPLAY" "XAUTHORITY=$XAUTHORITY" \
-		nvidia-settings -a "[gpu:0]/GPUFanControlState=1" >/dev/null 2>&1
+# Build the nvidia-settings prefix (sudo with env vars or display flag)
+nvidia_cmd() {
+	if [[ -n "$XAUTHORITY" ]]; then
+		sudo -E env "DISPLAY=$DISPLAY" "XAUTHORITY=$XAUTHORITY" \
+			nvidia-settings "$@" >/dev/null 2>&1
+	else
+		sudo nvidia-settings -c "$DISPLAY" "$@" >/dev/null 2>&1
+	fi
+}
 
-	sudo -E env "DISPLAY=$DISPLAY" "XAUTHORITY=$XAUTHORITY" \
-		nvidia-settings -a "[fan:0]/GPUTargetFanSpeed=$FAN_SPEED" >/dev/null 2>&1
-
-	sudo -E env "DISPLAY=$DISPLAY" "XAUTHORITY=$XAUTHORITY" \
-		nvidia-settings -a "[fan:1]/GPUTargetFanSpeed=$FAN_SPEED" >/dev/null 2>&1
-else
-	sudo nvidia-settings -c "$DISPLAY" \
-		-a "[gpu:0]/GPUFanControlState=1" >/dev/null 2>&1
-
-	sudo nvidia-settings -c "$DISPLAY" \
-		-a "[fan:0]/GPUTargetFanSpeed=$FAN_SPEED" >/dev/null 2>&1
-
-	sudo nvidia-settings -c "$DISPLAY" \
-		-a "[fan:1]/GPUTargetFanSpeed=$FAN_SPEED" >/dev/null 2>&1
-fi
+# Enable manual fan control and set both fans
+nvidia_cmd -a "[gpu:0]/GPUFanControlState=1"
+nvidia_cmd -a "[fan:0]/GPUTargetFanSpeed=$FAN_SPEED"
+nvidia_cmd -a "[fan:1]/GPUTargetFanSpeed=$FAN_SPEED"
