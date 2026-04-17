@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   ...
 }:
@@ -15,7 +16,8 @@ let
   geminiPolicies = import ./helpers/_gemini-policies.nix;
   impeccable = import ./helpers/_impeccable-commands.nix;
   models = import ./helpers/_models.nix;
-  settingsBuilders = import ./helpers/_settings-builders.nix { inherit cfg lib; };
+  agentEnvContent = import ./helpers/_agent-env.nix { inherit constants; };
+  settingsBuilders = import ./helpers/_settings-builders.nix { inherit cfg config lib; };
   inherit (settingsBuilders)
     geminiSettings
     opencodeSettingsByProfile
@@ -117,8 +119,16 @@ in
       ))
     ];
 
-    xdg.configFile = lib.mkIf cfg.opencode.enable (
-      opencodeConfigFiles // opencodeImpeccableCommandFiles
-    );
+    xdg.configFile = lib.mkMerge [
+      # Runtime model/service config for shell scripts (always available when agents enabled)
+      (lib.mkIf cfg.enable {
+        "ai-agents/models.sh" = {
+          text = agentEnvContent;
+          force = true;
+        };
+      })
+      # OpenCode profile configs
+      (lib.mkIf cfg.opencode.enable (opencodeConfigFiles // opencodeImpeccableCommandFiles))
+    ];
   };
 }
