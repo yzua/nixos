@@ -1,6 +1,8 @@
 # Kernel and network performance tuning (sysctl, TCP BBR, inotify, memory).
 
 {
+  boot.supportedFilesystems = [ "ntfs" ]; # NTFS for external drives
+
   boot.kernelModules = [ "tcp_bbr" ]; # BBR congestion control module
 
   boot.kernel.sysctl = {
