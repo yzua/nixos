@@ -122,6 +122,7 @@
     localsend = 53317;
     tor-dns = 9053;
     cups = 631;
+    devServer = 3000;
   };
 
   # Docker default bridge gateway IP.

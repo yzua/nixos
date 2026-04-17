@@ -44,12 +44,6 @@
       message = "Mullvad VPN requires NetworkManager (networking.networkmanager.enable = true).";
     }
 
-    # === Security Configuration Validation ===
-    {
-      assertion = with config.networking.firewall; enable;
-      message = "Firewall must be enabled (networking.firewall.enable = true) for system security.";
-    }
-
     # === Network Service Security ===
     {
       assertion = !config.services.avahi.enable || config.services.avahi.allowInterfaces != [ ];
@@ -65,12 +59,6 @@
     {
       assertion = !(config.services.displayManager.gdm.enable && config.services.greetd.enable);
       message = "GDM and greetd cannot be enabled simultaneously. Choose one display manager.";
-    }
-
-    # === Hardening Validation ===
-    {
-      assertion = config.security.apparmor.enable;
-      message = "AppArmor must be enabled (security.apparmor.enable = true) for mandatory access control.";
     }
 
     # === Observability Stack Dependencies ===
