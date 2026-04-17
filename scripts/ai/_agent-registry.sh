@@ -23,6 +23,7 @@ if [[ -f "$_ai_models_sh" ]]; then
   # shellcheck source=/dev/null
   source "$_ai_models_sh"
 else
+  print_warning "Using fallback model defaults — run 'just home' to generate $_ai_models_sh"
   # Fallback defaults — kept in sync with _models.nix and constants.nix.
   # These are overridden by the generated config after 'just home'.
   AI_MODEL_GPT_LOW="${AI_MODEL_GPT_LOW:-openai/gpt-5.4-spark}"

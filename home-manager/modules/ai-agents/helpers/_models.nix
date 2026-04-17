@@ -3,9 +3,9 @@
 
 {
   # Anthropic Claude models
-  claude-opus = "anthropic/claude-opus-4-6";
-  claude-sonnet = "anthropic/claude-sonnet-4-6";
-  claude-haiku = "anthropic/claude-haiku-4-5";
+  claude-opus = "opencode/claude-opus-4-6";
+  claude-sonnet = "opencode/claude-sonnet-4-6";
+  claude-haiku = "opencode/claude-haiku-4-5";
 
   # OpenAI models
   gpt-default = "openai/gpt-5.4";

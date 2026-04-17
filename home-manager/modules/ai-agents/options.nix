@@ -211,7 +211,7 @@ in
     opencode = {
       enable = lib.mkEnableOption "OpenCode configuration";
 
-      model = mkStrOption "anthropic/claude-opus-4-6" "Default model for OpenCode";
+      model = mkStrOption "opencode/claude-opus-4-6" "Default model for OpenCode";
       plugins = mkStrListOption [ ] "OpenCode plugins to enable";
       providers = mkAttrsOption { } "Provider configurations for OpenCode";
       permission =

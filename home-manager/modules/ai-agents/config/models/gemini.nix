@@ -7,6 +7,8 @@
 }:
 
 let
+  proModel = "gemini-3-pro-preview";
+
   mkModelAlias = model: generateContentConfig: {
     modelConfig = {
       inherit model generateContentConfig;
@@ -141,7 +143,7 @@ in
         overrides = {
           codebase_investigator = {
             enabled = true;
-            modelConfig.model = "gemini-3-pro-preview";
+            modelConfig.model = proModel;
             runConfig.maxTurns = 50;
           };
         };
@@ -158,8 +160,8 @@ in
             temperature = 0;
             maxOutputTokens = 16384;
           };
-          deep = mkThinkingAlias "gemini-3-pro-preview" "HIGH" { };
-          code = mkThinkingAlias "gemini-3-pro-preview" "HIGH" {
+          deep = mkThinkingAlias proModel "HIGH" { };
+          code = mkThinkingAlias proModel "HIGH" {
             maxOutputTokens = 65536;
           };
         };
@@ -173,7 +175,7 @@ in
       };
       # --- Model Defaults And Compression ---
       model = {
-        name = "gemini-3-pro-preview";
+        name = proModel;
         compressionThreshold = 0.75; # Wait until 75% full before compressing (was 0.5)
       };
       # --- Hooks ---
