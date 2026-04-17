@@ -32,7 +32,7 @@ Register in `hosts/_inventory.nix`:
 Deploy the current personal desktop config:
 
 ```bash
-just all   # hardcoded to desktop: modules, pkgs, lint -> format -> check -> nixos -> home
+just all   # hardcoded to desktop: modules, pkgs, lint -> format -> test -> check -> nixos -> home
 ```
 
 For a newly added host, use explicit `nh` commands instead of the hardcoded `just home` / `just nixos` recipes.
@@ -41,29 +41,30 @@ For a newly added host, use explicit `nh` commands instead of the hardcoded `jus
 
 ## Commands
 
-| Command                   | Description                                                                                           |
-| ------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `just all`                | Full desktop pipeline: `modules`, `pkgs`, `lint` in parallel; then `format -> check -> nixos -> home` |
-| `just home`               | Apply Home Manager for `yz@desktop`                                                                   |
-| `just nixos`              | Apply NixOS for `desktop`                                                                             |
-| `just modules`            | Validate import structure                                                                             |
-| `just pkgs`               | Check for duplicate packages and program/module ownership conflicts                                   |
-| `just lint`               | statix + deadnix + shellcheck + markdownlint                                                          |
-| `just dead`               | deadnix only (subset of lint)                                                                         |
-| `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                                           |
-| `just check`              | `nix flake check --no-build path:.`                                                                   |
-| `just diff`               | Diff current vs previous NixOS generation                                                             |
-| `just report [mode]`      | Generate system health report                                                                         |
-| `just report-view [type]` | View latest system report                                                                             |
-| `just update`             | Update flake inputs (pre/post health checks)                                                          |
-| `just upgrade`            | Full upgrade: update → nixos → home → security-audit                                                  |
-| `just clean`              | `nh clean all --keep 1` + HM generation expiry + store optimise                                       |
-| `just install-hooks`      | Install repo-local pre-commit/pre-push hooks                                                          |
-| `just sops-edit`          | Edit encrypted secrets                                                                                |
-| `just sops-view`          | View secrets (read-only)                                                                              |
-| `just secrets-add KEY`    | Add a single secret (prompted securely)                                                               |
-| `just security-audit`     | Systemd hardening + CVE scan                                                                          |
-| `just skills-sync`        | Sync AI agent skills from GitHub                                                                      |
+| Command                   | Description                                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `just all`                | Full desktop pipeline: `modules`, `pkgs`, `lint` in parallel; then `format -> test -> check -> nixos -> home` |
+| `just home`               | Apply Home Manager for `yz@desktop`                                                                           |
+| `just nixos`              | Apply NixOS for `desktop`                                                                                     |
+| `just modules`            | Validate import structure                                                                                     |
+| `just pkgs`               | Check for duplicate packages and program/module ownership conflicts                                           |
+| `just lint`               | statix + deadnix + shellcheck + markdownlint                                                                  |
+| `just dead`               | deadnix only (subset of lint)                                                                                 |
+| `just test`               | Run all shell test suites                                                                                     |
+| `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                                                   |
+| `just check`              | `nix flake check --no-build path:.`                                                                           |
+| `just diff`               | Diff current vs previous NixOS generation                                                                     |
+| `just report [mode]`      | Generate system health report                                                                                 |
+| `just report-view [type]` | View latest system report                                                                                     |
+| `just update`             | Update flake inputs (pre/post health checks)                                                                  |
+| `just upgrade`            | Full upgrade: update → nixos → home → security-audit                                                          |
+| `just clean`              | `nh clean all --keep 1` + HM generation expiry + store optimise                                               |
+| `just install-hooks`      | Install repo-local pre-commit/pre-push hooks                                                                  |
+| `just sops-edit`          | Edit encrypted secrets                                                                                        |
+| `just sops-view`          | View secrets (read-only)                                                                                      |
+| `just secrets-add KEY`    | Add a single secret (prompted securely)                                                                       |
+| `just security-audit`     | Systemd hardening + CVE scan                                                                                  |
+| `just skills-sync`        | Sync AI agent skills from GitHub                                                                              |
 
 ---
 
@@ -217,9 +218,10 @@ shared/                       # Shared identity, helpers, option/secret utilitie
 hosts/<hostname>/             # Per-host config + hardware modules
 nixos-modules/                # Shared system modules (56 imports in hub)
 home-manager/                 # User-level modules + packages
-scripts/                      # Utility scripts
+scripts/                      # Utility scripts (ai/, build/, apps/, system/, sops/; shared helpers in lib/)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
 dev-shells/                   # Per-language dev shell templates (nix flake init -t)
+docs/                        # Placeholder for additional documentation
 guides/                       # User-facing tool guides (AI Agents, Ghostty, Niri, Neovim, Yazi, Zellij)
 skills/                       # AI agent skill symlinks (Nix/NixOS/Shell skills, managed by skills CLI via HM activation)
 themes/                       # GruvboxAlt theme overrides (LibreWolf CSS, Telegram Desktop, YouTube Music)

@@ -438,7 +438,8 @@ ai-agents/
         ├── codex.nix          # Codex CLI model config
         ├── gemini.nix         # Gemini CLI model config + mkModelAlias/mkThinkingAlias
         ├── opencode.nix       # OpenCode model config (owns all let bindings)
-        └── _opencode-lsp.nix  # OpenCode LSP tool configuration
+        ├── _opencode-lsp.nix  # OpenCode LSP tool configuration
+        └── _opencode-android-re.nix # OpenCode Android RE agent config
 ```
 
 ### How It Works

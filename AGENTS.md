@@ -7,7 +7,7 @@
 ## Validate with repo commands
 
 - Start with `just modules`, `just pkgs`, `just lint`, and `just check`.
-- `just all` is the full desktop pipeline: `modules`, `pkgs`, and `lint` in parallel, then `format -> check -> nixos -> home`.
+- `just all` is the full desktop pipeline: `modules`, `pkgs`, and `lint` in parallel, then `format -> test -> check -> nixos -> home`.
 - `just check` is eval-only: `nix flake check --no-build path:.`. It does not replace `just home` or `just nixos`.
 - `just format` rewrites `.nix` files via `nix fmt`; the hook's check-only equivalent is `nix fmt -- --fail-on-change --no-cache .`.
 - There is no normal unit-test suite at repo root; validation here is mostly import/lint/eval/apply.
@@ -24,7 +24,8 @@
 
 - System entrypoint: `hosts/<host>/configuration.nix`, which imports `../../nixos-modules`.
 - Home Manager entrypoint: `home-manager/home.nix`, which imports `./modules` and `./packages`.
-- Home Manager is standalone here, not a NixOS module: HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs` such as `constants`, `hostname`, and `pkgsStable`.
+- Home Manager is standalone here, not a NixOS module: HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs` such as `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, and `hostname`.
+- NixOS modules receive `specialArgs`: `inputs`, `stateVersion`, `hostname`, `user`, `pkgsStable`, `pkgConfig`, `constants`, `systemdHelpers`, and `optionHelpers`.
 - Shared identity, terminal, editor, theme, and service defaults live in `shared/constants.nix`.
 - System feature toggles live under `mySystem.*`; set `mySystem.hostProfile` first and override deltas. Put cross-module assertions in `nixos-modules/validation.nix`, not feature modules.
 
