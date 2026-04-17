@@ -1,11 +1,15 @@
 # Per-agent settings builders and profile variant overrides.
 
-{ cfg, lib }:
+{
+  cfg,
+  config,
+  lib,
+}:
 
 let
   mcpTransforms = import ./_mcp-transforms.nix { inherit cfg lib; };
   formatterRegistry = import ./_formatters.nix;
-  models = import ./_models.nix;
+  opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
   inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
   opencodeFormatterSettings = builtins.listToAttrs (
     map (formatter: {
@@ -81,34 +85,16 @@ let
   })
   // (lib.optionalAttrs (cfg.gemini.extraSettings != { }) cfg.gemini.extraSettings);
 
-  mkProfileSettings =
-    { model }:
-    {
-      opencode = opencodeSettings // {
-        inherit model;
-      };
-    };
-
-  profiles = {
-    glm = mkProfileSettings { model = models.glm; };
-    gemini = mkProfileSettings { model = models.gemini; };
-    gpt = mkProfileSettings { model = models.gpt-default; };
-    openrouter = mkProfileSettings { model = models.openrouter; };
-    zen = mkProfileSettings { model = models.zen; };
-  };
-
-  # Profile variant settings keyed by profile name (matching _opencode-profiles.nix names).
-  opencodeSettingsByProfile = {
-    opencode = opencodeSettings;
-    "opencode-glm" = profiles.glm.opencode;
-    "opencode-gemini" = profiles.gemini.opencode;
-    "opencode-gpt" = profiles.gpt.opencode;
-    "opencode-openrouter" = profiles.openrouter.opencode;
-    "opencode-sonnet" = opencodeSettings // {
-      model = models.claude-sonnet;
-    };
-    "opencode-zen" = profiles.zen.opencode;
-  };
+  # Derived from _opencode-profiles.nix — single source of truth for profile→model mapping.
+  opencodeSettingsByProfile = builtins.listToAttrs (
+    map (
+      { name, model, ... }:
+      {
+        inherit name;
+        value = if model == null then opencodeSettings else opencodeSettings // { inherit model; };
+      }
+    ) opencodeProfiles.profiles
+  );
 in
 {
   inherit

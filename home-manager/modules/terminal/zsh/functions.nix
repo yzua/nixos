@@ -1,40 +1,28 @@
 # Zsh initContent: shell functions, environment setup, and sops-enabled agent wrappers.
 
-{ constants, lib, ... }:
+{
+  config,
+  constants,
+  lib,
+  ...
+}:
 
 let
   inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
   inherit (constants.services.zai) timeout;
   inherit (constants.services.zai.models) haiku sonnet opus;
 
-  # Simple opencode wrappers: name, profile dir, zellij tab name
-  simpleOpenCodeWrappers = [
-    {
-      name = "glm";
-      profile = "glm";
-      tab = "ocglm";
-    }
-    {
-      name = "gemini";
-      profile = "gemini";
-      tab = "ocgem";
-    }
-    {
-      name = "gpt";
-      profile = "gpt";
-      tab = "ocgpt";
-    }
-    {
-      name = "sonnet";
-      profile = "sonnet";
-      tab = "ocs";
-    }
-    {
-      name = "zen";
-      profile = "zen";
-      tab = "oczen";
-    }
-  ];
+  # Derive OpenCode wrapper functions from profile definitions.
+  # Single source: home-manager/modules/ai-agents/helpers/_opencode-profiles.nix.
+  opencodeProfiles = import ../../ai-agents/helpers/_opencode-profiles.nix { inherit config; };
+
+  # Profiles that get a simple wrapper (excludes default "opencode" and
+  # "opencode-openrouter" which needs secret loading).
+  simpleWrapperProfiles = builtins.filter (
+    p: p.alias != "oc" && p.name != "opencode-openrouter"
+  ) opencodeProfiles.profiles;
+
+  profileSuffix = p: builtins.replaceStrings [ "opencode-" ] [ "" ] p.name;
 in
 
 {
@@ -100,11 +88,11 @@ in
     }
 
     ${lib.concatStringsSep "\n\n" (
-      map (w: ''
-        opencode_${w.name}() {
-          _opencode_profile "${w.profile}" "${w.tab}" "$@"
+      map (p: ''
+        opencode_${profileSuffix p}() {
+          _opencode_profile "${profileSuffix p}" "${p.alias}" "$@"
         }
-      '') simpleOpenCodeWrappers
+      '') simpleWrapperProfiles
     )}
 
     opencode_openrouter() {

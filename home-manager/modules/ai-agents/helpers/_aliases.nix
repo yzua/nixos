@@ -1,4 +1,7 @@
 # Zsh alias generation for AI agent launchers and workflow prompts.
+#
+# NOTE: Agent aliases are also defined in scripts/ai/_agent-registry.sh for runtime
+# dispatch (launcher/iter). Adding or renaming an alias requires updating both files.
 
 {
   config,
