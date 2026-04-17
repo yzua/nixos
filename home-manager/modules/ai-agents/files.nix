@@ -25,6 +25,87 @@ let
 
   opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   opencodeProfileNames = opencodeProfiles.names;
+  opencodeGruvboxDarkTheme = toJSON {
+    "$schema" = "https://opencode.ai/theme.json";
+    defs = {
+      bg0 = "#282828";
+      bg1 = "#32302f";
+      bg2 = "#3c3836";
+      bg3 = "#504945";
+      bg4 = "#665c54";
+      fg0 = "#ebdbb2";
+      fg2 = "#a89984";
+      yellow = "#fabd2f";
+      blue = "#83a598";
+      purple = "#d3869b";
+      red = "#fb4934";
+      green = "#b8bb26";
+      aqua = "#8ec07c";
+      orange = "#fe8019";
+    };
+    theme = {
+      primary = {
+        dark = "yellow";
+        light = "yellow";
+      };
+      secondary = {
+        dark = "blue";
+        light = "blue";
+      };
+      accent = {
+        dark = "purple";
+        light = "purple";
+      };
+      error = {
+        dark = "red";
+        light = "red";
+      };
+      warning = {
+        dark = "orange";
+        light = "orange";
+      };
+      success = {
+        dark = "green";
+        light = "green";
+      };
+      info = {
+        dark = "aqua";
+        light = "aqua";
+      };
+      text = {
+        dark = "fg0";
+        light = "fg0";
+      };
+      textMuted = {
+        dark = "fg2";
+        light = "fg2";
+      };
+      background = {
+        dark = "bg0";
+        light = "bg0";
+      };
+      backgroundPanel = {
+        dark = "bg1";
+        light = "bg1";
+      };
+      backgroundElement = {
+        dark = "bg2";
+        light = "bg2";
+      };
+      border = {
+        dark = "bg3";
+        light = "bg3";
+      };
+      borderActive = {
+        dark = "bg4";
+        light = "bg4";
+      };
+      borderSubtle = {
+        dark = "bg2";
+        light = "bg2";
+      };
+    };
+  };
 
   opencodeConfigFiles = builtins.listToAttrs (
     lib.flatten (
@@ -40,8 +121,15 @@ let
           name = "${name}/tui.json";
           value = {
             text = toJSON {
-              theme = "gruvbox";
+              theme = "gruvbox-dark";
             };
+            force = true;
+          };
+        }
+        {
+          name = "${name}/themes/gruvbox-dark.json";
+          value = {
+            text = opencodeGruvboxDarkTheme;
             force = true;
           };
         }
