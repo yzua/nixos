@@ -56,7 +56,8 @@
     ./vnc.nix # VNC remote access (x11vnc, noVNC, websockify)
 
     # Virtualisation
-    ./virtualisation.nix # Docker and libvirt/QEMU
+    ./docker.nix # Docker container engine
+    ./libvirt.nix # libvirt/QEMU virtual machines
     ./waydroid.nix # Waydroid Android emulation
     ./nix-ld.nix # Dynamic linker for non-Nix binaries
 

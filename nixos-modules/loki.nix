@@ -1,4 +1,4 @@
-# Loki log aggregation with Promtail.
+# Loki log aggregation server.
 
 {
   config,
@@ -10,7 +10,7 @@
 
 let
   inherit (systemdHelpers) mkServiceHardening;
-  inherit (constants) ports;
+  inherit (constants) localhost ports;
 in
 {
   options.mySystem.loki = {
@@ -26,9 +26,9 @@ in
 
         server = {
           http_listen_port = ports.loki;
-          http_listen_address = "127.0.0.1";
+          http_listen_address = localhost;
           grpc_listen_port = ports.loki-grpc;
-          grpc_listen_address = "127.0.0.1";
+          grpc_listen_address = localhost;
         };
 
         common = {
@@ -39,11 +39,11 @@ in
           };
           replication_factor = 1;
           ring = {
-            instance_addr = "127.0.0.1";
+            instance_addr = localhost;
             kvstore.store = "inmemory";
           };
           instance_interface_names = [ ]; # Skip interface detection (fails on NixOS)
-          instance_addr = "127.0.0.1";
+          instance_addr = localhost;
         };
 
         schema_config = {
@@ -76,78 +76,16 @@ in
       };
     };
 
-    services.promtail = {
-      enable = true;
-
-      configuration = {
-        server = {
-          http_listen_port = ports.promtail;
-          http_listen_address = "127.0.0.1";
-          grpc_listen_port = 0;
-        };
-
-        positions = {
-          filename = "/var/lib/promtail/positions.yaml";
-        };
-
-        clients = [
-          {
-            url = "http://127.0.0.1:${toString ports.loki}/loki/api/v1/push";
-          }
-        ];
-
-        scrape_configs = [
-          {
-            job_name = "journal";
-            journal = {
-              max_age = "12h";
-              labels = {
-                job = "systemd-journal";
-              };
-            };
-            relabel_configs = [
-              {
-                source_labels = [ "__journal__systemd_unit" ];
-                target_label = "unit";
-              }
-              {
-                source_labels = [ "__journal__hostname" ];
-                target_label = "hostname";
-              }
-              {
-                source_labels = [ "__journal_priority_keyword" ];
-                target_label = "level";
-              }
-            ];
-          }
-        ];
-      };
-    };
-
-    users.users.promtail.extraGroups = [ "systemd-journal" ];
-
     # SECURITY: Systemd hardening directives + resource limits
-    systemd = {
-      services = {
-        loki.serviceConfig = mkServiceHardening {
-          readWritePaths = [ "/var/lib/loki" ];
-          protectHome = true;
-          useMkForce = true;
-          memoryMax = "256M";
-          memoryHigh = "192M";
-        };
-
-        promtail.serviceConfig = mkServiceHardening {
-          protectHome = true;
-          useMkForce = true;
-          memoryMax = "128M";
-          memoryHigh = "64M";
-        };
-      };
-
-      tmpfiles.rules = [
-        "d /var/lib/promtail 0750 promtail promtail -"
-      ];
+    systemd.services.loki.serviceConfig = mkServiceHardening {
+      readWritePaths = [ "/var/lib/loki" ];
+      protectHome = true;
+      useMkForce = true;
+      memoryMax = "256M";
+      memoryHigh = "192M";
     };
+
+    # Promtail is always enabled alongside Loki (it ships logs to Loki)
+    mySystem.promtail.enable = lib.mkDefault true;
   };
 }

@@ -49,6 +49,7 @@ in
       ntfy.enable = mkDefaultTrue;
       observability.enable = mkDefaultTrue;
       loki.enable = mkDefaultTrue;
+      promtail.enable = mkDefaultTrue;
       systemReport.enable = mkDefaultTrue;
       fail2ban.enable = mkDefaultTrue; # fail2ban does NOT conflict with AppArmor (only auditd does)
       metadataScrubber.enable = mkDefaultTrue; # Auto-strip metadata from user files
