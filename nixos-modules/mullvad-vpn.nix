@@ -7,6 +7,75 @@
   ...
 }:
 
+let
+  mullvad = "${pkgs.mullvad}/bin/mullvad";
+
+  # LAN sharing policy: allow when services need LAN access, block otherwise.
+  # Docker requires LAN sharing — bridge traffic uses RFC1918 ranges that
+  # Mullvad lockdown mode would otherwise block, breaking container networking.
+  lanCommand =
+    if
+      (
+        config.mySystem.kdeconnect.enable
+        || config.mySystem.flatpak.enable
+        || config.mySystem.virtualisation.enable
+      )
+    then
+      "${mullvad} lan set allow"
+    else
+      "${mullvad} lan set block";
+
+  mullvadSettingsScript = pkgs.writeShellScript "mullvad-settings" ''
+    # Wait for mullvad daemon RPC socket to be ready
+    for i in $(seq 1 30); do
+      ${mullvad} status >/dev/null 2>&1 && break
+      sleep 1
+    done
+
+    # === DNS ===
+    # Do not set Mullvad-side custom DNS. The host already resolves through
+    # local dnscrypt-proxy via resolv.conf/NetworkManager. Forcing Mullvad's
+    # tunnel DNS to 127.0.0.1 adds unnecessary complexity and can slow tunnel
+    # establishment.
+    ${mullvad} dns set default
+
+    # === Kill Switch ===
+    # Block ALL traffic when VPN is disconnected. No leaks.
+    ${mullvad} lockdown-mode set on
+
+    # === Auto-connect ===
+    # Reconnect VPN automatically on boot/network change.
+    ${mullvad} auto-connect set on
+
+    # === Relay Selection ===
+    # Prefer the currently reliable nearby region instead of `location any`.
+    # Random far-away relays caused repeated WireGuard timeout/obfuscation
+    # loops during boot before eventually landing on Israel anyway.
+    ${mullvad} relay set multihop off
+    ${mullvad} relay set location il
+
+    # === Tunnel Hardening ===
+    # Quantum-resistant key exchange (post-quantum crypto on top of WireGuard)
+    ${mullvad} tunnel set quantum-resistant on
+    # DAITA disabled: from Jordan, DAITA + obfuscation causes connection failures.
+    # Mullvad auto-disables it after repeated failures anyway. Re-enable on
+    # unrestricted networks where direct WireGuard works.
+    ${mullvad} tunnel set daita off
+    # Disable IPv6 inside Mullvad tunnel (Yggdrasil can still use kernel IPv6 stack)
+    ${mullvad} tunnel set ipv6 off
+    # Rotate WireGuard keys every 24 hours for forward secrecy
+    ${mullvad} tunnel set rotation-interval 24
+
+    # === Obfuscation ===
+    # Auto-detect censorship and apply obfuscation when needed.
+    ${mullvad} obfuscation set mode auto
+
+    # === Local Network ===
+    # SECURITY: Only allow LAN access when services need it (KDE Connect, LocalSend, Docker).
+    # On public/hostile networks, LAN access is an attack surface.
+    ${lanCommand}
+  '';
+in
 {
   options.mySystem.mullvadVpn = {
     enable = lib.mkEnableOption "Mullvad VPN service";
@@ -42,75 +111,7 @@
         Type = "oneshot";
         RemainAfterExit = true;
       };
-      script = ''
-        mullvad=${pkgs.mullvad}/bin/mullvad
-
-        # Wait for mullvad daemon RPC socket to be ready
-        for i in $(seq 1 30); do
-          $mullvad status >/dev/null 2>&1 && break
-          sleep 1
-        done
-
-        # === DNS ===
-        # Do not set Mullvad-side custom DNS. The host already resolves through
-        # local dnscrypt-proxy via resolv.conf/NetworkManager. Forcing Mullvad's
-        # tunnel DNS to 127.0.0.1 adds unnecessary complexity and can slow tunnel
-        # establishment.
-        $mullvad dns set default
-
-        # === Kill Switch ===
-        # Block ALL traffic when VPN is disconnected. No leaks.
-        $mullvad lockdown-mode set on
-
-        # === Auto-connect ===
-        # Reconnect VPN automatically on boot/network change.
-        $mullvad auto-connect set on
-
-        # === Relay Selection ===
-        # Prefer the currently reliable nearby region instead of `location any`.
-        # Random far-away relays caused repeated WireGuard timeout/obfuscation
-        # loops during boot before eventually landing on Israel anyway.
-        $mullvad relay set multihop off
-        $mullvad relay set location il
-
-        # === Tunnel Hardening ===
-        # Quantum-resistant key exchange (post-quantum crypto on top of WireGuard)
-        $mullvad tunnel set quantum-resistant on
-        # DAITA disabled: from Jordan, DAITA + obfuscation causes connection failures.
-        # Mullvad auto-disables it after repeated failures anyway. Re-enable on
-        # unrestricted networks where direct WireGuard works.
-        $mullvad tunnel set daita off
-        # Disable IPv6 inside Mullvad tunnel (Yggdrasil can still use kernel IPv6 stack)
-        $mullvad tunnel set ipv6 off
-        # Rotate WireGuard keys every 24 hours for forward secrecy
-        $mullvad tunnel set rotation-interval 24
-
-        # === Obfuscation ===
-        # Auto-detect censorship and apply obfuscation when needed.
-        $mullvad obfuscation set mode auto
-
-        # === Local Network ===
-        # SECURITY: Only allow LAN access when services need it (KDE Connect, LocalSend, Docker).
-        # On public/hostile networks, LAN access is an attack surface.
-        # Docker requires LAN sharing: bridge traffic uses RFC1918 ranges that Mullvad
-        # lockdown mode would otherwise block, breaking container networking entirely.
-        ${
-          if
-            (
-              config.mySystem.kdeconnect.enable
-              || config.mySystem.flatpak.enable
-              || config.mySystem.virtualisation.enable
-            )
-          then
-            ''
-              $mullvad lan set allow
-            ''
-          else
-            ''
-              $mullvad lan set block
-            ''
-        }
-      '';
+      script = "${mullvadSettingsScript}";
     };
   };
 }

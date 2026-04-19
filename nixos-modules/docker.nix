@@ -1,4 +1,4 @@
-# Docker and libvirt/QEMU virtualisation.
+# Docker container engine with bridge networking.
 
 {
   config,
@@ -36,48 +36,24 @@
       "net.ipv4.ip_forward" = true;
     };
 
-    virtualisation = {
-      docker = {
-        enable = true;
-        enableOnBoot = true;
-        rootless = {
-          enable = false;
-          setSocketVariable = true;
-        };
-        daemon.settings = {
-          dns = [ constants.dockerBridge ];
-          ipv6 = false;
-          iptables = true;
-        };
+    virtualisation.docker = {
+      enable = true;
+      enableOnBoot = true;
+      rootless = {
+        enable = false;
+        setSocketVariable = true;
       };
-
-      libvirtd = {
-        enable = true;
-        onShutdown = "shutdown";
-        onBoot = "ignore";
-
-        qemu = {
-          package = pkgsStable.qemu_kvm;
-          swtpm.enable = true;
-        };
+      daemon.settings = {
+        dns = [ constants.dockerBridge ];
+        ipv6 = false;
+        iptables = true;
       };
     };
 
     users.users."${user}".extraGroups = [
       "docker"
-      "libvirtd"
       "kvm"
     ];
-
-    systemd = {
-      # Socket-activate libvirtd — daemon starts only on first virsh/virt-manager use
-      services.libvirtd.wantedBy = lib.mkForce [ ];
-      sockets.libvirtd.wantedBy = [ "sockets.target" ];
-
-      # Disable libvirt-guests entirely — onBoot = "ignore" makes it pointless,
-      # and its default shutdown handling can block poweroff for minutes.
-      services.libvirt-guests.enable = false;
-    };
 
     # Only enable GPU containers on desktop (Optimus laptops can't reliably passthrough)
     hardware.nvidia-container-toolkit.enable =
@@ -100,10 +76,9 @@
       '';
     };
 
-    environment.systemPackages = with pkgsStable; [
-      virt-manager
-      nvidia-container-toolkit
-      nftables # Docker needs nft for old rule cleanup
+    environment.systemPackages = [
+      pkgsStable.nvidia-container-toolkit
+      pkgsStable.nftables # Docker needs nft for old rule cleanup
     ];
   };
 }
