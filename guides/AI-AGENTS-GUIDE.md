@@ -380,12 +380,13 @@ Source: `scripts/ai/agents-search.sh` · Wired via `home-manager/modules/ai-agen
 
 ```
 ai-agents/
-├── default.nix              # Import hub (options, activation, files, services, log-analyzer, config)
+├── default.nix              # Import hub (options, activation, files, services, config)
 ├── options.nix              # All programs.aiAgents option definitions
 ├── helpers/                 # Non-module helpers for builders, aliases, templates, transforms
 │   ├── _mcp-transforms.nix    # MCP server transform helpers
 │   ├── _settings-builders.nix # Per-agent settings builders
 │   ├── _opencode-profiles.nix # OpenCode profile names and config paths
+│   ├── _opencode-gruvbox-theme.nix # Gruvbox Dark theme definition for OpenCode TUI
 │   ├── _aliases.nix           # Shared alias generation
 │   ├── _destructive-rules.nix # Destructive action allow/deny rules per agent
 │   ├── _file-templates.nix    # Config file templates
@@ -418,8 +419,7 @@ ai-agents/
 │   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
 │   └── prompts/               # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 ├── files.nix                # home.file + xdg.configFile declarations
-├── services.nix             # Packages, zsh aliases, systemd user services/timers
-├── log-analyzer.nix         # Log analysis tools and dashboard
+├── services.nix             # Packages, zsh aliases, systemd user services/timers, log analysis
 └── config/
     ├── default.nix          # Import hub (claude + models + flat files)
     ├── defaults.nix         # Default values for agent options

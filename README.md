@@ -107,6 +107,7 @@ Set `hostProfile` first, then override as needed:
 | `ntfy.port`                  | Local ntfy bridge listener port                                           |
 | `observability.enable`       | Prometheus + Alertmanager + Grafana (ports 9090, 9093, 3001)              |
 | `loki.enable`                | Log aggregation with Promtail                                             |
+| `promtail.enable`            | Promtail log shipper for Loki (on by default)                             |
 | `systemReport.enable`        | Unified health reporting                                                  |
 | `systemReport.outputDir`     | System report output directory                                            |
 | `systemReport.retentionDays` | System report retention window (days)                                     |
@@ -121,7 +122,8 @@ Set `hostProfile` first, then override as needed:
 | `vnc.enable`                 | VNC remote access                                                         |
 | `secureBoot.enable`          | Secure Boot preparation with sbctl                                        |
 | `webRe.enable`               | Web reverse engineering and security tools                                |
-| android (unconditional)      | ADB, Fastboot, Android Studio (no toggle)                                 |
+| `android.enable`             | ADB, Fastboot, Android Studio (on by default)                             |
+| `browserDeps.enable`         | Chromium, Puppeteer headless testing dependencies (on by default)         |
 
 ---
 
@@ -216,7 +218,7 @@ justfile                      # Build/deploy commands (`just --list`)
 AGENTS.md                     # Agent-facing repo conventions
 shared/                       # Shared identity, helpers, option/secret utilities
 hosts/<hostname>/             # Per-host config + hardware modules
-nixos-modules/                # Shared system modules (56 imports in hub)
+nixos-modules/                # Shared system modules (58 imports in hub)
 home-manager/                 # User-level modules + packages
 scripts/                      # Utility scripts (ai/, build/, apps/, hardware/, system/, sops/; shared helpers in lib/)
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)

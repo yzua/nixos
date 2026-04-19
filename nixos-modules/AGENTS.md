@@ -78,7 +78,7 @@ We use `host-defaults.nix` to reduce boilerplate. Setting `mySystem.hostProfile`
 
 Modules are grouped into these namespaces:
 
-- **Core**: Boot, nix, users, timezone, i18n, environment, kernel-tuning, hostname, system-services, resource limits.
+- **Core**: Boot, nix, users, timezone, i18n, environment, kernel-tuning, host-info, system-services, resource limits.
 - **Hardware**: GPU, audio, bluetooth, input, power (UPower), firmware updates.
 - **Desktop**: Niri, greetd, xserver, portals, file manager (Nautilus).
 - **Networking**: NetworkManager, encrypted DNS, VPNs, Tor, I2P, mesh networks.
