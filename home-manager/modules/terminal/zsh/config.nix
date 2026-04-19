@@ -2,6 +2,7 @@
 
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -66,6 +67,11 @@
         "bgnotify" # Notify on long-running commands
       ];
     };
+
+    initContent = lib.mkAfter ''
+      # Silence bgnotify D-Bus errors when notification daemon is unavailable
+      __bgnotify_notifier() { notify-send "$1" "$2" 2>/dev/null || true; }
+    '';
 
     plugins = [
       {

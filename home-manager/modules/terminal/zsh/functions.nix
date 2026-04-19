@@ -51,10 +51,22 @@ in
     fi
 
     # === AI agent wrappers ===
+    _ai_tab_icon() {
+      case "$1" in
+        cl*|ocl*|hcl*) printf '\uf1b0 ' ;;                   #  Claude — cl, clu, clglm, ocl, hcl + all workflow suffixes
+        oc*|locgpt*|mocgpt*|xocgpt*) printf '\ue7a4 ' ;;     #  OpenCode — oc, ocglm, ocgem, ocgpt, ocs, oczen + all workflow suffixes
+        cx*|lcx*|mcx*|hcx*|xcx*) printf '\uf1c0 ' ;;         #  Codex — cx, lcx, mcx, hcx, xcx + all workflow suffixes
+        gem*) printf '\uf529 ' ;;                              #  Gemini — gem + all workflow suffixes
+        *) ;;
+      esac
+    }
+
     _zellij_rename_tab() {
       local tab_name="$1"
       [[ -n "$tab_name" && -n "${"ZELLIJ:-"}" ]] || return 0
-      command zellij action rename-tab "$tab_name" >/dev/null 2>&1 || true
+      local icon
+      icon="$(_ai_tab_icon "$tab_name")"
+      command zellij action rename-tab "''${icon}''${tab_name}" >/dev/null 2>&1 || true
     }
 
     _ai_agent_exec() {
