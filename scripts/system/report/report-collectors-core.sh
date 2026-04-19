@@ -161,16 +161,8 @@ collect_nix_builds() {
 collect_ai_agents() {
 	section "AI Agent Errors"
 
-	local -a candidate_dirs=(
-		"$LOG_DIR"
-		"$OPENCODE_LOG_DIR"
-		"$CODEX_LOG_DIR"
-	)
 	local -a log_dirs=()
-
-	for dir in "${candidate_dirs[@]}"; do
-		[[ -d "$dir" ]] && log_dirs+=("$dir")
-	done
+	mapfile -t log_dirs < <(agent_log_roots)
 
 	if [[ "${#log_dirs[@]}" -eq 0 ]]; then
 		echo "No agent logs found."

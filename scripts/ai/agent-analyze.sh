@@ -157,8 +157,11 @@ patterns() {
 	print_info "Analyzing error patterns..."
 	echo "----------------------------------------------------------------"
 
-	if find_all_agent_logs -7 | grep -q .; then
-		find_all_agent_logs -7 | xargs -r rg --no-filename -o -i "${ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
+	local all_logs
+	all_logs="$(find_all_agent_logs -7)"
+
+	if echo "$all_logs" | grep -q .; then
+		echo "$all_logs" | xargs -r rg --no-filename -o -i "${ERROR_PATTERN}:? .{0,120}" 2>/dev/null |
 			sort | uniq -c | sort -rn | head -20
 	else
 		print_warning "No log files found."
@@ -167,8 +170,8 @@ patterns() {
 	echo ""
 	echo "----------------------------------------------------------------"
 	print_info "Top exit codes:"
-	if find_all_agent_logs -7 | grep -q .; then
-		find_all_agent_logs -7 | xargs -r grep -h "exited with code" 2>/dev/null |
+	if echo "$all_logs" | grep -q .; then
+		echo "$all_logs" | xargs -r grep -h "exited with code" 2>/dev/null |
 			grep -oE "code [0-9]+" | sort | uniq -c | sort -rn | head -10 || true
 	else
 		print_warning "No log files found."

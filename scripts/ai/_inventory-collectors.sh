@@ -128,6 +128,7 @@ list_agent_files_merged() {
 
 # Collect OpenCode inventory rows.
 collect_opencode() {
+	need_cmd jq
 	shopt -s nullglob
 	local profiles=("$HOME"/.config/opencode*/opencode.json)
 	local agent_dirs=("$HOME"/.config/opencode*/agents)
@@ -145,29 +146,12 @@ collect_opencode() {
 		row "opencode" "profile" "$profile_name" "model=$model" "$cfg"
 		row "opencode" "small_model" "$profile_name" "$small_model" "$cfg"
 
-		while IFS= read -r cmd; do
-			[[ -n "$cmd" ]] || continue
-			local desc
-			desc="$(jq -r --arg k "$cmd" '.command[$k].description // "no description"' "$cfg" 2>/dev/null || echo "no description")"
-			row "opencode" "command" "$cmd" "$desc" "$cfg"
-		done < <(json_keys "$cfg" '.command // {} | keys[]')
-
-		while IFS= read -r plugin; do
-			[[ -n "$plugin" ]] || continue
-			row "opencode" "plugin" "$plugin" "enabled" "$cfg"
-		done < <(json_keys "$cfg" '.plugin // [] | .[]')
-
-		while IFS= read -r mcp; do
-			[[ -n "$mcp" ]] || continue
-			local mcp_type
-			mcp_type="$(jq -r --arg k "$mcp" '.mcp[$k].type // "local"' "$cfg" 2>/dev/null || echo "local")"
-			row "opencode" "mcp" "$mcp" "$mcp_type" "$cfg"
-		done < <(json_keys "$cfg" '.mcp // {} | keys[]')
-
-		while IFS= read -r provider; do
-			[[ -n "$provider" ]] || continue
-			row "opencode" "provider" "$provider" "configured" "$cfg"
-		done < <(json_keys "$cfg" '.provider // {} | keys[]')
+		# shellcheck disable=SC2016
+		collect_json_rows_jq "opencode" "command" "$cfg" '.command // {} | keys[]' '.command[$k].description // "no description"'
+		collect_json_rows "opencode" "plugin" "$cfg" '.plugin // [] | .[]' "enabled"
+		# shellcheck disable=SC2016
+		collect_json_rows_jq "opencode" "mcp" "$cfg" '.mcp // {} | keys[]' '.mcp[$k].type // "local"'
+		collect_json_rows "opencode" "provider" "$cfg" '.provider // {} | keys[]' "configured"
 	done
 
 	list_agent_files_merged "opencode" "${agent_dirs[@]}"
@@ -177,6 +161,7 @@ collect_opencode() {
 
 # Collect Claude inventory rows.
 collect_claude() {
+	need_cmd jq
 	local cfg="$HOME/.claude/settings.json"
 	if [[ -f "$cfg" ]]; then
 		row "claude" "model" "default" "$(jq -r '.model // "n/a"' "$cfg" 2>/dev/null || echo "n/a")" "$cfg"
@@ -184,10 +169,7 @@ collect_claude() {
 		mapfile -t claude_configured_hooks < <(json_keys "$cfg" '.hooks // {} | keys[]')
 		list_hook_rows_with_unconfigured "claude" "$cfg" "https://code.claude.com/docs/en/hooks" "${claude_configured_hooks[@]}"
 
-		while IFS= read -r plugin; do
-			[[ -n "$plugin" ]] || continue
-			row "claude" "plugin" "$plugin" "enabled" "$cfg"
-		done < <(json_keys "$cfg" '.enabledPlugins // {} | to_entries[] | select(.value == true) | .key')
+		collect_json_rows "claude" "plugin" "$cfg" '.enabledPlugins // {} | to_entries[] | select(.value == true) | .key' "enabled"
 	fi
 
 	local mcp_cfg="$HOME/.mcp.json"
@@ -278,14 +260,11 @@ PY
 
 # Collect Gemini inventory rows.
 collect_gemini() {
+	need_cmd jq
 	local cfg="$HOME/.gemini/settings.json"
 	if [[ -f "$cfg" ]]; then
-		while IFS= read -r alias; do
-			[[ -n "$alias" ]] || continue
-			local model
-			model="$(jq -r --arg k "$alias" '.modelConfigs.customAliases[$k].modelConfig.model // "n/a"' "$cfg" 2>/dev/null || echo "n/a")"
-			row "gemini" "model_alias" "$alias" "$model" "$cfg"
-		done < <(json_keys "$cfg" '.modelConfigs.customAliases // {} | keys[]')
+		# shellcheck disable=SC2016
+		collect_json_rows_jq "gemini" "model_alias" "$cfg" '.modelConfigs.customAliases // {} | keys[]' '.modelConfigs.customAliases[$k].modelConfig.model // "n/a"'
 
 		mapfile -t gemini_configured_hooks < <(json_keys "$cfg" '.hooks // {} | keys[]')
 		list_hook_rows_with_unconfigured "gemini" "$cfg" "https://geminicli.com/docs/hooks/reference/" "${gemini_configured_hooks[@]}"

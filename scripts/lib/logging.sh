@@ -8,7 +8,7 @@ readonly YELLOW='\033[1;33m'
 readonly BLUE='\033[0;34m'
 readonly NC='\033[0m'
 
-print_colored() {
+_print_colored() {
 	local color="$1"
 	local icon="$2"
 	local message="$3"
@@ -35,19 +35,19 @@ log_with_level() {
 
 # Simple colored output functions (emoji style)
 print_info() {
-	print_colored "$BLUE" "ℹ" "$1"
+	_print_colored "$BLUE" "ℹ" "$1"
 }
 
 print_success() {
-	print_colored "$GREEN" "✓" "$1"
+	_print_colored "$GREEN" "✓" "$1"
 }
 
 print_warning() {
-	print_colored "$YELLOW" "⚠" "$1"
+	_print_colored "$YELLOW" "⚠" "$1"
 }
 
 print_error() {
-	print_colored "$RED" "✗" "$1"
+	_print_colored "$RED" "✗" "$1"
 }
 
 # Timestamped logging functions (with optional file logging)

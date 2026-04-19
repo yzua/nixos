@@ -22,16 +22,40 @@ sanitize() {
 export -f sanitize
 
 # Extract keys from a JSON file using a jq expression.
+# Caller must ensure jq is available (need_cmd jq).
 json_keys() {
-	need_cmd jq
 	local file="$1"
 	local expr="$2"
 	jq -r "$expr" "$file" 2>/dev/null || true
 }
 
+# Collect JSON keys and emit rows with a static detail string.
+# Usage: collect_json_rows SCOPE KIND CONFIG_FILE JQ_KEYS_EXPR [DETAIL]
+collect_json_rows() {
+	local scope="$1" kind="$2" cfg="$3" keys_expr="$4" detail="${5:-}"
+	local item
+	while IFS= read -r item; do
+		[[ -n "$item" ]] || continue
+		row "$scope" "$kind" "$item" "$detail" "$cfg"
+	done < <(json_keys "$cfg" "$keys_expr")
+}
+
+# Collect JSON keys and emit rows with detail from a jq expression.
+# $k is bound to the current key in DETAIL_JQ_EXPR.
+# Usage: collect_json_rows_jq SCOPE KIND CONFIG_FILE JQ_KEYS_EXPR DETAIL_JQ_EXPR
+collect_json_rows_jq() {
+	local scope="$1" kind="$2" cfg="$3" keys_expr="$4" detail_expr="$5"
+	local item detail
+	while IFS= read -r item; do
+		[[ -n "$item" ]] || continue
+		detail="$(jq -r --arg k "$item" "$detail_expr" "$cfg" 2>/dev/null || echo "n/a")"
+		row "$scope" "$kind" "$item" "$detail" "$cfg"
+	done < <(json_keys "$cfg" "$keys_expr")
+}
+
 # Infer MCP server type: explicit type field, else "http" if url present, else "local".
+# Caller must ensure jq is available (need_cmd jq).
 mcp_type_for() {
-	need_cmd jq
 	local file="$1"
 	local key="$2"
 	jq -r --arg k "$key" '.mcpServers[$k].type // (if .mcpServers[$k].url then "http" else "local" end)' "$file" 2>/dev/null || echo "local"

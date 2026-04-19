@@ -48,6 +48,16 @@ _find_logs_in_roots() {
 	done | sort -u
 }
 
+# Print the canonical list of agent log root directories (one per line).
+# Only includes directories that actually exist on disk.
+# Use this when you need the directory paths themselves, not the log files.
+agent_log_roots() {
+	local root
+	for root in "$LOG_DIR" "$OPENCODE_LOG_DIR" "$CODEX_LOG_DIR"; do
+		[[ -d "$root" ]] && echo "$root"
+	done
+}
+
 # Find all agent log files across standard directories.
 # Args: $1 — mtime filter (default: -7, i.e. last 7 days)
 # Output: sorted unique list of log file paths
