@@ -168,7 +168,6 @@ in
     "editor.defaultFormatter" = "rust-lang.rust-analyzer";
     "editor.tabSize" = 4;
   };
-  "[svelte]"."editor.defaultFormatter" = "svelte.svelte-vscode";
   "css.lint.unknownAtRules" = "ignore";
   "[markdown]" = {
     "editor.wordWrap" = "on";
