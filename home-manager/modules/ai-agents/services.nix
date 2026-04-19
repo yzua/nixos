@@ -1,4 +1,4 @@
-# Zsh aliases, systemd user services/timers, and packages for AI agents.
+# Packages, zsh aliases, systemd user services/timers, and log analysis for AI agents.
 
 {
   config,
@@ -23,6 +23,14 @@ let
   agentsSearch = pkgs.writeShellScriptBin "agents-search" ''
     exec ${scriptsDir}/ai/agents-search.sh "$@"
   '';
+  logAnalyzer = pkgs.writeShellScriptBin "ai-agent-analyze" ''
+    AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
+      exec ${scriptsDir}/ai/agent-analyze.sh "$@"
+  '';
+  logDashboard = pkgs.writeShellScriptBin "ai-agent-dashboard" ''
+    AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
+      exec ${scriptsDir}/ai/agent-dashboard.sh "$@"
+  '';
   androidReLaunchers = import ./helpers/_android-re-launchers.nix {
     inherit
       config
@@ -43,13 +51,13 @@ let
   inherit (aliasLib) aiAliases aiAgentLauncher aiAgentInventory;
   mkCliAutoupdateScript = import ./helpers/_mk-cli-autoupdate-script.nix { inherit pkgs; };
   shellAliases = import ./helpers/_services-shell-aliases.nix {
-    inherit cfg aiAliases;
+    inherit cfg aiAliases constants;
   };
 
   logCleanupCommand = ''
     find "${cfg.logging.directory}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete
-    find "$HOME/.local/share/opencode/log" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete 2>/dev/null || true
-    find "$HOME/.codex/log" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete 2>/dev/null || true
+    find "$HOME/${constants.paths.opencodeLogDir}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete 2>/dev/null || true
+    find "$HOME/${constants.paths.codexLogDir}" -name "*.log" -mtime +${toString cfg.logging.retentionDays} -delete 2>/dev/null || true
   '';
 
   aiSystemdUser = import ./helpers/_services-systemd.nix {
@@ -79,7 +87,11 @@ in
         ${logCleanupCommand}
         echo "Cleaned up logs older than ${toString cfg.logging.retentionDays} days"
       ''
-    ));
+    ))
+    ++ (lib.optionals cfg.logging.enable [
+      logAnalyzer
+      logDashboard
+    ]);
 
     home.sessionVariables = lib.mkIf cfg.opencode.enable {
       OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";

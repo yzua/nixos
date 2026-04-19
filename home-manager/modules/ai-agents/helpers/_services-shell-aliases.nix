@@ -1,7 +1,12 @@
 {
   cfg,
   aiAliases,
+  constants,
 }:
+let
+  ol = "~/${constants.paths.opencodeLogDir}";
+  cl = "~/${constants.paths.codexLogDir}";
+in
 (
   if cfg.logging.enable then
     {
@@ -11,13 +16,13 @@
       "codex-log" = "ai-agent-log-wrapper codex codex";
       "gemini-log" = "ai-agent-log-wrapper gemini gemini";
 
-      "ai-logs" = "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null";
+      "ai-logs" = "tail -f ${ol}/*.log ${cl}/*.log 2>/dev/null";
       "ai-errors-all" =
-        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -100";
+        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ${ol}/ ${cl}/ 2>/dev/null | tail -100";
       "ai-errors" =
-        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | grep -vi 'Method not found: prompts/list\\|Method not found: resources/list\\|Method not found failed to get prompts' | tail -50";
+        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ${ol}/ ${cl}/ 2>/dev/null | grep -vi 'Method not found: prompts/list\\|Method not found: resources/list\\|Method not found failed to get prompts' | tail -50";
       "ai-errors-runtime" =
-        "grep -rn --color=always -i 'not connected failed to get prompts\\|EIO: i/o error\\|setRawMode failed\\|tui bootstrap failed\\|bun info failed' ~/.local/share/opencode/log/ ~/.codex/log/ 2>/dev/null | tail -50";
+        "grep -rn --color=always -i 'not connected failed to get prompts\\|EIO: i/o error\\|setRawMode failed\\|tui bootstrap failed\\|bun info failed' ${ol}/ ${cl}/ 2>/dev/null | tail -50";
 
       "ai-stats" = "ai-agent-analyze stats";
       "ai-report" = "ai-agent-analyze report";

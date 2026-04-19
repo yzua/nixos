@@ -17,6 +17,7 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | `_destructive-rules.nix`        | Canonical destructive command list + generators for deny rules                     |
 | `_gemini-policies.nix`          | Gemini CLI TOML safety policies (allow research, deny destructive)                 |
 | `_opencode-profiles.nix`        | Seven OpenCode profile names and their XDG config paths                            |
+| `_opencode-gruvbox-theme.nix`   | Gruvbox Dark theme definition for OpenCode TUI                                     |
 | `_aliases.nix`                  | Zsh alias generation for agent launchers and workflow combos                       |
 | `_workflow-prompts.nix`         | Workflow prompt constants (commitSplit, securityAudit, etc.)                       |
 | `_file-templates.nix`           | Static agent/skill/definition templates for Claude and Gemini                      |

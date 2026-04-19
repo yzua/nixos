@@ -19,8 +19,7 @@ The system follows a strict unidirectional flow:
 3. **Helpers** (`helpers/`): Shared logic imported by config, activation, and files modules.
 4. **File Generation** (`files.nix`): Declares configuration files in XDG paths.
 5. **Activation Logic** (`activation/`): Handles late-stage secret injection, config setup, best-effort skill management, and state caching.
-6. **Services** (`services.nix`): Packages, zsh aliases, and systemd user services/timers.
-7. **Log Analyzer** (`log-analyzer.nix`): AI agent log analysis and dashboard.
+6. **Services** (`services.nix`): Packages, zsh aliases, systemd user services/timers, and log analysis tools.
 
 ### Profile-Driven Polymorphism
 
@@ -44,11 +43,10 @@ Seven OpenCode profiles are defined in `helpers/_opencode-profiles.nix`:
 
 ```
 ai-agents/
-├── default.nix              # Import hub (options, activation, files, services, log-analyzer, config)
+├── default.nix              # Import hub (options, activation, files, services, config)
 ├── options.nix              # All programs.aiAgents option definitions
 ├── files.nix                # home.file + xdg.configFile declarations
-├── services.nix             # Packages, zsh aliases, systemd user services/timers
-├── log-analyzer.nix         # AI agent log analysis and dashboard
+├── services.nix             # Packages, zsh aliases, systemd user services/timers, log analysis
 ├── helpers/                 # Shared logic (not modules, imported by others)
 │   ├── _settings-builders.nix   # Per-agent settings + profile variant overrides
 │   ├── _mcp-transforms.nix      # Unified MCP abstraction (shared → agent-specific schemas)
@@ -67,6 +65,7 @@ ai-agents/
 │   ├── _formatters.nix                   # Formatter registry (shared by claude hooks + gemini config)
 │   ├── _impeccable-commands.nix          # Impeccable skill command definitions and text renderer
 │   ├── _models.nix                       # Shared model/provider constants (names, aliases)
+│   ├── _opencode-gruvbox-theme.nix       # OpenCode Gruvbox Dark TUI theme
 │   ├── _agent-env.nix                    # Agent environment variable bridging
 │   └── _git-clone-update.nix             # Git clone/update helper for plugin repos
 ├── activation/              # Home Manager activation scripts

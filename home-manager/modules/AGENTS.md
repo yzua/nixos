@@ -10,11 +10,10 @@ Most modules directly configure `programs.*`, `services.*`, `home.*`; `ai-agents
 ```
 modules/
 ├── ai-agents/          # AI coding agent config (Claude Code, OpenCode, Codex, Gemini CLI)
-│   ├── default.nix     # Import hub (options, activation, files, services, log-analyzer, config)
+│   ├── default.nix     # Import hub (options, activation, files, services, config)
 │   ├── options.nix     # All programs.aiAgents option definitions
 │   ├── files.nix       # home.file + xdg.configFile declarations
-│   ├── services.nix    # Packages, zsh aliases, systemd user services/timers
-│   ├── log-analyzer.nix # AI agent log analysis and dashboard
+│   ├── services.nix    # Packages, zsh aliases, systemd user services/timers, log analysis
 │   ├── helpers/        # Shared logic (not modules, imported by others)
 │   │   ├── _settings-builders.nix # Per-agent settings + profile variant overrides
 │   │   ├── _mcp-transforms.nix    # Unified MCP abstraction (shared → agent-specific)
@@ -33,6 +32,7 @@ modules/
 │   │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
 │   │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   │   ├── _models.nix           # Shared model/provider constants (names, aliases)
+│   │   ├── _opencode-gruvbox-theme.nix # OpenCode Gruvbox Dark TUI theme
 │   │   ├── _agent-env.nix       # Agent environment variable bridging
 │   │   └── _git-clone-update.nix # Git clone/update helper for plugin repos
 │   ├── activation/     # Home Manager activation scripts
@@ -48,7 +48,8 @@ modules/
 │   │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   │   └── skills.nix       # Skill installations and omissions
 │   ├── android-re/     # Android RE workflow prompts and config
-│   │   └── _prompt.nix # Prompt templates (not a module, imported by services)
+│   │   ├── _prompt.nix # Prompt templates (not a module, imported by services)
+│   │   └── prompts/    # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 │   └── config/         # Split configuration values
 │       ├── default.nix      # Import hub (defaults, mcp-servers, models, claude)
 │       ├── defaults.nix     # Default values for agent options

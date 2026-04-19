@@ -2,9 +2,50 @@
 
 let
   formatterRegistry = import ../../helpers/_formatters.nix;
+
+  mkCommandHook =
+    {
+      body,
+      matcher ? null,
+      extractCommand ? (matcher != null),
+      runInBackground ? false,
+      timeout ? null,
+    }:
+    let
+      bgAttrs = if runInBackground then { run_in_background = true; } else { };
+      toAttrs = if timeout != null then { inherit timeout; } else { };
+      matcherAttrs = if matcher != null then { inherit matcher; } else { };
+      commandPrefix =
+        if extractCommand then
+          ''
+            INPUT=$(cat)
+            COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
+          ''
+        else
+          ''
+            INPUT=$(cat)
+          '';
+    in
+    matcherAttrs
+    // {
+      hooks = [
+        (
+          {
+            type = "command";
+            command = ''
+              ${commandPrefix}
+              ${body}
+              echo "$INPUT"
+            '';
+          }
+          // bgAttrs
+          // toAttrs
+        )
+      ];
+    };
 in
 {
-  inherit formatterRegistry;
+  inherit formatterRegistry mkCommandHook;
 
   mkFormatterHook =
     {
@@ -33,60 +74,15 @@ in
       ];
     };
 
-  mkBashHook =
-    {
-      body,
-      matcher ? "Bash",
-      runInBackground ? false,
-      timeout ? null,
-    }:
-    let
-      bgAttrs = if runInBackground then { run_in_background = true; } else { };
-      toAttrs = if timeout != null then { inherit timeout; } else { };
-    in
-    {
-      inherit matcher;
-      hooks = [
-        (
-          {
-            type = "command";
-            command = ''
-              INPUT=$(cat)
-              COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
-              ${body}
-              echo "$INPUT"
-            '';
-          }
-          // bgAttrs
-          // toAttrs
-        )
-      ];
-    };
-
+  # Legacy aliases — prefer mkCommandHook directly.
+  mkBashHook = args: mkCommandHook (args // { matcher = args.matcher or "Bash"; });
   mkPassthroughHook =
-    {
-      body,
-      timeout ? null,
-      runInBackground ? false,
-    }:
-    let
-      bgAttrs = if runInBackground then { run_in_background = true; } else { };
-      toAttrs = if timeout != null then { inherit timeout; } else { };
-    in
-    {
-      hooks = [
-        (
-          {
-            type = "command";
-            command = ''
-              INPUT=$(cat)
-              ${body}
-              echo "$INPUT"
-            '';
-          }
-          // bgAttrs
-          // toAttrs
-        )
-      ];
-    };
+    args:
+    mkCommandHook (
+      args
+      // {
+        matcher = null;
+        extractCommand = false;
+      }
+    );
 }
