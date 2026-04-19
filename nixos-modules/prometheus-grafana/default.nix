@@ -12,8 +12,7 @@
 let
   inherit (systemdHelpers) mkServiceHardening;
 
-  localhost = "127.0.0.1";
-  inherit (constants) ports;
+  inherit (constants) localhost ports;
   netdataTarget = "${localhost}:${toString ports.netdata}";
   lokiTarget = "${localhost}:${toString ports.loki}";
   prometheusTarget = "${localhost}:${toString ports.prometheus}";

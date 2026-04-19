@@ -15,7 +15,7 @@ let
     mkOneshotService
     mkPersistentTimer
     ;
-  inherit (constants) ports;
+  inherit (constants) localhost ports;
 in
 {
   options.mySystem.scrutiny = {
@@ -30,7 +30,7 @@ in
 
         settings = {
           web.listen = {
-            host = "127.0.0.1";
+            host = localhost;
             port = ports.scrutiny;
           };
           log.level = "INFO";
@@ -42,14 +42,14 @@ in
         };
       };
 
-      influxdb2.settings.http-bind-address = "127.0.0.1:${toString ports.influxdb}";
+      influxdb2.settings.http-bind-address = "${localhost}:${toString ports.influxdb}";
     };
 
     systemd =
       let
         waitScript = pkgs.writeShellScript "wait-for-scrutiny" ''
           for i in $(seq 1 30); do
-            ${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString ports.scrutiny}/api/summary >/dev/null 2>&1 && exit 0
+            ${pkgs.curl}/bin/curl -sf http://${localhost}:${toString ports.scrutiny}/api/summary >/dev/null 2>&1 && exit 0
             sleep 2
           done
           echo "Scrutiny API not ready after 60s"

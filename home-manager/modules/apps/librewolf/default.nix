@@ -61,7 +61,7 @@ let
 
     # Proxy base config (host set per-profile)
     "network.proxy.type" = 1;
-    "network.proxy.socks_port" = 1080;
+    "network.proxy.socks_port" = constants.ports.socks;
     "network.proxy.socks_version" = 5;
     "network.proxy.socks_remote_dns" = true;
 

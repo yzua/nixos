@@ -18,8 +18,8 @@
 
       settings = {
         listen_addresses = [
-          "127.0.0.1:53"
-          "${constants.dockerBridge}:53"
+          "${constants.localhost}:${toString constants.ports.dns}"
+          "${constants.dockerBridge}:${toString constants.ports.dns}"
         ];
 
         # Diversified resolvers — prevents single-provider compromise

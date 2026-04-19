@@ -12,6 +12,7 @@
 
 let
   inherit (systemdHelpers) mkServiceHardening;
+  inherit (constants) localhost ports;
 in
 {
   options.mySystem.netdata = {
@@ -25,8 +26,8 @@ in
 
       config = {
         global = {
-          "bind to" = "127.0.0.1";
-          "default port" = "${toString constants.ports.netdata}";
+          "bind to" = localhost;
+          "default port" = "${toString ports.netdata}";
           "memory mode" = "dbengine";
           "page cache size" = "64";
           "dbengine multihost disk space" = "512";

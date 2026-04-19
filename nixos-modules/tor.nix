@@ -32,7 +32,7 @@
       settings = {
         DNSPort = [
           {
-            addr = "127.0.0.1";
+            addr = constants.localhost;
             port = constants.ports.tor-dns;
           }
         ];

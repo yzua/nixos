@@ -27,6 +27,6 @@ in
   # Proxy launcher - Finland via Mullvad SOCKS5
   home.file.".local/bin/brave-proxy" = mkWaylandBrowserWrapper {
     bin = "${pkgs.brave}/bin/brave";
-    extraFlags = [ ''--proxy-server="socks5://${brave.personal}:1080"'' ];
+    extraFlags = [ ''--proxy-server="socks5://${brave.personal}:${toString constants.ports.socks}"'' ];
   };
 }

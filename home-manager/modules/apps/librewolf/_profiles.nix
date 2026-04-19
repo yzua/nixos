@@ -21,7 +21,7 @@ in
     isDefault = true;
     path = "personal.default";
     proxyHost = personal;
-    homepage = "http://127.0.0.1:${toString constants.ports.glance}/search";
+    homepage = "http://${constants.localhost}:${toString constants.ports.glance}/search";
   }
   {
     name = "work";
@@ -74,7 +74,7 @@ in
     homepage = "about:blank";
     extraSettings = {
       "browser.newtabpage.enabled" = false;
-      "network.proxy.socks_port" = 4447;
+      "network.proxy.socks_port" = constants.ports.i2pd-socks;
     };
   }
 ]

@@ -17,7 +17,7 @@
 
   # Default text editor
   editor = "code";
-  editorAppId = "code|Code|code-url-handler"; # Wayland app-id — used in window rules (lowercase for vscode-fhs, Code for upstream, code-url-handler for URL opens)
+  editorAppId = "code|Code"; # Wayland app-id — used in window rules (lowercase for vscode-fhs, Code for upstream, code-url-handler for URL opens)
 
   # Fonts
   font = {
@@ -45,7 +45,6 @@
     fg0 = "#ebdbb2"; # base06 (primary light foreground)
     fg_light = "#fbf1c7"; # base05 (bright foreground / light-mode background)
     fg_dark = "#665c54"; # bg3
-    fg = "#7c6f64"; # bg4
 
     # Accent colors
     red = "#fb4934"; # base08 (bright)
@@ -99,6 +98,10 @@
     i2pd = "127.0.0.1"; # Local I2P daemon (port 4447)
   };
 
+  # Loopback address — single source of truth for localhost-only service bindings.
+  # Used by NixOS modules that bind services to the loopback interface.
+  localhost = "127.0.0.1";
+
   # Service ports — single source of truth for localhost services.
   # Referenced by NixOS modules and Glance dashboard health checks.
   ports = {
@@ -114,13 +117,17 @@
     promtail = 9080;
     ntfy-bridge = 8090;
     i2pd-webconsole = 7070;
+    i2pd-socks = 4447;
     syncthing = 8384;
     activitywatch = 5600;
     otel = 4317;
     vnc = 5900;
     vnc-web = 6080;
     localsend = 53317;
+    tor-socks = 9050;
     tor-dns = 9053;
+    socks = 1080;
+    dns = 53;
     cups = 631;
     devServer = 3000;
   };
@@ -133,6 +140,8 @@
   paths = {
     scripts = "System/scripts";
     screens = "Screens";
+    opencodeLogDir = ".local/share/opencode/log";
+    codexLogDir = ".codex/log";
   };
 
   # External service API endpoints.
@@ -143,7 +152,7 @@
       models = {
         haiku = "glm-5-turbo";
         sonnet = "glm-5.1";
-        opus = "glm-5.1";
+        opus = "glm-5.1"; # Same model as sonnet — no dedicated opus-tier available
       };
     };
   };

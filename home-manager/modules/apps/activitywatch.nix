@@ -11,7 +11,7 @@
 
     settings = {
       port = constants.ports.activitywatch;
-      host = "127.0.0.1"; # Localhost only — defense-in-depth alongside firewall
+      host = constants.localhost; # Localhost only — defense-in-depth alongside firewall
     };
 
     watchers = {

@@ -47,7 +47,7 @@
         in
         {
           server = {
-            host = "127.0.0.1";
+            host = constants.localhost;
             port = constants.ports.glance;
           };
 
@@ -93,7 +93,7 @@
                       type = "monitor";
                       title = "Services";
                       cache = "1m";
-                      sites = import ./_service-sites.nix { inherit (constants) ports; };
+                      sites = import ./_service-sites.nix { inherit (constants) localhost ports; };
                     }
 
                     # NOTE: Tor exposes SOCKS/DNS ports (9050/9053), not an HTTP UI endpoint,
