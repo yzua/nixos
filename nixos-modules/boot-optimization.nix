@@ -20,7 +20,7 @@ let
     ]
     ++ lib.optionals cfg.loki.enable [
       "loki"
-      "promtail"
+      "alloy"
     ]
     ++ lib.optionals cfg.scrutiny.enable [
       "scrutiny"

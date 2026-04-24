@@ -70,7 +70,7 @@
     ./scrutiny.nix # SMART disk health monitoring
     ./glance # Self-hosted dashboard
     ./loki.nix # Loki log aggregation server
-    ./promtail.nix # Promtail log shipper for Loki
+    ./alloy.nix # Grafana Alloy log shipper for Loki
     ./prometheus-grafana # Prometheus + Alertmanager + Grafana observability
     ./system-report.nix # Unified system health reporting
 

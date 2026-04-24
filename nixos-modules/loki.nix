@@ -85,7 +85,7 @@ in
       memoryHigh = "192M";
     };
 
-    # Promtail is always enabled alongside Loki (it ships logs to Loki)
-    mySystem.promtail.enable = lib.mkDefault true;
+    # Alloy is always enabled alongside Loki (it ships logs to Loki)
+    mySystem.alloy.enable = lib.mkDefault true;
   };
 }

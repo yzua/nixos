@@ -8,7 +8,7 @@ _:
   # === journald Hardening ===
   # Rate-limit journal to prevent log flooding attacks, cap storage,
   # and disable forwarding to prevent log exfiltration.
-  # Loki/Promtail retains 30 days, so keep journal lean.
+  # Loki/Alloy retains 30 days, so keep journal lean.
   services.journald = {
     extraConfig = ''
       # Rate limit: max 200 messages per 30s window per service

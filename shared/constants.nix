@@ -114,7 +114,7 @@
     influxdb = 8086;
     loki = 3100;
     loki-grpc = 9096;
-    promtail = 9080;
+    alloy = 12345;
     ntfy-bridge = 8090;
     i2pd-webconsole = 7070;
     i2pd-socks = 4447;
