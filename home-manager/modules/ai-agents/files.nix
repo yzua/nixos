@@ -25,7 +25,9 @@ let
 
   opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   opencodeProfileNames = opencodeProfiles.names;
-  opencodeGruvboxDarkTheme = toJSON (import ./helpers/_opencode-gruvbox-theme.nix);
+  opencodeGruvboxDarkTheme = toJSON (
+    import ./helpers/_opencode-gruvbox-theme.nix { inherit (constants) color; }
+  );
 
   opencodeConfigFiles = builtins.listToAttrs (
     lib.flatten (

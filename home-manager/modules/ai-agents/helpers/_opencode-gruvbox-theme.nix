@@ -1,22 +1,28 @@
 # Gruvbox Dark theme definition for OpenCode TUI.
 # Used by files.nix to generate per-profile theme files.
 
+{ color }:
+
 let
   defs = {
-    bg0 = "#282828";
-    bg1 = "#32302f";
-    bg2 = "#3c3836";
-    bg3 = "#504945";
-    bg4 = "#665c54";
-    fg0 = "#ebdbb2";
-    fg2 = "#a89984";
-    yellow = "#fabd2f";
-    blue = "#83a598";
-    purple = "#d3869b";
-    red = "#fb4934";
-    green = "#b8bb26";
-    aqua = "#8ec07c";
-    orange = "#fe8019";
+    bg0 = color.bg;
+    bg1 = color.bg_soft;
+    bg2 = color.bg0;
+    bg3 = color.bg1;
+    bg4 = color.fg_dark;
+    fg2 = color.gray_dim;
+  }
+  // {
+    inherit (color)
+      fg0
+      yellow
+      blue
+      purple
+      red
+      green
+      aqua
+      orange
+      ;
   };
 in
 {
