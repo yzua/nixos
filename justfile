@@ -20,15 +20,18 @@ lint:
     set -euo pipefail
     rc=0
 
-    # Run all three lint groups in parallel
+    # Run all four lint groups in parallel (shellcheck and inline-check are independent)
     {{JUST}} _lint-nix > /tmp/lint-nix.log 2>&1 & pid_nix=$!
-    {{JUST}} _lint-shell > /tmp/lint-shell.log 2>&1 & pid_shell=$!
+    {{JUST}} _shellcheck > /tmp/lint-shellcheck.log 2>&1 & pid_sc=$!
+    {{JUST}} _inline-check > /tmp/lint-inline.log 2>&1 & pid_ic=$!
     {{JUST}} _lint-markdown > /tmp/lint-markdown.log 2>&1 & pid_md=$!
 
     wait $pid_nix || rc=$?
     cat /tmp/lint-nix.log
-    wait $pid_shell || rc=$?
-    cat /tmp/lint-shell.log
+    wait $pid_sc || rc=$?
+    cat /tmp/lint-shellcheck.log
+    wait $pid_ic || rc=$?
+    cat /tmp/lint-inline.log
     wait $pid_md || rc=$?
     cat /tmp/lint-markdown.log
 
@@ -43,11 +46,14 @@ _lint-nix:
     @\time -f "⏱ Deadnix in %E" deadnix --fail . || nix run nixpkgs#deadnix -- --fail .
     @echo "✔ Nix linting passed!"
 
-# Lint shell scripts (shellcheck + inline)
-_lint-shell:
+# Lint shell scripts with ShellCheck
+_shellcheck:
     @echo -e "\n➤ Checking Bash scripts…"
     @\time -f "⏱ ShellCheck in %E" find . -name "*.sh" -not -path "./.git/*" -exec shellcheck {} + || find . -name "*.sh" -not -path "./.git/*" -exec nix run nixpkgs#shellcheck -- {} +
     @echo "✔ ShellCheck passed!"
+
+# Lint inline shell scripts embedded in .nix files
+_inline-check:
     @echo -e "\n➤ Checking inline Nix shell scripts…"
     @\time -f "⏱ Inline scripts in %E" bash ./scripts/build/shellcheck-nix-inline.sh
 
