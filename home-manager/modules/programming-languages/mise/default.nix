@@ -9,7 +9,6 @@
       experimental = true;
       verbose = false;
       quiet = false;
-      python_compile = false;
       disable_tools = [ "python" ];
     };
   };

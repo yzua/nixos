@@ -52,6 +52,7 @@
   # GTK4/libadwaita apps default to light mode (dark text on dark background).
   gtk = {
     enable = true;
+    gtk4.theme = null;
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
     };

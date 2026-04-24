@@ -6,8 +6,8 @@
     # High Priority (Python packages handled in python.nix)
     nixd # Nix language server
     bash-language-server # Bash scripts (scripts/ directory)
-    nodePackages.yaml-language-server # YAML configs
-    nodePackages.svelte-language-server # Svelte framework
+    yaml-language-server # YAML configs
+    svelte-language-server # Svelte framework
     pyright # Python type-checking LSP (completions + diagnostics)
     clang-tools # C/C++ LSP (clangd) + formatter (clang-format)
 

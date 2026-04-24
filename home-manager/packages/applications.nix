@@ -21,7 +21,7 @@
     telegram-desktop
 
     # VPN GUIs
-    protonvpn-gui
+    proton-vpn
 
     # Torrents
     qbittorrent

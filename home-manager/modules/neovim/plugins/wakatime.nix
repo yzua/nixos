@@ -10,6 +10,7 @@
     plugins = [
       {
         plugin = pkgs.vimPlugins.vim-wakatime;
+        type = "viml";
         config = ''
           " Point CLI to Nix-managed wakatime-cli
           let g:wakatime_CLIPath = "${pkgs.wakatime-cli}/bin/wakatime-cli"
