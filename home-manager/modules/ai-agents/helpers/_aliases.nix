@@ -151,34 +151,42 @@ let
     {
       suffix = "cm";
       prompt = commitSplitPrompt;
+      envVar = "COMMIT_SPLIT_PROMPT";
     }
     {
       suffix = "rf";
       prompt = refactorMaintainabilityPrompt;
+      envVar = "REFACTOR_MAINTAINABILITY_PROMPT";
     }
     {
       suffix = "fx";
       prompt = bugfixRootCausePrompt;
+      envVar = "BUGFIX_ROOT_CAUSE_PROMPT";
     }
     {
       suffix = "sa";
       prompt = securityAuditPrompt;
+      envVar = "SECURITY_AUDIT_PROMPT";
     }
     {
       suffix = "du";
       prompt = dependencyUpgradePrompt;
+      envVar = "DEPENDENCY_UPGRADE_PROMPT";
     }
     {
       suffix = "bp";
       prompt = buildPerformancePrompt;
+      envVar = "BUILD_PERFORMANCE_PROMPT";
     }
     {
       suffix = "rp";
       prompt = runtimePerformancePrompt;
+      envVar = "RUNTIME_PERFORMANCE_PROMPT";
     }
     {
       suffix = "md";
       prompt = markdownSyncPrompt;
+      envVar = "MARKDOWN_SYNC_PROMPT";
     }
   ];
 
@@ -216,17 +224,15 @@ let
   );
 
   # Shared env var passthrough for workflow prompts (used by launcher and iter wrappers).
-  mkWorkflowEnvVars = targetScript: ''
-    COMMIT_SPLIT_PROMPT=${lib.escapeShellArg commitSplitPrompt} \
-    REFACTOR_MAINTAINABILITY_PROMPT=${lib.escapeShellArg refactorMaintainabilityPrompt} \
-    BUGFIX_ROOT_CAUSE_PROMPT=${lib.escapeShellArg bugfixRootCausePrompt} \
-    SECURITY_AUDIT_PROMPT=${lib.escapeShellArg securityAuditPrompt} \
-    DEPENDENCY_UPGRADE_PROMPT=${lib.escapeShellArg dependencyUpgradePrompt} \
-    BUILD_PERFORMANCE_PROMPT=${lib.escapeShellArg buildPerformancePrompt} \
-    RUNTIME_PERFORMANCE_PROMPT=${lib.escapeShellArg runtimePerformancePrompt} \
-    MARKDOWN_SYNC_PROMPT=${lib.escapeShellArg markdownSyncPrompt} \
-    exec ${targetScript} "$@"
-  '';
+  mkWorkflowEnvVars =
+    targetScript:
+    let
+      envAssignments = map (spec: "${spec.envVar}=${lib.escapeShellArg spec.prompt}") workflowPromptSpecs;
+    in
+    ''
+      ${builtins.concatStringsSep " \\\n    " envAssignments} \
+      exec ${targetScript} "$@"
+    '';
 
   aiAgentLauncher = pkgs.writeShellScriptBin "ai-agent-launcher" (
     mkWorkflowEnvVars "${scriptsDir}/ai/agent-launcher.sh"
