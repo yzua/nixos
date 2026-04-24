@@ -7,6 +7,9 @@ let
     "--enable-wayland-ime"
     "--wayland-text-input-version=3"
     "--password-store=basic"
+    # GPU stability under compositor load — prevents niri GL contention crashes
+    "--enable-features=VaapiVideoDecoder"
+    "--disable-features=UseChromeOSDirectVideoDecoder"
   ];
 in
 {

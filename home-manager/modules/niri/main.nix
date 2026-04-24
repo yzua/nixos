@@ -54,6 +54,8 @@ in
 
     environment = {
       ELECTRON_OZONE_PLATFORM_HINT = "auto";
+      # Prevent Electron/Chromium GPU sandbox contention with niri under load
+      ELECTRON_EXTRA_LAUNCH_FLAGS = "--disable-gpu-sandbox";
       # QT_QPA_PLATFORM is set globally in home.nix sessionVariables
       QT_STYLE_OVERRIDE = "kvantum";
       XDG_SCREENSHOTS_DIR = "$HOME/Screens";
