@@ -217,7 +217,7 @@ rlx_output="$({
 } 2>&1)"
 rlx_status=$?
 set -e
-assert_eq "${rlx_status}" "1" "rate-limit exhaustion: exits with original error code"
+assert_eq "${rlx_status}" "2" "rate-limit exhaustion: exits with rate-limit code"
 assert_contains "${rlx_output}" "Rate-limit retry limit (2) exceeded" "rate-limit exhaustion: reports limit exceeded"
 
 # Restore normal claude symlink

@@ -55,7 +55,7 @@ is_rate_limit_error() {
 }
 
 # Run a single headless iteration of an agent using AGENT_ITER_REGISTRY.
-# Returns 0 on success, 1 on rate-limit error (stderr captured in _ITER_LAST_STDERR),
+# Returns 0 on success, 2 on rate-limit error (stderr captured in _ITER_LAST_STDERR),
 # or the agent's raw exit code for other failures.
 run_agent_once() {
 	local alias_name="$1"
@@ -89,7 +89,7 @@ run_agent_once() {
 
 	if ((rc != 0)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
 		trap - RETURN
-		return 1
+		return 2
 	fi
 	trap - RETURN
 	return "${rc}"
@@ -151,7 +151,7 @@ main() {
 			status=$?
 		fi
 
-		if ((status == 1)) && is_rate_limit_error "${_ITER_LAST_STDERR}"; then
+		if ((status == 2)); then
 			rate_limit_attempts=$((rate_limit_attempts + 1))
 			if ((rate_limit_attempts > rate_limit_retries)); then
 				print_error "Rate-limit retry limit (${rate_limit_retries}) exceeded"
