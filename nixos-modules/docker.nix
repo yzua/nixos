@@ -59,6 +59,20 @@
     hardware.nvidia-container-toolkit.enable =
       config.mySystem.nvidia.enable && (config.mySystem.hostProfile == "desktop");
 
+    # The CDI generator calls NVML which requires matching kernel/userspace nvidia
+    # driver versions. During rebuilds the userspace updates immediately but the
+    # kernel module stays pinned until reboot — so NVML init fails with "Driver/
+    # library version mismatch". Treat exit 1 as success so rebuilds don't break;
+    # the spec regenerates correctly on next boot when versions align again.
+    systemd.services.nvidia-container-toolkit-cdi-generator = {
+      stopIfChanged = false;
+      restartIfChanged = false;
+      serviceConfig.SuccessExitStatus = [
+        0
+        1
+      ];
+    };
+
     networking.firewall = {
       trustedInterfaces = [ "docker0" ];
       # Let Docker manage its own FORWARD/NAT chains.
