@@ -28,13 +28,10 @@ fi
 # Focus the android workspace in niri — window rule by title "^android-re" places it correctly
 # shellcheck source=scripts/ai/android-re/_helpers.sh
 source "${SCRIPT_DIR}/_helpers.sh"
-NIRI_WS_REF="$(resolve_niri_android_workspace)"
-if command -v niri >/dev/null 2>&1 && niri msg version >/dev/null 2>&1; then
-	if [[ -n "${NIRI_WS_REF}" ]]; then
-		niri msg action focus-workspace "${NIRI_WS_REF}" >/dev/null 2>&1 || true
-		sleep 0.3
-	fi
-fi
+# shellcheck source=scripts/ai/android-re/_tmux.sh
+source "${SCRIPT_DIR}/_tmux.sh"
+focus_re_workspace
+sleep 0.3
 
 # Boot the emulator baseline if nothing is running.
 # Run start in background so the OpenCode session opens immediately;

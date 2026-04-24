@@ -129,21 +129,18 @@ main() {
 
 	TMP_DIR=$(mktemp -d)
 
-	# Single-pass extraction: one find + one AWK process for all files
-	local file_count
-	file_count=$(find "${SCAN_DIRS[@]}" \
-		-type f -name "*.nix" \
-		! -name "_*.nix" \
-		! -path "*/custom/*" \
-		-print 2>/dev/null | wc -l)
-	echo "   Scanned $file_count files" >&2
-
+	# Single-pass: save file list once, use for both counting and extraction
 	find "${SCAN_DIRS[@]}" \
 		-type f -name "*.nix" \
 		! -name "_*.nix" \
 		! -path "*/custom/*" \
-		-print0 2>/dev/null \
-		| xargs -0 awk -f "${AWK_EXTRACT}" \
+		-print0 2>/dev/null >"${TMP_DIR}/files.txt"
+
+	local file_count
+	file_count=$(grep -cz '' "${TMP_DIR}/files.txt")
+	echo "   Scanned $file_count files" >&2
+
+	xargs -0 awk -f "${AWK_EXTRACT}" <"${TMP_DIR}/files.txt" \
 		| sort -u >"${TMP_DIR}/all.txt"
 
 	grep "^PKG" "${TMP_DIR}/all.txt" >"${TMP_DIR}/packages.txt" || true

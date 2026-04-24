@@ -7,10 +7,8 @@
 LOG_DIR="${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agents/logs}"
 # shellcheck disable=SC2034
 OPENCODE_LOG_DIR="${OPENCODE_LOG_DIR:-$HOME/.local/share/opencode/log}"
-# Codex uses the same log directory as OpenCode by default.
-# Override CODEX_LOG_DIR if Codex gets its own log directory.
 # shellcheck disable=SC2034
-CODEX_LOG_DIR="${CODEX_LOG_DIR:-$OPENCODE_LOG_DIR}"
+CODEX_LOG_DIR="${CODEX_LOG_DIR:-$HOME/.codex/log}"
 
 # Add a root to seen_roots if not already present. Returns 0 (continue) or 1 (skip).
 # Args: $1 — root path to check
@@ -53,8 +51,11 @@ _find_logs_in_roots() {
 # Use this when you need the directory paths themselves, not the log files.
 agent_log_roots() {
 	local root
+	local -a seen_roots=()
 	for root in "$LOG_DIR" "$OPENCODE_LOG_DIR" "$CODEX_LOG_DIR"; do
-		[[ -d "$root" ]] && echo "$root"
+		[[ -d "$root" ]] || continue
+		_add_unique_root "$root" || continue
+		echo "$root"
 	done
 }
 

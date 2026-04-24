@@ -56,8 +56,8 @@ while [[ $# -gt 0 ]]; do
 		exit 0
 		;;
 	-*)
-		echo "Unknown flag: $1" >&2
-		echo "Usage: $(basename "$0") [--all] [-t N] [-l N] [--json] [PATH]" >&2
+		print_error "Unknown flag: $1"
+		print_error "Usage: $(basename "$0") [--all] [-t N] [-l N] [--json] [PATH]"
 		exit 1
 		;;
 	*)
