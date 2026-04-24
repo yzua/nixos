@@ -46,39 +46,41 @@ in
       stylua
     ];
 
+    withRuby = false;
+    withPython3 = false;
+
     plugins = with pkgs.vimPlugins; [
       plenary-nvim
       nvim-web-devicons
       nui-nvim
 
-      (nvim-treesitter.withPlugins (p: [
-        p.typescript
-        p.tsx
-        p.javascript
-        p.rust
-        p.zig
-        p.lua
-        p.nix
-        p.json
-        p.yaml
-        p.toml
-        p.markdown
-        p.markdown_inline
-        p.bash
-        p.html
-        p.css
-        p.python
-        p.go
-        p.vim
-        p.vimdoc
-        p.regex
-        p.c
-        p.cpp
-        p.java
-        p.svelte
-        p.graphql
-        p.dockerfile
-      ]))
+      nvim-treesitter
+      nvim-treesitter-parsers.typescript
+      nvim-treesitter-parsers.tsx
+      nvim-treesitter-parsers.javascript
+      nvim-treesitter-parsers.rust
+      nvim-treesitter-parsers.zig
+      nvim-treesitter-parsers.lua
+      nvim-treesitter-parsers.nix
+      nvim-treesitter-parsers.json
+      nvim-treesitter-parsers.yaml
+      nvim-treesitter-parsers.toml
+      nvim-treesitter-parsers.markdown
+      nvim-treesitter-parsers.markdown_inline
+      nvim-treesitter-parsers.bash
+      nvim-treesitter-parsers.html
+      nvim-treesitter-parsers.css
+      nvim-treesitter-parsers.python
+      nvim-treesitter-parsers.go
+      nvim-treesitter-parsers.vim
+      nvim-treesitter-parsers.vimdoc
+      nvim-treesitter-parsers.regex
+      nvim-treesitter-parsers.c
+      nvim-treesitter-parsers.cpp
+      nvim-treesitter-parsers.java
+      nvim-treesitter-parsers.svelte
+      nvim-treesitter-parsers.graphql
+      nvim-treesitter-parsers.dockerfile
 
       nvim-lspconfig
       conform-nvim
