@@ -17,6 +17,7 @@ scripts/
 │   ├── agent-dashboard.sh   # fzf dashboard wrapper for analyzer commands
 │   ├── agent-inventory.sh   # Interactive fzf inventory for AI tools (skills, MCP, agents)
 │   ├── _inventory-collectors.sh # Shared inventory data collectors (sourced by agent-inventory.sh)
+│   ├── _inventory-walkers.sh # Generic directory-walking helpers for inventory (sourced by agent-inventory.sh)
 │   ├── _inventory-helpers.sh # Shared inventory helper functions (sourced by agent-inventory.sh)
 │   ├── agents-search.sh     # Scan project trees for directories needing AGENTS.md
 │   ├── agents-search-test.sh # Unit tests for agents-search.sh

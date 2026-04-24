@@ -11,6 +11,8 @@ source "${SCRIPT_DIR}/../lib/require.sh"
 source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
 # shellcheck source=scripts/ai/_inventory-helpers.sh
 source "${SCRIPT_DIR}/_inventory-helpers.sh"
+# shellcheck source=scripts/ai/_inventory-walkers.sh
+source "${SCRIPT_DIR}/_inventory-walkers.sh"
 # shellcheck source=scripts/ai/_inventory-collectors.sh
 source "${SCRIPT_DIR}/_inventory-collectors.sh"
 
