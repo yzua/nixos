@@ -2,11 +2,15 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   ...
 }:
 
+let
+  inherit (constants) localhost;
+in
 {
   options.mySystem.waydroid = {
     enable = lib.mkEnableOption "Waydroid Android emulation (LXC container, requires Wayland)";
@@ -22,7 +26,7 @@
 
     # PRIVACY: Force Waydroid to use host's DNSCrypt-Proxy
     environment.etc."waydroid-extra/waydroid_base.prop".text = ''
-      net.dns1=127.0.0.1
+      net.dns1=${localhost}
       persist.waydroid.disable_ipv6=true
     '';
 
@@ -39,7 +43,7 @@
     networking.firewall.extraCommands = ''
       iptables -I OUTPUT -m owner --uid-owner waydroid -j DROP
       iptables -I OUTPUT -m owner --uid-owner waydroid -o wg+ -j ACCEPT
-      iptables -I OUTPUT -m owner --uid-owner waydroid -d 127.0.0.1 -j ACCEPT
+      iptables -I OUTPUT -m owner --uid-owner waydroid -d ${localhost} -j ACCEPT
     '';
   };
 }

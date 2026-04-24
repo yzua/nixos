@@ -12,6 +12,7 @@
 
 let
   cfg = config.mySystem.ntfy;
+  inherit (constants) localhost;
   inherit (systemdHelpers) mkServiceHardening;
 
   # Config template for alertmanager-ntfy bridge.
@@ -62,7 +63,7 @@ in
         ${pkgs.gnused}/bin/sed "s/NTFY_TOPIC_PLACEHOLDER/$TOPIC/" ${configTemplate} > "$CONFIG"
         exec ${pkgs.alertmanager-ntfy}/bin/alertmanager-ntfy \
           --configs "$CONFIG" \
-          --http-addr 127.0.0.1:${toString cfg.port}
+          --http-addr ${localhost}:${toString cfg.port}
       '';
 
       serviceConfig = {

@@ -1,6 +1,10 @@
 # Cursor Agent — terminal agent CLI from Cursor Labs.
 
-{ pkgs, ... }:
+{
+  pkgs,
+  constants,
+  ...
+}:
 
 let
   cursorAgent = pkgs.stdenvNoCC.mkDerivation rec {
@@ -38,7 +42,7 @@ let
       homepage = "https://cursor.com";
       license = licenses.unfree;
       sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-      platforms = [ "x86_64-linux" ];
+      platforms = [ constants.system ];
       mainProgram = "agent";
     };
   };

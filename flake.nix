@@ -53,7 +53,7 @@
       ...
     }@inputs:
     let
-      system = "x86_64-linux";
+      inherit (constants) system;
       homeStateVersion = "25.11";
       user = constants.user.handle;
 
@@ -84,6 +84,8 @@
         config = pkgConfig;
       };
 
+      optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
+
       makeSystem =
         { hostname, stateVersion }:
         nixpkgs.lib.nixosSystem {
@@ -97,9 +99,9 @@
               pkgsStable
               pkgConfig
               constants
+              optionHelpers
               ;
             systemdHelpers = import ./nixos-modules/helpers/_systemd-helpers.nix { inherit (nixpkgs) lib; };
-            optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
           };
           modules = [ ./hosts/${hostname}/configuration.nix ];
         };
@@ -119,8 +121,8 @@
               user
               pkgsStable
               constants
+              optionHelpers
               ;
-            optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
             inherit (host) hostname;
           };
           modules = [

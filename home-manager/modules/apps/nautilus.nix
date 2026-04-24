@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   ...
 }:
@@ -11,7 +12,7 @@ let
   bookmarkDirs = [
     "Documents"
     "Pictures"
-    "Screens"
+    "${constants.paths.screens}"
     "Videos"
     "Music"
     "Downloads"

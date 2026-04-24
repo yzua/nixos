@@ -144,6 +144,9 @@
     codexLogDir = ".codex/log";
   };
 
+  # System architecture — used by flake.nix and package meta.platforms.
+  system = "x86_64-linux";
+
   # External service API endpoints.
   services = {
     zai = {

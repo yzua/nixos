@@ -1,6 +1,10 @@
 # Kiro CLI — agentic workflows in the terminal.
 
-{ pkgs, ... }:
+{
+  pkgs,
+  constants,
+  ...
+}:
 
 let
   kiroCli = pkgs.stdenvNoCC.mkDerivation rec {
@@ -44,7 +48,7 @@ let
       homepage = "https://kiro.dev/cli";
       license = licenses.amazonsl;
       sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-      platforms = [ "x86_64-linux" ];
+      platforms = [ constants.system ];
       mainProgram = "kiro-cli";
     };
   };

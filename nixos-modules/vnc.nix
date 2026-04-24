@@ -52,9 +52,9 @@
     # Firewall: Block VNC ports from external access (SSH tunnel only)
     networking.firewall.extraCommands = ''
       # Block external VNC access — must use SSH tunnel
-      iptables -A INPUT -p tcp --dport ${toString constants.ports.vnc} -s 127.0.0.1 -j ACCEPT
+      iptables -A INPUT -p tcp --dport ${toString constants.ports.vnc} -s ${constants.localhost} -j ACCEPT
       iptables -A INPUT -p tcp --dport ${toString constants.ports.vnc} -j DROP
-      iptables -A INPUT -p tcp --dport ${toString constants.ports.vnc-web} -s 127.0.0.1 -j ACCEPT
+      iptables -A INPUT -p tcp --dport ${toString constants.ports.vnc-web} -s ${constants.localhost} -j ACCEPT
       iptables -A INPUT -p tcp --dport ${toString constants.ports.vnc-web} -j DROP
     '';
   };
