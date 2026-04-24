@@ -11,7 +11,7 @@ git clone <repo-url> ~/System
 cd ~/System
 ```
 
-Edit `shared/constants.nix` for your identity, then set `user = "yourname"` in `flake.nix`.
+Edit `shared/constants.nix` for your identity (the `user.handle` field drives the flake's `user` variable).
 
 Create your host:
 
@@ -48,7 +48,7 @@ For a newly added host, use explicit `nh` commands instead of the hardcoded `jus
 | `just nixos`              | Apply NixOS for `desktop`                                                                                     |
 | `just modules`            | Validate import structure                                                                                     |
 | `just pkgs`               | Check for duplicate packages and program/module ownership conflicts                                           |
-| `just lint`               | statix + deadnix + shellcheck + markdownlint                                                                  |
+| `just lint`               | statix + deadnix + shellcheck + inline Nix shell scripts + markdownlint                                       |
 | `just dead`               | deadnix only (subset of lint)                                                                                 |
 | `just test`               | Run all shell test suites                                                                                     |
 | `just format`             | `nix fmt` (nixfmt-tree via flake formatter)                                                                   |
@@ -91,7 +91,8 @@ Set `hostProfile` first, then override as needed:
 | `i2pd.bandwidth`             | Optional I2P bandwidth cap (KB/s)                                         |
 | `yggdrasil.enable`           | Yggdrasil mesh network                                                    |
 | `dnscryptProxy.enable`       | Encrypted DNS with DNSSEC                                                 |
-| `virtualisation.enable`      | Docker, libvirt/QEMU                                                      |
+| `docker.enable`              | Docker container engine with bridge networking                            |
+| `libvirt.enable`             | libvirt/QEMU virtual machine management                                   |
 | `flatpak.enable`             | Flatpak + Flathub                                                         |
 | `printing.enable`            | CUPS                                                                      |
 | `nautilus.enable`            | GNOME Files                                                               |
@@ -106,8 +107,8 @@ Set `hostProfile` first, then override as needed:
 | `ntfy.enable`                | Alertmanager → ntfy.sh notifications                                      |
 | `ntfy.port`                  | Local ntfy bridge listener port                                           |
 | `observability.enable`       | Prometheus + Alertmanager + Grafana (ports 9090, 9093, 3001)              |
-| `loki.enable`                | Log aggregation with Promtail                                             |
-| `promtail.enable`            | Promtail log shipper for Loki (on by default)                             |
+| `loki.enable`                | Log aggregation with Grafana Alloy                                        |
+| `alloy.enable`               | Grafana Alloy log shipper for Loki (on by default)                        |
 | `systemReport.enable`        | Unified health reporting                                                  |
 | `systemReport.outputDir`     | System report output directory                                            |
 | `systemReport.retentionDays` | System report retention window (days)                                     |
@@ -158,11 +159,11 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### Log Aggregation
 
-| Service  | Port | Purpose            |
-| -------- | ---- | ------------------ |
-| Loki     | 3100 | Log storage (HTTP) |
-| Loki     | 9096 | Log storage (gRPC) |
-| Promtail | 9080 | Log collector      |
+| Service       | Port  | Purpose            |
+| ------------- | ----- | ------------------ |
+| Loki          | 3100  | Log storage (HTTP) |
+| Loki          | 9096  | Log storage (gRPC) |
+| Grafana Alloy | 12345 | Log collector      |
 
 ### Privacy & Network
 
@@ -178,26 +179,27 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### System Services & Features
 
-| Service/Feature                         | Toggle                           | Notes                                     |
-| --------------------------------------- | -------------------------------- | ----------------------------------------- |
-| NVIDIA drivers + CUDA                   | `mySystem.nvidia.enable`         | Proprietary NVIDIA stack                  |
-| Firmware updates (fwupd)                | `mySystem.fwupd.enable`          | LVFS firmware updates                     |
-| Bluetooth + Blueman                     | `mySystem.bluetooth.enable`      | Desktop Bluetooth management              |
-| Flatpak + Flathub                       | `mySystem.flatpak.enable`        | Additional app ecosystem                  |
-| CUPS printing                           | `mySystem.printing.enable`       | Local/network printer support             |
-| GNOME Files integration                 | `mySystem.nautilus.enable`       | File manager + thumbnailers               |
-| Dynamic linker for non-Nix binaries     | `mySystem.nixLd.enable`          | Compatibility for external binaries       |
-| Docker + libvirt/QEMU                   | `mySystem.virtualisation.enable` | Containers and VMs                        |
-| Waydroid                                | `mySystem.waydroid.enable`       | Android container runtime                 |
-| greetd + tuigreet                       | `mySystem.greetd.enable`         | Display manager/login UI                  |
-| OpenSnitch firewall                     | `mySystem.opensnitch.enable`     | Outbound app firewalling                  |
-| KDE Connect                             | `mySystem.kdeconnect.enable`     | Phone integration                         |
-| VNC stack (x11vnc + noVNC + websockify) | `mySystem.vnc.enable`            | Remote desktop access                     |
-| Cleanup timers                          | `mySystem.cleanup.enable`        | Downloads/cache retention jobs            |
-| Restic backup jobs                      | `mySystem.backup.enable`         | Scheduled backups with pruning            |
-| fail2ban intrusion prevention           | `mySystem.fail2ban.enable`       | SSH/auth log monitoring                   |
-| Secure Boot preparation                 | `mySystem.secureBoot.enable`     | sbctl for Secure Boot setup               |
-| Web RE/security tools                   | `mySystem.webRe.enable`          | Nuclei, Nikto, SQLMap, Subfinder, WhatWeb |
+| Service/Feature                         | Toggle                       | Notes                                          |
+| --------------------------------------- | ---------------------------- | ---------------------------------------------- |
+| NVIDIA drivers + CUDA                   | `mySystem.nvidia.enable`     | Proprietary NVIDIA stack                       |
+| Firmware updates (fwupd)                | `mySystem.fwupd.enable`      | LVFS firmware updates                          |
+| Bluetooth + Blueman                     | `mySystem.bluetooth.enable`  | Desktop Bluetooth management                   |
+| Flatpak + Flathub                       | `mySystem.flatpak.enable`    | Additional app ecosystem                       |
+| CUPS printing                           | `mySystem.printing.enable`   | Local/network printer support                  |
+| GNOME Files integration                 | `mySystem.nautilus.enable`   | File manager + thumbnailers                    |
+| Dynamic linker for non-Nix binaries     | `mySystem.nixLd.enable`      | Compatibility for external binaries            |
+| Docker container engine                 | `mySystem.docker.enable`     | Container runtime with bridge networking       |
+| libvirt/QEMU                            | `mySystem.libvirt.enable`    | Virtual machine management                     |
+| Waydroid                                | `mySystem.waydroid.enable`   | Android container runtime                      |
+| greetd + tuigreet                       | `mySystem.greetd.enable`     | Display manager/login UI                       |
+| OpenSnitch firewall                     | `mySystem.opensnitch.enable` | Outbound app firewalling                       |
+| KDE Connect                             | `mySystem.kdeconnect.enable` | Phone integration                              |
+| VNC stack (x11vnc + noVNC + websockify) | `mySystem.vnc.enable`        | Remote desktop (SSH-tunneled, ports 5900/6080) |
+| Cleanup timers                          | `mySystem.cleanup.enable`    | Downloads/cache retention jobs                 |
+| Restic backup jobs                      | `mySystem.backup.enable`     | Scheduled backups with pruning                 |
+| fail2ban intrusion prevention           | `mySystem.fail2ban.enable`   | SSH/auth log monitoring                        |
+| Secure Boot preparation                 | `mySystem.secureBoot.enable` | sbctl for Secure Boot setup                    |
+| Web RE/security tools                   | `mySystem.webRe.enable`      | Nuclei, Nikto, SQLMap, Subfinder, WhatWeb      |
 
 ### User-level (Home Manager)
 

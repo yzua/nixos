@@ -24,15 +24,16 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 Six named workspaces are preconfigured, plus unnamed numeric slots:
 
-| #   | Workspace   | Apps                           | Access              |
-| --- | ----------- | ------------------------------ | ------------------- |
-| 1   | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`           |
-| 2   | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`           |
-| 3   | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`           |
-| 4   | 󰎆 media     | Music/Video players (rules)    | `Super+4`           |
-| 5   | 󰦝 vpn       | VPN tools (window rules only)  | `Super+5`           |
-| 6   | 󰀲 android   | Android tools (rules only)     | `Super+6`           |
-| 7–9 | _(unnamed)_ | General use                    | `Super+7`–`Super+9` |
+| #      | Workspace   | Apps                           | Access              |
+| ------ | ----------- | ------------------------------ | ------------------- |
+| 1      | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`           |
+| 2      | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`           |
+| 3      | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`           |
+| 4      | 󰎆 media     | Music/Video players (rules)    | `Super+4`           |
+| 5      | _(unnamed)_ | General use                    | `Super+5`           |
+| 05-vpn | 󰦝 vpn       | VPN tools (window rules only)  | _(no keybinding)_   |
+| 6      | 󰀲 android   | Android tools (rules only)     | `Super+6`           |
+| 7–9    | _(unnamed)_ | General use                    | `Super+7`–`Super+9` |
 
 Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open on the vpn workspace via window rules.
 
@@ -149,7 +150,7 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+2`         | Go to 󰨞 editor workspace                      |
 | `Super+3`         | Go to 󰍡 social workspace                      |
 | `Super+4`         | Go to 󰎆 media workspace                       |
-| `Super+5`         | Go to 󰦝 vpn workspace                         |
+| `Super+5`         | Go to unnamed workspace 5                     |
 | `Super+6`         | Go to 󰀲 android workspace                     |
 | `Super+7–9`       | Go to unnamed workspaces 7–9                  |
 | `Super+Page_Up`   | Go to workspace above                         |
@@ -165,7 +166,7 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+Shift+2`         | Move column to 󰨞 editor workspace     |
 | `Super+Shift+3`         | Move column to 󰍡 social workspace     |
 | `Super+Shift+4`         | Move column to 󰎆 media workspace      |
-| `Super+Shift+5`         | Move column to 󰦝 vpn workspace        |
+| `Super+Shift+5`         | Move column to unnamed workspace 5    |
 | `Super+Shift+6`         | Move column to 󰀲 android workspace    |
 | `Super+Shift+7–9`       | Move column to unnamed workspaces 7–9 |
 | `Super+Shift+Page_Up`   | Move column to workspace above        |
@@ -355,7 +356,10 @@ These apps open floating instead of tiled:
 | muffon            | 󰎆 media   | Default (50%) |
 | nuclear           | 󰎆 media   | Default (50%) |
 | Mullvad VPN       | 󰦝 vpn     | Floating      |
+| KeePassXC         | 󰦝 vpn     | Floating      |
 | librewolf-i2pd    | 󰦝 vpn     | Full width    |
+| android-re        | 󰀲 android | Default (50%) |
+| Emulator          | 󰀲 android | Floating      |
 
 ### Visual Rules
 
@@ -573,7 +577,7 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | Key                        | Action                                 |
 | -------------------------- | -------------------------------------- |
 | `Super+1–4`                | Focus named workspaces (browser–media) |
-| `Super+5`                  | Focus 󰦝 vpn workspace                  |
+| `Super+5`                  | Focus unnamed workspace 5              |
 | `Super+6`                  | Focus 󰀲 android workspace              |
 | `Super+7–9`                | Focus unnamed workspaces 7–9           |
 | `Super+Shift+1–9`          | Move column to workspace 1–9           |

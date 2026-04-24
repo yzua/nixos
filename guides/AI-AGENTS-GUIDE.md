@@ -114,7 +114,7 @@ Source: `home-manager/modules/ai-agents/activation/plugins.nix`.
 
 ---
 
-## Verification Snapshot (2026-04-17)
+## Verification Snapshot (2026-04-24)
 
 This guide is verified against the live configuration sources in:
 
@@ -260,49 +260,49 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 
 ### Quick Reference
 
-| Alias/Function                 | What It Runs                                                       | Notes                                                                              |
-| ------------------------------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| `cl`                           | `claude`                                                           | Claude Code default; auto-renames current Zellij tab to `cl`                       |
-| `ocl`                          | `claude --model opus`                                              | Claude Code forced Opus model                                                      |
-| `hcl`                          | `claude --model haiku`                                             | Claude Code forced Haiku model                                                     |
-| `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                                 |
-| `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                                        |
-| `oc`                           | `opencode`                                                         | Default OpenCode                                                                   |
-| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile; auto-renames current Zellij tab to `ocglm`            |
-| `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                                       |
-| `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                          |
-| `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                                       |
-| `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                                     |
-| `gem`                          | `gemini --approval-mode=yolo`                                      | Gemini CLI default YOLO launcher                                                   |
-| `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                                        |
-| `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                                 |
-| `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                              |
-| `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                                |
-| `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                          |
-| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                           |
-| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                              |
-| `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                          |
-| `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix              |
-| `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries                       |
-| `iter`                         | `iter [count] <agent> [prompt...]`                                 | Headless Ralph-style reruns; no count means unlimited until failure                |
-| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                                |
-| `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                                       |
-| `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)                   |
-| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt and names the tab     |
-| `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                             |
-| `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`                       |
-| `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`                    |
-| `opencode_gpt` (`ocgpt`)       | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`                       |
-| `opencode_sonnet` (`ocs`)      | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`                    |
-| `opencode_zen` (`oczen`)       | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`                       |
-| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                   | Function: loads OpenRouter key from sops, sets config dir                          |
-| `occm`                         | `opencode --prompt '<commit-split prompt>'`                        | Split-stage current git changes into logical commits with `git commit -S`          |
-| `ocbp`                         | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas              |
-| `cprf`                         | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpfx`, `cpsa`, `cpdu`, `cpbp`, `cpmd`) |
+| Alias/Function                 | What It Runs                                                       | Notes                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `cl`                           | `claude`                                                           | Claude Code default; auto-renames current Zellij tab to `cl`                                     |
+| `ocl`                          | `claude --model opus`                                              | Claude Code forced Opus model                                                                    |
+| `hcl`                          | `claude --model haiku`                                             | Claude Code forced Haiku model                                                                   |
+| `clu`                          | `claude --dangerously-skip-permissions`                            | Claude Code YOLO (unsafe explicit)                                                               |
+| `clglm`                        | `claude_glm`                                                       | Claude via Z.AI GLM-5 proxy (includes YOLO)                                                      |
+| `oc`                           | `opencode`                                                         | Default OpenCode                                                                                 |
+| `ocglm`                        | `opencode_glm`                                                     | OpenCode with GLM-5 profile; auto-renames current Zellij tab to `ocglm`                          |
+| `ocgem`                        | `opencode_gemini`                                                  | OpenCode with Gemini profile                                                                     |
+| `ocgpt`                        | `opencode_gpt`                                                     | OpenCode with GPT profile                                                                        |
+| `ocs`                          | `opencode_sonnet`                                                  | OpenCode with Sonnet profile                                                                     |
+| `oczen`                        | `opencode_zen`                                                     | OpenCode with Zen free profile                                                                   |
+| `gem`                          | `gemini --approval-mode=yolo`                                      | Gemini CLI default YOLO launcher                                                                 |
+| `cx`                           | `codex --no-alt-screen --dangerously-bypass-approvals-and-sandbox` | Codex default YOLO launcher                                                                      |
+| `lcx`                          | `codex ... -c model_reasoning_effort=\"low\"`                      | Codex low reasoning effort profile                                                               |
+| `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                                            |
+| `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                                              |
+| `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                                        |
+| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                                         |
+| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                                            |
+| `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                                        |
+| `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix (requires logging enabled) |
+| `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries (requires logging enabled)          |
+| `iter`                         | `iter [count] <agent> [prompt...]`                                 | Headless Ralph-style reruns; no count means unlimited until failure                              |
+| `agents-search`                | `agents-search.sh`                                                 | Find directories that need AGENTS.md guidance files                                              |
+| `oc-port`                      | `opencode --port 4096`                                             | OpenCode on custom port (for multi-instance)                                                     |
+| `ai-mcp-scan`                  | fallback to `ai-mcp-health`                                        | MCP readiness check (alias for health when mcp-scan unavailable)                                 |
+| `aip`                          | AI Panes — multi-agent side-by-side in Zellij                      | Function: `aip cl oc gem "prompt"` opens 3 panes with prompt and names the tab                   |
+| `claude_glm` (`clglm`)         | Claude Code via Z.AI GLM-5 proxy                                   | Function: sets ANTHROPIC base URL + GLM model env vars                                           |
+| `opencode_glm` (`ocglm`)       | OpenCode with GLM-5 profile                                        | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-glm/`                                     |
+| `opencode_gemini` (`ocgem`)    | OpenCode with Gemini profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gemini/`                                  |
+| `opencode_gpt` (`ocgpt`)       | OpenCode with GPT profile                                          | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-gpt/`                                     |
+| `opencode_sonnet` (`ocs`)      | OpenCode with Sonnet profile                                       | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-sonnet/`                                  |
+| `opencode_zen` (`oczen`)       | OpenCode with Zen free profile                                     | Function: sets `OPENCODE_CONFIG_DIR=~/.config/opencode-zen/`                                     |
+| `opencode_openrouter` (`ocor`) | OpenCode with OpenRouter profile                                   | Function: loads OpenRouter key from sops, sets config dir                                        |
+| `occm`                         | `opencode --prompt '<commit-split prompt>'`                        | Split-stage current git changes into logical commits with `git commit -S`                        |
+| `ocbp`                         | `opencode --prompt '<build-performance prompt>'`                   | Run build/perf bottleneck pass with measured baseline vs after deltas                            |
+| `cprf`                         | Copy refactor workflow prompt to clipboard                         | Prefix form: `cp<suffix>` (`cpcm`, `cprf`, `cpfx`, `cpsa`, `cpdu`, `cpbp`, `cprp`, `cpmd`)       |
 
 ### Aliases vs Functions
 
-- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `ais`, `ait`, `occm`, `ocbp`, `ocor`, `oc-port`, `ai-mcp-scan`, etc.) are generated by `helpers/_aliases.nix` and merged into shell scope via `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*fx`, `*sa`, `*du`, `*bp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpfx`, `cpsa`, `cpdu`, `cpbp`, `cpmd`) are generated automatically.
+- **Aliases** (`cl`, `ocl`, `hcl`, `clglm`, `oc`, `ocglm`, `ocgem`, `ocgpt`, `locgpt`, `mocgpt`, `xocgpt`, `ocs`, `oczen`, `gem`, `cx`, `lcx`, `mcx`, `hcx`, `xcx`, `ais`, `ait`, `occm`, `ocbp`, `ocor`, `oc-port`, `ai-mcp-scan`, etc.) are generated by `helpers/_aliases.nix` and merged into shell scope via `helpers/_services-shell-aliases.nix`. Workflow aliases (`*cm`, `*rf`, `*fx`, `*sa`, `*du`, `*bp`, `*rp`, `*md`) and clipboard prompt aliases (`cp*`: `cpcm`, `cprf`, `cpfx`, `cpsa`, `cpdu`, `cpbp`, `cprp`, `cpmd`) are generated automatically.
 - **Packages** (`agents-search`, `iter`) are `writeShellScriptBin` wrappers added to `home.packages` in `home-manager/modules/ai-agents/services.nix`.
 - **Functions** (`claude_glm`, `opencode_glm`, `opencode_gemini`, `opencode_gpt`, `opencode_sonnet`, `opencode_zen`, `opencode_openrouter`, `aip`) are defined in `home-manager/modules/terminal/zsh/functions.nix` for env var injection, profile switching, or multi-line logic.
 - When launched from inside Zellij, AI aliases/functions now rename the focused tab to the launcher name (`ocglm`, `cl`, `gem`, `cx`, `occm`, etc.), and the status bar shows tab names instead of raw tab indexes.
@@ -332,7 +332,7 @@ Behavior:
 
 1. Pick provider (`OpenCode`, `Claude Code`, `Codex`, `Gemini`)
 2. Pick profile/mode for that provider
-3. Pick workflow suffix (`none`, `cm`, `rf`, `sa`, `bp`, `md`) when supported
+3. Pick workflow suffix (`none`, `cm`, `rf`, `fx`, `sa`, `du`, `bp`, `rp`, `md`) when supported
 
 When `none` is selected, it runs normal mode (no workflow postfix prompt).
 
@@ -828,11 +828,12 @@ All sops functions use `_load_zai_key()` which reads `/run/secrets/zai_api_key`.
 2. `~/.config/opencode-glm/opencode.json` — GLM profile MCP server env + remote MCPs
 3. `~/.config/opencode-gemini/opencode.json` — Gemini profile MCP server env + remote MCPs
 4. `~/.config/opencode-gpt/opencode.json` — GPT profile MCP server env + remote MCPs
-5. `~/.config/opencode-sonnet/opencode.json` — Sonnet profile MCP server env + remote MCPs
-6. `~/.config/opencode-zen/opencode.json` — Zen profile MCP server env + remote MCPs
-7. `~/.mcp.json` — Claude Code MCP server env + remote MCPs
-8. `~/.codex/config.toml` — MCP server env
-9. `~/.gemini/settings.json` — MCP server env + remote MCPs
+5. `~/.config/opencode-openrouter/opencode.json` — OpenRouter profile MCP server env + remote MCPs
+6. `~/.config/opencode-sonnet/opencode.json` — Sonnet profile MCP server env + remote MCPs
+7. `~/.config/opencode-zen/opencode.json` — Zen profile MCP server env + remote MCPs
+8. `~/.mcp.json` — Claude Code MCP server env + remote MCPs
+9. `~/.codex/config.toml` — MCP server env
+10. `~/.gemini/settings.json` — MCP server env + remote MCPs
 
 ---
 
@@ -849,17 +850,17 @@ All sops functions use `_load_zai_key()` which reads `/run/secrets/zai_api_key`.
 
 ### Commands
 
-| Alias               | What It Does                                                                   |
-| ------------------- | ------------------------------------------------------------------------------ |
-| `ai-logs`           | Tail real OpenCode + Codex logs                                                |
-| `ai-errors-all`     | Raw grep for errors/panics/fatals in agent logs                                |
-| `ai-errors`         | Error grep filtered for known benign MCP probe noise                           |
-| `ai-errors-runtime` | Focused runtime failures (`Not connected`, TUI/bootstrap, bun info)            |
-| `ai-mcp-health`     | MCP readiness check (bun/bunx/uvx, gh auth, JSON validity, token placeholders) |
-| `ai-mcp-scan`       | Fallback to `ai-mcp-health` (mcp-scan package unavailable)                     |
-| `ai-stats`          | Log statistics summary (wrapper-based)                                         |
-| `ai-report`         | Full analysis report                                                           |
-| `ai-dash`           | Interactive fzf dashboard                                                      |
+| Alias               | What It Does                                                                                   |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| `ai-logs`           | Tail real OpenCode + Codex logs (requires logging enabled)                                     |
+| `ai-errors-all`     | Raw grep for errors/panics/fatals in agent logs (requires logging enabled)                     |
+| `ai-errors`         | Error grep filtered for known benign MCP probe noise (requires logging enabled)                |
+| `ai-errors-runtime` | Focused runtime failures (`Not connected`, TUI/bootstrap, bun info) (requires logging enabled) |
+| `ai-mcp-health`     | MCP readiness check (bun/bunx/uvx, gh auth, JSON validity, token placeholders)                 |
+| `ai-mcp-scan`       | Fallback to `ai-mcp-health` (mcp-scan package unavailable)                                     |
+| `ai-stats`          | Log statistics summary (requires logging enabled)                                              |
+| `ai-report`         | Full analysis report (requires logging enabled)                                                |
+| `ai-dash`           | Interactive fzf dashboard (requires logging enabled)                                           |
 
 ### Wrapper Logging (Optional)
 
@@ -872,6 +873,8 @@ Use `*-log` aliases for explicit logged sessions through the wrapper:
 | `oc-port`    | `opencode --port 4096`                   |
 | `codex-log`  | `ai-agent-log-wrapper codex codex`       |
 | `gemini-log` | `ai-agent-log-wrapper gemini gemini`     |
+
+All logging aliases (`*-log`, `ai-logs`, `ai-errors*`, `ai-stats`, `ai-report`, `ai-dash`) are gated behind `programs.aiAgents.logging.enable` (default: `true`). The interactive launcher (`ais`) and inventory (`ait`) aliases share the same gate.
 
 Wrapper logs go to `~/.local/share/ai-agents/logs/`. Log cleanup runs weekly (30-day retention) via systemd user timer.
 
