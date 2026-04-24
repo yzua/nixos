@@ -3,12 +3,12 @@
 [
   {
     hostname = "desktop";
-    stateVersion = "25.11";
+    stateVersion = "26.05";
     enabled = true;
   }
   {
     hostname = "laptop";
-    stateVersion = "25.11";
+    stateVersion = "26.05";
     enabled = false;
   }
 ]
