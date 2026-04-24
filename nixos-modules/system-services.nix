@@ -11,8 +11,8 @@
 
     earlyoom = {
       enable = true;
-      freeMemThreshold = 8; # 8% ≈ 2.6GB on 32GB (was 5%)
-      freeSwapThreshold = 10;
+      freeMemThreshold = 15; # 15% ≈ 4.8GB on 32GB — act earlier to prevent compositor stalls
+      freeSwapThreshold = 15;
       enableNotifications = true; # Desktop notification on kill
     };
 
