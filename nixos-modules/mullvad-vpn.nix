@@ -16,9 +16,7 @@ let
   lanCommand =
     if
       (
-        config.mySystem.kdeconnect.enable
-        || config.mySystem.flatpak.enable
-        || config.mySystem.virtualisation.enable
+        config.mySystem.kdeconnect.enable || config.mySystem.flatpak.enable || config.mySystem.docker.enable
       )
     then
       "${mullvad} lan set allow"

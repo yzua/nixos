@@ -10,11 +10,11 @@
 }:
 
 {
-  options.mySystem.virtualisation = {
-    enable = lib.mkEnableOption "Docker, libvirt/QEMU virtualisation support";
+  options.mySystem.docker = {
+    enable = lib.mkEnableOption "Docker container engine with bridge networking";
   };
 
-  config = lib.mkIf config.mySystem.virtualisation.enable {
+  config = lib.mkIf config.mySystem.docker.enable {
     boot.kernelModules = [
       "kvm" # intel/amd modules auto-detected
       "bridge"

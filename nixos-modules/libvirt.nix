@@ -9,7 +9,11 @@
 }:
 
 {
-  config = lib.mkIf config.mySystem.virtualisation.enable {
+  options.mySystem.libvirt = {
+    enable = lib.mkEnableOption "libvirt/QEMU virtual machine management";
+  };
+
+  config = lib.mkIf config.mySystem.libvirt.enable {
     virtualisation.libvirtd = {
       enable = true;
       onShutdown = "shutdown";

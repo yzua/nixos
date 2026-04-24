@@ -33,7 +33,8 @@ in
       yggdrasil.enable = mkDefaultFalse;
       dnscryptProxy.enable = mkDefaultTrue;
       printing.enable = mkDefaultTrue;
-      virtualisation.enable = mkDefaultTrue;
+      docker.enable = mkDefaultTrue;
+      libvirt.enable = mkDefaultTrue;
       nautilus.enable = mkDefaultTrue;
       glance.enable = mkDefaultTrue;
       netdata.enable = mkDefaultTrue;
