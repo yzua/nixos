@@ -53,9 +53,8 @@
     };
   };
 
-  swapDevices = [
-    { device = "/dev/mapper/luks-4e98b5c2-4022-41a6-8e97-dddf0fe5c408"; }
-  ];
+  swapDevices = [ ]; # Disabled — use zram only (see: security/opsec.nix)
+  # Prevents freezes when heavy disk I/O + swap hit same encrypted disk.
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
