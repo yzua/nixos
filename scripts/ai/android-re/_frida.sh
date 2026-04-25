@@ -36,10 +36,36 @@ log_frida_failure_context() {
 	fi
 }
 
+download_frida_server() {
+	local frida_dir
+	frida_dir="$(dirname "${FRIDA_BIN}")"
+	mkdir -p "${frida_dir}"
+
+	if [[ -x "${FRIDA_BIN}" ]]; then
+		return 0
+	fi
+
+	local url="https://github.com/frida/frida/releases/download/${FRIDA_VERSION}/frida-server-${FRIDA_VERSION}-android-x86_64.xz"
+	local tmp_xz="${frida_dir}/frida-server-${FRIDA_VERSION}-android-x86_64.xz"
+
+	log_info "downloading frida-server ${FRIDA_VERSION} from GitHub"
+	need_cmd curl
+	need_cmd xz
+
+	curl -fSL -o "${tmp_xz}" "${url}"
+	xz -d "${tmp_xz}"
+	chmod +x "${FRIDA_BIN}"
+
+	if [[ ! -x "${FRIDA_BIN}" ]]; then
+		error_exit "frida-server download failed — ${FRIDA_BIN} not executable"
+	fi
+	log_success "frida-server ${FRIDA_VERSION} downloaded"
+}
+
 frida_start() {
 	local attempt
 
-	need_file "${FRIDA_BIN}"
+	download_frida_server
 	resolve_frida_ps_bin
 	log_info "deploying frida server"
 	adb_run push "${FRIDA_BIN}" "${FRIDA_TARGET}" >/dev/null

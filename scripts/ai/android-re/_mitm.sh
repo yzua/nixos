@@ -113,7 +113,20 @@ EOF
 
 start_mitm_tmux() {
 	need_cmd mitmdump
-	need_file "${MITM_CONF_DIR}/mitmproxy-ca-cert.cer"
+	if [[ ! -e "${MITM_CONF_DIR}/mitmproxy-ca-cert.cer" ]]; then
+		log_info "generating mitmproxy CA cert in ${MITM_CONF_DIR}"
+		mkdir -p "${MITM_CONF_DIR}"
+		mitmdump --set confdir="${MITM_CONF_DIR}" -q &
+		local mitm_pid=$!
+		sleep 3
+		kill "${mitm_pid}" 2>/dev/null || true
+		wait "${mitm_pid}" 2>/dev/null || true
+		if [[ ! -e "${MITM_CONF_DIR}/mitmproxy-ca-cert.cer" ]]; then
+			log_warning "failed to generate mitmproxy CA cert in ${MITM_CONF_DIR}"
+			return 1
+		fi
+		log_success "mitmproxy CA cert generated"
+	fi
 	kill_mitm_listeners
 	ensure_re_tmux
 

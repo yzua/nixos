@@ -57,6 +57,7 @@ let
       # Boot the emulator baseline if nothing is running
       if ! adb devices 2>/dev/null | grep -q '^emulator-'; then
         echo "No emulator running — starting Android RE baseline in background (log: ''${START_LOG})"
+        mkdir -p "$(dirname "''${START_LOG}")"
         nohup bash "''${SCRIPT_DIR}/re-avd.sh" start >"''${START_LOG}" 2>&1 &
         START_PID=$!
         echo "re-avd.sh start PID: ''${START_PID}"

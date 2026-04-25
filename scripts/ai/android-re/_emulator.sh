@@ -131,6 +131,7 @@ start_emulator() {
 		)
 	fi
 
+	mkdir -p "$(dirname "${RUNTIME_LOG}")"
 	nohup env "${env_args[@]}" emulator "${emulator_args[@]}" >"${RUNTIME_LOG}" 2>&1 &
 	log_info "emulator gpu=${gpu_mode} headless=${headless} disable_vulkan=${EMU_DISABLE_VULKAN} disable_hw_decoder=${EMU_DISABLE_HARDWARE_DECODER}"
 	log_success "emulator started; log=${RUNTIME_LOG}"

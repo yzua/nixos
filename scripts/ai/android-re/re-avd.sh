@@ -50,8 +50,13 @@ start_re() {
 	# ── Phase 2: Boot emulator ──
 	start_emulator
 
-	# ── Phase 3: Set up tmux + mitmproxy ──
-	start_mitm_tmux
+	# ── Phase 3: Set up tmux session ──
+	ensure_re_tmux
+
+	# ── Phase 3b: Start mitmproxy (non-fatal) ──
+	if ! start_mitm_tmux; then
+		log_warning "mitmproxy setup skipped — tmux session still available"
+	fi
 
 	# ── Phase 4: Open Ghostty terminal on android workspace ──
 	open_re_terminal

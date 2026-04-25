@@ -38,6 +38,7 @@ sleep 0.3
 # the agent can check readiness with `re-avd.sh status` or `adb wait-for-device`.
 if ! emulator_online; then
 	echo "No emulator running — starting Android RE baseline in background (log: ${START_LOG})"
+	mkdir -p "$(dirname "${START_LOG}")"
 	nohup bash "${SCRIPT_DIR}/re-avd.sh" start >"${START_LOG}" 2>&1 &
 	START_PID=$!
 	echo "re-avd.sh start PID: ${START_PID}"
