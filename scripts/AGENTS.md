@@ -23,6 +23,7 @@ scripts/
 │   ├── agents-search-test.sh # Unit tests for agents-search.sh
 │   ├── agent-iter.sh        # Run an AI agent command N times (iterative loop)
 │   ├── agent-iter-test.sh   # Unit tests for agent-iter.sh
+│   ├── agent-registry-drift-test.sh # Unit tests for agent registry drift detection
 │   ├── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
 │   └── android-re/
 │       ├── re-avd.sh        # Android emulator management (AVD create/start/snapshot)

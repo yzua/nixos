@@ -402,7 +402,17 @@ ai-agents/
 │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   ├── _models.nix           # Shared model/provider constants (names, aliases)
 │   ├── _agent-env.nix       # Agent environment variable bridging
-│   └── _git-clone-update.nix # Git clone/update helper for plugin repos
+│   ├── _git-clone-update.nix # Git clone/update helper for plugin repos
+│   └── workflows/            # Workflow prompt definitions for slash commands
+│       ├── _shared.nix             # Shared workflow utilities
+│       ├── _bugfix-root-cause.nix  # Bug root cause analysis workflow
+│       ├── _build-performance.nix  # Build performance optimization workflow
+│       ├── _commit-split.nix       # Logical commit splitting workflow
+│       ├── _dependency-upgrade.nix # Dependency upgrade workflow
+│       ├── _markdown-sync.nix      # Markdown documentation sync workflow
+│       ├── _refactor-maintainability.nix # Refactoring for maintainability workflow
+│       ├── _runtime-performance.nix # Runtime performance optimization workflow
+│       └── _security-audit.nix     # Security audit workflow
 ├── activation/              # Activation scripts (secret patching, Codex/Claude setup, plugin installs)
 │   ├── default.nix            # Aggregation hub
 │   ├── codex-setup.nix        # Codex config.toml + ~/.codex/agents generation

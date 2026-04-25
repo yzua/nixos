@@ -67,7 +67,17 @@ ai-agents/
 │   ├── _models.nix                       # Shared model/provider constants (names, aliases)
 │   ├── _opencode-gruvbox-theme.nix       # OpenCode Gruvbox Dark TUI theme
 │   ├── _agent-env.nix                    # Agent environment variable bridging
-│   └── _git-clone-update.nix             # Git clone/update helper for plugin repos
+│   ├── _git-clone-update.nix             # Git clone/update helper for plugin repos
+│   └── workflows/             # Workflow prompt definitions (Nix expressions)
+│       ├── _shared.nix                  # Shared workflow helpers
+│       ├── _bugfix-root-cause.nix       # Bugfix root-cause workflow
+│       ├── _build-performance.nix       # Build performance workflow
+│       ├── _commit-split.nix            # Commit splitting workflow
+│       ├── _dependency-upgrade.nix      # Dependency upgrade workflow
+│       ├── _markdown-sync.nix           # Markdown sync workflow
+│       ├── _refactor-maintainability.nix # Refactor maintainability workflow
+│       ├── _runtime-performance.nix     # Runtime performance workflow
+│       └── _security-audit.nix          # Security audit workflow
 ├── activation/              # Home Manager activation scripts
 │   ├── default.nix          # Aggregation: wires all activation steps
 │   ├── secrets.nix          # Secret patching (placeholder → real key injection)

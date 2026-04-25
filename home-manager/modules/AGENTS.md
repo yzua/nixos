@@ -34,7 +34,8 @@ modules/
 │   │   ├── _models.nix           # Shared model/provider constants (names, aliases)
 │   │   ├── _opencode-gruvbox-theme.nix # OpenCode Gruvbox Dark TUI theme
 │   │   ├── _agent-env.nix       # Agent environment variable bridging
-│   │   └── _git-clone-update.nix # Git clone/update helper for plugin repos
+│   │   ├── _git-clone-update.nix # Git clone/update helper for plugin repos
+│   │   └── workflows/  # Workflow prompt Nix expressions (9 files)
 │   ├── activation/     # Home Manager activation scripts
 │   │   ├── default.nix      # Aggregation hub
 │   │   ├── secrets.nix      # Secret patching (placeholder → real key injection)
@@ -184,7 +185,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-12 domain chunks + 5 custom chunks: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`.
+12 domain chunks + 5 custom chunks + 1 helper: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`, and `_egl-wrap.nix` (helper, imported manually).
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 

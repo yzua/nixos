@@ -22,7 +22,7 @@ Parent: `scripts/AGENTS.md`
 ## Conventions
 
 - Shebang: `#!/usr/bin/env bash` + `set -euo pipefail`. Sources `../lib/logging.sh`.
-- AWK heavy: `modules-check.sh` and `packages-check.sh` write inline AWK scripts to temp files.
+- AWK heavy: `modules-check.sh` writes inline AWK to temp files; `packages-check.sh` delegates to `../lib/extract-nix-packages.awk`.
 - `shellcheck-nix-inline.sh` composes `awk-utils.awk` + `extract-nix-shell.awk` from `../lib/`.
 - Temp files use `mktemp -d` with `trap ... EXIT` cleanup.
 - Test files: `*-test.sh` suffix alongside the script under test.
@@ -32,8 +32,8 @@ Parent: `scripts/AGENTS.md`
 ## Gotchas
 
 - `modules-check.sh` skips `_*.nix` files. Comments with `modules-check: manual-helper` or `imported manually` exclude specific modules.
-- `packages-check.sh` skips `_*.nix` files and `*/custom/*` paths, and has a large inline AWK skip-list of non-package `pkgs.*` attributes — new package namespaces may need adding.
-- `shellcheck-nix-inline.sh` excludes SC1114, SC1128, SC2239. Blocks with `${lib.` are skipped entirely (Nix-level conditionals).
+- `packages-check.sh` skips `_*.nix` files and `*/custom/*` paths, and uses `../lib/extract-nix-packages.awk` to extract package references — new package namespaces may need adding to the AWK script.
+- `shellcheck-nix-inline.sh` excludes SC1114, SC1128, SC2086, SC2239. Blocks with `${lib.` are skipped entirely (Nix-level conditionals).
 - `pre-commit-hook.sh` hardcodes an exclude for `./home-manager/modules/terminal/zellij/layouts.nix` in deadnix.
 - `pre-push-hook.sh` reads from stdin (git hook protocol: `local_ref local_sha remote_ref remote_sha` per line).
 

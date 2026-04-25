@@ -33,7 +33,7 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 | `net.ipv4.conf.all.rp_filter`      | 2     | Loose reverse path filtering (Docker/Mullvad compat) |
 | `kernel.unprivileged_bpf_disabled` | 1     | Restrict unprivileged BPF                            |
 
-**Blacklisted kernel modules**: dccp, sctp, rds, tipc, firewire-\*, thunderbolt, vivid, cramfs, hfs, hfsplus, udf
+**Blacklisted kernel modules**: dccp, sctp, rds, tipc, firewire-core, firewire-ohci, firewire-sbp2, thunderbolt, vivid, cramfs, hfs, hfsplus, udf
 
 **Disabled (documented why)**:
 

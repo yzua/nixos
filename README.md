@@ -24,8 +24,8 @@ Register in `hosts/_inventory.nix`:
 
 ```nix
 [
-  { hostname = "desktop"; stateVersion = "25.11"; enabled = true; }
-  { hostname = "your-hostname"; stateVersion = "25.11"; enabled = true; }
+  { hostname = "desktop"; stateVersion = "26.05"; enabled = true; }
+  { hostname = "your-hostname"; stateVersion = "26.05"; enabled = true; }
 ]
 ```
 

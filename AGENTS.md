@@ -9,7 +9,7 @@
 - Start with `just modules`, `just pkgs`, `just lint`, and `just check`.
 - `just all` is the full desktop pipeline: `modules`, `pkgs`, and `lint` in parallel, then `format -> test -> check -> nixos -> home`.
 - `just check` is eval-only: `nix flake check --no-build path:.`. It does not replace `just home` or `just nixos`.
-- `just format` rewrites `.nix` files via `nix fmt`; the hook's check-only equivalent is `nix fmt -- --fail-on-change --no-cache .`.
+- `just format` rewrites `.nix` files via `nix fmt`; the hook's check-only equivalent is `nix fmt -- --fail-on-change .`.
 - There is no normal unit-test suite at repo root; validation here is mostly import/lint/eval/apply.
 - The root dev shell only provides `statix`, `deadnix`, `shellcheck`, and `nixfmt-tree`; `home-manager` / `nh` come from the host system.
 

@@ -86,6 +86,6 @@ Modules are grouped into these namespaces:
 - **Apps**: Gaming, flatpak, printing, android, web RE tools, browser deps, KDE Connect, remote access.
 - **Virtualization**: Docker, VMs, android containers, dynamic linker.
 - **Notifications**: Alertmanager → ntfy.sh push bridge.
-- **Observability**: Metrics, dashboards, logs, health reports, alerts.
+- **Observability**: Metrics, dashboards, logs (Loki + Alloy shipper), health reports, alerts.
 - **Boot optimization**: Deferred service startup.
 - **Maintenance**: Cleanup timers, backups, Nix Helper (`nh`).
