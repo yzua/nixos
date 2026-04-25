@@ -54,12 +54,7 @@ collect_claude() {
 
 	local mcp_cfg="$HOME/.mcp.json"
 	if [[ -f "$mcp_cfg" ]]; then
-		while IFS= read -r server; do
-			[[ -n "$server" ]] || continue
-			local mcp_type
-			mcp_type="$(mcp_type_for "$mcp_cfg" "$server")"
-			row "claude" "mcp" "$server" "$mcp_type" "$mcp_cfg"
-		done < <(json_keys "$mcp_cfg" '.mcpServers // {} | keys[]')
+		collect_mcp_rows "claude" "$mcp_cfg"
 	fi
 
 	local agents_dir="$HOME/.claude/agents"
@@ -149,12 +144,7 @@ collect_gemini() {
 		mapfile -t gemini_configured_hooks < <(json_keys "$cfg" '.hooks // {} | keys[]')
 		list_hook_rows_with_unconfigured "gemini" "$cfg" "https://geminicli.com/docs/hooks/reference/" "${gemini_configured_hooks[@]}"
 
-		while IFS= read -r mcp; do
-			[[ -n "$mcp" ]] || continue
-			local mcp_type
-			mcp_type="$(mcp_type_for "$cfg" "$mcp")"
-			row "gemini" "mcp" "$mcp" "$mcp_type" "$cfg"
-		done < <(json_keys "$cfg" '.mcpServers // {} | keys[]')
+		collect_mcp_rows "gemini" "$cfg"
 	fi
 
 	list_skill_dirs "$HOME/.gemini/skills" "gemini"

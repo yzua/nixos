@@ -61,6 +61,18 @@ mcp_type_for() {
 	jq -r --arg k "$key" '.mcpServers[$k].type // (if .mcpServers[$k].url then "http" else "local" end)' "$file" 2>/dev/null || echo "local"
 }
 
+# Collect MCP server rows from a JSON config file.
+# Usage: collect_mcp_rows SCOPE CONFIG_FILE
+collect_mcp_rows() {
+	local scope="$1" cfg="$2"
+	local server mcp_type
+	while IFS= read -r server; do
+		[[ -n "$server" ]] || continue
+		mcp_type="$(mcp_type_for "$cfg" "$server")"
+		row "$scope" "mcp" "$server" "$mcp_type" "$cfg"
+	done < <(json_keys "$cfg" '.mcpServers // {} | keys[]')
+}
+
 # Deduplicate TSV rows by the first four columns.
 dedupe_rows() {
 	awk -F'\t' '!seen[$1 FS $2 FS $3 FS $4]++'

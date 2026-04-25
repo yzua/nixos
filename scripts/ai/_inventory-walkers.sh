@@ -28,13 +28,18 @@ list_skill_dirs() {
 	shopt -u nullglob
 }
 
-# List skills from multiple base directories, deduplicating by skill name.
-list_skill_dirs_merged() {
-	local scope="$1"
-	shift
+# Walk skill subdirectories from multiple base dirs, deduplicating by name.
+# Emits rows via `row()` for each unique skill.
+#   $1        scope       row scope tag
+#   $2        kind        "skill" or "command"
+#   $3        detail_mode "accumulate" (comma-separate source names) or "first"
+#   ${@:4}    base dirs to walk
+_walk_skill_dirs() {
+	local scope="$1" kind="$2" detail_mode="$3"
+	shift 3
 
-	declare -A skill_sources=()
-	declare -A skill_source_path=()
+	declare -A seen_sources=()
+	declare -A seen_path=()
 
 	local base d skill
 	for base in "$@"; do
@@ -43,52 +48,41 @@ list_skill_dirs_merged() {
 		for d in "$base"/*; do
 			[[ -d "$d" ]] || continue
 			skill="$(basename "$d")"
-			if [[ -n "${skill_sources[$skill]:-}" ]]; then
-				skill_sources[$skill]="${skill_sources[$skill]}, $(basename "$base")"
+			if [[ -n "${seen_sources[$skill]:-}" ]]; then
+				[[ "$detail_mode" == "accumulate" ]] && seen_sources[$skill]="${seen_sources[$skill]}, $(basename "$base")"
 			else
-				skill_sources[$skill]="$(basename "$base")"
+				seen_sources[$skill]="$(basename "$base")"
 				if [[ -f "$d/SKILL.md" ]]; then
-					skill_source_path[$skill]="$d/SKILL.md"
+					seen_path[$skill]="$d/SKILL.md"
 				else
-					skill_source_path[$skill]="$d"
+					seen_path[$skill]="$d"
 				fi
 			fi
 		done
 		shopt -u nullglob
 	done
 
-	for skill in "${!skill_sources[@]}"; do
-		row "$scope" "skill" "$skill" "${skill_sources[$skill]}" "${skill_source_path[$skill]}"
+	local name_col
+	for skill in "${!seen_sources[@]}"; do
+		if [[ "$kind" == "command" ]]; then
+			name_col="/$skill"
+		else
+			name_col="$skill"
+		fi
+		row "$scope" "$kind" "$name_col" "${seen_sources[$skill]}" "${seen_path[$skill]}"
 	done
 }
 
+# List skills from multiple base directories, deduplicating by skill name.
+# Comma-separates source names when a skill appears in multiple directories.
+list_skill_dirs_merged() {
+	_walk_skill_dirs "$1" "skill" "accumulate" "${@:2}"
+}
+
 # List skill slash commands from multiple base directories, deduplicating.
+# Keeps only the first source for each skill name.
 list_skill_commands_merged() {
-	local scope="$1"
-	shift
-
-	declare -A cmd_source_path=()
-	local base d skill
-	for base in "$@"; do
-		[[ -d "$base" ]] || continue
-		shopt -s nullglob
-		for d in "$base"/*; do
-			[[ -d "$d" ]] || continue
-			skill="$(basename "$d")"
-			if [[ -z "${cmd_source_path[$skill]:-}" ]]; then
-				if [[ -f "$d/SKILL.md" ]]; then
-					cmd_source_path[$skill]="$d/SKILL.md"
-				else
-					cmd_source_path[$skill]="$d"
-				fi
-			fi
-		done
-		shopt -u nullglob
-	done
-
-	for skill in "${!cmd_source_path[@]}"; do
-		row "$scope" "command" "/$skill" "skill slash command" "${cmd_source_path[$skill]}"
-	done
+	_walk_skill_dirs "$1" "command" "first" "${@:2}"
 }
 
 # List command files from a directory.

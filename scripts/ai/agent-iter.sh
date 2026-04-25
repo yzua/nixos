@@ -61,28 +61,22 @@ run_agent_once() {
 	local alias_name="$1"
 	local prompt="$2"
 
-	local entry="${AGENT_ITER_REGISTRY[$alias_name]:-}"
-	if [[ -z "$entry" ]]; then
+	if ! resolve_alias_entry AGENT_ITER_REGISTRY "$alias_name"; then
 		error_exit "Unsupported alias for iter: ${alias_name}"
 	fi
 
-	local env_marker="${entry%%|*}"
-	local command="${entry#*|}"
 	local stderr_file
 	stderr_file="$(mktemp)"
 	trap 'rm -f "${stderr_file}"' RETURN
 
-	local resolved_env
-	resolved_env="$(resolve_env_marker "$env_marker")"
-
 	local rc=0
 	# Execute with resolved env, capturing stderr for rate-limit detection
-	if [[ -n "$resolved_env" ]]; then
+	if [[ -n "$_RESOLVED_ENV" ]]; then
 		# shellcheck disable=SC2086,SC2046
-		env $resolved_env $command "${prompt}" 2>"${stderr_file}" || rc=$?
+		env $_RESOLVED_ENV $_COMMAND_PREFIX "${prompt}" 2>"${stderr_file}" || rc=$?
 	else
 		# shellcheck disable=SC2086
-		$command "${prompt}" 2>"${stderr_file}" || rc=$?
+		$_COMMAND_PREFIX "${prompt}" 2>"${stderr_file}" || rc=$?
 	fi
 
 	_ITER_LAST_STDERR="$(cat "${stderr_file}")"

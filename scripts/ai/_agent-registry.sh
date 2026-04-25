@@ -109,6 +109,7 @@ _def xcx   -    "codex --no-alt-screen --dangerously-bypass-approvals-and-sandbo
 
 # OpenCode (default and profiles)
 _def oc      -                                      "opencode"                       "opencode run"
+_def ocor    "OPENROUTER"                           "opencode"                       "opencode run"
 _def ocglm   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-glm"     "opencode"         "opencode run"
 _def ocgem   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gemini"  "opencode"         "opencode run"
 _def ocgpt   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-gpt"    "opencode"         "opencode run"
@@ -120,6 +121,10 @@ _def oczen   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-zen"    "opencode"     
 
 # Gemini
 _def gem   -    "gemini --approval-mode=yolo"         "gemini --approval-mode=yolo --prompt"
+
+# --- Supported tools (single source of truth) ---
+# shellcheck disable=SC2034 # Used by agent-analyze.sh, agent-inventory.sh, _inventory-collectors.sh
+SUPPORTED_TOOLS=(claude opencode codex gemini)
 
 # --- Supported base aliases ---
 
@@ -162,6 +167,26 @@ zai_claude_env() {
   printf '%s\n' "ANTHROPIC_DEFAULT_OPUS_MODEL=${ZAI_MODEL_OPUS}"
 }
 
+# OpenRouter API key resolution (reads from sops secret at runtime).
+openrouter_key_path() {
+  printf '%s\n' "${OPENROUTER_API_KEY_FILE:-/run/secrets/openrouter_api_key}"
+}
+
+openrouter_key() {
+  local key_path
+  key_path="$(openrouter_key_path)"
+  require_secret_file "${key_path}"
+  cat "${key_path}"
+}
+
+# OpenRouter env vars for opencode with openrouter profile.
+openrouter_opencode_env() {
+  local key
+  key="$(openrouter_key)"
+  printf '%s\n' "OPENROUTER_API_KEY=${key}"
+  printf '%s\n' "OPENCODE_CONFIG_DIR=${HOME}/.config/opencode-openrouter"
+}
+
 # --- Workflow suffix resolution ---
 
 resolve_workflow_prompt() {
@@ -179,16 +204,42 @@ resolve_workflow_prompt() {
 # Resolve an env_marker from a registry entry into a space-separated env string.
 # Usage: resolved_env="$(resolve_env_marker "$env_marker")"
 #   env_marker:
-#     "-"   = no extra env vars (outputs empty string)
-#     "ZAI" = resolve Z.AI API vars at runtime
-#     otherwise = literal env string (e.g. "FOO=bar BAZ=qux")
+#     "-"           = no extra env vars (outputs empty string)
+#     "ZAI"         = resolve Z.AI API vars at runtime
+#     "OPENROUTER"  = resolve OpenRouter API key + OpenCode config dir
+#     otherwise     = literal env string (e.g. "FOO=bar BAZ=qux")
 resolve_env_marker() {
 	local env_marker="$1"
 	case "$env_marker" in
 	"-") ;;
 	"ZAI") zai_claude_env | tr '\n' ' ' ;;
+	"OPENROUTER") openrouter_opencode_env | tr '\n' ' ' ;;
 	*) printf '%s' "$env_marker" ;;
 	esac
+}
+
+# --- Registry lookup + env resolution ---
+
+# Look up an alias in the given registry, split env_marker from command,
+# and resolve the env_marker.  Sets _RESOLVED_ENV and _COMMAND_PREFIX in
+# the caller's scope.  Returns 1 if the alias is not found.
+#
+# Usage:
+#   resolve_alias_entry AGENT_REGISTRY "$alias" || error_exit "bad alias"
+#   # then use "${_RESOLVED_ENV}" and "${_COMMAND_PREFIX}"
+resolve_alias_entry() {
+  local registry_name="$1" alias_name="$2"
+
+  # Use indirect reference to access the named registry array.
+  local -n _registry="${registry_name}"
+  local entry="${_registry[$alias_name]:-}"
+  if [[ -z "$entry" ]]; then
+    return 1
+  fi
+
+  local env_marker="${entry%%|*}"
+  _COMMAND_PREFIX="${entry#*|}"
+  _RESOLVED_ENV="$(resolve_env_marker "$env_marker")"
 }
 
 # --- Alias/suffix splitting ---

@@ -76,33 +76,25 @@ execute_agent() {
 		prompt="$(resolve_workflow_prompt "$workflow_suffix")"
 	fi
 
-	local entry="${AGENT_REGISTRY[$agent_alias]:-}"
-	if [[ -z "$entry" ]]; then
+	if ! resolve_alias_entry AGENT_REGISTRY "$agent_alias"; then
 		error_exit "Unsupported alias: $agent_alias"
 	fi
-
-	local env_marker="${entry%%|*}"
-	local command_prefix="${entry#*|}"
-
-	# Resolve env vars
-	local resolved_env
-	resolved_env="$(resolve_env_marker "$env_marker")"
 
 	# Build command array for safe execution
 	local -a cmd=()
 
-	if [[ -n "$resolved_env" ]]; then
+	if [[ -n "$_RESOLVED_ENV" ]]; then
 		# shellcheck disable=SC2206
-		local -a env_args=($resolved_env)
+		local -a env_args=($_RESOLVED_ENV)
 		cmd+=(env "${env_args[@]}")
 	fi
 
 	# shellcheck disable=SC2206
-	local -a prefix_args=($command_prefix)
+	local -a prefix_args=($_COMMAND_PREFIX)
 	cmd+=("${prefix_args[@]}")
 
 	if [[ -n "$prompt" ]]; then
-		if [[ "$command_prefix" == opencode* ]]; then
+		if [[ "$_COMMAND_PREFIX" == opencode* ]]; then
 			cmd+=("--prompt")
 		fi
 		cmd+=("$prompt")
@@ -142,7 +134,7 @@ run_simple_mode() {
 
 	agent_alias="$(pick "Simple Mode: Select Agent Prefix" \
 		cl ocl hcl clglm \
-		oc ocglm ocgem ocgpt locgpt mocgpt xocgpt ocs oczen \
+		oc ocglm ocgem ocgpt ocor ocs oczen \
 		cx lcx mcx hcx xcx \
 		gem)"
 	if [[ -z "${agent_alias:-}" ]]; then
@@ -184,12 +176,13 @@ run_sectioned_mode() {
 
 	case "$provider_choice" in
 	"OpenCode")
-		profile_choice="$(pick "OpenCode profile" default glm gemini gpt sonnet zen)"
+		profile_choice="$(pick "OpenCode profile" default glm gemini gpt openrouter sonnet zen)"
 		case "$profile_choice" in
 		default) agent_alias="oc" ;;
 		glm) agent_alias="ocglm" ;;
 		gemini) agent_alias="ocgem" ;;
 		gpt) agent_alias="$(pick_ocgpt_effort_alias)" || return 1 ;;
+		openrouter) agent_alias="ocor" ;;
 		sonnet) agent_alias="ocs" ;;
 		zen) agent_alias="oczen" ;;
 		"") return 1 ;;

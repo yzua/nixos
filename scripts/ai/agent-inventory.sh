@@ -9,6 +9,8 @@ source "${SCRIPT_DIR}/../lib/logging.sh"
 source "${SCRIPT_DIR}/../lib/require.sh"
 # shellcheck source=scripts/lib/fzf-theme.sh
 source "${SCRIPT_DIR}/../lib/fzf-theme.sh"
+# shellcheck source=scripts/ai/_agent-registry.sh
+source "${SCRIPT_DIR}/_agent-registry.sh"
 # shellcheck source=scripts/ai/_inventory-helpers.sh
 source "${SCRIPT_DIR}/_inventory-helpers.sh"
 # shellcheck source=scripts/ai/_inventory-walkers.sh
@@ -25,7 +27,7 @@ Usage: ai-agent-inventory [--tool TOOL] [--section SECTION]
 Dynamic AI tool inventory browser.
 
 TOOL values:
-  opencode | claude | codex | gemini | all
+  ${SUPPORTED_TOOLS[*]} | all
 
 SECTION values:
   all | profile | model | small_model | command | plugin | mcp | provider |
@@ -36,7 +38,10 @@ EOF
 }
 
 pick_tool() {
-	printf '%s\n' "all" "opencode" "claude" "codex" "gemini" |
+	{
+		printf 'all\n'
+		printf '%s\n' "${SUPPORTED_TOOLS[@]}"
+	} |
 		fzf --height=40% --reverse --header="Select Tool Family"
 }
 
