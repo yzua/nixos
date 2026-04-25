@@ -27,7 +27,19 @@
     services.tor = {
       enable = true;
       torsocks.enable = true;
-      client.enable = true;
+
+      client = {
+        enable = true;
+        # Override the NixOS default (IsolateDestAddr = true).
+        # relayrad already isolates per-request via unique SOCKS5 auth credentials,
+        # which Tor uses as circuit isolation keys (IsolateSOCKSAuth).  IsolateDestAddr
+        # forces a separate circuit per destination on top of that, dramatically
+        # increasing circuit pressure and causing timeouts when guards are overloaded.
+        socksListenAddress = {
+          addr = constants.localhost;
+          port = constants.ports.tor-socks;
+        };
+      };
 
       settings = {
         DNSPort = [
@@ -43,20 +55,24 @@
           ".noconnect"
         ];
 
-        # Only use exit nodes in safe jurisdictions
-        ExitNodes = "{de},{nl},{ch},{fi},{is},{ro}";
+        # Prefer exits in privacy-friendly jurisdictions, but allow fallback
+        # to any country (StrictNodes = 0) when preferred exits are overloaded.
+        # Widened from the original {de,nl,ch,fi,is,ro} for better availability.
+        ExitNodes = "{de},{nl},{ch},{fi},{is},{ro},{se},{no},{dk},{fr},{ca},{jp}";
 
-        # Disable IPv6 for better anonymity
         IPv6Exit = false;
-
-        # Non-strict: prefer these exit countries but fall back to others if unavailable.
-        # StrictNodes = 1 would shrink anonymity set and break Tor if preferred exits are down.
         StrictNodes = 0;
 
-        # Reduce fingerprinting
         UseEntryGuards = 1;
         NumEntryGuards = 3;
         NumDirectoryGuards = 3;
+
+        # Give circuits more time to build when the network is congested.
+        CircuitBuildTimeout = 90;
+
+        # Start building circuits immediately on daemon startup instead of
+        # waiting for the first SOCKS connection.
+        DormantCanceledByStartup = true;
       };
     };
   };
