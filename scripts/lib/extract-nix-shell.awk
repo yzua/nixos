@@ -16,9 +16,18 @@ function normalize_line(line, value) {
   return value
 }
 
-function flush_block(    out, i, line, safe, block_name, indent, min_indent, current_indent) {
+function flush_block(    out, i, line, safe, block_name, min_indent, current_indent) {
   if (line_count == 0) {
     in_block = 0
+    return
+  }
+
+  # Skip blocks from previous file if src was never set for it
+  if (src == "") {
+    in_block = 0
+    line_count = 0
+    script_name = ""
+    start_line = 0
     return
   }
 
@@ -74,6 +83,21 @@ function flush_block(    out, i, line, safe, block_name, indent, min_indent, cur
   start_line = 0
 }
 
+# Detect file boundaries for batch mode: flush pending state when the input
+# file changes.  In per-file mode (src passed via -v), this is a no-op
+# because FILENAME never changes.
+FNR == 1 {
+  if (NR != FNR && in_block) {
+    flush_block()
+  }
+  src = FILENAME
+  block_index = 0
+  in_wsa = 0
+  wsa_depth = 0
+  pending_script = 0
+  pending_wsa_text = 0
+}
+
 {
   # Track writeShellApplication scope with a simple brace counter.
   if (!in_wsa && $0 ~ /writeShellApplication[[:space:]]*\{/) {
@@ -100,7 +124,7 @@ function flush_block(    out, i, line, safe, block_name, indent, min_indent, cur
       if (index($0, "''") > 0) {
         script_name = pending_script_name
         in_block = 1
-        start_line = NR + 1
+        start_line = FNR + 1
         line_count = 0
         pending_script = 0
       }
@@ -111,7 +135,7 @@ function flush_block(    out, i, line, safe, block_name, indent, min_indent, cur
       if (index($0, "''") > 0) {
         script_name = pending_script_name
         in_block = 1
-        start_line = NR + 1
+        start_line = FNR + 1
         line_count = 0
       } else if ($0 ~ /[);][[:space:]]*$/) {
         pending_script = 0
@@ -123,7 +147,7 @@ function flush_block(    out, i, line, safe, block_name, indent, min_indent, cur
     if (in_wsa && $0 ~ /text[[:space:]]*=[[:space:]]*''/) {
       script_name = "writeShellApplication"
       in_block = 1
-      start_line = NR + 1
+      start_line = FNR + 1
       line_count = 0
       pending_wsa_text = 0
       next
@@ -138,7 +162,7 @@ function flush_block(    out, i, line, safe, block_name, indent, min_indent, cur
       if (index($0, "''") > 0) {
         script_name = "writeShellApplication"
         in_block = 1
-        start_line = NR + 1
+        start_line = FNR + 1
         line_count = 0
       } else if ($0 ~ /;[[:space:]]*$/) {
         pending_wsa_text = 0

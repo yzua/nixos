@@ -25,7 +25,7 @@ statix check --ignore '.git/**'
 deadnix --fail --exclude "${DEADNIX_EXCLUDES[@]}" .
 
 print_info "Checking formatting..."
-nix fmt -- --fail-on-change --no-cache . 2>/dev/null || {
+nix fmt -- --fail-on-change . 2>/dev/null || {
 	print_error "Formatting check failed. Run 'just format' first."
 	exit 1
 }

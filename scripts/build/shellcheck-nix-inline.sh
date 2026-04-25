@@ -19,7 +19,7 @@ awk_script="$tmp_dir/extract.awk"
 } > "$awk_script"
 
 mapfile -t extracted_scripts < <(
-	rg --files -g '*.nix' . | xargs -d '\n' -P4 -I{} awk -v tmpdir="$tmp_dir" -v src="{}" -f "$awk_script" "{}"
+	rg --files -g '*.nix' . | xargs -d '\n' awk -v tmpdir="$tmp_dir" -f "$awk_script"
 )
 
 if ((${#extracted_scripts[@]} == 0)); then
