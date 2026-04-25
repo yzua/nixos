@@ -19,6 +19,7 @@ let
     mkStrListOption
     mkLinesOption
     mkNullOrStrOption
+    mkNullableOption
     ;
 
   # Shared Codex enum types — used by top-level, profiles, and customAgents options.
@@ -171,9 +172,7 @@ in
             command = mkStrOption "" "Command to run for local servers";
             args = mkStrListOption [ ] "Arguments for the command";
             url = mkNullOrStrOption null "URL for remote MCP servers";
-            headers = mkTypedOption (lib.types.nullOr (
-              lib.types.attrsOf lib.types.str
-            )) null "Headers for remote MCP servers";
+            headers = mkNullableOption (lib.types.attrsOf lib.types.str) null "Headers for remote MCP servers";
             env = mkAttrsOfStrOption { } "Environment variables for the server";
           };
         }
