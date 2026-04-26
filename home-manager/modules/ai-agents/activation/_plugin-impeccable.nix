@@ -30,40 +30,40 @@ in
         ) || true
       fi
 
-      if [[ -d "$IMPECCABLE_DIR/dist/claude-code/.claude/skills" && "${
-        if cfg.claude.enable then "1" else "0"
-      }" == "1" ]]; then
-        mkdir -p "$HOME/.claude/skills"
-        for src in "$IMPECCABLE_DIR"/dist/claude-code/.claude/skills/*; do
-          [[ -e "$src" ]] || continue
-          name="$(basename "$src")"
-          dst="$HOME/.claude/skills/$name"
-          if [[ -e "$dst" && ! -d "$dst" ]]; then
-            rm -f "$dst"
-          fi
-          cp -r "$src" "$dst" 2>/dev/null || true
-        done
-        echo "✓ impeccable installed for Claude Code"
-      fi
-
-      if [[ -d "$IMPECCABLE_DIR/dist/opencode/.opencode/skills" && "${
-        if cfg.opencode.enable then "1" else "0"
-      }" == "1" ]]; then
-        for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfiles.names)}; do
-          skills_dir="$HOME/.config/$profile/skills"
-          mkdir -p "$skills_dir"
-          for src in "$IMPECCABLE_DIR"/dist/opencode/.opencode/skills/*; do
+      ${lib.optionalString cfg.claude.enable ''
+        if [[ -d "$IMPECCABLE_DIR/dist/claude-code/.claude/skills" ]]; then
+          mkdir -p "$HOME/.claude/skills"
+          for src in "$IMPECCABLE_DIR"/dist/claude-code/.claude/skills/*; do
             [[ -e "$src" ]] || continue
             name="$(basename "$src")"
-            dst="$skills_dir/$name"
+            dst="$HOME/.claude/skills/$name"
             if [[ -e "$dst" && ! -d "$dst" ]]; then
               rm -f "$dst"
             fi
             cp -r "$src" "$dst" 2>/dev/null || true
           done
-        done
-        echo "✓ impeccable installed for OpenCode"
-      fi
+          echo "✓ impeccable installed for Claude Code"
+        fi
+      ''}
+
+      ${lib.optionalString cfg.opencode.enable ''
+        if [[ -d "$IMPECCABLE_DIR/dist/opencode/.opencode/skills" ]]; then
+          for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfiles.names)}; do
+            skills_dir="$HOME/.config/$profile/skills"
+            mkdir -p "$skills_dir"
+            for src in "$IMPECCABLE_DIR"/dist/opencode/.opencode/skills/*; do
+              [[ -e "$src" ]] || continue
+              name="$(basename "$src")"
+              dst="$skills_dir/$name"
+              if [[ -e "$dst" && ! -d "$dst" ]]; then
+                rm -f "$dst"
+              fi
+              cp -r "$src" "$dst" 2>/dev/null || true
+            done
+          done
+          echo "✓ impeccable installed for OpenCode"
+        fi
+      ''}
     ''
   );
 }
