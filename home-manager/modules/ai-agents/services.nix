@@ -1,10 +1,12 @@
 # Packages, zsh aliases, systemd user services/timers, and log analysis for AI agents.
 
 {
+  aliasHelpers,
   config,
   constants,
   lib,
   pkgs,
+  secretLoader,
   ...
 }:
 
@@ -37,6 +39,7 @@ let
       constants
       lib
       pkgs
+      secretLoader
       ;
   };
 
@@ -97,7 +100,7 @@ in
       OPENCODE_EXPERIMENTAL_LSP_TOOL = "true";
     };
 
-    programs = import ../../../shared/_alias-helpers.nix { inherit shellAliases; };
+    programs = aliasHelpers { inherit shellAliases; };
 
     systemd.user = aiSystemdUser;
   };

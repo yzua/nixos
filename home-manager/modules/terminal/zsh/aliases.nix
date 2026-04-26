@@ -1,12 +1,13 @@
 # Zsh shell aliases.
 
 {
+  aliasHelpers,
   constants,
   ...
 }:
 
 let
-  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
+  mkShellAliasPrograms = aliasHelpers;
 in
 {
   programs =

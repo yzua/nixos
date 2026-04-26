@@ -1,13 +1,14 @@
 # Go development environment (gopls, delve, golangci-lint, etc).
 
 {
+  aliasHelpers,
   config,
   pkgs,
   ...
 }:
 
 let
-  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
+  mkShellAliasPrograms = aliasHelpers;
 in
 {
   programs =

@@ -1,6 +1,7 @@
 # JavaScript/TypeScript development environment (Node, Bun, Deno, LSP, etc).
 
 {
+  aliasHelpers,
   config,
   lib,
   pkgs,
@@ -8,7 +9,7 @@
 }:
 
 let
-  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
+  mkShellAliasPrograms = aliasHelpers;
   bunGlobalPackages = [
     "@anthropic-ai/claude-code"
     "@google/gemini-cli"

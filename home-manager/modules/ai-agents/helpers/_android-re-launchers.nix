@@ -3,13 +3,13 @@
   constants,
   lib,
   pkgs,
+  secretLoader,
 }:
 let
   scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
   launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
-  inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
-  inherit (constants.services.zai) timeout;
-  inherit (constants.services.zai.models) haiku sonnet opus;
+  inherit (secretLoader) loadSecretFn;
+  zaiEnv = import ./_zai-env.nix { inherit constants; };
 
   mkAndroidReLauncher =
     {
@@ -84,16 +84,12 @@ let
       fi
     '';
 
-  # Load Z.AI secret for GLM wrapper (mirrors claude_glm from functions.nix)
+  # Load Z.AI secret for GLM wrapper (env vars from _zai-env.nix)
   glmModelEnv = ''
     ${loadSecretFn}
     key="$(_load_secret zai_api_key)" || return 1
     export ANTHROPIC_AUTH_TOKEN="$key"
-    export ANTHROPIC_BASE_URL="${constants.services.zai.apiRoot}/anthropic"
-    export API_TIMEOUT_MS="${toString timeout}"
-    export ANTHROPIC_DEFAULT_HAIKU_MODEL="${haiku}"
-    export ANTHROPIC_DEFAULT_SONNET_MODEL="${sonnet}"
-    export ANTHROPIC_DEFAULT_OPUS_MODEL="${opus}"
+    ${zaiEnv.exportBlock}
   '';
 
 in

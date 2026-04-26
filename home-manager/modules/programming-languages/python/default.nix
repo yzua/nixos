@@ -1,6 +1,7 @@
 # Python development environment (uv, ruff, poetry, pytest, etc).
 
 {
+  aliasHelpers,
   config,
   lib,
   pkgs,
@@ -8,7 +9,7 @@
 }:
 
 let
-  mkShellAliasPrograms = import ../../../../shared/_alias-helpers.nix;
+  mkShellAliasPrograms = aliasHelpers;
 in
 {
   programs =
