@@ -1,12 +1,15 @@
 # Helper for wrapping GUI binaries with Mesa EGL vendor override.
 
-{ pkgs }:
+{
+  pkgs,
+  constants,
+}:
 
 let
-  mesaEglVendorFile = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
+  inherit (constants.paths) eglVendorFile;
 in
 {
-  inherit mesaEglVendorFile;
+  inherit eglVendorFile;
 
   wrapWithMesaEgl =
     name: pkg:
@@ -16,7 +19,7 @@ in
       buildInputs = [ pkgs.makeWrapper ];
       postBuild = ''
         wrapProgram $out/bin/${name} \
-          --set __EGL_VENDOR_LIBRARY_FILENAMES ${mesaEglVendorFile}
+          --set __EGL_VENDOR_LIBRARY_FILENAMES ${eglVendorFile}
       '';
     };
 }

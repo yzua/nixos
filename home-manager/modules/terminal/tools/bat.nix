@@ -1,10 +1,12 @@
 # Bat (cat clone) configuration.
 
+{ constants, ... }:
+
 {
   programs.bat = {
     enable = true;
     config = {
-      theme = "gruvbox-dark";
+      theme = constants.themeNames.bat;
       style = "numbers,changes,header";
       map-syntax = [
         "*.nix:Nix"

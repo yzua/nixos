@@ -2,13 +2,14 @@
 # NOTE: i2pd managed by services.i2pd
 
 {
+  constants,
   pkgs,
   pkgsStable,
   ...
 }:
 
 let
-  eglWrap = import ./_egl-wrap.nix { inherit pkgs; };
+  eglWrap = import ./_egl-wrap.nix { inherit pkgs constants; };
   inherit (eglWrap) wrapWithMesaEgl;
 in
 {

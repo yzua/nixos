@@ -43,13 +43,13 @@ let
           name = "${name}/tui.json";
           value = {
             text = toJSON {
-              theme = "gruvbox-dark";
+              theme = constants.themeNames.opencode;
             };
             force = true;
           };
         }
         {
-          name = "${name}/themes/gruvbox-dark.json";
+          name = "${name}/themes/${constants.themeNames.opencode}.json";
           value = {
             text = opencodeGruvboxDarkTheme;
             force = true;
