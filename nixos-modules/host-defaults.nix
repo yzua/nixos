@@ -61,6 +61,7 @@ in
       vnc.enable = mkDefaultFalse; # On-demand remote access
       android.enable = mkDefaultTrue; # Android Studio, emulator, ADB, Fastboot
       browserDeps.enable = mkDefaultTrue; # Chromium, Puppeteer headless browser deps
+      webRe.enable = mkDefaultTrue; # Web reverse engineering tools
 
       # Profile-dependent defaults
       gaming = {

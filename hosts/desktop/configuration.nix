@@ -11,15 +11,12 @@
 
   mySystem = {
     hostProfile = "desktop";
-    android.enable = true;
-    browserDeps.enable = true;
     waydroid.enable = false;
     flatpak.enable = false;
     kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.
     opensnitch.enable = false;
     i2pd.enable = true;
     yggdrasil.enable = true;
-    netdata.enable = true;
     vnc.enable = true;
     webRe.enable = true;
   };
