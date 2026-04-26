@@ -393,6 +393,7 @@ ai-agents/
 │   ├── _gemini-policies.nix   # Gemini CLI safety policy definitions
 │   ├── _workflow-prompts.nix  # Workflow prompt definitions
 │   ├── _zai-services.nix      # Z.AI MCP service registry
+│   ├── _zai-env.nix           # Z.AI environment variable helpers
 │   ├── _zai-filters.nix       # Z.AI MCP jq filter generation
 │   ├── _services-systemd.nix  # Systemd service/timer definitions
 │   ├── _services-shell-aliases.nix # Shell alias generation

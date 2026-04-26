@@ -122,7 +122,7 @@ Set `hostProfile` first, then override as needed:
 | `kdeconnect.enable`          | KDE Connect phone integration                                             |
 | `vnc.enable`                 | VNC remote access                                                         |
 | `secureBoot.enable`          | Secure Boot preparation with sbctl                                        |
-| `webRe.enable`               | Web reverse engineering and security tools                                |
+| `webRe.enable`               | Web reverse engineering and security tools (on by default)                |
 | `android.enable`             | ADB, Fastboot, Android Studio (on by default)                             |
 | `browserDeps.enable`         | Chromium, Puppeteer headless testing dependencies (on by default)         |
 
@@ -132,11 +132,11 @@ Set `hostProfile` first, then override as needed:
 
 Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening.
 
-On by default (toggleable): AIDE file integrity, fail2ban, Lynis weekly audit, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid.
+On by default (toggleable): AIDE file integrity, fail2ban, Lynis weekly audit, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid, web RE/security tools.
 
 Profile-dependent defaults: gaming/gamemode/gamescope (on for `desktop`), bluetooth (on for `laptop`).
 
-Off by default (toggleable): Yggdrasil, I2P, web RE/security tools, backup (requires sops secret), VNC.
+Off by default (toggleable): Yggdrasil, I2P, backup (requires sops secret), VNC.
 
 ---
 
@@ -218,6 +218,7 @@ flake.nix                     # Entry point
 flake.lock                    # Pinned input versions
 justfile                      # Build/deploy commands (`just --list`)
 AGENTS.md                     # Agent-facing repo conventions
+LICENSE                       # Repository license
 shared/                       # Shared identity, helpers, option/secret utilities
 hosts/<hostname>/             # Per-host config + hardware modules
 nixos-modules/                # Shared system modules (58 imports in hub)

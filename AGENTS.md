@@ -24,7 +24,7 @@
 
 - System entrypoint: `hosts/<host>/configuration.nix`, which imports `../../nixos-modules`.
 - Home Manager entrypoint: `home-manager/home.nix`, which imports `./modules` and `./packages`.
-- Home Manager is standalone here, not a NixOS module: HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs` such as `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, and `hostname`.
+- Home Manager is standalone here, not a NixOS module: HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs` such as `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, `aliasHelpers`, `secretLoader`, and `hostname`.
 - NixOS modules receive `specialArgs`: `inputs`, `stateVersion`, `hostname`, `user`, `pkgsStable`, `pkgConfig`, `constants`, `systemdHelpers`, and `optionHelpers`.
 - Shared identity, terminal, editor, theme, and service defaults live in `shared/constants.nix`.
 - System feature toggles live under `mySystem.*`; set `mySystem.hostProfile` first and override deltas. Put cross-module assertions in `nixos-modules/validation.nix`, not feature modules.

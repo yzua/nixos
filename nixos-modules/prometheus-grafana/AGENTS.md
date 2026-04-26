@@ -10,6 +10,9 @@ Enabled through `mySystem.observability.enable` and integrated with Netdata/Loki
 | File              | Purpose                                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------------------------- |
 | `default.nix`     | Main stack wiring: Prometheus scrape/jobs, Alertmanager route, Grafana provisioning, resource limits |
+| `_prometheus.nix` | Prometheus and Alertmanager configuration (scrape targets, alert routing)                            |
+| `_grafana.nix`    | Grafana server settings, provisioning, and datasource wiring                                         |
+| `_helpers.nix`    | Shared helper functions (not a module, imported by other files)                                      |
 | `alert-rules.nix` | Alert rule groups (system, disk, services, network)                                                  |
 | `dashboards/`     | Provisioned Grafana dashboard JSON files                                                             |
 

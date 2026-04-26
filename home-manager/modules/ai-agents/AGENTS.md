@@ -67,6 +67,7 @@ ai-agents/
 │   ├── _models.nix                       # Shared model/provider constants (names, aliases)
 │   ├── _opencode-gruvbox-theme.nix       # OpenCode Gruvbox Dark TUI theme
 │   ├── _agent-env.nix                    # Agent environment variable bridging
+│   ├── _zai-env.nix                      # Z.AI provider env vars (shared by claude_glm + Android RE launchers)
 │   ├── _git-clone-update.nix             # Git clone/update helper for plugin repos
 │   └── workflows/             # Workflow prompt definitions (Nix expressions)
 │       ├── _shared.nix                  # Shared workflow helpers

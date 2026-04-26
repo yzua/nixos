@@ -29,6 +29,9 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | `_zai-filters.nix`              | Agent-specific jq filters for Z.AI MCP secret injection                            |
 | `_git-clone-update.nix`         | Generates Bash snippet for git clone/update under `~/.local/share/`                |
 | `_android-re-launchers.nix`     | Shell script binaries for Android RE OpenCode launchers                            |
+| `_agent-env.nix`                | Agent environment variable bridging                                                |
+| `_zai-env.nix`                  | Z.AI provider env vars (shared by claude_glm + Android RE launchers)               |
+| `workflows/`                    | Workflow prompt Nix expressions (9 files: bugfix, build-perf, commit-split, etc.)  |
 
 ---
 
