@@ -20,6 +20,7 @@ let
   };
   inherit (cleanupLib)
     mkCleanupTimer
+    mkCachePurgeTimer
     mkFindCleanupTimer
     bash
     find
@@ -38,12 +39,12 @@ in
         delay = "3h";
       })
 
-      (mkCleanupTimer {
+      (mkCachePurgeTimer {
         name = "pip-cache";
         description = "Clean up PIP package cache";
-        command = "${bash} -c 'if command -v pip >/dev/null 2>&1; then pip cache purge 2>/dev/null || true; fi'";
+        binary = "pip";
+        cacheCommand = "cache purge";
         calendar = "weekly";
-        delay = "1h";
       })
 
       (mkFindCleanupTimer {
@@ -55,28 +56,25 @@ in
         delay = "2h";
       })
 
-      (mkCleanupTimer {
+      (mkCachePurgeTimer {
         name = "bun-cache";
         description = "Clean up Bun package manager cache";
-        command = "${bash} -c 'if command -v bun >/dev/null 2>&1; then bun pm cache rm 2>/dev/null || true; fi'";
-        calendar = "monthly";
-        delay = "1h";
+        binary = "bun";
+        cacheCommand = "pm cache rm";
       })
 
-      (mkCleanupTimer {
+      (mkCachePurgeTimer {
         name = "go-cache";
         description = "Clean up Go modules cache";
-        command = "${bash} -c 'if command -v go >/dev/null 2>&1; then go clean -modcache 2>/dev/null || true; fi'";
-        calendar = "monthly";
-        delay = "1h";
+        binary = "go";
+        cacheCommand = "clean -modcache";
       })
 
-      (mkCleanupTimer {
+      (mkCachePurgeTimer {
         name = "npm-cache";
         description = "Clean up npm cache";
-        command = "${bash} -c 'if command -v npm >/dev/null 2>&1; then npm cache clean --force 2>/dev/null || true; fi'";
-        calendar = "monthly";
-        delay = "1h";
+        binary = "npm";
+        cacheCommand = "cache clean --force";
       })
 
       (mkCleanupTimer {

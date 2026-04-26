@@ -115,4 +115,27 @@ in
           delay
           ;
       });
+
+  mkCachePurgeTimer =
+    {
+      name,
+      description,
+      binary,
+      cacheCommand,
+      calendar ? "monthly",
+      delay ? "1h",
+    }:
+    lib.recursiveUpdate
+      (mkCleanupService {
+        inherit name description;
+        execStart = "${bash} -c 'if command -v ${binary} >/dev/null 2>&1; then ${binary} ${cacheCommand} 2>/dev/null || true; fi'";
+      })
+      (mkCleanupTimerUnit {
+        inherit
+          name
+          description
+          calendar
+          delay
+          ;
+      });
 }
