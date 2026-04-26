@@ -30,6 +30,15 @@
   # Theme (GruvboxAlt)
   theme = "gruvbox-dark-soft";
 
+  # Locale
+  locale = "en_US.UTF-8";
+
+  # Application-level theme names (not all apps support base16/Stylix)
+  themeNames = {
+    bat = "gruvbox-dark";
+    opencode = "gruvbox-dark";
+  };
+
   # Gruvbox color palette (base16 colors)
   # Used by applications that don't support Stylix theming
   color = {
@@ -142,6 +151,10 @@
     screens = "Screens";
     opencodeLogDir = ".local/share/opencode/log";
     codexLogDir = ".codex/log";
+    sopsKeyDir = ".config/sops/age/keys.txt";
+    androidSdk = "Android/Sdk";
+    systemRepo = "System";
+    eglVendorFile = "/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json";
   };
 
   # System architecture — used by flake.nix and package meta.platforms.
