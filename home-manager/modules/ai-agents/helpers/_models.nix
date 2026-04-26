@@ -20,6 +20,11 @@
   gemini = "google/gemini-3-pro-preview";
   zen = "opencode/minimax-m2.5-free";
 
+  # Gemini CLI model IDs (bare names, no provider prefix)
+  gemini-pro = "gemini-3-pro-preview";
+  gemini-flash = "gemini-2.5-flash";
+  gemini-flash-lite = "gemini-2.5-flash-lite";
+
   # Aider (uses Anthropic model IDs without provider prefix)
   aider-model = "claude-sonnet-4-6";
   aider-editor = "claude-haiku-4-5";

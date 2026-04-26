@@ -7,7 +7,7 @@
 }:
 
 let
-  proModel = "gemini-3-pro-preview";
+  models = import ../../helpers/_models.nix;
 
   mkModelAlias = model: generateContentConfig: {
     modelConfig = {
@@ -143,7 +143,7 @@ in
         overrides = {
           codebase_investigator = {
             enabled = true;
-            modelConfig.model = proModel;
+            modelConfig.model = models.gemini-pro;
             runConfig.maxTurns = 50;
           };
         };
@@ -152,16 +152,16 @@ in
       modelConfigs = {
         customAliases = {
           auto = mkModelAlias "auto" { };
-          fast = mkModelAlias "gemini-2.5-flash-lite" {
+          fast = mkModelAlias models.gemini-flash-lite {
             temperature = 0;
             maxOutputTokens = 8192;
           };
-          flash = mkModelAlias "gemini-2.5-flash" {
+          flash = mkModelAlias models.gemini-flash {
             temperature = 0;
             maxOutputTokens = 16384;
           };
-          deep = mkThinkingAlias proModel "HIGH" { };
-          code = mkThinkingAlias proModel "HIGH" {
+          deep = mkThinkingAlias models.gemini-pro "HIGH" { };
+          code = mkThinkingAlias models.gemini-pro "HIGH" {
             maxOutputTokens = 65536;
           };
         };
@@ -175,7 +175,7 @@ in
       };
       # --- Model Defaults And Compression ---
       model = {
-        name = proModel;
+        name = models.gemini-pro;
         compressionThreshold = 0.75; # Wait until 75% full before compressing (was 0.5)
       };
       # --- Hooks ---
