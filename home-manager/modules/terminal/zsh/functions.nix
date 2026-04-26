@@ -4,13 +4,13 @@
   config,
   constants,
   lib,
+  secretLoader,
   ...
 }:
 
 let
-  inherit (import ../../../../shared/_secret-loader.nix) loadSecretFn;
-  inherit (constants.services.zai) timeout;
-  inherit (constants.services.zai.models) haiku sonnet opus;
+  inherit (secretLoader) loadSecretFn;
+  zaiEnv = import ../../ai-agents/helpers/_zai-env.nix { inherit constants; };
 
   # Derive OpenCode wrapper functions from profile definitions.
   # Single source: home-manager/modules/ai-agents/helpers/_opencode-profiles.nix.
@@ -83,11 +83,7 @@ in
       local key; key="$(_load_zai_key)" || return 1
       _zellij_rename_tab "clglm"
       ANTHROPIC_AUTH_TOKEN="$key" \
-      ANTHROPIC_BASE_URL="${constants.services.zai.apiRoot}/anthropic" \
-      API_TIMEOUT_MS="${toString timeout}" \
-      ANTHROPIC_DEFAULT_HAIKU_MODEL="${haiku}" \
-      ANTHROPIC_DEFAULT_SONNET_MODEL="${sonnet}" \
-      ANTHROPIC_DEFAULT_OPUS_MODEL="${opus}" \
+      ${zaiEnv.inlinePrefix} \
       claude --dangerously-skip-permissions "$@"
     }
 
