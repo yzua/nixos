@@ -1,11 +1,16 @@
 # Nix Helper (nh) build tool wrapper.
 
-{ pkgsStable, user, ... }:
+{
+  constants,
+  pkgsStable,
+  user,
+  ...
+}:
 
 {
   environment = {
     systemPackages = with pkgsStable; [ nh ];
-    sessionVariables.NH_FLAKE = "/home/${user}/System";
+    sessionVariables.NH_FLAKE = "/home/${user}/${constants.paths.systemRepo}";
   };
 
   systemd.tmpfiles.rules = [ "d /var/cache/nh 0755 root root -" ];

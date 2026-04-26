@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Helper functions for system report generation (section, query_api, safe_cmd, etc.) and JSON summary.
 
-# Service endpoints — single source of truth for observability URLs.
+# Service endpoints — derived from constants.nix via system-report.nix env vars.
+# Defaults match constants.ports + constants.localhost for standalone invocations.
 # shellcheck disable=SC2034
-NETDATA_URL="http://127.0.0.1:19999"
-LOKI_URL="http://127.0.0.1:3100"
-SCRUTINY_URL="http://127.0.0.1:8080"
+NETDATA_URL="${NETDATA_URL:-http://127.0.0.1:19999}"
+LOKI_URL="${LOKI_URL:-http://127.0.0.1:3100}"
+SCRUTINY_URL="${SCRUTINY_URL:-http://127.0.0.1:8080}"
 
 section() { printf '\n## %s\n\n' "$1"; }
 

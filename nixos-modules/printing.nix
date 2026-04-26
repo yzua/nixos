@@ -18,7 +18,7 @@
       enable = true;
       drivers = [ pkgsStable.foo2zjs ]; # Driver for HP LaserJet P1102
       listenAddresses = [ "${constants.localhost}:${toString constants.ports.cups}" ]; # Restrict to localhost for security
-      allowFrom = [ "localhost" ]; # Only allow local connections
+      allowFrom = [ constants.localhost ]; # Only allow local connections
       # PRIVACY: Disable job history and metadata retention
       extraConf = ''
         Browsing Off

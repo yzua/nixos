@@ -2,6 +2,7 @@
 
 {
   config,
+  constants,
   lib,
   pkgs,
   systemdHelpers,
@@ -41,6 +42,9 @@ let
     SYSTEM_REPORT_COLLECTORS_OBSERVABILITY = "${reportScriptsDir}/bin/report-collectors-observability.sh";
     SYSTEM_REPORT_COLLECTORS_SECURITY = "${reportScriptsDir}/bin/report-collectors-security.sh";
     AI_AGENT_LOG_DIR = "/home/${user}/.local/share/ai-agents/logs";
+    NETDATA_URL = "http://${constants.localhost}:${toString constants.ports.netdata}";
+    LOKI_URL = "http://${constants.localhost}:${toString constants.ports.loki}";
+    SCRUTINY_URL = "http://${constants.localhost}:${toString constants.ports.scrutiny}";
   };
 
   mkReportService =

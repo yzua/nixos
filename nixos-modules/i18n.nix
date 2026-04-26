@@ -7,7 +7,7 @@
 }:
 
 let
-  locale = "en_US.UTF-8";
+  inherit (constants) locale;
   localeCategories = [
     "LC_ADDRESS"
     "LC_IDENTIFICATION"

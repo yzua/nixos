@@ -2,11 +2,18 @@
 
 {
   config,
+  constants,
   inputs,
   user,
   ...
 }:
 
+let
+  mkUserSecret = _: {
+    owner = user;
+    mode = "0400";
+  };
+in
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];
 
@@ -16,39 +23,37 @@
     validateSopsFiles = true;
 
     age = {
-      keyFile = "/home/${user}/.config/sops/age/keys.txt";
+      keyFile = "/home/${user}/${constants.paths.sopsKeyDir}";
       generateKey = false;
     };
 
-    secrets = {
-      zai_api_key = {
-        owner = user;
-        mode = "0400";
+    secrets =
+      (builtins.listToAttrs (
+        map
+          (name: {
+            inherit name;
+            value = mkUserSecret name;
+          })
+          [
+            "zai_api_key"
+            "openrouter_api_key"
+            "context7_api_key"
+            "gemini_api_key"
+          ]
+      ))
+      // {
+        grafana_admin_password = {
+          owner = "grafana";
+          mode = "0400";
+        };
+        ntfy_topic = {
+          mode = "0444"; # DynamicUser service — no persistent user/group to grant access
+        };
+        noctalia_location = {
+          owner = user;
+          mode = "0444";
+        };
       };
-      openrouter_api_key = {
-        owner = user;
-        mode = "0400";
-      };
-      context7_api_key = {
-        owner = user;
-        mode = "0400";
-      };
-      gemini_api_key = {
-        owner = user;
-        mode = "0400";
-      };
-      grafana_admin_password = {
-        owner = "grafana";
-        mode = "0400";
-      };
-      ntfy_topic = {
-        mode = "0444"; # DynamicUser service — no persistent user/group to grant access
-      };
-      noctalia_location = {
-        owner = user;
-        mode = "0444";
-      };
-    };
 
     # SOPS templates: generate config files with secret interpolation.
     # Templates are rendered at activation time (not in the Nix store),

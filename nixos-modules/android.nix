@@ -4,6 +4,7 @@
 
 {
   config,
+  constants,
   pkgs,
   pkgsStable,
   lib,
@@ -12,7 +13,7 @@
 }:
 
 let
-  sdkRoot = "/home/${user}/Android/Sdk";
+  sdkRoot = "/home/${user}/${constants.paths.androidSdk}";
   nvidiaVulkanIcd = "/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json";
   sdkBuildToolsDir = "${sdkRoot}/build-tools";
   # Libraries the SDK emulator needs from the host (not bundled)
@@ -34,7 +35,7 @@ let
     case "$gpuMode" in
       software|swiftshader|swangle|lavapipe)
         export LIBGL_ALWAYS_SOFTWARE="''${LIBGL_ALWAYS_SOFTWARE:-1}"
-        export __EGL_VENDOR_LIBRARY_FILENAMES="''${__EGL_VENDOR_LIBRARY_FILENAMES:-/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json}"
+        export __EGL_VENDOR_LIBRARY_FILENAMES="''${__EGL_VENDOR_LIBRARY_FILENAMES:-${constants.paths.eglVendorFile}}"
         unset LIBVA_DRIVER_NAME
         unset GBM_BACKEND
         unset __GLX_VENDOR_LIBRARY_NAME
