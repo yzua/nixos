@@ -85,6 +85,8 @@
       };
 
       optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
+      aliasHelpers = import ./shared/_alias-helpers.nix;
+      secretLoader = import ./shared/_secret-loader.nix;
 
       makeSystem =
         { hostname, stateVersion }:
@@ -122,6 +124,8 @@
               pkgsStable
               constants
               optionHelpers
+              aliasHelpers
+              secretLoader
               ;
             inherit (host) hostname;
           };
