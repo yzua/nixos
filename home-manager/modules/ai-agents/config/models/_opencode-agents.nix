@@ -39,7 +39,24 @@ let
     "git ls-files*"
   ];
 
-  yoloPermission = "allow";
+  yoloPermission = {
+    read = "allow";
+    edit = "allow";
+    glob = "allow";
+    grep = "allow";
+    list = "allow";
+    bash = "allow";
+    task = "allow";
+    external_directory = "allow";
+    todowrite = "allow";
+    question = "allow";
+    webfetch = "allow";
+    websearch = "allow";
+    codesearch = "allow";
+    lsp = "allow";
+    doom_loop = "allow";
+    skill = "allow";
+  };
 
   readOnlyPermission = {
     read = "allow";
