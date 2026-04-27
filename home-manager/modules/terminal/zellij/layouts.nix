@@ -89,7 +89,7 @@ in
           pane size="60%" name="claude" command="${config.home.homeDirectory}/.bun/bin/claude"
           pane split_direction="horizontal" {
             pane size="50%" name="logs" command="${pkgs.bash}/bin/bash" {
-              args "-c" "tail -f ~/.local/share/opencode/log/*.log ~/.codex/log/*.log 2>/dev/null || echo 'No agent logs yet. Waiting...'; sleep infinity"
+              args "-c" "tail -f ${config.home.homeDirectory}/${constants.paths.opencodeLogDir}/*.log ${config.home.homeDirectory}/${constants.paths.codexLogDir}/*.log 2>/dev/null || echo 'No agent logs yet. Waiting...'; sleep infinity"
             }
             pane name="git" command="${pkgs.lazygit}/bin/lazygit"
           }

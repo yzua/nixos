@@ -71,6 +71,13 @@
     initContent = lib.mkAfter ''
       # Silence bgnotify D-Bus errors when notification daemon is unavailable
       __bgnotify_notifier() { notify-send "$1" "$2" 2>/dev/null || true; }
+      bgnotify_threshold=5
+
+      # Snappy vi mode (default 0.4s feels laggy)
+      KEYTIMEOUT=1
+
+      # Better autosuggestions: prefer history, fall back to completion
+      ZSH_AUTOSUGGEST_STRATEGY=(history completion)
     '';
 
     plugins = [
@@ -98,12 +105,10 @@
       "NOTIFY"
       "NUMERIC_GLOB_SORT"
       "PROMPT_SUBST"
-      "HIST_BEEP"
       "HIST_FIND_NO_DUPS"
       "HIST_IGNORE_ALL_DUPS"
       "HIST_SAVE_NO_DUPS"
       "HIST_VERIFY"
-      "INC_APPEND_HISTORY"
       "SHARE_HISTORY"
     ];
   };

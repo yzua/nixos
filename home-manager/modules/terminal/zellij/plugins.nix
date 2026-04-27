@@ -5,8 +5,8 @@
 let
   plugins = lib.mapAttrs (_: pkgs.fetchurl) {
     zjstatus = {
-      url = "https://github.com/dj95/zjstatus/releases/download/v0.21.1/zjstatus.wasm";
-      hash = "sha256-3BmCogjCf2aHHmmBFFj7savbFeKGYv3bE2tXXWVkrho=";
+      url = "https://github.com/dj95/zjstatus/releases/download/v0.23.0/zjstatus.wasm";
+      hash = "sha256-4AaQEiNSQjnbYYAh5MxdF/gtxL+uVDKJW6QfA/E4Yf8=";
     };
     zellij-autolock = {
       url = "https://github.com/fresh2dev/zellij-autolock/releases/download/0.2.2/zellij-autolock.wasm";
@@ -21,16 +21,16 @@ let
       hash = "sha256-kLSDpAt2JGj7dYYhYFh6BfvtzVwTrcs+0jHwG/nActE=";
     };
     harpoon = {
-      url = "https://github.com/Nacho114/harpoon/releases/download/v0.1.0/harpoon.wasm";
-      hash = "sha256-ytn4faMd26q7mzbE1oINM/u62SXojxawa924K98AlgI=";
+      url = "https://github.com/Nacho114/harpoon/releases/download/v0.3.0/harpoon.wasm";
+      hash = "sha256-f4z1enHx27vRFTN6MWOHgNfhjpuHbe8cgclwGIyqMvI=";
     };
     zellij-forgot = {
       url = "https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm";
       hash = "sha256-MRlBRVGdvcEoaFtFb5cDdDePoZ/J2nQvvkoyG6zkSds=";
     };
     multitask = {
-      url = "https://github.com/leakec/multitask/releases/download/0.43.1/multitask.wasm";
-      hash = "sha256-8IRkFe+JsBaAwGnFl0zOLJ5xsu1YGPhJY9LVPYg8VWA=";
+      url = "https://github.com/leakec/multitask/releases/download/v0.44.1/multitask.wasm";
+      hash = "sha256-WiM5rXpcrdNucjfcVfsmpEWq44xN+3IW+jBVsVRzXSU=";
     };
   };
 in

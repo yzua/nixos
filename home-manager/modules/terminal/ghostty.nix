@@ -42,6 +42,7 @@
       clipboard-read = "allow";
       clipboard-write = "allow";
       clipboard-paste-protection = true;
+      clipboard-trim-trailing-spaces = true;
 
       mouse-hide-while-typing = true;
       mouse-scroll-multiplier = 1;
@@ -55,7 +56,6 @@
 
       bold-is-bright = false;
       gtk-tabs-location = "hidden"; # Zellij handles multiplexing
-      window-vsync = true;
 
       keybind = [
         "ctrl+shift+c=copy_to_clipboard"

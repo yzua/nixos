@@ -194,6 +194,19 @@ in
       rm -f "$layout_file"
     }
 
+    # === Auto-rename Zellij tab to running command ===
+    if [[ -n "''${ZELLIJ:-}" ]]; then
+      _zellij_auto_tab_preexec() {
+        local name="''${2%% *}"
+        name="''${name:t}"
+        case "$name" in
+          cd|ls|ll|la|l|clear|cls|exit|source|\.|zellij) return 0 ;;
+        esac
+        command zellij action rename-tab "$name" >/dev/null 2>&1 || true
+      }
+      preexec_functions+=(_zellij_auto_tab_preexec)
+    fi
+
     # === Environment setup ===
     export GPG_TTY=$(tty)
 

@@ -12,8 +12,9 @@
     FZF_DEFAULT_COMMAND = "fd --type f --hidden --follow --exclude .git";
     FZF_CTRL_T_COMMAND = "$FZF_DEFAULT_COMMAND";
     FZF_ALT_C_COMMAND = "fd --type d --hidden --follow --exclude .git";
-    FZF_CTRL_T_OPTS = "--preview 'bat --color=always --style=numbers --line-range=:500 {}'";
-    FZF_ALT_C_OPTS = "--preview 'eza --tree --level=2 --color=always {}'";
+    FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --margin=1 --padding=1 --info=inline";
+    FZF_CTRL_T_OPTS = "$FZF_DEFAULT_OPTS --preview 'bat --color=always --style=numbers --line-range=:500 {}'";
+    FZF_ALT_C_OPTS = "$FZF_DEFAULT_OPTS --preview 'eza --tree --level=2 --color=always {}'";
 
     LS_COLORS = "di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33:cd=1;33:su=1;31:sg=1;31:tw=1;34:ow=1;34"; # Fallback if vivid unavailable
 
