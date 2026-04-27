@@ -89,7 +89,6 @@ Your Ghostty setup includes:
 | Selection highlight        | Inverted fg/bg                  | Clear visibility when selecting text          |
 | Bold is bright             | Disabled                        | Bold text stays same color (cleaner look)     |
 | GTK tabs                   | Hidden                          | Zellij handles multiplexing                   |
-| VSync                      | Enabled                         | Smooth scrolling on Wayland                   |
 | Auto-update                | Off                             | Managed by Nix                                |
 
 ---
