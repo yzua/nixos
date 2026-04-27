@@ -87,6 +87,7 @@
       optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
       aliasHelpers = import ./shared/_alias-helpers.nix;
       secretLoader = import ./shared/_secret-loader.nix;
+      hmSystemdHelpers = import ./shared/_hm-systemd-helpers.nix { inherit (nixpkgs) lib; };
 
       makeSystem =
         { hostname, stateVersion }:
@@ -126,6 +127,7 @@
               optionHelpers
               aliasHelpers
               secretLoader
+              hmSystemdHelpers
               ;
             inherit (host) hostname;
           };

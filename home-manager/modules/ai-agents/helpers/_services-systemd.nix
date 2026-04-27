@@ -5,16 +5,11 @@
   pkgs,
   logCleanupCommand,
   mkCliAutoupdateScript,
+  hmSystemdHelpers,
 }:
 let
-  mkWeeklyTimer = description: {
-    Unit.Description = description;
-    Timer = {
-      OnCalendar = "weekly";
-      Persistent = true;
-    };
-    Install.WantedBy = [ "timers.target" ];
-  };
+  inherit (hmSystemdHelpers) mkWeeklyTimer;
+
   autoUpdateTools = [
     {
       binary = "claude";
@@ -80,13 +75,15 @@ lib.mkIf cfg.logging.enable {
   );
 
   timers = {
-    ai-agent-log-cleanup = mkWeeklyTimer "Weekly AI agent log cleanup";
-    opencode-db-vacuum = mkWeeklyTimer "Weekly OpenCode database vacuum";
+    ai-agent-log-cleanup = mkWeeklyTimer { description = "Weekly AI agent log cleanup"; };
+    opencode-db-vacuum = mkWeeklyTimer { description = "Weekly OpenCode database vacuum"; };
   }
   // builtins.listToAttrs (
     map (
       tool:
-      lib.nameValuePair "${tool.binary}-autoupdate" (mkWeeklyTimer "Weekly ${tool.label} auto-update")
+      lib.nameValuePair "${tool.binary}-autoupdate" (mkWeeklyTimer {
+        description = "Weekly ${tool.label} auto-update";
+      })
     ) autoUpdateTools
   );
 }

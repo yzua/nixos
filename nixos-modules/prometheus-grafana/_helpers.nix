@@ -4,6 +4,7 @@
 
 let
   inherit (constants) localhost ports;
+  urls = import ../helpers/_service-urls.nix { inherit constants; };
 
   mkStaticConfig = targets: [ { inherit targets; } ];
 
@@ -37,7 +38,7 @@ let
     (mkDatasource {
       name = "Prometheus";
       type = "prometheus";
-      url = "http://${localhost}:${toString ports.prometheus}";
+      url = urls.prometheus;
       uid = "prometheus";
       isDefault = true;
     })

@@ -1,52 +1,55 @@
 # Glance dashboard service health check endpoints.
 # Port numbers are injected from constants.ports to avoid drift.
 
-{ localhost, ports }:
+{ constants }:
 
+let
+  urls = import ../helpers/_service-urls.nix { inherit constants; };
+in
 [
   {
     title = "Glance";
-    url = "http://${localhost}:${toString ports.glance}";
+    url = urls.glance;
     icon = "mdi:view-dashboard-outline";
   }
   {
     title = "Netdata";
-    url = "http://${localhost}:${toString ports.netdata}";
+    url = urls.netdata;
     icon = "si:netdata";
   }
   {
     title = "Grafana";
-    url = "http://${localhost}:${toString ports.grafana}";
+    url = urls.grafana;
     icon = "si:grafana";
   }
   {
     title = "Prometheus";
-    url = "http://${localhost}:${toString ports.prometheus}";
+    url = urls.prometheus;
     icon = "si:prometheus";
   }
   {
     title = "Alertmanager";
-    url = "http://${localhost}:${toString ports.alertmanager}";
+    url = urls.alertmanager;
     icon = "mdi:alert-outline";
   }
   {
     title = "Scrutiny";
-    url = "http://${localhost}:${toString ports.scrutiny}";
+    url = urls.scrutiny;
     icon = "mdi:harddisk";
   }
   {
     title = "I2PD Webconsole";
-    url = "http://${localhost}:${toString ports.i2pd-webconsole}";
+    url = urls.i2pd-webconsole;
     icon = "mdi:router-network";
   }
   {
     title = "Syncthing";
-    url = "http://${localhost}:${toString ports.syncthing}";
+    url = urls.syncthing;
     icon = "si:syncthing";
   }
   {
     title = "ActivityWatch";
-    url = "http://${localhost}:${toString ports.activitywatch}";
+    url = urls.activitywatch;
     icon = "mdi:clock-check-outline";
   }
 ]

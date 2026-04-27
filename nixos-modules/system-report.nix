@@ -24,6 +24,8 @@ let
 
   cfg = config.mySystem.systemReport;
 
+  serviceUrls = import ./helpers/_service-urls.nix { inherit constants; };
+
   # Standard hardening for system-report services
   reportHardening = mkServiceHardening { readWritePaths = [ cfg.outputDir ]; };
 
@@ -42,9 +44,9 @@ let
     SYSTEM_REPORT_COLLECTORS_OBSERVABILITY = "${reportScriptsDir}/bin/report-collectors-observability.sh";
     SYSTEM_REPORT_COLLECTORS_SECURITY = "${reportScriptsDir}/bin/report-collectors-security.sh";
     AI_AGENT_LOG_DIR = "/home/${user}/.local/share/ai-agents/logs";
-    NETDATA_URL = "http://${constants.localhost}:${toString constants.ports.netdata}";
-    LOKI_URL = "http://${constants.localhost}:${toString constants.ports.loki}";
-    SCRUTINY_URL = "http://${constants.localhost}:${toString constants.ports.scrutiny}";
+    NETDATA_URL = serviceUrls.netdata;
+    LOKI_URL = serviceUrls.loki;
+    SCRUTINY_URL = serviceUrls.scrutiny;
   };
 
   mkReportService =

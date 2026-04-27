@@ -5,6 +5,7 @@
 # at nixos-modules/security/metadata-scrubber.nix.
 
 {
+  hmSystemdHelpers,
   lib,
   pkgs,
   pkgsStable,
@@ -12,6 +13,8 @@
 }:
 
 let
+  inherit (hmSystemdHelpers) mkWeeklyTimer;
+
   scrubberBinPath = lib.makeBinPath [
     pkgsStable.coreutils
     pkgsStable.mat2
@@ -132,15 +135,10 @@ in
       };
     };
 
-    timers.metadata-scrubber-full = {
-      Unit.Description = "Weekly full metadata scrub";
-      Timer = {
-        OnCalendar = "weekly";
-        Persistent = true;
-        RandomizedDelaySec = "2h";
-        Unit = "metadata-scrubber-full.service";
-      };
-      Install.WantedBy = [ "timers.target" ];
+    timers.metadata-scrubber-full = mkWeeklyTimer {
+      description = "Weekly full metadata scrub";
+      randomizedDelaySec = "2h";
+      unit = "metadata-scrubber-full.service";
     };
   };
 }
