@@ -4,6 +4,7 @@
   aliasHelpers,
   config,
   constants,
+  hmSystemdHelpers,
   lib,
   pkgs,
   secretLoader,
@@ -39,16 +40,16 @@ let
       constants
       lib
       pkgs
+      scriptsDir
       secretLoader
       ;
   };
 
   aliasLib = import ./helpers/_aliases.nix {
     inherit
-      config
-      constants
       lib
       pkgs
+      scriptsDir
       ;
   };
   inherit (aliasLib) aiAliases aiAgentLauncher aiAgentInventory;
@@ -71,6 +72,7 @@ let
       pkgs
       logCleanupCommand
       mkCliAutoupdateScript
+      hmSystemdHelpers
       ;
   };
 in
