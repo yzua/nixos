@@ -17,9 +17,8 @@ let
   inherit (mcpTransforms) sharedMcpServers claudeMcpServers;
 
   settingsBuilders = import ../helpers/_settings-builders.nix { inherit cfg config lib; };
-  inherit (settingsBuilders) claudeSettings;
+  inherit (settingsBuilders) claudeSettings opencodeProfiles;
 
-  opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
   opencodeConfigPaths = map opencodeProfiles.configPath opencodeProfiles.names;
   opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
 
@@ -69,12 +68,14 @@ let
       claudeMcpServers
       ;
   };
+  opencodeProfileNames = opencodeProfiles.names;
+
   pluginInstalls = import ./plugins.nix {
     inherit
       cfg
-      config
       pkgs
       lib
+      opencodeProfileNames
       ;
   };
   skillInstallation = import ./skills.nix {

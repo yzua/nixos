@@ -102,5 +102,6 @@ in
     opencodeSettings
     geminiSettings
     opencodeSettingsByProfile
+    opencodeProfiles
     ;
 }

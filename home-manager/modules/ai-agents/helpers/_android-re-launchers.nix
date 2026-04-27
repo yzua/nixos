@@ -3,10 +3,10 @@
   constants,
   lib,
   pkgs,
+  scriptsDir,
   secretLoader,
 }:
 let
-  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
   launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
   inherit (secretLoader) loadSecretFn;
   zaiEnv = import ./_zai-env.nix { inherit constants; };

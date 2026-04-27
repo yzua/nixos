@@ -2,13 +2,12 @@
 
 {
   cfg,
-  config,
   pkgs,
   lib,
+  opencodeProfileNames,
 }:
 
 let
-  opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
   gitCloneUpdate = import ../helpers/_git-clone-update.nix { inherit pkgs; };
 in
 
@@ -48,7 +47,7 @@ in
 
       ${lib.optionalString cfg.opencode.enable ''
         if [[ -d "$IMPECCABLE_DIR/dist/opencode/.opencode/skills" ]]; then
-          for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfiles.names)}; do
+          for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfileNames)}; do
             skills_dir="$HOME/.config/$profile/skills"
             mkdir -p "$skills_dir"
             for src in "$IMPECCABLE_DIR"/dist/opencode/.opencode/skills/*; do

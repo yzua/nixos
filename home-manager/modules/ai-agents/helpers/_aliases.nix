@@ -4,15 +4,13 @@
 # dispatch (launcher/iter). Adding or renaming an alias requires updating both files.
 
 {
-  config,
-  constants,
   lib,
   pkgs,
+  scriptsDir,
   ...
 }:
 
 let
-  scriptsDir = "${config.home.homeDirectory}/${constants.paths.scripts}";
   models = import ./_models.nix;
   workflowPrompts = import ./_workflow-prompts.nix { };
   commitSplitPrompt = workflowPrompts.commitSplit;

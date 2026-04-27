@@ -21,9 +21,9 @@ let
   inherit (settingsBuilders)
     geminiSettings
     opencodeSettingsByProfile
+    opencodeProfiles
     ;
 
-  opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   opencodeProfileNames = opencodeProfiles.names;
   opencodeGruvboxDarkTheme = toJSON (
     import ./helpers/_opencode-gruvbox-theme.nix { inherit (constants) color; }

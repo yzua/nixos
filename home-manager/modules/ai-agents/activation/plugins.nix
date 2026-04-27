@@ -4,9 +4,9 @@
 
 {
   cfg,
-  config,
   pkgs,
   lib,
+  opencodeProfileNames,
 }:
 
 let
@@ -16,9 +16,9 @@ let
   impeccable = import ./_plugin-impeccable.nix {
     inherit
       cfg
-      config
       pkgs
       lib
+      opencodeProfileNames
       ;
   };
   agencyAgents = import ./_plugin-agency-agents.nix {
@@ -27,16 +27,20 @@ let
   everythingClaudeCode = import ./_plugin-everything-claude-code.nix {
     inherit
       cfg
-      config
       pkgs
       lib
+      opencodeProfileNames
       ;
   };
   cleanupAgencyAgents = import ./_cleanup-agency-agents.nix {
     inherit cfg lib preservedClaudeAgents;
   };
   cleanupEverythingClaudeCode = import ./_cleanup-everything-claude-code.nix {
-    inherit cfg config lib;
+    inherit
+      cfg
+      lib
+      opencodeProfileNames
+      ;
   };
 in
 impeccable
