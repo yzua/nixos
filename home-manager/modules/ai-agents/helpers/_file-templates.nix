@@ -1,8 +1,8 @@
 # Static file templates for AI agent support files.
 #
 # Agent concepts (implementation-engineer, static-recon, protocol-triage, security-reviewer)
-# are defined once as canonical records and derived into Claude agent files,
-# Gemini commands, and Gemini skills.
+# are defined once as canonical records and derived into Claude agent files
+# and Gemini commands.
 
 let
   # Canonical agent concept definitions — single source of truth.
@@ -79,34 +79,6 @@ let
 
         Rules:
         - ${rulesText}
-      '';
-    };
-
-  # Derive Gemini skill file from canonical definition.
-  mkGeminiSkill =
-    name: concept:
-    let
-      rulesLines = map (r: "- ${r}") concept.rules;
-      # Title: known display names for skill headings
-      titles = {
-        implementation-engineer = "Implementation Engineer";
-        static-recon = "Static Recon";
-        protocol-triage = "Protocol Triage";
-        security-reviewer = "Security Reviewer";
-      };
-      title = titles.${name} or (builtins.replaceStrings [ "-" ] [ " " ] name);
-    in
-    {
-      name = "${name}/SKILL.md";
-      value = ''
-        ---
-        name: ${name}
-        description: ${concept.description} ${concept.skillContext}
-        ---
-
-        # ${title}
-
-        ${builtins.concatStringsSep "\n" rulesLines}
       '';
     };
 in
@@ -197,82 +169,6 @@ in
 
       Do not start editing until the plan is explicit.
       """
-    '';
-  };
-
-  geminiSkills = (builtins.listToAttrs (mapAttrsToList mkGeminiSkill agentConcepts)) // {
-    "code-reviewer/SKILL.md" = ''
-      ---
-      name: code-reviewer
-      description: Review code for quality, security, and best practices. Use when asked to review code, PRs, or diffs.
-      ---
-
-      # Code Reviewer
-
-      ## When to Activate
-      - User asks to review code, a PR, or a diff
-      - User asks "is this code good?" or "any issues with this?"
-
-      ## Review Checklist
-      1. **Correctness**: Does the logic do what it claims?
-      2. **Edge cases**: Missing null checks, empty arrays, boundary conditions
-      3. **Security**: SQL injection, XSS, hardcoded secrets, unsafe deserialization
-      4. **Performance**: N+1 queries, unnecessary allocations, missing indexes
-      5. **Maintainability**: Clear naming, reasonable function size, no dead code
-      6. **Error handling**: Are errors caught? Are error messages useful?
-      7. **Tests**: Are critical paths tested? Are edge cases covered?
-
-      ## Output Format
-      - Rate severity: 🔴 Critical | 🟡 Warning | 🟢 Suggestion
-      - Be specific: include file path and line number
-      - Suggest fixes, not just problems
-      - Acknowledge what's done well (briefly)
-
-      ## Style
-      - Concise, no fluff
-      - Group by file
-      - Most critical issues first
-    '';
-
-    "pr-creator/SKILL.md" = ''
-      ---
-      name: pr-creator
-      description: Create well-structured pull requests with clear descriptions. Use when asked to create a PR or prepare changes for review.
-      ---
-
-      # PR Creator
-
-      ## When to Activate
-      - User asks to create a PR or prepare changes for review
-      - User says "submit this" or "make a PR"
-
-      ## PR Structure
-      1. **Title**: Concise, imperative mood ("Add auth middleware", not "Added auth middleware")
-      2. **Summary**: 1-3 bullet points of what changed and why
-      3. **Type**: Feature | Fix | Refactor | Docs | Chore
-      4. **Testing**: What was tested and how
-      5. **Breaking changes**: List any, or "None"
-
-      ## Workflow
-      1. Review all uncommitted changes (`git diff`, `git status`)
-      2. Group related changes into logical commits
-      3. Write commit messages (conventional commits style)
-      4. Create PR with `gh pr create`
-      5. Add appropriate labels if available
-
-      ## Commit Message Format
-      ```
-      type(scope): brief description
-
-      Longer explanation if needed.
-      ```
-      Types: feat, fix, refactor, docs, test, chore, perf
-
-      ## Rules
-      - Never include unrelated changes
-      - Never commit secrets, .env files, or credentials
-      - Always run project lint/test before creating PR
-      - Draft PR if work is incomplete
     '';
   };
 }

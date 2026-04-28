@@ -115,7 +115,7 @@ in
         };
       }
 
-      # === Gemini Files (Settings, Commands, Skills) ===
+      # === Gemini Files (Settings, Commands, Policies) ===
       (lib.mkIf cfg.gemini.enable (
         {
           ".gemini/settings.json" = {
@@ -124,7 +124,6 @@ in
           };
         }
         // (mkTextFiles ".gemini/commands" fileTemplates.geminiCommands)
-        // (mkTextFiles ".gemini/skills" fileTemplates.geminiSkills)
         // (mkTextFiles ".gemini/policies" geminiPolicies)
       ))
     ];
