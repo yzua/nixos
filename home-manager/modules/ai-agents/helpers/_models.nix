@@ -28,4 +28,5 @@
   # Aider (uses Anthropic model IDs without provider prefix)
   aider-model = "claude-sonnet-4-6";
   aider-editor = "claude-haiku-4-5";
+
 }

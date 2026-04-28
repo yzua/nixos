@@ -1,4 +1,9 @@
 # Cleanup for disabled Everything Claude Code.
+#
+# Removes all ECC assets unconditionally across all agent profiles when the
+# top-level `everythingClaudeCode.enable` is false, regardless of per-agent
+# toggles (claude/codex/opencode). This is intentional: cleanup must be thorough
+# to avoid orphaned files from a previous activation where ECC was enabled.
 
 {
   cfg,

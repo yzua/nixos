@@ -23,7 +23,11 @@ let
   opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
 
   zaiFilters = import ../helpers/_zai-filters.nix { inherit lib constants; };
-  inherit (zaiFilters) opencodeZaiFilter claudeZaiFilter geminiZaiFilter;
+  inherit (zaiFilters)
+    opencodeZaiFilter
+    claudeZaiFilter
+    geminiZaiFilter
+    ;
   githubPlaceholderFilter = ''
     walk(if type == "string" then gsub("__GITHUB_TOKEN_PLACEHOLDER__"; $token) else . end)
   '';
@@ -86,6 +90,7 @@ let
       toJSON
       ;
   };
+
 in
 {
   config = lib.mkIf cfg.enable {
