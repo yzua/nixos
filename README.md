@@ -227,7 +227,6 @@ scripts/                      # Utility scripts (ai/, build/, apps/, hardware/, 
 secrets/secrets.yaml          # Encrypted secrets (sops-nix)
 dev-shells/                   # Per-language dev shell templates (nix flake init -t)
 guides/                       # User-facing tool guides (AI Agents, Ghostty, Niri, Neovim, Yazi, Zellij)
-skills/                       # AI agent skill symlinks (Nix/NixOS/Shell skills, managed by skills CLI via HM activation)
 themes/                       # GruvboxAlt theme overrides (LibreWolf CSS, Telegram Desktop, YouTube Music)
 ```
 

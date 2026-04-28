@@ -144,11 +144,11 @@ source "$(dirname "$0")/../lib/logging.sh"
 | `system/report/report-collectors-security.sh`      | Sourced by `system/report/report-collectors.sh`                                                                          |
 | `system/report/report-helpers.sh`                  | Sourced by `system-report.sh`                                                                                            |
 | `ai/agent-launcher.sh`                             | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-launcher` wrapper)                                      |
-| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/services.nix` (`ai-agent-log-wrapper` wrapper)                                           |
-| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/services.nix` (`ai-agent-analyze` wrapper)                                               |
-| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/services.nix` (`ai-agent-dashboard` wrapper)                                             |
+| `ai/agent-log-wrapper.sh`                          | `home-manager/modules/ai-agents/packages.nix` (`ai-agent-log-wrapper` wrapper)                                           |
+| `ai/agent-analyze.sh`                              | `home-manager/modules/ai-agents/packages.nix` (`ai-agent-analyze` wrapper)                                               |
+| `ai/agent-dashboard.sh`                            | `home-manager/modules/ai-agents/packages.nix` (`ai-agent-dashboard` wrapper)                                             |
 | `ai/agent-inventory.sh`                            | `home-manager/modules/ai-agents/helpers/_aliases.nix` (`ai-agent-inventory` wrapper)                                     |
-| `ai/agent-iter.sh`                                 | `home-manager/modules/ai-agents/services.nix` (iterative agent loop wrapper)                                             |
+| `ai/agent-iter.sh`                                 | `home-manager/modules/ai-agents/packages.nix` (iterative agent loop wrapper)                                             |
 | `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/config/models/opencode.nix` (prompt docs), called at runtime by `opencode-android-re.sh` |
 | `ai/android-re/opencode-android-re.sh`             | `home-manager/modules/ai-agents/helpers/_android-re-launchers.nix` (launcher for `oc*are` wrapper binaries)              |
 | `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                                                         |

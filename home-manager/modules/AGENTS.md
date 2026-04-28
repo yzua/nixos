@@ -13,7 +13,7 @@ modules/
 │   ├── default.nix     # Import hub (options, activation, files, services, config)
 │   ├── options.nix     # All programs.aiAgents option definitions
 │   ├── files.nix       # home.file + xdg.configFile declarations
-│   ├── services.nix    # Packages, zsh aliases, systemd user services/timers, log analysis
+│   ├── packages.nix    # Packages, zsh aliases, systemd user services/timers, log analysis
 │   ├── helpers/        # Shared logic (not modules, imported by others)
 │   │   ├── _settings-builders.nix # Per-agent settings + profile variant overrides
 │   │   ├── _mcp-transforms.nix    # Unified MCP abstraction (shared → agent-specific)
@@ -48,7 +48,8 @@ modules/
 │   │   ├── _plugin-everything-claude-code.nix # ECC skill install
 │   │   ├── _cleanup-agency-agents.nix # Agency agents cleanup on disable
 │   │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
-│   │   └── skills.nix       # Skill installations and omissions
+│   │   ├── skills.nix       # Skill installations and omissions
+│   │   └── pi-setup.nix     # Pi CLI setup (npm install, config dirs)
 │   ├── android-re/     # Android RE workflow prompts and config
 │   │   ├── _prompt.nix # Prompt templates (not a module, imported by services)
 │   │   └── prompts/    # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
@@ -66,11 +67,14 @@ modules/
 │       │   ├── _hooks-post-tool-use.nix # Post-tool-use auto-format hooks
 │       │   ├── _hooks-session.nix      # Session lifecycle hooks
 │       │   └── _permission-rules.nix # Claude allow/deny rules (not a module)
-│       └── models/          # Model/provider registries
+│       ├── pi/                # Pi CLI agent extension
+│       │   └── mcp-extension.ts # MCP server extension for Pi coding agent
+│       └── models/            # Model/provider registries
 │           ├── default.nix  # Import hub + shared toggles (agencyAgents, impeccable)
 │           ├── codex.nix    # Codex CLI config (model, profiles, custom agents, developer instructions)
 │           ├── gemini.nix   # Gemini CLI config (settings, theming, model aliases, auto-format hooks)
 │           ├── opencode.nix # OpenCode config (agents, LSP, providers)
+│           ├── pi.nix       # Pi CLI config (model, thinking level, UI settings)
 │           ├── _opencode-agents.nix # OpenCode agent definitions
 │           ├── _opencode-commands.nix # OpenCode slash command definitions
 │           ├── _opencode-android-re.nix # OpenCode Android RE agent definition

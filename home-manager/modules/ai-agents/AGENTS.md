@@ -19,7 +19,7 @@ The system follows a strict unidirectional flow:
 3. **Helpers** (`helpers/`): Shared logic imported by config, activation, and files modules.
 4. **File Generation** (`files.nix`): Declares configuration files in XDG paths.
 5. **Activation Logic** (`activation/`): Handles late-stage secret injection, config setup, best-effort skill management, and state caching.
-6. **Services** (`services.nix`): Packages, zsh aliases, systemd user services/timers, and log analysis tools.
+6. **Services** (`packages.nix`): Packages, zsh aliases, systemd user services/timers, and log analysis tools.
 
 ### Profile-Driven Polymorphism
 
@@ -46,7 +46,7 @@ ai-agents/
 ├── default.nix              # Import hub (options, activation, files, services, config)
 ├── options.nix              # All programs.aiAgents option definitions
 ├── files.nix                # home.file + xdg.configFile declarations
-├── services.nix             # Packages, zsh aliases, systemd user services/timers, log analysis
+├── packages.nix             # Packages, zsh aliases, systemd user services/timers, log analysis
 ├── helpers/                 # Shared logic (not modules, imported by others)
 │   ├── _settings-builders.nix   # Per-agent settings + profile variant overrides
 │   ├── _mcp-transforms.nix      # Unified MCP abstraction (shared → agent-specific schemas)
@@ -90,7 +90,7 @@ ai-agents/
 │   ├── _plugin-everything-claude-code.nix # ECC skill install
 │   ├── _cleanup-agency-agents.nix # Agency agents cleanup on disable
 │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
-│   └── skills.nix           # Skill installations and omissions
+│   ├── skills.nix           # Skill installations and omissions
 ├── android-re/              # Android RE workflow prompts and config
 │   ├── _prompt.nix          # Prompt templates (not a module, imported by services)
 │   └── prompts/             # RE session prompts and operator guides
