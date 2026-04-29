@@ -8,16 +8,17 @@ Parent modules (`opensnitch.nix`, `sops.nix`, `tor.nix`) handle togglable securi
 
 ## Module Map
 
-| File                    | Purpose                                                                                                      | Guarded?                           |
+| File | Purpose | Guarded? |
+| `default.nix` | Import hub — aggregates all sub-modules | — |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
-| `hardening.nix`         | Kernel sysctl, AppArmor, PAM core dumps, sudo, hidepid=2, coredump                                           | Always-on                          |
-| `firewall.nix`          | nftables firewall, LLMNR/NetBIOS/SMB hostname leak prevention                                                | Always-on                          |
-| `services.nix`          | dbus-broker and journald hardening                                                                           | Always-on                          |
-| `lynis.nix`             | Weekly Lynis security audit timer + service (owns `lynis` package)                                           | `mySystem.lynis.enable`            |
-| `fail2ban.nix`          | Intrusion prevention (5 retries, 1h ban, exponential backoff, owns `audit` package)                          | `mySystem.fail2ban.enable`         |
+| `hardening.nix` | Kernel sysctl, AppArmor, PAM core dumps, sudo, hidepid=2, coredump | Always-on |
+| `firewall.nix` | nftables firewall, LLMNR/NetBIOS/SMB hostname leak prevention | Always-on |
+| `services.nix` | dbus-broker and journald hardening | Always-on |
+| `lynis.nix` | Weekly Lynis security audit timer + service (owns `lynis` package) | `mySystem.lynis.enable` |
+| `fail2ban.nix` | Intrusion prevention (5 retries, 1h ban, exponential backoff, owns `audit` package) | `mySystem.fail2ban.enable` |
 | `metadata-scrubber.nix` | System-side metadata scrubber tooling (`mat2`, `exiftool`, `inotify-tools`) for the user-level watcher/timer | `mySystem.metadataScrubber.enable` |
-| `opsec.nix`             | Session locking, zram swap, Chrony NTS                                                                       | Always-on                          |
-| `aide.nix`              | AIDE file integrity monitoring (weekly scan, owns `aide` package)                                            | `mySystem.aide.enable`             |
+| `opsec.nix` | Session locking, zram swap, Chrony NTS | Always-on |
+| `aide.nix` | AIDE file integrity monitoring (weekly scan, owns `aide` package) | `mySystem.aide.enable` |
 
 ---
 
