@@ -58,6 +58,7 @@ ai-agents/
 │   ├── _workflow-prompts.nix    # Workflow prompt definitions
 │   ├── _zai-services.nix        # Z.AI MCP service registry
 │   ├── _zai-filters.nix         # Z.AI MCP jq filter generation
+│   ├── _zai-config.nix          # Z.AI API root, timeout, model identifiers
 │   ├── _android-re-launchers.nix         # Android RE emulator/script launchers
 │   ├── _mk-cli-autoupdate-script.nix     # CLI autoupdate script builder
 │   ├── _services-shell-aliases.nix       # Shell alias definitions for agent services

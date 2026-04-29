@@ -71,7 +71,6 @@ scripts/
 │   ├── fzf-theme.sh         # FZF theme configuration (Gruvbox colors)
 │   └── require.sh           # Shared dependency assertion helpers
 ├── sops/
-│   ├── editor-code-wait.sh  # VS Code wait wrapper for sops editing
 │   └── sops-edit.sh         # Secrets editor (RAM-backed tmpfs, age encryption)
 ├── system/
 │   └── report/

@@ -26,9 +26,9 @@
 
 - System entrypoint: `hosts/<host>/configuration.nix`, which imports `../../nixos-modules`.
 - Home Manager entrypoint: `home-manager/home.nix`, which imports `./modules` and `./packages`.
-- Home Manager is standalone here, not a NixOS module: HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs`: `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, `aliasHelpers`, `secretLoader`, `hmSystemdHelpers`, and `hostname`.
+- Home Manager is standalone here, not a NixOS module: HM code cannot rely on NixOS `config.*`; shared values arrive through flake `extraSpecialArgs`: `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, `secretLoader`, `hmSystemdHelpers`, and `hostname`.
 - NixOS modules receive `specialArgs`: `inputs`, `stateVersion`, `hostname`, `user`, `pkgsStable`, `pkgConfig`, `constants`, `systemdHelpers`, and `optionHelpers`.
-- `shared/` contains cross-cutting code: `constants.nix` (identity/ports/theme defaults), `_option-helpers.nix`, `_alias-helpers.nix`, `_secret-loader.nix`, `_hm-systemd-helpers.nix`. Import via relative path from the consumer.
+- `shared/` contains cross-cutting code: `constants.nix` (identity/ports/theme defaults), `_option-helpers.nix`, `_secret-loader.nix`, `_hm-systemd-helpers.nix`. Import via relative path from the consumer.
 - System feature toggles live under `mySystem.*`; set `mySystem.hostProfile` first and override deltas. Put cross-module assertions in `nixos-modules/validation.nix`, not feature modules.
 
 ## Gotchas

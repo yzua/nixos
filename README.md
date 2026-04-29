@@ -203,11 +203,10 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### User-level (Home Manager)
 
-| Service       | Port  | Purpose                      |
-| ------------- | ----- | ---------------------------- |
-| ActivityWatch | 5600  | App usage tracking           |
-| Syncthing     | 8384  | File synchronization         |
-| LocalSend     | 53317 | Local file sharing (TCP/UDP) |
+| Service       | Port | Purpose              |
+| ------------- | ---- | -------------------- |
+| ActivityWatch | 5600 | App usage tracking   |
+| Syncthing     | 8384 | File synchronization |
 
 ---
 

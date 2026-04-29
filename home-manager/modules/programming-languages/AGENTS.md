@@ -26,7 +26,7 @@ Keep this directory focused on developer toolchains; app behavior belongs in `ho
 - Put runtime binaries in `home.packages`; put shell/session wiring in `home.sessionVariables` and `home.sessionPath`.
 - Activation hooks are allowed for workspace/bootstrap tasks (`lib.hm.dag.entryAfter [ "writeBoundary" ]`).
 - `mise` is configured with Python disabled (`disable_tools = [ "python" ]`); Python ownership stays in `python/`.
-- Each language gets its own subdirectory. Shared alias wiring is at repo-root `shared/_alias-helpers.nix` (imported via `../../../../shared/_alias-helpers.nix` from each language module).
+- Each language gets its own subdirectory. Shell aliases are applied to both zsh and bash via the local `mkShellAliasPrograms` function in `terminal/zsh/aliases.nix`.
 
 ---
 

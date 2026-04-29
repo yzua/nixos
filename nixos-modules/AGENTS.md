@@ -15,7 +15,7 @@ The module system follows a strict layout:
 - **Feature Modules**: Single files like `gaming.nix`, `nvidia.nix`, or `backup.nix` that manage specific subsystems.
 - **Sub-module Directories**: Paths like `security/`, `cleanup/`, `glance/`, `prometheus-grafana/` that have their own internal hubs.
 - **helpers/**: Internal helpers (`_systemd-helpers.nix`, `_service-urls.nix`). Not in the hub; import manually.
-- **`../shared/`**: Cross-cutting helpers (`constants.nix` for identity/defaults, `_option-helpers.nix` for typed option constructors, `_secret-loader.nix` for secret loading, `_alias-helpers.nix` for alias utilities, `_hm-systemd-helpers.nix` for HM systemd unit helpers). Lives at repo root, not inside this directory. Import via `../shared/`.
+- **`../shared/`**: Cross-cutting helpers (`constants.nix` for identity/defaults, `_option-helpers.nix` for typed option constructors, `_secret-loader.nix` for secret loading, `_hm-systemd-helpers.nix` for HM systemd unit helpers). Lives at repo root, not inside this directory. Import via `../shared/`.
 
 ## WHERE TO LOOK
 

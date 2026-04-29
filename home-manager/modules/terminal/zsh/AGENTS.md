@@ -6,13 +6,13 @@ Zsh + Oh My Zsh with Starship prompt, privacy-filtered history, agent wrapper fu
 
 ## Files
 
-| File             | Purpose                                                                 |
-| ---------------- | ----------------------------------------------------------------------- |
-| `default.nix`    | Import hub, `sessionPath` (cargo, composer, gem, uv), Docker env vars  |
-| `config.nix`     | Core zsh options: history, OMZ plugins, vi mode, setOptions (23 opts)   |
-| `aliases.nix`    | Shell aliases applied to both zsh and bash via `aliasHelpers`           |
+| File             | Purpose                                                                                             |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| `default.nix`    | Import hub, `sessionPath` (cargo, composer, gem, uv), Docker env vars                               |
+| `config.nix`     | Core zsh options: history, OMZ plugins, vi mode, setOptions (23 opts)                               |
+| `aliases.nix`    | Shell aliases applied to both zsh and bash via local `mkShellAliasPrograms`                         |
 | `functions.nix`  | `initContent`: sops secret loaders, AI agent wrappers, `aip` launcher, Zellij tab rename, LS_COLORS |
-| `local-vars.nix` | `localVariables`: editor, pager, FZF commands, XDG cache paths, tool homes |
+| `local-vars.nix` | `localVariables`: editor, pager, FZF commands, XDG cache paths, tool homes                          |
 
 ---
 
@@ -20,11 +20,12 @@ Zsh + Oh My Zsh with Starship prompt, privacy-filtered history, agent wrapper fu
 
 ### Dual-shell aliases
 
-`aliases.nix` uses `aliasHelpers` from `shared/_alias-helpers.nix` to apply the same `shellAliases` attrset to both `programs.zsh` and `programs.bash`. Always add aliases to the shared attrset — never to only one shell.
+`aliases.nix` defines a local `mkShellAliasPrograms` function that applies the same `shellAliases` attrset to both `programs.zsh` and `programs.bash`. Always add aliases to the shared attrset — never to only one shell.
 
 ### Agent wrapper functions (`functions.nix`)
 
 Agent wrappers (`claude_glm`, `opencode_*`, etc.) are zsh functions that:
+
 1. Load API keys from `/run/secrets/` via `_load_secret` (from `shared/_secret-loader.nix`).
 2. Rename the current Zellij tab with an agent icon.
 3. Launch the agent with the correct environment variables.

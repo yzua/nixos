@@ -1,6 +1,6 @@
 # Niri Compositor Configuration
 
-Scrollable tiling Wayland compositor. 8 local modules plus 1 shared helper (`_workspace-names.nix`) and 3 helper scripts (and 2 imported flake modules).
+Scrollable tiling Wayland compositor. 8 local modules plus 2 shared helpers (`_workspace-names.nix`, `_noctalia.nix`) and 3 helper scripts (and 2 imported flake modules).
 Configures `programs.niri.settings` — all settings live under that namespace.
 
 ---
@@ -18,24 +18,25 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | `idle.nix`             | Idle/DPMS                             | swayidle integration, screen lock timeout                                                      |
 | `lock.nix`             | Screen locker                         | swaylock fallback configuration                                                                |
 | `_workspace-names.nix` | Workspace display names               | Helper, imported by `main.nix`, `binds.nix`, `rules.nix` (not in import hub)                   |
+| `_noctalia.nix`        | Noctalia Shell IPC helper             | Wraps `noctalia-shell ipc call` with auto-start + retry; imported by `binds.nix`, `idle.nix`   |
 | `scripts/`             | Helper scripts                        | `color-picker.nix`, `screenshot.nix`, `open-books.nix` — each returns a derivation             |
 
 ---
 
 ## Workspaces
 
-6 named workspaces (ordered by sort key):
+6 named workspaces defined in `_workspace-names.nix`, ordered as they appear in `main.nix`:
 
-| Key          | Name    | Typical Apps                 |
-| ------------ | ------- | ---------------------------- |
-| `01-browser` | browser | LibreWolf (personal), Brave  |
-| `02-code`    | editor  | configured editor, terminals |
-| `03-social`  | social  | Telegram, Vesktop            |
-| `04-media`   | media   | YouTube Music, FreeTube      |
-| `05-vpn`     | vpn     | Mullvad VPN                  |
-| `06-android` | android | Android tools                |
+| Name    | Typical Apps                 | Keybinding |
+| ------- | ---------------------------- | ---------- |
+| browser | LibreWolf (personal), Brave  | `Mod+1`    |
+| editor  | configured editor, terminals | `Mod+2`    |
+| social  | Telegram, Vesktop            | `Mod+3`    |
+| media   | YouTube Music, FreeTube      | `Mod+4`    |
+| vpn     | Mullvad VPN                  | _(none)_   |
+| android | Android tools                | `Mod+6`    |
 
-Dynamic workspaces 7-9 available via `Mod+7` through `Mod+9`.
+Workspace `vpn` exists but has no keybinding — Mullvad/KeePassXC/i2pd windows land there via window rules. `Mod+5` focuses unnamed workspace `5` (general use). Dynamic workspaces 7-9 available via `Mod+7` through `Mod+9`.
 Window rules in `rules.nix` assign apps to workspaces by `app-id` regex.
 
 ---

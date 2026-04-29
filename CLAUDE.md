@@ -35,7 +35,7 @@ No traditional unit-test suite — validation is import/lint/eval/apply. Shell t
 
 **NixOS modules** receive: `inputs`, `stateVersion`, `hostname`, `user`, `pkgsStable`, `pkgConfig`, `constants`, `systemdHelpers`, `optionHelpers`.
 
-**Home Manager modules** receive: `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, `aliasHelpers`, `secretLoader`, `hmSystemdHelpers`, `hostname`.
+**Home Manager modules** receive: `inputs`, `homeStateVersion`, `user`, `pkgsStable`, `constants`, `optionHelpers`, `secretLoader`, `hmSystemdHelpers`, `hostname`.
 
 HM is standalone — it cannot access NixOS `config.*`. Shared values arrive only through `extraSpecialArgs`.
 
@@ -44,7 +44,6 @@ HM is standalone — it cannot access NixOS `config.*`. Shared values arrive onl
 - `shared/constants.nix` — single source of truth for user identity, terminal, editor, fonts, theme, colors, ports, paths, proxies, keyboard layout
 - `shared/_option-helpers.nix` — typed option constructors for `mySystem.*` toggles
 - `shared/_secret-loader.nix` — reads from `/run/secrets/*` (sops-nix)
-- `shared/_alias-helpers.nix` — shell alias utilities
 - `shared/_hm-systemd-helpers.nix` — systemd unit helpers for HM services
 
 ### NixOS Modules (`nixos-modules/`)

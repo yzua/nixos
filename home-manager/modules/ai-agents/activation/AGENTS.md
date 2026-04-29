@@ -21,7 +21,6 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | `_plugin-everything-claude-code.nix`  | ECC: clone, curated copy of skills/commands/agents to all profiles                       |
 | `_cleanup-agency-agents.nix`          | Removes agency-agent files when disabled, preserves curated agents                       |
 | `_cleanup-everything-claude-code.nix` | Removes ECC files from Claude/Codex/OpenCode when disabled                               |
-| `pi-setup.nix`                        | Pi CLI setup: installs npm package, creates config/extension/session directories         |
 
 ---
 

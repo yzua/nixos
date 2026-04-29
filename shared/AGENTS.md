@@ -6,13 +6,12 @@ Cross-cutting Nix expressions imported by both NixOS and Home Manager modules vi
 
 ## Files
 
-| File                    | Purpose                                                                        | Consumers                              |
-| ----------------------- | ------------------------------------------------------------------------------ | -------------------------------------- |
-| `constants.nix`         | Single source of truth: user identity, terminal/editor, fonts, theme, colors, keyboard, proxies, service ports, paths, system arch | All NixOS and HM modules via `constants` |
-| `_option-helpers.nix`   | Typed option constructors (`mkBoolOption`, `mkStrOption`, etc.)                | NixOS modules via `optionHelpers`      |
-| `_alias-helpers.nix`    | Applies `shellAliases` to both zsh and bash                                    | `terminal/zsh/aliases.nix`             |
-| `_secret-loader.nix`    | `_load_secret` bash function (reads from `/run/secrets/`)                      | `terminal/zsh/functions.nix`, ai-agents launchers |
-| `_hm-systemd-helpers.nix` | Home Manager systemd timer constructors (`mkPersistentTimer`, `mkWeeklyTimer`) | HM modules that define systemd timers  |
+| File                      | Purpose                                                                                                                            | Consumers                                         |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `constants.nix`           | Single source of truth: user identity, terminal/editor, fonts, theme, colors, keyboard, proxies, service ports, paths, system arch | All NixOS and HM modules via `constants`          |
+| `_option-helpers.nix`     | Typed option constructors (`mkBoolOption`, `mkStrOption`, etc.)                                                                    | NixOS modules via `optionHelpers`                 |
+| `_secret-loader.nix`      | `_load_secret` bash function (reads from `/run/secrets/`)                                                                          | `terminal/zsh/functions.nix`, ai-agents launchers |
+| `_hm-systemd-helpers.nix` | Home Manager systemd timer constructors (`mkPersistentTimer`, `mkWeeklyTimer`)                                                     | HM modules that define systemd timers             |
 
 ---
 
@@ -26,7 +25,6 @@ optionHelpers = import ../shared/_option-helpers.nix { inherit lib; };
 
 # From home-manager/modules/
 constants = constants; # already in extraSpecialArgs
-aliasHelpers = import ../../../shared/_alias-helpers.nix { inherit shellAliases; };
 ```
 
 The flake pre-imports all shared files and passes them as `specialArgs`/`extraSpecialArgs`, so most modules receive them as function arguments rather than importing directly.
@@ -53,4 +51,3 @@ The flake pre-imports all shared files and passes them as `specialArgs`/`extraSp
 
 - Do not add logic or side effects to `constants.nix` — it must remain a pure attrset.
 - `_option-helpers.nix` requires `{ lib }` as its argument; it is not a module.
-- `_alias-helpers.nix` takes `{ shellAliases }` and returns `programs` attrset for both zsh and bash.

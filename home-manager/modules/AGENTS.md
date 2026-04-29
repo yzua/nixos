@@ -25,6 +25,7 @@ modules/
 │   │   ├── _workflow-prompts.nix  # Workflow prompt definitions
 │   │   ├── _zai-services.nix      # Z.AI MCP service registry
 │   │   ├── _zai-filters.nix       # Z.AI MCP jq filter generation
+│   │   ├── _zai-config.nix        # Z.AI API root, timeout, model identifiers
 │   │   ├── _android-re-launchers.nix    # Android RE emulator/script launchers
 │   │   ├── _mk-cli-autoupdate-script.nix # CLI autoupdate script builder
 │   │   ├── _services-shell-aliases.nix  # Shell alias definitions for agent services
@@ -49,7 +50,6 @@ modules/
 │   │   ├── _cleanup-agency-agents.nix # Agency agents cleanup on disable
 │   │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   │   ├── skills.nix       # Skill installations and omissions
-│   │   └── pi-setup.nix     # Pi CLI setup (npm install, config dirs)
 │   ├── android-re/     # Android RE workflow prompts and config
 │   │   ├── _prompt.nix # Prompt templates (not a module, imported by services)
 │   │   └── prompts/    # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
@@ -67,14 +67,11 @@ modules/
 │       │   ├── _hooks-post-tool-use.nix # Post-tool-use auto-format hooks
 │       │   ├── _hooks-session.nix      # Session lifecycle hooks
 │       │   └── _permission-rules.nix # Claude allow/deny rules (not a module)
-│       ├── pi/                # Pi CLI agent extension
-│       │   └── mcp-extension.ts # MCP server extension for Pi coding agent
 │       └── models/            # Model/provider registries
 │           ├── default.nix  # Import hub + shared toggles (agencyAgents, impeccable)
 │           ├── codex.nix    # Codex CLI config (model, profiles, custom agents, developer instructions)
 │           ├── gemini.nix   # Gemini CLI config (settings, theming, model aliases, auto-format hooks)
 │           ├── opencode.nix # OpenCode config (agents, LSP, providers)
-│           ├── pi.nix       # Pi CLI config (model, thinking level, UI settings)
 │           ├── _opencode-agents.nix # OpenCode agent definitions
 │           ├── _opencode-commands.nix # OpenCode slash command definitions
 │           ├── _opencode-android-re.nix # OpenCode Android RE agent definition
@@ -112,6 +109,7 @@ modules/
 │   ├── main.nix        # Compositor settings (autostart, workspaces, environment, animations)
 │   ├── binds.nix       # Keybindings and custom scripts
 │   ├── _workspace-names.nix # Workspace display names (not a module, imported by main/binds/rules)
+│   ├── _noctalia.nix   # Noctalia Shell IPC helper with auto-start + retry (not a module, imported by binds/idle)
 │   ├── input.nix       # Input devices (keyboard, mouse, touchpad, trackpoint)
 │   ├── layout.nix      # Layout settings (columns, gaps, focus ring, border)
 │   ├── rules.nix       # Window rules (opacity, rounding, floating, workspace assignments)
@@ -279,7 +277,7 @@ Read these when working in those areas.
 
 ## Notes
 
-- `home.nix` receives `{ inputs, homeStateVersion, user, pkgsStable, constants, optionHelpers, aliasHelpers, secretLoader, hostname }` via `extraSpecialArgs` from flake
+- `home.nix` receives `{ inputs, homeStateVersion, user, pkgsStable, constants, optionHelpers, secretLoader, hmSystemdHelpers, hostname }` via `extraSpecialArgs` from flake
 - `hostname` available for host-specific HM config
 - `constants` available from `shared/constants.nix` (terminal, editor, font, theme, keyboard, user identity)
 - Git identity (name, email, signingKey, githubEmail) lives in `constants.user.*` — used by `terminal/tools/git/config.nix`
