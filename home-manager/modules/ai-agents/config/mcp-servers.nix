@@ -1,9 +1,9 @@
 # MCP server definitions and logging configuration.
 
-{ config, constants, ... }:
+{ config, ... }:
 
 let
-  zai = import ../helpers/_zai-services.nix { inherit constants; };
+  zai = import ../helpers/_zai-services.nix;
 
   mkZaiRemoteMcp = path: {
     enable = true;

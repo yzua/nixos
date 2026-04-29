@@ -17,12 +17,13 @@ let
   inherit (mcpTransforms) sharedMcpServers claudeMcpServers;
 
   settingsBuilders = import ../helpers/_settings-builders.nix { inherit cfg config lib; };
-  inherit (settingsBuilders) claudeSettings opencodeProfiles;
+  opencodeProfiles = import ../helpers/_opencode-profiles.nix { inherit config; };
+  inherit (settingsBuilders) claudeSettings;
 
   opencodeConfigPaths = map opencodeProfiles.configPath opencodeProfiles.names;
   opencodeConfigPathList = lib.concatMapStringsSep " " lib.escapeShellArg opencodeConfigPaths;
 
-  zaiFilters = import ../helpers/_zai-filters.nix { inherit lib constants; };
+  zaiFilters = import ../helpers/_zai-filters.nix { inherit lib; };
   inherit (zaiFilters)
     opencodeZaiFilter
     claudeZaiFilter

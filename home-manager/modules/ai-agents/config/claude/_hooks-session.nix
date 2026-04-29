@@ -1,4 +1,4 @@
-# Session lifecycle hooks — start, end, compact, notifications, permissions, failures.
+# Session lifecycle hooks — notifications, permissions, failures, stop.
 
 { mkPassthroughHook }:
 
@@ -77,70 +77,12 @@
     })
   ];
 
-  # --- Session Lifecycle Hooks ---
-  SessionStart = [
-    {
-      hooks = [
-        {
-          type = "command";
-          command = ''
-            SESSION_DIR="$HOME/.claude/session-state"
-            if [ -f "$SESSION_DIR/last-session.json" ]; then
-              echo "[Hook] Loaded previous session context" >&2
-              cat "$SESSION_DIR/last-session.json" >&2
-            fi
-            cat
-          '';
-        }
-      ];
-    }
-  ];
-
-  SessionEnd = [
-    (mkPassthroughHook {
-      body = ''
-        SESSION_DIR="$HOME/.claude/session-state"
-        mkdir -p "$SESSION_DIR"
-        GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-        echo "$INPUT" | jq --arg cwd "$PWD" --arg branch "$GIT_BRANCH" '{
-          timestamp: now,
-          reason: (.reason // .stop_reason // "other"),
-          cwd: $cwd,
-          git_branch: $branch
-        }' > "$SESSION_DIR/last-session.json" 2>/dev/null || true
-      '';
-    })
-  ];
-
   SubagentStop = [
     (mkPassthroughHook {
       body = ''
         AGENT_NAME=$(echo "$INPUT" | jq -r '.agent_name // .agent // "unknown"')
         STATUS=$(echo "$INPUT" | jq -r '.status // .stop_reason // "completed"')
         echo "[Hook] Subagent finished: $AGENT_NAME ($STATUS)" >&2
-      '';
-    })
-  ];
-
-  # --- PreCompact Hook ---
-  PreCompact = [
-    (mkPassthroughHook {
-      body = ''
-        SESSION_DIR="$HOME/.claude/session-state"
-        mkdir -p "$SESSION_DIR"
-        echo "[Hook] Saving state before compaction..." >&2
-        date -Iseconds > "$SESSION_DIR/last-compact.txt"
-      '';
-    })
-  ];
-
-  PostCompact = [
-    (mkPassthroughHook {
-      body = ''
-        SESSION_DIR="$HOME/.claude/session-state"
-        mkdir -p "$SESSION_DIR"
-        date -Iseconds > "$SESSION_DIR/last-post-compact.txt"
-        echo "[Hook] Context compaction completed" >&2
       '';
     })
   ];

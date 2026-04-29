@@ -3,16 +3,15 @@
 # and Android RE launchers (_android-re-launchers.nix).
 # The API key must be set separately by the caller (different loading mechanisms).
 
-{ constants }:
-
 let
-  inherit (constants.services.zai) timeout;
-  inherit (constants.services.zai.models) haiku sonnet opus;
+  zaiConfig = import ./_zai-config.nix;
+  inherit (zaiConfig) timeout;
+  inherit (zaiConfig.models) haiku sonnet opus;
 
   envVars = [
     {
       name = "ANTHROPIC_BASE_URL";
-      value = "${constants.services.zai.apiRoot}/anthropic";
+      value = "${zaiConfig.apiRoot}/anthropic";
     }
     {
       name = "API_TIMEOUT_MS";

@@ -3,10 +3,9 @@
 # shell scripts (scripts/ai/_agent-registry.sh).
 # Written to ~/.config/ai-agents/models.sh by files.nix.
 
-{ constants }:
-
 let
   models = import ./_models.nix;
+  zaiConfig = import ./_zai-config.nix;
 
   lines = [
     "# Auto-generated model and service config — do not edit."
@@ -18,12 +17,12 @@ let
     "AI_MODEL_GPT_DEFAULT='${models.gpt-default}'"
     "AI_MODEL_GPT_XHIGH='${models.gpt-xhigh}'"
     ""
-    "# ZAI service config (source: shared/constants.nix)"
-    "ZAI_API_ROOT='${constants.services.zai.apiRoot}'"
-    "ZAI_TIMEOUT='${toString constants.services.zai.timeout}'"
-    "ZAI_MODEL_HAIKU='${constants.services.zai.models.haiku}'"
-    "ZAI_MODEL_SONNET='${constants.services.zai.models.sonnet}'"
-    "ZAI_MODEL_OPUS='${constants.services.zai.models.opus}'"
+    "# ZAI service config (source: helpers/_zai-config.nix)"
+    "ZAI_API_ROOT='${zaiConfig.apiRoot}'"
+    "ZAI_TIMEOUT='${toString zaiConfig.timeout}'"
+    "ZAI_MODEL_HAIKU='${zaiConfig.models.haiku}'"
+    "ZAI_MODEL_SONNET='${zaiConfig.models.sonnet}'"
+    "ZAI_MODEL_OPUS='${zaiConfig.models.opus}'"
   ];
 in
 builtins.concatStringsSep "\n" lines + "\n"

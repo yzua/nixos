@@ -16,12 +16,12 @@ let
   geminiPolicies = import ./helpers/_gemini-policies.nix;
   impeccable = import ./helpers/_impeccable-commands.nix;
   models = import ./helpers/_models.nix;
-  agentEnvContent = import ./helpers/_agent-env.nix { inherit constants; };
+  agentEnvContent = import ./helpers/_agent-env.nix;
   settingsBuilders = import ./helpers/_settings-builders.nix { inherit cfg config lib; };
+  opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   inherit (settingsBuilders)
     geminiSettings
     opencodeSettingsByProfile
-    opencodeProfiles
     ;
 
   opencodeProfileNames = opencodeProfiles.names;

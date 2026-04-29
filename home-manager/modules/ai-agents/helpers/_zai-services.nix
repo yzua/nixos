@@ -1,9 +1,8 @@
 # Z.AI MCP service registry — single source of truth for service names and base URL.
 
-{ constants }:
-
 let
-  baseUrl = "${constants.services.zai.apiRoot}/mcp";
+  zaiConfig = import ./_zai-config.nix;
+  baseUrl = "${zaiConfig.apiRoot}/mcp";
 in
 rec {
   inherit baseUrl;

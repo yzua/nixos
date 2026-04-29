@@ -9,7 +9,7 @@
 let
   launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
   inherit (secretLoader) loadSecretFn;
-  zaiEnv = import ./_zai-env.nix { inherit constants; };
+  zaiEnv = import ./_zai-env.nix;
 
   mkAndroidReLauncher =
     {

@@ -151,13 +151,6 @@ in
 {
   inherit mkWorkflow;
   inherit
-    joinSections
-    userIdentity
-    universalHardRules
-    changeControl
-    ;
-  inherit sharedSections sharedSectionsWithChangeControl;
-  inherit
     commitSplitOutput
     refactorOutput
     bugfixOutput

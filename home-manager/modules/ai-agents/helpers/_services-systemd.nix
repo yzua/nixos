@@ -8,7 +8,7 @@
   hmSystemdHelpers,
 }:
 let
-  inherit (hmSystemdHelpers) mkWeeklyTimer;
+  inherit (hmSystemdHelpers) mkPersistentTimer;
 
   autoUpdateTools = [
     {
@@ -75,13 +75,13 @@ lib.mkIf cfg.logging.enable {
   );
 
   timers = {
-    ai-agent-log-cleanup = mkWeeklyTimer { description = "Weekly AI agent log cleanup"; };
-    opencode-db-vacuum = mkWeeklyTimer { description = "Weekly OpenCode database vacuum"; };
+    ai-agent-log-cleanup = mkPersistentTimer { description = "Weekly AI agent log cleanup"; };
+    opencode-db-vacuum = mkPersistentTimer { description = "Weekly OpenCode database vacuum"; };
   }
   // builtins.listToAttrs (
     map (
       tool:
-      lib.nameValuePair "${tool.binary}-autoupdate" (mkWeeklyTimer {
+      lib.nameValuePair "${tool.binary}-autoupdate" (mkPersistentTimer {
         description = "Weekly ${tool.label} auto-update";
       })
     ) autoUpdateTools

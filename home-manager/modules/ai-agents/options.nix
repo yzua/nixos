@@ -14,13 +14,18 @@ let
     mkStrOption
     mkBoolOption
     mkIntOption
-    mkAttrsOption
-    mkAttrsOfStrOption
-    mkStrListOption
-    mkLinesOption
-    mkNullOrStrOption
     mkNullableOption
     ;
+
+  # Helpers only used in this module — not shared across other modules.
+  mkAttrsOption = default: description: mkTypedOption lib.types.attrs default description;
+  mkAttrsOfStrOption =
+    default: description: mkTypedOption (lib.types.attrsOf lib.types.str) default description;
+  mkStrListOption =
+    default: description: mkTypedOption (lib.types.listOf lib.types.str) default description;
+  mkLinesOption = default: description: mkTypedOption lib.types.lines default description;
+  mkNullOrStrOption =
+    default: description: mkTypedOption (lib.types.nullOr lib.types.str) default description;
 
   # Shared Codex enum types — used by top-level, profiles, and customAgents options.
   codexPersonalityType = lib.types.enum [
