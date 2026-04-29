@@ -1,4 +1,11 @@
 # Unified systemd helpers: service hardening, persistent timers, oneshot services.
+#
+# NOTE: mkPersistentTimer here outputs NixOS systemd format
+# ({ description; wantedBy; timerConfig = { ... } }).
+# The Home Manager equivalent lives in shared/_hm-systemd-helpers.nix
+# and outputs HM systemd format ({ Unit.Description; Timer = { ... }; Install.WantedBy }).
+# They share the name but produce different schemas because HM and NixOS use
+# different systemd option structures.
 
 { lib }:
 {

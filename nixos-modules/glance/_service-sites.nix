@@ -4,7 +4,8 @@
 { constants }:
 
 let
-  urls = import ../helpers/_service-urls.nix { inherit constants; };
+  svcUrls = import ../helpers/_service-urls.nix { inherit constants; };
+  inherit (svcUrls) urls;
 in
 [
   {
@@ -41,15 +42,5 @@ in
     title = "I2PD Webconsole";
     url = urls.i2pd-webconsole;
     icon = "mdi:router-network";
-  }
-  {
-    title = "Syncthing";
-    url = urls.syncthing;
-    icon = "si:syncthing";
-  }
-  {
-    title = "ActivityWatch";
-    url = urls.activitywatch;
-    icon = "mdi:clock-check-outline";
   }
 ]

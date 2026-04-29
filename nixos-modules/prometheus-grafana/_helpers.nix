@@ -3,8 +3,11 @@
 { constants }:
 
 let
-  inherit (constants) localhost ports;
-  urls = import ../helpers/_service-urls.nix { inherit constants; };
+  svcUrls = import ../helpers/_service-urls.nix { inherit constants; };
+  inherit (svcUrls) urls;
+
+  # Strip http:// prefix for Prometheus scrape targets (needs host:port form)
+  mkTarget = url: builtins.substring 7 (builtins.stringLength url - 7) url;
 
   mkStaticConfig = targets: [ { inherit targets; } ];
 
@@ -30,9 +33,9 @@ let
       jsonData = { };
     };
 
-  netdataTarget = "${localhost}:${toString ports.netdata}";
-  lokiTarget = "${localhost}:${toString ports.loki}";
-  alertmanagerTarget = "${localhost}:${toString ports.alertmanager}";
+  netdataTarget = mkTarget urls.netdata;
+  lokiTarget = mkTarget urls.loki;
+  alertmanagerTarget = mkTarget urls.alertmanager;
 
   datasources = [
     (mkDatasource {

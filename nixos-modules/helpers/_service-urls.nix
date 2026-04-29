@@ -1,23 +1,19 @@
 # Build localhost service URLs from constants.ports.
 # Shared by monitoring modules (prometheus-grafana, glance, system-report, etc.)
+# All URLs are auto-generated — add a port to constants.ports and it gets a URL.
 
 { constants }:
 
 let
   inherit (constants) localhost ports;
   mkUrl = port: "http://${localhost}:${toString port}";
+  urls = builtins.mapAttrs (_name: mkUrl) ports;
 in
 {
-  inherit localhost ports mkUrl;
-
-  netdata = mkUrl ports.netdata;
-  loki = mkUrl ports.loki;
-  grafana = mkUrl ports.grafana;
-  prometheus = mkUrl ports.prometheus;
-  alertmanager = mkUrl ports.alertmanager;
-  scrutiny = mkUrl ports.scrutiny;
-  glance = mkUrl ports.glance;
-  i2pd-webconsole = mkUrl ports.i2pd-webconsole;
-  syncthing = mkUrl ports.syncthing;
-  activitywatch = mkUrl ports.activitywatch;
+  inherit
+    localhost
+    ports
+    mkUrl
+    urls
+    ;
 }

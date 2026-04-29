@@ -1,6 +1,6 @@
 # NetworkManager with MAC randomization, DNS delegation, and DHCP leak prevention.
 
-{ lib, ... }:
+_:
 
 {
   networking = {
@@ -30,7 +30,7 @@
     };
   };
 
-  # mkForce needed — Mullvad VPN module tries to enable resolved
+  # DNSCrypt-Proxy handles DNS — resolved must not interfere.
   # DNS chain: Apps -> dnscrypt-proxy (127.0.0.1:53) -> Mullvad tunnel -> resolver
-  services.resolved.enable = lib.mkForce false;
+  services.resolved.enable = false;
 }

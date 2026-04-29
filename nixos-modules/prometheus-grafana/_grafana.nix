@@ -60,6 +60,11 @@ in
     };
 
     systemd.services.grafana = {
+      after = [
+        "loki.service"
+        "prometheus.service"
+      ];
+      requires = [ "prometheus.service" ];
       restartTriggers = [ config.sops.secrets.grafana_admin_password.path ];
       serviceConfig = mkServiceHardening {
         memoryMax = "256M";

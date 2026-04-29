@@ -28,26 +28,12 @@ let
     ];
 
   # Generate wantedBy overrides: remove each service from multi-user.target
-  serviceOverrides =
-    builtins.listToAttrs (
-      map (name: {
-        inherit name;
-        value.wantedBy = lib.mkForce [ ];
-      }) deferredServices
-    )
-
-    # Grafana depends on Loki + Prometheus being up for datasource provisioning
-    // lib.optionalAttrs (cfg.observability.enable && cfg.loki.enable) {
-      grafana = {
-        after = [
-          "loki.service"
-          "prometheus.service"
-        ];
-        requires = [
-          "prometheus.service"
-        ];
-      };
-    };
+  serviceOverrides = builtins.listToAttrs (
+    map (name: {
+      inherit name;
+      value.wantedBy = lib.mkForce [ ];
+    }) deferredServices
+  );
 
   # Generate timers: start each deferred service 90s after boot
   timerEntries = builtins.listToAttrs (
