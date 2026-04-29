@@ -10,7 +10,7 @@
 
 let
   inherit (secretLoader) loadSecretFn;
-  zaiEnv = import ../../ai-agents/helpers/_zai-env.nix { inherit constants; };
+  zaiEnv = import ../../ai-agents/helpers/_zai-env.nix;
 
   # Derive OpenCode wrapper functions from profile definitions.
   # Single source: home-manager/modules/ai-agents/helpers/_opencode-profiles.nix.
