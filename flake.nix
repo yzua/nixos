@@ -85,25 +85,26 @@
       };
 
       optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
-      aliasHelpers = import ./shared/_alias-helpers.nix;
       secretLoader = import ./shared/_secret-loader.nix;
       hmSystemdHelpers = import ./shared/_hm-systemd-helpers.nix { inherit (nixpkgs) lib; };
+
+      # Args shared between NixOS and Home Manager specialArgs
+      sharedArgs = {
+        inherit
+          inputs
+          user
+          pkgsStable
+          constants
+          optionHelpers
+          ;
+      };
 
       makeSystem =
         { hostname, stateVersion }:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = {
-            inherit
-              inputs
-              stateVersion
-              hostname
-              user
-              pkgsStable
-              pkgConfig
-              constants
-              optionHelpers
-              ;
+          specialArgs = sharedArgs // {
+            inherit stateVersion hostname pkgConfig;
             systemdHelpers = import ./nixos-modules/helpers/_systemd-helpers.nix { inherit (nixpkgs) lib; };
           };
           modules = [ ./hosts/${hostname}/configuration.nix ];
@@ -117,18 +118,8 @@
       homeConfigurations = forEachHost (host: {
         "${user}@${host.hostname}" = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          extraSpecialArgs = {
-            inherit
-              inputs
-              homeStateVersion
-              user
-              pkgsStable
-              constants
-              optionHelpers
-              aliasHelpers
-              secretLoader
-              hmSystemdHelpers
-              ;
+          extraSpecialArgs = sharedArgs // {
+            inherit homeStateVersion secretLoader hmSystemdHelpers;
             inherit (host) hostname;
           };
           modules = [

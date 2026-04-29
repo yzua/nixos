@@ -86,7 +86,6 @@
     layout = "us,ara";
     variant = ",qwerty";
     options = "grp:caps_toggle,grp_led:caps";
-    niriExtra = "terminate:ctrl_alt_bksp";
   };
 
   # Mullvad SOCKS5 proxy endpoints for browser profiles.
@@ -125,9 +124,8 @@
     loki-grpc = 9096;
     alloy = 12345;
     ntfy-bridge = 8090;
-    i2pd-webconsole = 7070;
     i2pd-socks = 4447;
-    syncthing = 8384;
+    i2pd-webconsole = 7070;
     activitywatch = 5600;
     otel = 4317;
     vnc = 5900;
