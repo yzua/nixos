@@ -1,14 +1,18 @@
 # Go development environment (gopls, delve, golangci-lint, etc).
 
 {
-  aliasHelpers,
   config,
   pkgs,
   ...
 }:
 
 let
-  mkShellAliasPrograms = aliasHelpers;
+  mkShellAliasPrograms =
+    { shellAliases }:
+    {
+      zsh.shellAliases = shellAliases;
+      bash.shellAliases = shellAliases;
+    };
 in
 {
   programs =

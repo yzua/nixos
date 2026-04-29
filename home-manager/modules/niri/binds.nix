@@ -10,22 +10,7 @@
 }:
 
 let
-  noctalia =
-    cmd:
-    [
-      "${pkgs.bash}/bin/sh"
-      "-c"
-      ''
-        if ! ${config.home.profileDirectory}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1; then
-          ${pkgs.coreutils}/bin/nohup ${config.home.profileDirectory}/bin/noctalia-shell >/dev/null 2>&1 &
-          # Wait for shell to initialize before retrying IPC; may need adjustment if startup slows.
-          ${pkgs.coreutils}/bin/sleep 0.35
-          ${config.home.profileDirectory}/bin/noctalia-shell ipc call "$@" >/dev/null 2>&1 || true
-        fi
-      ''
-      "sh"
-    ]
-    ++ (lib.splitString " " cmd);
+  noctalia = import ./_noctalia.nix { inherit config pkgs lib; };
 
   booksScript = import ./scripts/open-books.nix { inherit pkgsStable; };
   screenshotAnnotate = import ./scripts/screenshot.nix { inherit pkgsStable; };

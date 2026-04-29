@@ -1,7 +1,6 @@
 # Python development environment (uv, ruff, poetry, pytest, etc).
 
 {
-  aliasHelpers,
   config,
   lib,
   pkgs,
@@ -9,7 +8,12 @@
 }:
 
 let
-  mkShellAliasPrograms = aliasHelpers;
+  mkShellAliasPrograms =
+    { shellAliases }:
+    {
+      zsh.shellAliases = shellAliases;
+      bash.shellAliases = shellAliases;
+    };
 in
 {
   programs =

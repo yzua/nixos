@@ -1,13 +1,17 @@
 # Zsh shell aliases.
 
 {
-  aliasHelpers,
   constants,
   ...
 }:
 
 let
-  mkShellAliasPrograms = aliasHelpers;
+  mkShellAliasPrograms =
+    { shellAliases }:
+    {
+      zsh.shellAliases = shellAliases;
+      bash.shellAliases = shellAliases;
+    };
 in
 {
   programs =

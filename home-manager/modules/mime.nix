@@ -34,7 +34,6 @@ let
       "image/bmp" # Windows Bitmap
       "image/gif" # GIF images
       "image/jpeg" # JPEG images
-      "image/jpg" # JPG images
       "image/png" # PNG images
       "image/svg+xml" # SVG vector graphics
       "image/tiff" # TIFF images

@@ -1,7 +1,18 @@
 # Idle management (swayidle) — ported from Hypridle.
 # Chain: 3min dim → 8min lock (Noctalia) → 20min DPMS off.
 
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+
+let
+  noctalia = import ./_noctalia.nix { inherit config pkgs lib; };
+
+  lockCmd = builtins.concatStringsSep " " (noctalia "lockScreen lock");
+in
 {
   services.swayidle = {
     enable = true;
@@ -17,7 +28,7 @@
       # Lock screen after 8 minutes (via Noctalia lock screen)
       {
         timeout = 480;
-        command = "${config.home.profileDirectory}/bin/noctalia-shell ipc call lockScreen lock";
+        command = lockCmd;
       }
 
       # Turn off displays after 20 minutes
@@ -30,9 +41,9 @@
 
     events = {
       # Lock before sleep
-      before-sleep = "${config.home.profileDirectory}/bin/noctalia-shell ipc call lockScreen lock";
+      before-sleep = lockCmd;
       # Handle loginctl lock-session
-      lock = "${pkgs.cliphist}/bin/cliphist wipe && ${config.home.profileDirectory}/bin/noctalia-shell ipc call lockScreen lock";
+      lock = "${pkgs.cliphist}/bin/cliphist wipe && ${lockCmd}";
     };
   };
 }

@@ -6,7 +6,7 @@
     keyboard = {
       xkb = {
         inherit (constants.keyboard) layout variant;
-        options = "${constants.keyboard.options},${constants.keyboard.niriExtra}";
+        options = "${constants.keyboard.options},terminate:ctrl_alt_bksp";
       };
       repeat-rate = 25;
       repeat-delay = 600;
