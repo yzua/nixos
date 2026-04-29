@@ -72,7 +72,7 @@
     ./loki.nix # Loki log aggregation server
     ./alloy.nix # Grafana Alloy log shipper for Loki
     ./prometheus-grafana # Prometheus + Alertmanager + Grafana observability
-    ./system-report.nix # Unified system health reporting
+    ./system-report # Unified system health reporting
 
     # Boot optimization
     ./boot-optimization.nix # Defer monitoring services from blocking boot
