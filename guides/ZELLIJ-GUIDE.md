@@ -187,7 +187,7 @@ zellij -l ai
 
 Single tab for AI-assisted development:
 
-- **agent** (focused): 60% Claude Code | 50% logs (OpenCode/Codex) + 50% lazygit
+- **agent** (focused): 60% Claude Code | logs + lazygit (split 50/50 in the remaining 40%)
 
 ### Monitoring Layout
 

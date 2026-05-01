@@ -6,14 +6,14 @@ Data-source layer for the model-usage plugin. Each file implements the provider 
 
 ## Files
 
-| File             | Data Source                                                                  | Strategy              |
-| ---------------- | ---------------------------------------------------------------------------- | --------------------- |
-| `Claude.qml`     | `~/.claude/stats-cache.json`, `~/.claude/history.jsonl`, Anthropic OAuth API | FileView + XHR        |
-| `Codex.qml`      | `~/.codex/history.jsonl`, `~/.codex/config.toml`, session files              | FileView + Process    |
-| `Copilot.qml`    | `gh auth token` + `api.github.com/copilot_internal/user`                     | Process + XHR         |
-| `OpenRouter.qml` | `OPENROUTER_API_KEY` env, `openrouter.ai/api/v1/key` + activity              | Pure XHR (7 parallel) |
-| `Zai.qml`        | `/run/secrets/zai_api_key`, `api.z.ai/api/monitor/usage/quota/limit`         | Process (`curl`)      |
-| `Zen.qml`        | `OPENCODE_ZEN_API_KEY` / `ZEN_API_KEY` env, `opencode.ai`                    | Pure XHR              |
+| File             | Data Source                                                                                                 | Strategy              |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- | --------------------- |
+| `Claude.qml`     | `~/.claude/stats-cache.json`, `~/.claude/history.jsonl`, `~/.claude/.credentials.json`, Anthropic OAuth API | FileView + XHR        |
+| `Codex.qml`      | `~/.codex/history.jsonl`, `~/.codex/config.toml`, `~/.codex/auth.json`, session files                       | FileView + Process    |
+| `Copilot.qml`    | `gh auth token` + `api.github.com/copilot_internal/user`                                                    | Process + XHR         |
+| `OpenRouter.qml` | `OPENROUTER_API_KEY` env, `openrouter.ai/api/v1/key` + activity                                             | Pure XHR (7 parallel) |
+| `Zai.qml`        | `/run/secrets/zai_api_key`, `api.z.ai/api/monitor/usage/quota/limit`                                        | Process (`curl`)      |
+| `Zen.qml`        | `OPENCODE_ZEN_API_KEY` / `OPENCODE_API_KEY` / `ZEN_API_KEY` env, `opencode.ai`                              | Pure XHR              |
 
 ---
 

@@ -45,7 +45,7 @@ The `y` command is the recommended way to use Yazi. When you quit (`q`), your sh
 | `o`           | Open selected files                          |
 | `O`           | Open selected files interactively            |
 
-Files open with your default apps (configured in MIME settings). The editor for text files is VS Code (set in constants).
+Files open with your default apps (configured in MIME settings). The editor for text files is VS Code (set in `constants.editor`); it opens as an external, non-blocking window.
 
 ### Selection
 

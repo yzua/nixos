@@ -6,7 +6,7 @@ Internationalization strings for the keybind-cheatsheet plugin. 20 locale files 
 
 ## Files
 
-All files share four top-level keys: `default-category`, `error`, `panel`, `settings`, `barwidget`.
+All files share five top-level keys: `default-category`, `error`, `panel`, `settings`, `barwidget`.
 
 - `en.json` — English (canonical/authoritative)
 - `de.json`, `es.json`, `fr.json`, `hn.json`, `hu.json`, `it.json`, `ja.json`, `ko-KR.json`, `ku.json`, `nl.json`, `nn-NO.json`, `pl.json`, `pt.json`, `ru.json`, `sv.json`, `tr.json`, `uk-UA.json`, `zh-CN.json`, `zh-TW.json`

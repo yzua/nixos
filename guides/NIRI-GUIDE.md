@@ -30,8 +30,7 @@ Six named workspaces are preconfigured, plus unnamed numeric slots:
 | 2      | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`           |
 | 3      | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`           |
 | 4      | 󰎆 media     | Music/Video players (rules)    | `Super+4`           |
-| 5      | _(unnamed)_ | General use                    | `Super+5`           |
-| 05-vpn | 󰦝 vpn       | VPN tools (window rules only)  | _(no keybinding)_   |
+| 05-vpn | 󰦝 vpn       | VPN tools (window rules only)  | `Super+5`           |
 | 6      | 󰀲 android   | Android tools (rules only)     | `Super+6`           |
 | 7–9    | _(unnamed)_ | General use                    | `Super+7`–`Super+9` |
 
@@ -150,7 +149,7 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+2`         | Go to 󰨞 editor workspace                      |
 | `Super+3`         | Go to 󰍡 social workspace                      |
 | `Super+4`         | Go to 󰎆 media workspace                       |
-| `Super+5`         | Go to unnamed workspace 5                     |
+| `Super+5`         | Go to 󰦝 vpn workspace                         |
 | `Super+6`         | Go to 󰀲 android workspace                     |
 | `Super+7–9`       | Go to unnamed workspaces 7–9                  |
 | `Super+Page_Up`   | Go to workspace above                         |
@@ -577,7 +576,7 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | Key                        | Action                                 |
 | -------------------------- | -------------------------------------- |
 | `Super+1–4`                | Focus named workspaces (browser–media) |
-| `Super+5`                  | Focus unnamed workspace 5              |
+| `Super+5`                  | Focus 󰦝 vpn workspace                  |
 | `Super+6`                  | Focus 󰀲 android workspace              |
 | `Super+7–9`                | Focus unnamed workspaces 7–9           |
 | `Super+Shift+1–9`          | Move column to workspace 1–9           |
@@ -662,6 +661,7 @@ Column 2 holds two windows stacked vertically (merged with `Super+Comma`/`Super+
 | `home-manager/modules/niri/lock.nix`             | Swaylock fallback configuration                            |
 | `home-manager/modules/niri/default.nix`          | Module imports and Niri flake integration                  |
 | `home-manager/modules/niri/_workspace-names.nix` | Named workspace definitions (imported by main/binds/rules) |
+| `home-manager/modules/niri/_noctalia.nix`        | Noctalia Shell IPC helper (imported by binds/idle)         |
 | `home-manager/modules/niri/scripts/`             | Helper scripts (color-picker, open-books, screenshot)      |
 
 To apply changes after editing: `just home` (rebuilds Home Manager configuration).

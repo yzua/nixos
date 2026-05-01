@@ -46,4 +46,4 @@ Parent: `scripts/system/AGENTS.md`
 - `../lib/error-patterns.sh` (AI agent log scanning), `../lib/log-dirs.sh` (log discovery), `../lib/test-helpers.sh` (tests)
 - Does NOT depend on `../lib/logging.sh` or `../lib/require.sh`
 - External: `systemctl`, `journalctl`, `vnstat`, `jq`, `curl`, `timeout`, `bat`, `fail2ban-client`, `systemd-analyze`, `date`, `bc`
-- Nix: `system-report.sh` wrapped via `writeShellApplication` in `nixos-modules/system-report.nix`
+- Nix: `system-report.sh` wrapped via `writeShellApplication` in `nixos-modules/system-report/_config.nix`

@@ -43,8 +43,8 @@ HM is standalone — it cannot access NixOS `config.*`. Shared values arrive onl
 
 - `shared/constants.nix` — single source of truth for user identity, terminal, editor, fonts, theme, colors, ports, paths, proxies, keyboard layout
 - `shared/_option-helpers.nix` — typed option constructors for `mySystem.*` toggles
-- `shared/_secret-loader.nix` — reads from `/run/secrets/*` (sops-nix)
-- `shared/_hm-systemd-helpers.nix` — systemd unit helpers for HM services
+- `home-manager/_helpers/_secret-loader.nix` — reads from `/run/secrets/*` (sops-nix)
+- `home-manager/_helpers/_systemd-helpers.nix` — systemd unit helpers for HM services
 
 ### NixOS Modules (`nixos-modules/`)
 
@@ -56,7 +56,7 @@ Feature modules use the `mySystem.*` namespace pattern:
 
 `host-defaults.nix` sets profile defaults (`desktop`/`laptop`) based on `mySystem.hostProfile`. Cross-module assertions go in `validation.nix`, not in feature modules.
 
-Sub-module directories (`security/`, `cleanup/`, `glance/`, `prometheus-grafana/`, `helpers/`) have their own `default.nix` hubs.
+Sub-module directories (`security/`, `cleanup/`, `glance/`, `prometheus-grafana/`, `helpers/`, `nix-ld/`, `system-report/`) have their own `default.nix` hubs.
 
 ### Home Manager (`home-manager/`)
 

@@ -17,16 +17,13 @@ Package declarations for `home.packages`. This directory is chunked by domain an
 - `cli.nix` — CLI toolchain
 - `development.nix` — Dev tooling and databases
 - `lsp-servers.nix` — Language servers for editors (shared across languages)
-- `gnome.nix` — Minimal GNOME utilities for Niri workflow
-- `multimedia.nix` — Media tools
 - `networking.nix` — Network analysis and diagnostics
 - `niri.nix` — Niri/Wayland-related packages
 - `privacy.nix` — Privacy/security user tools
-- `productivity.nix` — Focus/time utilities
 - `system-monitoring.nix` — Observability user tools
 - `utilities.nix` — General utility packages
 - `custom/beads.nix`, `custom/chrome-devtools.nix`, `custom/cursor.nix`, `custom/kiro.nix`, `custom/prayer.nix` — Local/custom package definitions
-- `_egl-wrap.nix` — Helper imported manually by chunks; not imported by `default.nix`
+- `_egl-wrap.nix` — Helper at `_helpers/_egl-wrap.nix`, imported manually by chunks; not imported by `default.nix`
 
 ---
 

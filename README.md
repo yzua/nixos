@@ -105,6 +105,9 @@ Set `hostProfile` first, then override as needed:
 | `glance.enable`              | Dashboard (port 8082)                                                     |
 | `opensnitch.enable`          | Application firewall                                                      |
 | `ntfy.enable`                | Alertmanager → ntfy.sh notifications                                      |
+| `firewall.enable`            | Network firewall and hostname leak prevention                             |
+| `opsec.enable`               | Session lock, zram swap, Chrony NTS                                       |
+| `securityServices.enable`    | dbus-broker and journald hardening                                        |
 | `ntfy.port`                  | Local ntfy bridge listener port                                           |
 | `observability.enable`       | Prometheus + Alertmanager + Grafana (ports 9090, 9093, 3001)              |
 | `loki.enable`                | Log aggregation with Grafana Alloy                                        |
@@ -130,9 +133,9 @@ Set `hostProfile` first, then override as needed:
 
 ## Security
 
-Always-on: kernel hardening, AppArmor, zram swap, hidepid=2, firewall hostname leak prevention, Chrony with NTS, journald hardening.
+Always-on: kernel hardening, AppArmor, hidepid=2, coredump suppression.
 
-On by default (toggleable): AIDE file integrity, fail2ban, Lynis weekly audit, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid, web RE/security tools.
+On by default (toggleable): AIDE file integrity, fail2ban, Lynis weekly audit, metadata scrubber (`mat2`/`exiftool`/`inotify-tools`), Mullvad VPN, Tor, DNSCrypt, OpenSnitch, Secure Boot, Waydroid, web RE/security tools, firewall (hostname leak prevention), zram swap, Chrony NTS, journald hardening, dbus-broker.
 
 Profile-dependent defaults: gaming/gamemode/gamescope (on for `desktop`), bluetooth (on for `laptop`).
 
@@ -218,7 +221,7 @@ flake.lock                    # Pinned input versions
 justfile                      # Build/deploy commands (`just --list`)
 AGENTS.md                     # Agent-facing repo conventions
 LICENSE                       # Repository license
-shared/                       # Shared identity, helpers, option/secret utilities
+shared/                       # Shared identity and option utilities
 hosts/<hostname>/             # Per-host config + hardware modules
 nixos-modules/                # Shared system modules (58 imports in hub)
 home-manager/                 # User-level modules + packages

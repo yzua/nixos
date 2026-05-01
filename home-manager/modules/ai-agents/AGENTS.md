@@ -59,7 +59,6 @@ ai-agents/
 │   ├── _zai-services.nix        # Z.AI MCP service registry
 │   ├── _zai-filters.nix         # Z.AI MCP jq filter generation
 │   ├── _zai-config.nix          # Z.AI API root, timeout, model identifiers
-│   ├── _android-re-launchers.nix         # Android RE emulator/script launchers
 │   ├── _mk-cli-autoupdate-script.nix     # CLI autoupdate script builder
 │   ├── _services-shell-aliases.nix       # Shell alias definitions for agent services
 │   ├── _services-systemd.nix             # Systemd user service/timer definitions
@@ -93,6 +92,7 @@ ai-agents/
 │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   ├── skills.nix           # Skill installations and omissions
 ├── android-re/              # Android RE workflow prompts and config
+│   ├── _launchers.nix       # Android RE emulator/script launchers (not a module, imported by packages)
 │   ├── _prompt.nix          # Prompt templates (not a module, imported by services)
 │   └── prompts/             # RE session prompts and operator guides
 │       ├── AGENTS.md        # Quick rules for RE sessions

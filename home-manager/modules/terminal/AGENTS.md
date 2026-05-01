@@ -20,7 +20,7 @@ terminal/
 ├── scripts.nix      # Custom script wrappers (currently `nvidia-fans`)
 ├── shell.nix        # Nix shell integration and dev tools
 ├── zsh/
-│   ├── default.nix  # Zsh + OMZ (Starship prompt, 23 setOptions)
+│   ├── default.nix  # Zsh + OMZ (Starship prompt, 21 setOptions)
 │   ├── aliases.nix  # Shell aliases
 │   ├── config.nix   # Zsh settings and initialization
 │   ├── functions.nix # Custom zsh functions (nix helpers, agent wrappers, aip)

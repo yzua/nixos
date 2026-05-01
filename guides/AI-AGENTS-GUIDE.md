@@ -393,12 +393,12 @@ ai-agents/
 │   ├── _gemini-policies.nix   # Gemini CLI safety policy definitions
 │   ├── _workflow-prompts.nix  # Workflow prompt definitions
 │   ├── _zai-services.nix      # Z.AI MCP service registry
+│   ├── _zai-config.nix        # Z.AI config helpers
 │   ├── _zai-env.nix           # Z.AI environment variable helpers
 │   ├── _zai-filters.nix       # Z.AI MCP jq filter generation
 │   ├── _services-systemd.nix  # Systemd service/timer definitions
 │   ├── _services-shell-aliases.nix # Shell alias generation
 │   ├── _mk-cli-autoupdate-script.nix # Auto-update script builder
-│   ├── _android-re-launchers.nix # Android RE agent launcher helpers
 │   ├── _formatters.nix       # Formatter registry for auto-formatting hooks
 │   ├── _impeccable-commands.nix # Impeccable slash command definitions
 │   ├── _models.nix           # Shared model/provider constants (names, aliases)
@@ -427,6 +427,7 @@ ai-agents/
 │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   └── skills.nix             # Skill installations and omissions
 ├── android-re/              # Android RE workflow prompts and config
+│   ├── _launchers.nix          # Android RE agent launcher helpers (not a module, imported by packages)
 │   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
 │   └── prompts/               # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 ├── files.nix                # home.file + xdg.configFile declarations
@@ -451,9 +452,9 @@ ai-agents/
         ├── gemini.nix         # Gemini CLI model config + mkModelAlias/mkThinkingAlias
         ├── opencode.nix       # OpenCode model config (owns all let bindings)
         ├── _opencode-agents.nix # OpenCode agent definitions
+        ├── _opencode-android-re.nix # OpenCode Android RE agent definitions
         ├── _opencode-commands.nix # OpenCode slash command definitions
-        ├── _opencode-lsp.nix  # OpenCode LSP tool configuration
-        └── _opencode-android-re.nix # OpenCode Android RE agent config
+        └── _opencode-lsp.nix  # OpenCode LSP tool configuration
 ```
 
 ### How It Works
@@ -555,7 +556,7 @@ Operational notes:
 
 | Setting                  | Value                                      | Why                                                              |
 | ------------------------ | ------------------------------------------ | ---------------------------------------------------------------- |
-| Model                    | `gpt-5.4`                                  | Stable default across interactive coding and repository work     |
+| Model                    | `openai/gpt-5.4`                           | Stable default across interactive coding and repository work     |
 | Personality              | `pragmatic`                                | Direct, practical responses                                      |
 | Reasoning effort         | `medium`                                   | Balanced speed/quality                                           |
 | Approval policy          | `on-request`                               | Good autonomy/safety balance for local coding                    |
@@ -581,14 +582,14 @@ Uses a separate config directory (`~/.config/opencode-glm/`) with the model over
 
 Routes through Z.AI's Anthropic-compatible proxy (`https://api.z.ai/api/anthropic`).
 
-| Env Var                          | Value                             |
-| -------------------------------- | --------------------------------- |
-| `ANTHROPIC_AUTH_TOKEN`           | Z.AI API key (from sops)          |
-| `ANTHROPIC_BASE_URL`             | `https://api.z.ai/api/anthropic`  |
-| `API_TIMEOUT_MS`                 | `3000000` (50 min, per Z.AI docs) |
-| `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `glm-5-turbo`                     |
-| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5.1`                         |
-| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5.1`                         |
+| Env Var                          | Value                            |
+| -------------------------------- | -------------------------------- |
+| `ANTHROPIC_AUTH_TOKEN`           | Z.AI API key (from sops)         |
+| `ANTHROPIC_BASE_URL`             | `https://api.z.ai/api/anthropic` |
+| `API_TIMEOUT_MS`                 | `300000` (5 min)                 |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL`  | `glm-5-turbo`                    |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | `glm-5.1`                        |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL`   | `glm-5.1`                        |
 
 Also passes `--dangerously-skip-permissions` for autonomous operation.
 

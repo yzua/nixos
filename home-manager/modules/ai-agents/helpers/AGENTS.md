@@ -28,11 +28,10 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | `_zai-services.nix`             | Z.AI MCP service registry: service names, MCP keys, base URL                                     |
 | `_zai-filters.nix`              | Agent-specific jq filters for Z.AI MCP secret injection                                          |
 | `_git-clone-update.nix`         | Generates Bash snippet for git clone/update under `~/.local/share/`                              |
-| `_android-re-launchers.nix`     | Shell script binaries for Android RE OpenCode launchers                                          |
 | `_agent-env.nix`                | Agent environment variable bridging                                                              |
 | `_zai-env.nix`                  | Z.AI provider env vars (shared by claude_glm + Android RE launchers)                             |
 | `_zai-config.nix`               | Z.AI API root, timeout, model identifiers; imported by `_zai-env`, `_zai-services`, `_agent-env` |
-| `workflows/`                    | Workflow prompt Nix expressions (9 files: bugfix, build-perf, commit-split, etc.)                |
+| `workflows/`                    | Workflow prompt Nix expressions (9 files: shared, bugfix, build-perf, commit-split, etc.)        |
 
 ---
 
@@ -50,7 +49,6 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 - `_settings-builders.nix` imports `_mcp-transforms`, `_formatters`, and `_models` — changes propagate here.
 - `_zai-filters.nix` imports `_zai-services.nix` directly; both must stay in sync.
 - `_gemini-policies.nix` imports `_destructive-rules.nix` directly.
-- `_aliases.nix` and `_android-re-launchers.nix` both import `_models.nix`.
+- `_aliases.nix` imports `_models.nix`.
 - `_agent-env.nix`, `_zai-env.nix`, and `_zai-services.nix` all import `_zai-config.nix` — changes to the Z.AI API root URL propagate to env vars, launchers, and MCP filters through three paths.
-- `_android-re-launchers.nix` imports `_zai-env.nix`, which imports `_zai-config.nix` — a two-hop dependency on the Z.AI config.
 - `toHookPattern` in `_destructive-rules.nix` has special-case regex escaping for `rm -rf /`, `rm -rf ~`, `dd` — consider grep regex safety when adding commands.

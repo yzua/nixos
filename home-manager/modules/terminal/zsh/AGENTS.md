@@ -9,7 +9,7 @@ Zsh + Oh My Zsh with Starship prompt, privacy-filtered history, agent wrapper fu
 | File             | Purpose                                                                                             |
 | ---------------- | --------------------------------------------------------------------------------------------------- |
 | `default.nix`    | Import hub, `sessionPath` (cargo, composer, gem, uv), Docker env vars                               |
-| `config.nix`     | Core zsh options: history, OMZ plugins, vi mode, setOptions (23 opts)                               |
+| `config.nix`     | Core zsh options: history, OMZ plugins, vi mode, setOptions (21 opts)                               |
 | `aliases.nix`    | Shell aliases applied to both zsh and bash via local `mkShellAliasPrograms`                         |
 | `functions.nix`  | `initContent`: sops secret loaders, AI agent wrappers, `aip` launcher, Zellij tab rename, LS_COLORS |
 | `local-vars.nix` | `localVariables`: editor, pager, FZF commands, XDG cache paths, tool homes                          |

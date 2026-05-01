@@ -1,4 +1,6 @@
 # Zsh shell aliases.
+# NOTE: ai-agents/packages.nix also contributes to programs.zsh.shellAliases
+# and programs.bash.shellAliases via mkShellAliasPrograms. NixOS merges both attrsets.
 
 {
   constants,

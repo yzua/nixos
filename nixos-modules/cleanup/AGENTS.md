@@ -7,12 +7,12 @@ This directory uses a shared helper (`_lib.nix`) to keep timer definitions consi
 
 ## Structure
 
-| File            | Purpose                                                                    |
-| --------------- | -------------------------------------------------------------------------- |
-| `default.nix`   | Option definition + imports (`downloads.nix`, `cache.nix`)                 |
-| `_lib.nix`      | Helper library exposing `mkCleanupTimer`, `mkFindCleanupTimer`, `bash`, `find`, `home` |
-| `downloads.nix` | Download/media/screenshot/clipboard retention timers + user dir activation |
-| `cache.nix`     | Cache cleanup timers (pip, npm, bun, go, Playwright, Docker)               |
+| File            | Purpose                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------------- |
+| `default.nix`   | Option definition + imports (`downloads.nix`, `cache.nix`)                                                  |
+| `_lib.nix`      | Helper library exposing `mkCleanupTimer`, `mkFindCleanupTimer`, `mkCachePurgeTimer`, `bash`, `find`, `home` |
+| `downloads.nix` | Download/media/screenshot/clipboard retention timers + user dir activation                                  |
+| `cache.nix`     | Cache cleanup timers (pip, npm, bun, go, Playwright, Docker)                                                |
 
 ---
 

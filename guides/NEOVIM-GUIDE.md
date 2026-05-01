@@ -434,6 +434,10 @@ Undo history is persistent (saved to disk). Open the file again and press `u` to
 
 ### Formatting & Linting
 
+> **Note:** `Space f` is both a leaf binding (format) and a prefix group (`Space f f` for find files, etc.).
+> Pressing `Space f` alone triggers format after the 300ms `timeoutlen`. Type `Space f f` within the
+> timeout window to use Telescope find commands instead.
+
 | Key       | Mode | Action                         |
 | --------- | ---- | ------------------------------ |
 | `Space f` | N, V | Format buffer                  |

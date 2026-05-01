@@ -1,6 +1,6 @@
 # Niri Compositor Configuration
 
-Scrollable tiling Wayland compositor. 8 local modules plus 2 shared helpers (`_workspace-names.nix`, `_noctalia.nix`) and 3 helper scripts (and 2 imported flake modules).
+Scrollable tiling Wayland compositor. 7 local modules plus 2 shared helpers (`_workspace-names.nix`, `_noctalia.nix`) and 3 helper scripts (and 2 imported flake modules).
 Configures `programs.niri.settings` — all settings live under that namespace.
 
 ---
@@ -9,7 +9,7 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 
 | File                   | Configures                            | Key Details                                                                                    |
 | ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `default.nix`          | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 8 local modules |
+| `default.nix`          | Import hub                            | Imports `niri.homeModules.config` + `niri.homeModules.stylix` from flake, then 7 local modules |
 | `main.nix`             | Workspaces, autostart, environment    | 6 named workspaces, startup apps, `SSH_AUTH_SOCK` → KeePassXC                                  |
 | `binds.nix`            | Keybindings                           | Extensive binds; `noctalia` IPC helper; imports scripts from `scripts/`                        |
 | `input.nix`            | Keyboard, mouse, touchpad, trackpoint | Uses `constants.keyboard.*`; Niri adds `terminate:ctrl_alt_bksp`                               |
@@ -33,10 +33,10 @@ Configures `programs.niri.settings` — all settings live under that namespace.
 | editor  | configured editor, terminals | `Mod+2`    |
 | social  | Telegram, Vesktop            | `Mod+3`    |
 | media   | YouTube Music, FreeTube      | `Mod+4`    |
-| vpn     | Mullvad VPN                  | _(none)_   |
+| vpn     | Mullvad VPN                  | `Mod+5`    |
 | android | Android tools                | `Mod+6`    |
 
-Workspace `vpn` exists but has no keybinding — Mullvad/KeePassXC/i2pd windows land there via window rules. `Mod+5` focuses unnamed workspace `5` (general use). Dynamic workspaces 7-9 available via `Mod+7` through `Mod+9`.
+Workspace `vpn` is at position 5 and accessible via `Mod+5`. Mullvad/KeePassXC/i2pd windows land there via window rules. Dynamic workspaces 7-9 available via `Mod+7` through `Mod+9`.
 Window rules in `rules.nix` assign apps to workspaces by `app-id` regex.
 
 ---

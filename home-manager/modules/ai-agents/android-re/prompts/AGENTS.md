@@ -280,7 +280,7 @@ All paths relative to repo root (`/home/yz/System`):
   data
 - `scripts/ai/android-re/opencode-android-re.sh`: OpenCode Android RE session
   launcher
-- `home-manager/modules/ai-agents/helpers/_android-re-launchers.nix`: Nix wrapper
+- `home-manager/modules/ai-agents/android-re/_launchers.nix`: Nix wrapper
   definitions for both `oc*are` and `cl*are` launchers
 
 ## agent-device Skill

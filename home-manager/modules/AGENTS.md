@@ -26,7 +26,6 @@ modules/
 │   │   ├── _zai-services.nix      # Z.AI MCP service registry
 │   │   ├── _zai-filters.nix       # Z.AI MCP jq filter generation
 │   │   ├── _zai-config.nix        # Z.AI API root, timeout, model identifiers
-│   │   ├── _android-re-launchers.nix    # Android RE emulator/script launchers
 │   │   ├── _mk-cli-autoupdate-script.nix # CLI autoupdate script builder
 │   │   ├── _services-shell-aliases.nix  # Shell alias definitions for agent services
 │   │   ├── _services-systemd.nix        # Systemd user service/timer definitions
@@ -51,6 +50,7 @@ modules/
 │   │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
 │   │   ├── skills.nix       # Skill installations and omissions
 │   ├── android-re/     # Android RE workflow prompts and config
+│   │   ├── _launchers.nix # Android RE emulator/script launchers (not a module, imported by packages)
 │   │   ├── _prompt.nix # Prompt templates (not a module, imported by services)
 │   │   └── prompts/    # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 │   └── config/         # Split configuration values
@@ -188,7 +188,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-12 domain chunks + 5 custom chunks + 1 helper: `applications`, `cli`, `development`, `lsp-servers`, `gnome`, `multimedia`, `networking`, `niri`, `privacy`, `productivity`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`, and `_egl-wrap.nix` (helper, imported manually).
+9 domain chunks + 5 custom chunks + 1 helper: `applications`, `cli`, `development`, `lsp-servers`, `networking`, `niri`, `privacy`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`, and `_helpers/_egl-wrap.nix` (helper, imported manually).
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 

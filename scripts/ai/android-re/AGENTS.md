@@ -58,4 +58,4 @@ Parent: `scripts/ai/AGENTS.md`
 
 - `../../lib/logging.sh`, `../../lib/require.sh` (via `_helpers.sh`), `../../lib/test-helpers.sh`
 - Nix modules: `ai-agents/android-re/` (wrapper binaries, prompt injection)
-- Nix helpers: `ai-agents/helpers/_android-re-launchers.nix` wraps `opencode-android-re.sh`
+- Nix helpers: `ai-agents/android-re/_launchers.nix` wraps `opencode-android-re.sh`
