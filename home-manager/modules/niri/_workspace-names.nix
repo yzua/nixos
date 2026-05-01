@@ -8,4 +8,5 @@
   media = "󰎆 media";
   vpn = "󰦝 vpn";
   android = "󰀲 android";
+  web-re = "󰖩 web-re";
 }

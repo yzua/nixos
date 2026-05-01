@@ -199,6 +199,10 @@
         matches = [ { title = "^android-re"; } ];
         open-on-workspace = ws.android;
       }
+      {
+        matches = [ { title = "^web-re"; } ];
+        open-on-workspace = ws.web-re;
+      }
       (mkWorkspaceAppIdRule "^Emulator$" ws.android {
         open-floating = true;
       })

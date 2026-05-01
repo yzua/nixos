@@ -50,6 +50,9 @@ in
       "06-android" = {
         name = ws.android; # nf-md-android
       };
+      "07-web-re" = {
+        name = ws.web-re;
+      };
     };
 
     environment = {
