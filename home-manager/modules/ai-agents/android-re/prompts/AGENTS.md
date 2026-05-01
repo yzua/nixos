@@ -103,15 +103,22 @@ context.
 For every target, follow this order unless evidence forces a pivot:
 
 1. **Baseline health** — `doctor`, `status`, confirm root, confirm emulator boot
-2. **Target intake** — package name, version, ABI, install path, first-launch path
-3. **Static triage** — manifest, exports, network stack, pinning, anti-analysis,
+2. **Check existing workspace** — if `~/Documents/{app-name}/` exists, read all
+   workspace files (SESSIONS.md, NOTES.md, FINDINGS.md, ANTI-ANALYSIS.md,
+   ENDPOINTS.md, COMPONENTS.md, README.md) to learn what previous agents or
+   sessions already discovered. Skip steps that are already completed and
+   continue from where the last session left off.
+3. **Target intake** — package name, version, ABI, install path, first-launch path
+4. **Static triage** — manifest, exports, network stack, pinning, anti-analysis,
    native libs
-4. **Dynamic smoke test** — install, launch, logcat, confirm process stability
-5. **Traffic capture** — explicit proxy first, verify actual captured requests
-6. **Instrumentation** — Frida attach or spawn only after static guidance exists
-7. **Bypass work** — pinning/root/emulator checks only after you know what to
+5. **Dynamic smoke test** — install, launch, logcat, confirm process stability
+6. **Traffic capture** — explicit proxy first, verify actual captured requests
+7. **Instrumentation** — Frida attach or spawn only after static guidance exists
+8. **Bypass work** — pinning/root/emulator checks only after you know what to
    bypass and why
-8. **Evidence summary** — findings, proof, blockers, next best action
+9. **Full surface scan** — exercise every screen, test every component, probe
+   every endpoint, inspect every storage location. Leave no feature untested.
+10. **Evidence summary** — findings, proof, blockers, next best action
 
 Do not jump straight into patching hooks before static triage and runtime proof.
 
@@ -193,6 +200,20 @@ Keep asking these throughout the session:
     should write findings to the shared workspace files. Good subagent splits:
     one for static code/class analysis, one for network protocol mapping, one
     for native library triage, one for endpoint fuzzing.
+14. **Write and use custom scripts, tools, and packages freely.** You have Bash,
+    Python 3.13, Node.js 24, and Bun 1.3 available. Write exploit scripts, fuzzing
+    harnesses, replay tools, brute-force scripts, token forgers, request
+    manipulators, and any other tool you need to prove a finding. Install packages
+    with `pip install --user`, `npm install -g`, or `bun add` as needed. Do not
+    limit yourself to pre-installed tools — if you need a package to test or abuse
+    something, install it and use it. Save all scripts to
+    `~/Documents/{app-name}/scripts/`.
+15. **Scan everything exhaustively.** Do not stop at the first finding or the
+    obvious paths. Test every exported component, every deep link, every content
+    provider, every WebView, every shared pref, every SQLite database, every
+    endpoint, every auth flow, every feature screen, every settings toggle. If
+    something exists in the app, test it. The goal is full attack surface coverage,
+    not a single highlight.
 
 ## Evidence Output Template
 
