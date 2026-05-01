@@ -1,4 +1,4 @@
-# Niri compositor and Wayland utilities.
+# Niri compositor, Wayland utilities, and GNOME helpers (minimal set — GNOME desktop disabled).
 
 { pkgs, ... }:
 
@@ -22,5 +22,9 @@
     bemoji
     brightnessctl
     showmethekey
+
+    # GNOME utilities for Niri
+    gnome-disk-utility
+    gnome-text-editor
   ];
 }

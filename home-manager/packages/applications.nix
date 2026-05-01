@@ -1,4 +1,4 @@
-# Desktop applications and theming packages.
+# Desktop applications, multimedia, productivity, and theming packages.
 
 { pkgs, ... }:
 
@@ -29,5 +29,20 @@
     # GTK theming
     gnome-themes-extra
     gruvbox-gtk-theme
+
+    # Multimedia
+    amberol # GNOME audio player
+    ffmpeg # Multimedia processing toolkit
+    jpegoptim # JPEG lossless optimization
+    mediainfo # Media file analyzer
+    optipng # PNG lossless optimization
+    freetube # YouTube client
+    muffon # Desktop music streaming and discovery client
+    nuclear # Privacy-focused music player and discovery
+
+    # Productivity
+    porsmo # CLI Pomodoro timer
+    watson # Project-based time tracking
+    timewarrior # Taskwarrior companion
   ];
 }
