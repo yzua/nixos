@@ -3,17 +3,17 @@
 
 {
   # Anthropic Claude models
-  claude-opus = "opencode/claude-opus-4-6";
-  claude-sonnet = "opencode/claude-sonnet-4-6";
+  claude-opus = "opencode/claude-opus-4-7";
+  claude-sonnet = "opencode/claude-sonnet-4-7";
   claude-haiku = "opencode/claude-haiku-4-5";
 
   # OpenAI models
-  gpt-default = "openai/gpt-5.4";
-  gpt-low = "openai/gpt-5.4-spark";
+  gpt-default = "openai/gpt-5.5";
+  gpt-low = "openai/gpt-5.5-spark";
   gpt-xhigh = "openai/gpt-5.1-codex-max";
 
   # Provider-specific aliases
-  openrouter = "openrouter/openrouter/hunter-alpha";
+  openrouter = "openrouter/tencent/hy3-preview:free";
 
   # ZAI / other
   glm = "zai-coding-plan/glm-5.1";
@@ -26,7 +26,7 @@
   gemini-flash-lite = "gemini-2.5-flash-lite";
 
   # Aider (uses Anthropic model IDs without provider prefix)
-  aider-model = "claude-sonnet-4-6";
+  aider-model = "claude-sonnet-4-7";
   aider-editor = "claude-haiku-4-5";
 
 }
