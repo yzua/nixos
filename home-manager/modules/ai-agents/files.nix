@@ -22,6 +22,7 @@ let
   inherit (settingsBuilders)
     geminiSettings
     opencodeSettingsByProfile
+    opencodeAndroidReMcpServers
     ;
 
   opencodeProfileNames = opencodeProfiles.names;
@@ -133,6 +134,13 @@ in
       (lib.mkIf cfg.enable {
         "ai-agents/models.sh" = {
           text = agentEnvContent;
+          force = true;
+        };
+      })
+      # Android RE agent-specific MCP server fragment (merged into runtime config by launcher)
+      (lib.mkIf cfg.enable {
+        "opencode/android-re-mcp-servers.json" = {
+          text = toJSON opencodeAndroidReMcpServers;
           force = true;
         };
       })

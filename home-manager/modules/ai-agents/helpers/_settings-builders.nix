@@ -10,7 +10,7 @@ let
   mcpTransforms = import ./_mcp-transforms.nix { inherit cfg lib; };
   formatterRegistry = import ./_formatters.nix;
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
-  inherit (mcpTransforms) opencodeMcpServers geminiMcpServers;
+  inherit (mcpTransforms) opencodeMcpServers geminiMcpServers opencodeAndroidReMcpServers;
   opencodeFormatterSettings = builtins.listToAttrs (
     map (formatter: {
       name = formatter.tool;
@@ -85,13 +85,34 @@ let
   })
   // (lib.optionalAttrs (cfg.gemini.extraSettings != { }) cfg.gemini.extraSettings);
 
+  # Override agent-level model fields to match the profile's top-level model.
+  # OpenCode's deep merge preserves agent-level models from the global config even when
+  # OPENCODE_CONFIG_DIR loads a profile config without them, so we must explicitly set
+  # each agent's model to the profile model to override the defaults at runtime.
+  overrideAgentModels =
+    model: agents:
+    if agents == null || agents == { } then
+      agents
+    else
+      builtins.mapAttrs (_name: agent: agent // { inherit model; }) agents;
+
   # Derived from _opencode-profiles.nix — single source of truth for profile→model mapping.
   opencodeSettingsByProfile = builtins.listToAttrs (
     map (
       { name, model, ... }:
       {
         inherit name;
-        value = if model == null then opencodeSettings else opencodeSettings // { inherit model; };
+        value =
+          if model == null then
+            opencodeSettings
+          else
+            opencodeSettings
+            // {
+              inherit model;
+            }
+            // (lib.optionalAttrs (opencodeSettings ? agent) {
+              agent = overrideAgentModels model opencodeSettings.agent;
+            });
       }
     ) opencodeProfiles.profiles
   );
@@ -102,5 +123,6 @@ in
     opencodeSettings
     geminiSettings
     opencodeSettingsByProfile
+    opencodeAndroidReMcpServers
     ;
 }

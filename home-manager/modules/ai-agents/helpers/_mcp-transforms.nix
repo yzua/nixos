@@ -3,7 +3,11 @@
 { cfg, lib }:
 
 let
-  sharedMcpServers = cfg.mcpServers;
+  inherit (cfg)
+    mcpServers
+    androidReMcpServers
+    ;
+  sharedMcpServers = mcpServers;
 
   # Headers are shared across all remote transforms — apply once in the factory.
   withOptionalHeaders =
@@ -15,6 +19,7 @@ let
       localAttrs,
       remoteAttrs,
       envKey ? "env",
+      servers ? sharedMcpServers,
     }:
     lib.mapAttrs (
       _: server:
@@ -26,7 +31,7 @@ let
         };
       in
       base // envAttrs
-    ) (lib.filterAttrs (_: s: s.enable) sharedMcpServers);
+    ) (lib.filterAttrs (_: s: s.enable) servers);
 
   claudeMcpServers = mkMcpTransform {
     localAttrs = server: {
@@ -61,6 +66,19 @@ let
     };
   };
 
+  opencodeAndroidReMcpServers = mkMcpTransform {
+    localAttrs = server: {
+      type = "local";
+      command = [ server.command ] ++ (server.args or [ ]);
+    };
+    remoteAttrs = server: {
+      type = "remote";
+      inherit (server) url;
+    };
+    envKey = "environment";
+    servers = androidReMcpServers;
+  };
+
 in
 {
   inherit
@@ -68,5 +86,6 @@ in
     claudeMcpServers
     opencodeMcpServers
     geminiMcpServers
+    opencodeAndroidReMcpServers
     ;
 }

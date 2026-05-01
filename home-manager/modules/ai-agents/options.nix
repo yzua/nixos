@@ -186,6 +186,27 @@ in
       description = "Shared MCP server definitions used by all agents";
     };
 
+    androidReMcpServers = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            enable = mkBoolOption true "Enable this MCP server";
+            type = mkTypedOption (lib.types.enum [
+              "local"
+              "remote"
+            ]) "local" "Server type (local stdio or remote HTTP)";
+            command = mkStrOption "" "Command to run for local servers";
+            args = mkStrListOption [ ] "Arguments for the command";
+            url = mkNullOrStrOption null "URL for remote MCP servers";
+            headers = mkNullableOption (lib.types.attrsOf lib.types.str) null "Headers for remote MCP servers";
+            env = mkAttrsOfStrOption { } "Environment variables for the server";
+          };
+        }
+      );
+      default = { };
+      description = "MCP servers only loaded for the android-re agent (not shared globally)";
+    };
+
     logging = {
       enable = lib.mkEnableOption "centralized logging for AI agents";
 
@@ -215,7 +236,7 @@ in
     opencode = {
       enable = lib.mkEnableOption "OpenCode configuration";
 
-      model = mkStrOption "opencode/claude-opus-4-6" "Default model for OpenCode";
+      model = mkStrOption "opencode/claude-opus-4-7" "Default model for OpenCode";
       plugins = mkStrListOption [ ] "OpenCode plugins to enable";
       providers = mkAttrsOption { } "Provider configurations for OpenCode";
       permission =
@@ -240,7 +261,7 @@ in
     codex = {
       enable = lib.mkEnableOption "Codex CLI configuration";
 
-      model = mkStrOption "openai/gpt-5.4" "Default model for Codex";
+      model = mkStrOption "openai/gpt-5.5" "Default model for Codex";
       sandboxMode = mkStrOption "workspace-write" "Default sandbox mode for Codex";
       # Active only at top-level codex settings.
       enableSearch = mkBoolOption false "Enable native Codex web search by default";

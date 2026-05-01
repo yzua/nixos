@@ -6,7 +6,6 @@
   hmSystemdHelpers,
   lib,
   pkgs,
-  secretLoader,
   ...
 }:
 
@@ -35,11 +34,9 @@ let
   '';
   androidReLaunchers = import ./android-re/_launchers.nix {
     inherit
-      config
       lib
       pkgs
       scriptsDir
-      secretLoader
       ;
   };
 
