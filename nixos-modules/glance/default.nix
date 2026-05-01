@@ -3,7 +3,9 @@
 {
   config,
   lib,
+  pkgs,
   constants,
+  user,
   ...
 }:
 
@@ -16,6 +18,7 @@
     services.glance = {
       enable = true;
       openFirewall = false; # SECURITY: Localhost only
+      environmentFile = "/run/glance/github-token.env";
 
       settings =
         let
@@ -24,6 +27,9 @@
           marketSymbols = import ./_markets.nix;
           serverStats = import ./_server-stats.nix;
           githubRepos = import ./_github-releases.nix;
+          redditFeeds = import ./_reddit.nix;
+          githubTrending = import ./_github-trending.nix;
+          githubActivity = import ./_github-activity.nix;
           hexToGlanceHsl = import ./_color-helpers.nix;
 
           searchWidget = {
@@ -121,7 +127,16 @@
 
                     # YouTube feeds
                     youtubeWidget
-                  ];
+                  ]
+                  ++ (map (sub: {
+                    type = "reddit";
+                    inherit (sub)
+                      subreddit
+                      style
+                      limit
+                      collapse-after
+                      ;
+                  }) redditFeeds);
                 }
 
                 # RIGHT SIDEBAR
@@ -144,6 +159,7 @@
                       show-source-icon = true;
                       limit = 6;
                       collapse-after = 3;
+                      token = "\${GITHUB_TOKEN}";
                       repositories = githubRepos;
                     }
                   ];
@@ -175,10 +191,55 @@
                 }
               ];
             }
+            {
+              name = "GitHub";
+
+              columns = [
+                {
+                  size = "full";
+                  widgets = [
+                    githubTrending
+
+                    githubActivity.notifications
+
+                    githubActivity.personalRepos
+
+                    # Releases (repeated here for the GitHub-focused view)
+                    {
+                      type = "releases";
+                      title = "Releases";
+                      show-source-icon = true;
+                      limit = 6;
+                      collapse-after = 3;
+                      token = "\${GITHUB_TOKEN}";
+                      repositories = githubRepos;
+                    }
+                  ];
+                }
+              ];
+            }
           ];
         };
     };
 
-    systemd.services.glance.serviceConfig.SupplementaryGroups = [ "docker" ];
+    systemd.services.glance =
+      let
+        ghBin = lib.getExe pkgs.gh;
+        extractToken = pkgs.writeShellScriptBin "glance-github-token" ''
+          if GH_TOKEN=$(/run/wrappers/bin/su - ${user} -c "${ghBin} auth token" 2>/dev/null); then
+            printf 'GITHUB_TOKEN=%s\n' "$GH_TOKEN" > /run/glance/github-token.env
+          else
+            echo "⚠ gh CLI not authenticated - GitHub widgets will not work"
+            : > /run/glance/github-token.env
+          fi
+        '';
+      in
+      {
+        serviceConfig = {
+          ExecStartPre = [ "+${lib.getExe extractToken}" ];
+          EnvironmentFile = lib.mkForce "-/run/glance/github-token.env";
+          SupplementaryGroups = [ "docker" ];
+        };
+      };
   };
 }
