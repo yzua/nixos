@@ -487,6 +487,157 @@ Known pattern on this host:
 - translated ARM-only packages can behave differently across `x86_64` AVDs
 - some packages may fail with `INSTALL_FAILED_NO_MATCHING_ABIS`
 
+## Encrypted Or Packed DEX Symptoms
+
+Symptoms:
+
+- `jadx` output shows very few classes or a single wrapper/loader class
+- app works correctly but decompiled source is nearly empty
+- `binwalk` shows embedded DEX inside assets or raw files
+- static analysis finds `DexClassLoader`, `InMemoryDexClassLoader`, or dynamic
+  class loading patterns
+
+Proof:
+
+```bash
+grep -r "DexClassLoader\|InMemoryDexClassLoader" ~/.cache/android-re/out/<app>/jadx
+binwalk -e /path/to/app.apk
+frida -U -f com.example.target -q -e '
+Java.perform(function(){
+  Java.enumerateClassLoaders({ onMatch: function(l){ console.log("[loader] " + l); }, onComplete: function(){} });
+});
+'
+```
+
+Next actions:
+
+- hook `DexClassLoader` to capture dynamically loaded DEX paths
+- dump loaded DEX bytes from memory via Frida
+- re-run `jadx` on the unpacked DEX
+- save results to `~/Documents/{app}/analysis/unpacked/`
+
+## WebSocket Or gRPC Traffic Not Appearing In mitmproxy
+
+Symptoms:
+
+- HTTP traffic is visible but app clearly communicates more data
+- `frida-hook-network.js` shows socket connections that mitmproxy never sees
+- static analysis shows gRPC, protobuf, or WebSocket imports
+
+Proof:
+
+```bash
+frida -U -n com.example.target -l scripts/ai/android-re/frida-hook-network.js -q
+grep -ri "grpc\|protobuf\|websocket\|ws://\|wss://" ~/.cache/android-re/out/<app>/jadx
+```
+
+Next actions:
+
+- mitmproxy captures WebSocket frames by default — check for ws:// URLs in the
+  mitm pane
+- for gRPC: use `grpcurl` to probe services directly
+- for protobuf: extract `.proto` files from static output and decode raw traffic
+- if traffic goes over a raw socket, Frida hooks are the only visibility path
+
+## Firebase Misconfiguration Detection
+
+Symptoms:
+
+- app uses Firebase (Realtime Database, Firestore, Storage, Auth)
+- static analysis finds `google-services.json` or Firebase API keys
+
+Proof:
+
+```bash
+find ~/.cache/android-re/out/<app> -name "google-services.json" -o -name "google-services.xml"
+http GET "https://<project-id>.firebaseio.com/.json"
+```
+
+If the GET returns data without authentication, the Firebase rules are
+misconfigured and allow unauthenticated read access.
+
+Next actions:
+
+- test unauthenticated write: `http PUT "https://<project-id>.firebaseio.com/.json" <<< '{"test":true}'`
+- check Firestore: `http GET "https://firestore.googleapis.com/v1/projects/<id>/databases/(default)/documents"`
+- document as a finding under OWASP M8 (Security Misconfiguration)
+
+## Certificate Transparency Or Custom Trust Anchors
+
+Symptoms:
+
+- custom CA is installed and most domains decrypt fine
+- specific domains still show `Client TLS handshake failed`
+- the failing domain is not Google (which pins aggressively)
+
+Proof:
+
+```bash
+tmux capture-pane -t android-re:logcat -p -S -200 | grep -i 'ct\|transparency\|trust'
+grep -r "CertificatePinner\|TrustAnchor\|PinSet\|ctLog" ~/.cache/android-re/out/<app>/jadx
+```
+
+Next actions:
+
+- check if the app implements Certificate Transparency log verification
+- hook CT verification in the relevant trust manager
+- identify whether the app uses a custom trust anchor file or network security
+  config with explicit pins
+
+## Native-Only Anti-Analysis (Java Hooks Fire But Behavior Unchanged)
+
+Symptoms:
+
+- all Java hooks load and fire correctly
+- `frida-hook-build-fields.js` reports correct spoofed values
+- app still detects root, emulator, or Frida
+- `frida-hook-file-exists.js` shows no suspicious file probes
+
+Proof:
+
+```bash
+frida -U -n com.example.target -l scripts/ai/android-re/frida-hook-build-fields.js -q
+frida -U -n com.example.target -l scripts/ai/android-re/frida-hook-file-exists.js -q
+# If both report fine but app still detects, the check is native
+adb shell "su 0 cat /proc/$(adb shell pidof com.example.target)/maps | grep -i frida"
+```
+
+Next actions:
+
+- pivot to native analysis: use `pyghidra-mcp` or `radare2` on the native libs
+- use `Interceptor.attach` for native function hooks instead of `Java.use`
+- check `/proc/self/maps` for native library loading patterns
+- try Magisk DenyList + Shamiko for Zygisk-level hiding
+
+## Backup Extraction Fails
+
+Symptoms:
+
+- `adb backup` produces empty, truncated, or 0-byte file
+- backup dialog appears but no data is captured
+
+Proof:
+
+```bash
+grep -i "allowBackup\|fullBackupContent" ~/.cache/android-re/out/<app>/apktool/AndroidManifest.xml
+adb backup -f /tmp/test.ab com.example.target
+ls -la /tmp/test.ab
+```
+
+If `android:allowBackup="false"`:
+
+```bash
+# Root fallback — direct data extraction
+adb shell "su 0 tar -cf - /data/data/com.example.target" | tar xf - -C ~/Documents/{app}/evidence/root-extract/
+```
+
+Next actions:
+
+- if backup works: extract and analyze for sensitive data (tokens, creds, cached
+  API responses)
+- if backup is blocked but root works: extract directly via `su 0`
+- document backup status in the target workspace
+
 ## Generic Ownership Boundary
 
 This baseline owns:

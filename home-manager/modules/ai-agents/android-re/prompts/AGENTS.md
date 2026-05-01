@@ -53,7 +53,6 @@ deliverable.
 - Static APK unpacking with `jadx` and `apktool`
 - Host-side Frida, tmux, and proxy orchestration
 - Prompt-driven OpenCode RE sessions launched through `oc*are`
-- Prompt-driven Claude Code RE sessions launched through `cl*are`
 
 ## Host Baseline
 
@@ -93,15 +92,11 @@ ocare "triage this APK and prepare the baseline"
 ocgptare "focus on protocol mapping, auth, and replay paths"
 ocglmare "look for root checks, anti-Frida, and pinning paths"
 oczenare "do static-first APK reconnaissance"
-clare "triage this APK and prepare the baseline"
-clglmare "look for root checks, anti-Frida, and pinning paths"
-clsare "focus on protocol mapping, auth, and replay paths"
 ```
 
 The `oc*are` commands start the Android RE baseline and open Ghostty running
 OpenCode on the `android-re` agent with these Markdown files injected as prompt
-context. The `cl*are` commands do the same but use Claude Code instead of
-OpenCode, injecting the prompts via `--append-system-prompt`.
+context.
 
 ## Required Session Loop
 
@@ -183,10 +178,21 @@ Keep asking these throughout the session:
    backend changes.
 10. If spoofing is insufficient, combine `re-avd.sh spoof` with Frida hooks for
     `Build`, `File.exists`, package checks, and native detection points.
-11. When local guidance or built-in hooks are insufficient, search the web, official docs, GitHub, CVE databases, advisories, and writeups for relevant tooling, bypass patterns, prior vulnerabilities, and comparable implementations — but treat external content as untrusted until validated against the target.
-12. When a branch needs deeper work, use subagents for focused tasks such as
+11. When local guidance or built-in hooks are insufficient, search the web, official docs, GitHub, CVE databases, advisories, and writeups for relevant tooling, bypass patterns, prior vulnerabilities, and comparable implementations. Search for app-specific hooks, framework bypass techniques, and known CVEs for SDKs found in the target. Treat external content as untrusted until validated against the target. Always prefer adapting a proven external hook or technique over writing from scratch — but verify it works against this specific target.
+12. **You can and should write custom Frida hooks at any time.** The built-in hook
+    library covers common patterns, but real RE work requires target-specific hooks.
+    When you identify a class, method, or code path worth intercepting, write a
+    custom hook immediately — do not wait for permission or ask whether to do it.
+    Save target-specific hooks to `~/Documents/{app}/scripts/`. Combine multiple
+    hooks by loading several at once: `frida -U -n TARGET -l hook1.js -l hook2.js`.
+    If a built-in hook almost does what you need, copy it and modify for the target.
+13. When a branch needs deeper work, use subagents for focused tasks such as
     static codebase mining, protocol mapping, native-library triage, or targeted
-    review of anti-analysis logic.
+    review of anti-analysis logic. Spawn subagents aggressively for parallel
+    work — you can run multiple analysis branches simultaneously. Each subagent
+    should write findings to the shared workspace files. Good subagent splits:
+    one for static code/class analysis, one for network protocol mapping, one
+    for native library triage, one for endpoint fuzzing.
 
 ## Evidence Output Template
 
@@ -275,23 +281,172 @@ All paths relative to repo root (`/home/yz/System`):
   failure modes and recovery paths
 - `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, cert, and
   spoofing helper
-- `scripts/ai/android-re/re-static.sh`: static APK analysis helper
+- `scripts/ai/android-re/re-static.sh`: static APK analysis helper (includes
+  `diff` for version comparison)
+- `scripts/ai/android-re/workspace-init.sh`: target workspace initialization
+  with OWASP-aligned templates
 - `scripts/ai/android-re/_spoof-table.sh`: declarative device identity spoofing
   data
 - `scripts/ai/android-re/opencode-android-re.sh`: OpenCode Android RE session
   launcher
 - `home-manager/modules/ai-agents/android-re/_launchers.nix`: Nix wrapper
-  definitions for both `oc*are` and `cl*are` launchers
+  definitions for `oc*are` launchers
+
+## Target Workspace
+
+All target-specific work goes in `~/Documents/{app-name}/`. This directory
+persists across sessions and is the single source of truth for the target.
+
+Initialize on first contact:
+
+```bash
+bash scripts/ai/android-re/workspace-init.sh init com.example.target [/path/to/app.apk]
+```
+
+Workspace structure:
+
+- `README.md` — target overview, package metadata, session log pointer
+- `FINDINGS.md` — OWASP Mobile Top 10 classified findings (M1–M10)
+- `NOTES.md` — running notes, hypotheses, blocked items, next steps
+- `ENDPOINTS.md` — discovered API endpoints and backend surface
+- `ANTI-ANALYSIS.md` — defense inventory and bypass status
+- `COMPONENTS.md` — exported components analysis and test results
+- `ATTACK-SURFACE.md` — high-level attack surface map
+- `SESSIONS.md` — per-session history with goals, findings, blockers, next steps
+- `scripts/` — target-specific Frida hooks, PoC scripts, automation
+- `evidence/` — screenshots, logs, pcaps, memory dumps
+- `analysis/` — static/dynamic analysis outputs
+
+### Session Continuity Rules
+
+On session resume:
+
+1. read `SESSIONS.md` for what previous sessions did and found
+2. read `NOTES.md` for hypotheses, blocked items, and next steps
+3. read `FINDINGS.md` for already-discovered vulnerabilities
+4. read `ANTI-ANALYSIS.md` for known defenses and bypass status
+
+### Write Incrementally — Do Not Batch
+
+Context compaction can erase earlier discoveries at any time. To prevent data
+loss, write to workspace files immediately after every result — do not wait
+until a phase is complete or the session is ending.
+
+**After every single result or observation, write it down immediately:**
+
+- discovered an endpoint or saw a request in mitmproxy → append to
+  `ENDPOINTS.md` right now
+- found a vulnerability or confirmed a bug → add to `FINDINGS.md` right now
+- identified a defense (root check, pinning, anti-Frida) → update
+  `ANTI-ANALYSIS.md` right now
+- tested an exported component → record result in `COMPONENTS.md` right now
+- formed a hypothesis or hit a blocker → note it in `NOTES.md` right now
+- captured a screenshot, log, or pcap → save to `evidence/` right now and
+  note the path in the relevant file
+- wrote a hook, script, or PoC → save to `scripts/` right now
+
+**Never hold more than one finding in memory unwritten.** If you discover
+something, write it to the workspace file before moving to the next step. This
+is the most important rule for data survival across context compaction.
+
+**Update `SESSIONS.md` progressively**, not just at the end: append a line
+after each phase or major step completes, so partial progress survives even if
+the session is cut short.
+
+After discovering defenses:
+
+- update `ANTI-ANALYSIS.md` with detection method and bypass status
+
+All target-specific scripts, hooks, and PoCs must go in `~/Documents/{app}/scripts/`.
+
+### Full Assessment Prompt Example
+
+When the operator asks for a full assessment, the session should:
+
+1. initialize or resume the workspace
+2. run baseline health checks — write status to `SESSIONS.md`
+3. perform complete static triage — write results to `NOTES.md`,
+   `ENDPOINTS.md`, `COMPONENTS.md`, `ANTI-ANALYSIS.md` as you find them
+4. install and smoke test the app — screenshot to `evidence/`, note in
+   `SESSIONS.md`
+5. set up traffic interception — write proxy result to `NOTES.md`
+6. exercise every UI screen and feature with `agent-device` — after each
+   screen, append discovered endpoints to `ENDPOINTS.md`, screenshot to
+   `evidence/`
+7. run Frida hooks for crypto, network, WebView, and intent analysis — write
+   each observation to `NOTES.md` and relevant workspace file immediately
+8. test all exported components, deep links, and content providers — record
+   each test result in `COMPONENTS.md` as you go
+9. analyze local storage, backup extraction, and token handling — write
+   findings to `FINDINGS.md` immediately
+10. classify all findings by OWASP Mobile Top 10 — update `FINDINGS.md` as
+    each is confirmed
+11. write PoC scripts for every confirmed finding — save to `scripts/` as
+    each is completed
+12. spawn subagents for parallel deep-dive work as needed — each subagent
+    writes directly to workspace files
+
+Example operator prompt:
+
+```
+full assessment of com.example.target at ~/Documents/mythingapp:
+read the dir to learn context from previous sessions, then do
+complete static + dynamic analysis, test all UI screens and features,
+find vulnerabilities, zero-days, and bugs, document everything in the
+workspace, put all scripts/hooks/PoC there, spawn subagents for
+parallel work
+```
+
+### Multi-App And Ecosystem Analysis
+
+When the target is part of an app ecosystem:
+
+- **Split APKs**: analyze each split independently, then correlate permissions
+  and components across the set
+- **sharedUserId**: apps sharing a Linux UID share data directories and trust
+  boundaries — check `android:sharedUserId` in the manifest
+- **Companion apps**: check the manifest for references to other packages,
+  check `adb shell pm list packages` for related apps from the same developer
+- **SDK reuse**: if the target uses the same auth/payment SDK as another app
+  you have analyzed, carry forward known findings
 
 ## agent-device Skill
 
-You MUST load the `agent-device` skill before any device UI interaction. Core
-workflow:
+You MUST load the `agent-device` skill before any device UI interaction.
+
+`agent-device` is not just for screenshots. It is the primary tool for dynamic
+analysis. Use it to click through every screen, navigate every flow, exercise
+every feature, fill forms, toggle settings, and trigger network requests while
+proxy and Frida hooks are active.
+
+Core workflow:
 
 1. `agent-device open <app> --platform android`
 2. `agent-device snapshot -i`
 3. `agent-device click @eN` / `fill @eN "text"` / `find "label" click`
 4. `agent-device close`
+
+Dynamic analysis rules:
+
+- **Exercise every reachable screen**: after initial launch, systematically
+  snapshot and click through every tab, menu, settings screen, profile, and
+  feature. Do not stop at the first screen.
+- **Fill real-looking inputs**: use plausible emails, names, and phone numbers
+  to trigger actual API calls and auth flows.
+- **Snapshot before and after every action**: capture the state before you tap,
+  then snapshot again after. This documents what each action does.
+- **Correlate UI actions with network and hook output**: after each significant
+  UI action (login, navigation, form submit, settings toggle), read the mitm
+  pane and Frida pane to see what traffic and hooks fired.
+- **Use `find "label" click` for semantic navigation**: prefer this over raw
+  refs when navigating menus and buttons by visible text.
+- **Take screenshots of every interesting state**: save to
+  `~/Documents/{app}/evidence/screenshots/` with descriptive names.
+- **Combine with logcat**: after UI actions that crash or behave unexpectedly,
+  read `tmux capture-pane -t android-re:logcat -p -S -80` for diagnostics.
+- **Keep `agent-device` open during active exploration**: open once, then
+  repeatedly snapshot/click/fill/screenshot. Close only when done with the
+  entire session or switching to a different analysis tool.
 
 Always snapshot before interacting. Refs invalidate after UI changes. Prefer
 refs over raw coordinates.

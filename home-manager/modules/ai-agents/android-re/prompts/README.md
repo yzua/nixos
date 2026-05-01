@@ -85,7 +85,25 @@ as:
 Operator-owned scripts stay outside this prompt bundle:
 
 - `scripts/ai/android-re/re-avd.sh`: emulator and dynamic-analysis helper
-- `scripts/ai/android-re/re-static.sh`: static-analysis helper
+- `scripts/ai/android-re/re-static.sh`: static-analysis helper (includes `diff`
+  for version comparison)
+- `scripts/ai/android-re/workspace-init.sh`: target workspace initialization
+
+## Target Workspace Convention
+
+All target-specific work goes in `~/Documents/{app-name}/`. This directory
+persists across sessions and carries findings, notes, evidence, and PoC scripts
+between agent sessions.
+
+Initialize a new target workspace:
+
+```bash
+bash scripts/ai/android-re/workspace-init.sh init com.example.target /path/to/app.apk
+```
+
+The workspace contains OWASP-aligned templates for findings (M1–M10), endpoints,
+anti-analysis defenses, exported components, attack surface maps, and session
+history. See `AGENTS.md` for the full workspace convention and rules.
 
 ## Fast Start
 
@@ -109,9 +127,6 @@ tail -f ~/Downloads/android-re-tools/re-avd-start.log
 - `ocgptare` — protocol/auth mapping and deeper structured execution
 - `ocglmare` — anti-analysis, pinning, and cost-effective repeated probing
 - `oczenare` — static-first reconnaissance and low-cost wide searches
-- `clare` — Claude Code (opus), balanced general triage
-- `clglmare` — Claude Code via Z.AI GLM, anti-analysis and pinning focus
-- `clsare` — Claude Code (sonnet), protocol mapping and structured execution
 
 Examples:
 
@@ -120,9 +135,16 @@ ocare "prepare the emulator and inspect this target"
 ocgptare "focus on auth, traffic, and replay surfaces"
 ocglmare "look for root, emulator, and anti-Frida paths"
 oczenare "do static APK triage and summarize likely pivots"
-clare "prepare the emulator and inspect this target"
-clglmare "look for root, emulator, and anti-Frida paths"
-clsare "focus on auth, traffic, and replay surfaces"
+```
+
+Full assessment example:
+
+```bash
+ocare "full assessment of com.example.target at ~/Documents/mythingapp: \
+read the dir to learn context from previous sessions, then do \
+complete static + dynamic analysis, test all UI screens and features, \
+find vulnerabilities and bugs, document everything in the workspace, \
+put all scripts/hooks/PoC there, spawn subagents for parallel work"
 ```
 
 Available profile launchers:
@@ -134,10 +156,6 @@ Available profile launchers:
 - `ocorare` -> `opencode-openrouter`
 - `ocsare` -> `opencode-sonnet`
 - `oczenare` -> `opencode-zen`
-- `clare` -> Claude Code (opus)
-- `clglmare` -> Claude Code via Z.AI GLM endpoint
-- `clsare` -> Claude Code (sonnet)
-- `clhare` -> Claude Code (haiku)
 
 Each launcher:
 
@@ -170,9 +188,9 @@ Use the launcher that best fits the current branch, then switch once evidence
 points elsewhere:
 
 - `oczenare` -> cheapest static-first APK reconnaissance and wide search
-- `ocgptare` / `clsare` -> structured auth, protocol, replay, and reporting work
-- `ocglmare` / `clglmare` -> anti-analysis, pinning, and repeated bypass tries
-- `ocare` / `clare` -> balanced default when the target is not yet classified
+- `ocgptare` -> structured auth, protocol, replay, and reporting work
+- `ocglmare` -> anti-analysis, pinning, and repeated bypass tries
+- `ocare` -> balanced default when the target is not yet classified
 
 Do not stay attached to the original launcher choice once the evidence says a
 different branch is now dominant.
@@ -230,6 +248,13 @@ Static analysis:
 bash scripts/ai/android-re/re-static.sh prepare /path/to/app.apk
 bash scripts/ai/android-re/re-static.sh hashes /path/to/app.apk
 bash scripts/ai/android-re/re-static.sh inventory
+bash scripts/ai/android-re/re-static.sh diff old_version new_version
+```
+
+Target workspace:
+
+```bash
+bash scripts/ai/android-re/workspace-init.sh init com.example.target /path/to/app.apk
 ```
 
 Proxy and Frida:
