@@ -2,33 +2,44 @@
 # Kill switch handled by Mullvad lockdown mode (nftables), not iptables.
 # All rules use nftables for consistency with Mullvad and OpenSnitch.
 
-{ constants, ... }:
+{
+  config,
+  lib,
+  constants,
+  ...
+}:
 
 {
-  networking.firewall = {
-    enable = true;
-    logRefusedConnections = true;
-    rejectPackets = false; # Drop instead of reject for stealth
-    allowedTCPPorts = [
-      constants.ports.localsend
-      constants.ports.devServer
-    ];
-    allowedUDPPorts = [ constants.ports.localsend ];
+  options.mySystem.firewall = {
+    enable = lib.mkEnableOption "network firewall and hostname leak prevention";
+  };
 
-    extraCommands = ''
-      # === Hostname Leak Prevention (iptables — kernel nf_tables handles both) ===
-      iptables -A OUTPUT -p udp --dport 5355 -j DROP   # LLMNR
-      iptables -A OUTPUT -p udp --dport 137:138 -j DROP # NetBIOS
-      iptables -A OUTPUT -p tcp --dport 139 -j DROP     # NetBIOS
-      iptables -A OUTPUT -p tcp --dport 445 -j DROP     # SMB
-    '';
+  config = lib.mkIf config.mySystem.firewall.enable {
+    networking.firewall = {
+      enable = true;
+      logRefusedConnections = true;
+      rejectPackets = false; # Drop instead of reject for stealth
+      allowedTCPPorts = [
+        constants.ports.localsend
+        constants.ports.devServer
+      ];
+      allowedUDPPorts = [ constants.ports.localsend ];
 
-    # === nftables rules — evaluated AFTER iptables rules ===
-    # These add defense-in-depth on the nftables side
-    extraInputRules = ''
-      # Rate-limit ICMP echo (ping flood prevention)
-      ip protocol icmp limit rate 1/second burst 5 packets accept
-      ip6 nexthdr icmpv6 limit rate 1/second burst 5 packets accept
-    '';
+      extraCommands = ''
+        # === Hostname Leak Prevention (iptables — kernel nf_tables handles both) ===
+        iptables -A OUTPUT -p udp --dport 5355 -j DROP   # LLMNR
+        iptables -A OUTPUT -p udp --dport 137:138 -j DROP # NetBIOS
+        iptables -A OUTPUT -p tcp --dport 139 -j DROP     # NetBIOS
+        iptables -A OUTPUT -p tcp --dport 445 -j DROP     # SMB
+      '';
+
+      # === nftables rules — evaluated AFTER iptables rules ===
+      # These add defense-in-depth on the nftables side
+      extraInputRules = ''
+        # Rate-limit ICMP echo (ping flood prevention)
+        ip protocol icmp limit rate 1/second burst 5 packets accept
+        ip6 nexthdr icmpv6 limit rate 1/second burst 5 packets accept
+      '';
+    };
   };
 }

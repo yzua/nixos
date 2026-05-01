@@ -6,12 +6,12 @@
   assertions = [
     # === Power Management Daemon Conflicts ===
     {
-      assertion = with config.services; !(tlp.enable && power-profiles-daemon.enable);
+      assertion = !(config.services.tlp.enable && config.services.power-profiles-daemon.enable);
       message = "TLP and power-profiles-daemon cannot be enabled simultaneously. Choose one power management daemon.";
     }
 
     {
-      assertion = with config.services; !(power-profiles-daemon.enable && thermald.enable);
+      assertion = !(config.services.power-profiles-daemon.enable && config.services.thermald.enable);
       message = "power-profiles-daemon and thermald cannot be enabled simultaneously. They both manage thermal/power profiles.";
     }
 

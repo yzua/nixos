@@ -58,6 +58,9 @@ in
       aide.enable = mkDefaultTrue; # Weekly AIDE file integrity monitoring
       lynis.enable = mkDefaultTrue; # Weekly Lynis security audit
       secureBoot.enable = mkDefaultTrue; # Secure Boot preparation with sbctl
+      firewall.enable = mkDefaultTrue; # Network firewall and hostname leak prevention
+      opsec.enable = mkDefaultTrue; # Session lock, zram swap, Chrony NTS
+      securityServices.enable = mkDefaultTrue; # dbus-broker and journald hardening
       vnc.enable = mkDefaultFalse; # On-demand remote access
       android.enable = mkDefaultTrue; # Android Studio, emulator, ADB, Fastboot
       browserDeps.enable = mkDefaultTrue; # Chromium, Puppeteer headless browser deps
