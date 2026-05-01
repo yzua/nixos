@@ -15,6 +15,10 @@ let
     inherit config lib;
     inherit (opencodeAgents) yoloPermission;
   };
+  webReAgent = import ./_opencode-web-re.nix {
+    inherit config lib;
+    inherit (opencodeAgents) yoloPermission;
+  };
 in
 {
   programs.aiAgents.opencode = {
@@ -29,7 +33,7 @@ in
 
     command = opencodeCommands;
 
-    agent = opencodeAgents.agents // androidReAgent;
+    agent = opencodeAgents.agents // androidReAgent // webReAgent;
 
     lsp = import ./_opencode-lsp.nix;
 

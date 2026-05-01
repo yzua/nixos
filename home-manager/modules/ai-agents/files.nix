@@ -23,6 +23,7 @@ let
     geminiSettings
     opencodeSettingsByProfile
     opencodeAndroidReMcpServers
+    opencodeWebReMcpServers
     ;
 
   opencodeProfileNames = opencodeProfiles.names;
@@ -141,6 +142,13 @@ in
       (lib.mkIf cfg.enable {
         "opencode/android-re-mcp-servers.json" = {
           text = toJSON opencodeAndroidReMcpServers;
+          force = true;
+        };
+      })
+      # Web RE agent-specific MCP server fragment (merged into runtime config by launcher)
+      (lib.mkIf cfg.enable {
+        "opencode/web-re-mcp-servers.json" = {
+          text = toJSON opencodeWebReMcpServers;
           force = true;
         };
       })

@@ -10,7 +10,12 @@ let
   mcpTransforms = import ./_mcp-transforms.nix { inherit cfg lib; };
   formatterRegistry = import ./_formatters.nix;
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
-  inherit (mcpTransforms) opencodeMcpServers geminiMcpServers opencodeAndroidReMcpServers;
+  inherit (mcpTransforms)
+    opencodeMcpServers
+    geminiMcpServers
+    opencodeAndroidReMcpServers
+    opencodeWebReMcpServers
+    ;
   opencodeFormatterSettings = builtins.listToAttrs (
     map (formatter: {
       name = formatter.tool;
@@ -124,5 +129,6 @@ in
     geminiSettings
     opencodeSettingsByProfile
     opencodeAndroidReMcpServers
+    opencodeWebReMcpServers
     ;
 }

@@ -6,6 +6,7 @@ let
   inherit (cfg)
     mcpServers
     androidReMcpServers
+    webReMcpServers
     ;
   sharedMcpServers = mcpServers;
 
@@ -79,6 +80,19 @@ let
     servers = androidReMcpServers;
   };
 
+  opencodeWebReMcpServers = mkMcpTransform {
+    localAttrs = server: {
+      type = "local";
+      command = [ server.command ] ++ (server.args or [ ]);
+    };
+    remoteAttrs = server: {
+      type = "remote";
+      inherit (server) url;
+    };
+    envKey = "environment";
+    servers = webReMcpServers;
+  };
+
 in
 {
   inherit
@@ -87,5 +101,6 @@ in
     opencodeMcpServers
     geminiMcpServers
     opencodeAndroidReMcpServers
+    opencodeWebReMcpServers
     ;
 }

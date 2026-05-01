@@ -39,6 +39,13 @@ let
       scriptsDir
       ;
   };
+  webReLaunchers = import ./web-re/_launchers.nix {
+    inherit
+      lib
+      pkgs
+      scriptsDir
+      ;
+  };
 
   aliasLib = import ./helpers/_aliases.nix {
     inherit
@@ -82,6 +89,7 @@ in
       pkgs.bubblewrap
     ]
     ++ androidReLaunchers
+    ++ webReLaunchers
     ++ (lib.optional cfg.logging.enable (
       pkgs.writeShellScriptBin "ai-agent-log-cleanup" ''
         ${logCleanupCommand}
