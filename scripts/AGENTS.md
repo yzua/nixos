@@ -33,9 +33,13 @@ scripts/
 │       ├── frida-spoof-build.js # Frida gadget spoof build script
 │       ├── frida-bypass-certificate-pinner.js # Frida: bypass OkHttp CertificatePinner
 │       ├── frida-hook-build-fields.js # Frida: log android.os.Build fields
+│       ├── frida-hook-crypto.js # Frida: hook crypto operations
 │       ├── frida-hook-file-exists.js # Frida: log File.exists root/emulator checks
+│       ├── frida-hook-intent.js # Frida: log Intent creation and routing
+│       ├── frida-hook-network.js # Frida: log network requests and responses
 │       ├── frida-hook-shared-prefs.js # Frida: log SharedPreferences reads/writes
 │       ├── frida-hook-url-log.js # Frida: log URL creation and OkHttp requests
+│       ├── frida-hook-webview.js # Frida: hook WebView load and JS interface calls
 │       ├── frida-hooks-test.sh # Unit tests for Frida hook scripts
 │       ├── _helpers.sh      # Shared helpers: adb_prop, emulator_online, resolve_niri_android_workspace
 │       ├── _spoof-table.sh  # Device fingerprint spoof table
@@ -44,7 +48,8 @@ scripts/
 │       ├── _mitm.sh         # mitmproxy helper functions
 │       ├── _spoof.sh        # Device spoof helper functions
 │       ├── _status.sh       # Status check helper functions
-│       └── _tmux.sh         # tmux helper functions
+│       ├── _tmux.sh         # tmux helper functions
+│       └── workspace-init.sh # Android RE workspace initialization
 ├── apps/
 │   ├── browser-select.sh    # Browser profile selector (wofi menu)
 │   ├── element-desktop-keyring.sh # Element Desktop keyring helper

@@ -26,6 +26,8 @@ else
 fi
 
 # Focus the android workspace in niri — window rule by title "^android-re" places it correctly
+# shellcheck source=scripts/lib/logging.sh
+source "${REPO_ROOT}/scripts/lib/logging.sh"
 # shellcheck source=scripts/ai/android-re/_helpers.sh
 source "${SCRIPT_DIR}/_helpers.sh"
 # shellcheck source=scripts/ai/android-re/_tmux.sh
@@ -60,8 +62,19 @@ if [[ -d "${BASE_OPENCODE_CONFIG_DIR}" ]]; then
 fi
 
 if [[ -f "${RUNTIME_CONFIG_DIR}/opencode.json" ]] && command -v jq >/dev/null 2>&1; then
+	# Pin default agent to android-re
 	jq '.default_agent = "android-re"' "${RUNTIME_CONFIG_DIR}/opencode.json" >"${RUNTIME_CONFIG_DIR}/opencode.json.tmp"
 	mv -f "${RUNTIME_CONFIG_DIR}/opencode.json.tmp" "${RUNTIME_CONFIG_DIR}/opencode.json"
+
+	# Merge android-re-specific MCP servers (Ghidra, JADX, apktool) into runtime config.
+	# These are NOT in the shared profile — they only appear in the android-re overlay.
+	ANDROID_RE_MCP_FILE="$HOME/.config/opencode/android-re-mcp-servers.json"
+	if [[ -f "${ANDROID_RE_MCP_FILE}" ]]; then
+		jq --slurpfile armcp "${ANDROID_RE_MCP_FILE}" \
+			'.mcp += $armcp[0]' \
+			"${RUNTIME_CONFIG_DIR}/opencode.json" >"${RUNTIME_CONFIG_DIR}/opencode.json.tmp"
+		mv -f "${RUNTIME_CONFIG_DIR}/opencode.json.tmp" "${RUNTIME_CONFIG_DIR}/opencode.json"
+	fi
 fi
 
 if command -v ghostty >/dev/null 2>&1; then
