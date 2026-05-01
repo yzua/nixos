@@ -5,10 +5,11 @@
 #
 # Available helpers:
 #   _systemd-helpers.nix  — mkServiceHardening, mkPersistentTimer, mkOneshotService
-#   _service-urls.nix     — Auto-generated localhost URLs from constants.ports
+#
+# Service URLs are now `constants.urls` (auto-derived from constants.ports).
 #
 # Usage (from a sibling module):
 #   inherit (systemdHelpers) mkPersistentTimer;
-#   svcUrls = import ../helpers/_service-urls.nix { inherit constants; };
+#   inherit (constants) urls;
 
 { }

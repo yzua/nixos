@@ -2,7 +2,7 @@
 #
 # NOTE: mkPersistentTimer here outputs NixOS systemd format
 # ({ description; wantedBy; timerConfig = { ... } }).
-# The Home Manager equivalent lives in shared/_hm-systemd-helpers.nix
+# The Home Manager equivalent lives in home-manager/_helpers/_systemd-helpers.nix
 # and outputs HM systemd format ({ Unit.Description; Timer = { ... }; Install.WantedBy }).
 # They share the name but produce different schemas because HM and NixOS use
 # different systemd option structures.

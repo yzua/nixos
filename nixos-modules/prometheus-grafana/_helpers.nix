@@ -3,8 +3,7 @@
 { constants }:
 
 let
-  svcUrls = import ../helpers/_service-urls.nix { inherit constants; };
-  inherit (svcUrls) urls;
+  inherit (constants) urls;
 
   # Strip http:// prefix for Prometheus scrape targets (needs host:port form)
   mkTarget = url: builtins.substring 7 (builtins.stringLength url - 7) url;

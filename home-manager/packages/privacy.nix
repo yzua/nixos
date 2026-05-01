@@ -9,7 +9,7 @@
 }:
 
 let
-  eglWrap = import ./_egl-wrap.nix { inherit pkgs constants; };
+  eglWrap = import ../_helpers/_egl-wrap.nix { inherit pkgs constants; };
   inherit (eglWrap) wrapWithMesaEgl;
 in
 {

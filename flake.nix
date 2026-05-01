@@ -85,8 +85,8 @@
       };
 
       optionHelpers = import ./shared/_option-helpers.nix { inherit (nixpkgs) lib; };
-      secretLoader = import ./shared/_secret-loader.nix;
-      hmSystemdHelpers = import ./shared/_hm-systemd-helpers.nix { inherit (nixpkgs) lib; };
+      secretLoader = import ./home-manager/_helpers/_secret-loader.nix;
+      hmSystemdHelpers = import ./home-manager/_helpers/_systemd-helpers.nix { inherit (nixpkgs) lib; };
 
       # Args shared between NixOS and Home Manager specialArgs
       sharedArgs = {

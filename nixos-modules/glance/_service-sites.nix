@@ -4,8 +4,7 @@
 { constants }:
 
 let
-  svcUrls = import ../helpers/_service-urls.nix { inherit constants; };
-  inherit (svcUrls) urls;
+  inherit (constants) urls;
 in
 [
   {

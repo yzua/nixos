@@ -1,6 +1,39 @@
 # Shared constants used across NixOS and Home Manager configurations.
 # Single source of truth for terminal, editor, font, theme, and keyboard settings.
 # Passed via flake specialArgs (NixOS) and extraSpecialArgs (Home Manager).
+
+let
+  localhost = "127.0.0.1";
+
+  # Service ports — single source of truth for localhost services.
+  # Referenced by NixOS modules and Glance dashboard health checks.
+  ports = {
+    glance = 8082;
+    netdata = 19999;
+    grafana = 3001;
+    prometheus = 9090;
+    alertmanager = 9093;
+    scrutiny = 8080;
+    influxdb = 8086;
+    loki = 3100;
+    loki-grpc = 9096;
+    alloy = 12345;
+    ntfy-bridge = 8090;
+    i2pd-socks = 4447;
+    i2pd-webconsole = 7070;
+    activitywatch = 5600;
+    otel = 4317;
+    vnc = 5900;
+    vnc-web = 6080;
+    localsend = 53317;
+    tor-socks = 9050;
+    tor-dns = 9053;
+    socks = 1080;
+    dns = 53;
+    cups = 631;
+    devServer = 3000;
+  };
+in
 {
   # User Identity (Git, GitHub, Contact)
   user = {
@@ -107,37 +140,14 @@
   };
 
   # Loopback address — single source of truth for localhost-only service bindings.
-  # Used by NixOS modules that bind services to the loopback interface.
-  localhost = "127.0.0.1";
+  inherit localhost;
 
   # Service ports — single source of truth for localhost services.
-  # Referenced by NixOS modules and Glance dashboard health checks.
-  ports = {
-    glance = 8082;
-    netdata = 19999;
-    grafana = 3001;
-    prometheus = 9090;
-    alertmanager = 9093;
-    scrutiny = 8080;
-    influxdb = 8086;
-    loki = 3100;
-    loki-grpc = 9096;
-    alloy = 12345;
-    ntfy-bridge = 8090;
-    i2pd-socks = 4447;
-    i2pd-webconsole = 7070;
-    activitywatch = 5600;
-    otel = 4317;
-    vnc = 5900;
-    vnc-web = 6080;
-    localsend = 53317;
-    tor-socks = 9050;
-    tor-dns = 9053;
-    socks = 1080;
-    dns = 53;
-    cups = 631;
-    devServer = 3000;
-  };
+  inherit ports;
+
+  # Localhost service URLs — auto-derived from ports + localhost.
+  # Used by monitoring modules (prometheus-grafana, glance, system-report).
+  urls = builtins.mapAttrs (_name: port: "http://${localhost}:${toString port}") ports;
 
   # Docker default bridge gateway IP.
   # Used by dnscrypt-proxy (listen address) and Docker daemon (DNS).
@@ -157,17 +167,4 @@
 
   # System architecture — used by flake.nix and package meta.platforms.
   system = "x86_64-linux";
-
-  # External service API endpoints.
-  services = {
-    zai = {
-      apiRoot = "https://api.z.ai/api"; # Z.AI API root (Anthropic-compatible + MCP)
-      timeout = 3000000; # API timeout in ms
-      models = {
-        haiku = "glm-5-turbo";
-        sonnet = "glm-5.1";
-        opus = "glm-5.1"; # Same model as sonnet — no dedicated opus-tier available
-      };
-    };
-  };
 }

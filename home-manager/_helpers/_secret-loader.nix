@@ -1,6 +1,6 @@
 # Shared bash function for loading sops secrets from /run/secrets/.
-# Used by zsh init (functions.nix) and standalone agent wrapper scripts (_android-re-launchers.nix).
-# Located in shared/ because it crosses module boundaries (terminal + ai-agents).
+# Used by zsh init (functions.nix) and standalone agent wrapper scripts (android-re/_launchers.nix).
+# Located in home-manager/_helpers/ because it is only used by HM modules.
 
 let
   loadSecretFn = ''
