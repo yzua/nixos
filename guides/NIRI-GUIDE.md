@@ -165,7 +165,7 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+Shift+2`         | Move column to 󰨞 editor workspace     |
 | `Super+Shift+3`         | Move column to 󰍡 social workspace     |
 | `Super+Shift+4`         | Move column to 󰎆 media workspace      |
-| `Super+Shift+5`         | Move column to unnamed workspace 5    |
+| `Super+Shift+5`         | Move column to 󰖟 vpn workspace        |
 | `Super+Shift+6`         | Move column to 󰀲 android workspace    |
 | `Super+Shift+7–9`       | Move column to unnamed workspaces 7–9 |
 | `Super+Shift+Page_Up`   | Move column to workspace above        |

@@ -59,6 +59,7 @@ modules/
 │       ├── global-instructions.md # Global instructions text (not a module)
 │       ├── _skills.nix      # Skill installations and omissions (not a module)
 │       ├── mcp-servers.nix  # MCP server definitions + logging
+│       ├── mcp-servers-android-re.nix # Android RE MCP server definitions
 │       ├── claude/          # Claude Code configuration
 │       │   ├── default.nix  # Permissions, hooks, settings (import hub)
 │       │   ├── _hooks.nix   # Lifecycle hooks aggregation (imports helpers + per-stage modules)
@@ -188,7 +189,7 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 }
 ```
 
-9 domain chunks + 5 custom chunks + 1 helper: `applications`, `cli`, `development`, `lsp-servers`, `networking`, `niri`, `privacy`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`, and `_helpers/_egl-wrap.nix` (helper, imported manually).
+9 domain chunks + 5 custom chunks + 1 helper: `applications`, `cli`, `development`, `lsp-servers`, `networking`, `niri`, `privacy`, `system-monitoring`, `utilities`, plus `custom/beads`, `custom/chrome-devtools`, `custom/cursor`, `custom/kiro`, `custom/prayer`, and `../_helpers/_egl-wrap.nix` (helper, imported manually).
 
 **When adding packages**: pick the domain chunk, add to its list. Don't create new chunks unless new domain.
 

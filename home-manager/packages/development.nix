@@ -42,7 +42,8 @@ let
     # API development
     bruno
     burpsuite
-    hurl # HTTP request runner with assertions (CI-friendly API testing)
+    hurl
+    httpie # HTTP request runner with assertions (CI-friendly API testing)
     grpcurl # CLI for gRPC services (reflection + file descriptor support)
 
     # Build tools
@@ -90,6 +91,7 @@ let
     tokio-console # Real-time async Rust (tokio) diagnostics
 
     # Reverse engineering (android-tools provided by nixos-modules/android.nix)
+    androguard
     apktool
     binwalk
     cutter
@@ -115,5 +117,11 @@ let
   ];
 in
 {
-  home.packages = latest ++ stable ++ [ pkgs.objection ];
+  home.packages =
+    latest
+    ++ stable
+    ++ [
+      pkgs.objection
+      pkgs.cyberchef
+    ];
 }

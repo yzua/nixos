@@ -11,9 +11,9 @@ Parent: `home-manager/modules/ai-agents/AGENTS.md`
 | File                       | Purpose                                                                                     |
 | -------------------------- | ------------------------------------------------------------------------------------------- |
 | `default.nix`              | Import hub: imports codex, gemini, opencode                                                 |
-| `codex.nix`                | Codex CLI: model (gpt-5.4), profiles, custom agents, features                               |
+| `codex.nix`                | Codex CLI: model (gpt-5.5), profiles, custom agents, features                               |
 | `gemini.nix`               | Gemini CLI: theme (Gruvbox), model aliases, auto-format hooks, security, experimental flags |
-| `opencode.nix`             | OpenCode: model (opencode/claude-opus-4-6), 7 agents, 6 commands, LSP, permissions          |
+| `opencode.nix`             | OpenCode: model (opencode/claude-opus-4-7), 7 agents, 6 commands, LSP, permissions          |
 | `_opencode-agents.nix`     | OpenCode agent definitions (build, plan, review, recon, patch, optimize, android-re)        |
 | `_opencode-commands.nix`   | OpenCode slash command definitions (commit-split, refactor, security-audit, etc.)           |
 | `_opencode-android-re.nix` | OpenCode Android RE agent definition (imports `../../android-re/_prompt.nix`)               |

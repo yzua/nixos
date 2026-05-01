@@ -23,7 +23,7 @@ Package declarations for `home.packages`. This directory is chunked by domain an
 - `system-monitoring.nix` — Observability user tools
 - `utilities.nix` — General utility packages
 - `custom/beads.nix`, `custom/chrome-devtools.nix`, `custom/cursor.nix`, `custom/kiro.nix`, `custom/prayer.nix` — Local/custom package definitions
-- `_egl-wrap.nix` — Helper at `_helpers/_egl-wrap.nix`, imported manually by chunks; not imported by `default.nix`
+- `_egl-wrap.nix` — Helper at `../_helpers/_egl-wrap.nix`, imported manually by chunks; not imported by `default.nix`
 
 ---
 
@@ -50,7 +50,7 @@ Package declarations for `home.packages`. This directory is chunked by domain an
 
 - Add regular package: existing domain chunk in this directory
 - Add custom/local package: `custom/*.nix`
-- Add helper logic shared by chunks: `_*.nix`
+- Add helper logic shared by chunks: `../_helpers/_*.nix` (imported manually)
 - Wire new chunk into aggregation: `default.nix`
 
 ---

@@ -279,8 +279,8 @@ btca ask --resource <name> --question "Summarize setup, auth, and latest breakin
 | `mcx`                          | `codex ... -c model_reasoning_effort=\"medium\"`                   | Codex medium reasoning effort profile                                                            |
 | `hcx`                          | `codex ... -c model_reasoning_effort=\"high\"`                     | Codex high reasoning effort profile                                                              |
 | `xcx`                          | `codex ... -c model_reasoning_effort=\"xhigh\"`                    | Codex extra-high reasoning effort profile                                                        |
-| `locgpt`                       | `opencode_gpt --model openai/gpt-5.4-spark`                        | OpenCode GPT low reasoning/speed variant                                                         |
-| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.4`                              | OpenCode GPT medium reasoning default                                                            |
+| `locgpt`                       | `opencode_gpt --model openai/gpt-5.5-spark`                        | OpenCode GPT low reasoning/speed variant                                                         |
+| `mocgpt`                       | `opencode_gpt --model openai/gpt-5.5`                              | OpenCode GPT medium reasoning default                                                            |
 | `xocgpt`                       | `opencode_gpt --model openai/gpt-5.1-codex-max`                    | OpenCode GPT extra-high reasoning variant                                                        |
 | `ais`                          | `ai-agent-launcher`                                                | Interactive fzf selector for prefix, mode/effort, and workflow suffix (requires logging enabled) |
 | `ait`                          | `ai-agent-inventory`                                               | Interactive fzf inventory: tool family -> section -> entries (requires logging enabled)          |
@@ -438,6 +438,7 @@ ai-agents/
     ├── global-instructions.md # Global instructions text (not a module)
     ├── _skills.nix          # Skill installations and omissions (not a module)
     ├── mcp-servers.nix      # MCP server definitions + logging
+    ├── mcp-servers-android-re.nix # Android RE MCP server definitions
     ├── claude/              # Claude Code configuration
     │   ├── default.nix        # Permissions, hooks, settings (import hub)
     │   ├── _hooks.nix         # Lifecycle hooks aggregation (imports helpers + per-stage modules)
@@ -486,7 +487,7 @@ Permissions allow: `git`, `gh`, `npm run`, `pnpm`, `bun`, `just`, `nix`, `nh`, `
 
 | Setting             | Value                            | Why                                                           |
 | ------------------- | -------------------------------- | ------------------------------------------------------------- |
-| Model               | `opencode/claude-opus-4-6`       | Primary coding model                                          |
+| Model               | `opencode/claude-opus-4-7`       | Primary coding model                                          |
 | Default agent       | `build`                          | Implementation-first default                                  |
 | Small model         | `claude-haiku-4-5`               | Cheap model for titles, summaries                             |
 | Compaction          | Auto + prune                     | Remove old tool outputs, reserve 10k tokens                   |
@@ -556,7 +557,7 @@ Operational notes:
 
 | Setting                  | Value                                      | Why                                                              |
 | ------------------------ | ------------------------------------------ | ---------------------------------------------------------------- |
-| Model                    | `openai/gpt-5.4`                           | Stable default across interactive coding and repository work     |
+| Model                    | `openai/gpt-5.5`                           | Stable default across interactive coding and repository work     |
 | Personality              | `pragmatic`                                | Direct, practical responses                                      |
 | Reasoning effort         | `medium`                                   | Balanced speed/quality                                           |
 | Approval policy          | `on-request`                               | Good autonomy/safety balance for local coding                    |
@@ -637,8 +638,8 @@ Uses a separate config directory (`~/.config/opencode-gpt/`) with the model over
 
 | Model ID          | Use Case                             |
 | ----------------- | ------------------------------------ |
-| gpt-5.4           | Primary coding and deep execution    |
-| gpt-5.4-spark     | Fast low-cost exploration            |
+| gpt-5.5           | Primary coding and deep execution    |
+| gpt-5.5-spark     | Fast low-cost exploration            |
 | gpt-5.1-codex-max | Max-capacity GPT for demanding tasks |
 
 Provider prefixes: `openai/` (OpenAI API), `opencode/` (OpenCode hosted/free tier).
@@ -749,10 +750,10 @@ Not all auth types work with btca CLI. Consumer subscription OAuth (Claude Max, 
 If you have ChatGPT Plus, the cheapest working setup:
 
 ```bash
-btca connect -g -p openai -m gpt-5.4
+btca connect -g -p openai -m gpt-5.5
 ```
 
-This routes through the Codex endpoint (`chatgpt.com/backend-api/codex/responses`) which accepts ChatGPT OAuth. Models that work: `gpt-5.4`, `gpt-5.3` and other Codex-compatible `gpt-5*` entries. Models that fail: `gpt-4o-mini`, `gpt-4o`, `gpt-5-nano` (route to `api.openai.com` which rejects ChatGPT OAuth).
+This routes through the Codex endpoint (`chatgpt.com/backend-api/codex/responses`) which accepts ChatGPT OAuth. Models that work: `gpt-5.5`, `gpt-5.3` and other Codex-compatible `gpt-5*` entries. Models that fail: `gpt-4o-mini`, `gpt-4o`, `gpt-5-nano` (route to `api.openai.com` which rejects ChatGPT OAuth).
 
 ### Config File
 
@@ -761,7 +762,7 @@ btca config lives at `~/.config/btca/btca.config.jsonc` (global) or `.btca/btca.
 ```jsonc
 {
   "provider": "openai",        // Provider ID
-  "model": "gpt-5.4",         // Model for CLI queries
+  "model": "gpt-5.5",         // Model for CLI queries
   "resources": [ ... ],        // Registered repos/docs
   "providerTimeoutMs": 300000, // 5 min timeout
   "maxSteps": 40               // Max tool-use steps per query
@@ -774,7 +775,7 @@ btca config lives at `~/.config/btca/btca.config.jsonc` (global) or `.btca/btca.
 | ---------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
 | `Provider "X" is not authenticated`                              | No credentials for that provider       | `opencode auth login` → select provider                    |
 | `Provider "X" is not connected`                                  | OAuth token expired or wrong auth type | Re-auth: `opencode auth login`                             |
-| `model is not supported when using Codex with a ChatGPT account` | Non-Codex model with ChatGPT OAuth     | Use `gpt-5.4` (or another Codex-compatible `gpt-5*` model) |
+| `model is not supported when using Codex with a ChatGPT account` | Non-Codex model with ChatGPT OAuth     | Use `gpt-5.5` (or another Codex-compatible `gpt-5*` model) |
 | `No payment method` (OpenCode Zen)                               | OpenCode Zen needs billing             | Add payment at opencode.ai or switch provider              |
 | `API key not valid` (Google)                                     | Google account OAuth ≠ AI Studio key   | Get key from aistudio.google.com                           |
 

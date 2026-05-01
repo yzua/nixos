@@ -92,7 +92,7 @@ Inside Neo-tree:
 Inside Telescope:
 
 - Type to filter results
-- Use `Ctrl+j`/`Ctrl+k` or arrow keys to move up/down
+- Use `Ctrl+n`/`Ctrl+p` or arrow keys to move up/down
 - Press `Enter` to open the selected file
 - Press `Esc` to close Telescope
 
