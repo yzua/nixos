@@ -2,18 +2,16 @@
 
 ## MCP Analysis Servers
 
-Three MCP servers load exclusively for this agent:
+Two MCP servers load exclusively for this agent:
 
-- **pyghidra-mcp** — headless Ghidra via PyGhidra (native `.so` decompilation,
-  cross-refs, call graphs, symbol search)
-- **jadx-mcp-server** — JADX-driven decompilation, manifest inspection,
-  class/method search, xrefs, and resource reading
+- **pyghidra-mcp** — headless Ghidra via PyGhidra: native `.so` decompilation,
+  cross-refs, call graphs, symbol search
 - **apktool-mcp-server** — APK decode/rebuild, smali and resource
   read/modify, project management
 
 MCP tools are discovered automatically at runtime. Use them as the primary
-analysis interface whenever they cover the task. Fall back to bash when they are
-unavailable or don't cover the need.
+analysis interface whenever they cover the task. Fall back to bash `jadx` and
+`apktool` CLI when MCP tools are unavailable or don't cover the need.
 
 ## Installed On This Machine
 

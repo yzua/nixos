@@ -4,6 +4,12 @@
 
 { pkgs, ... }:
 
+let
+  # jpype (used by pyghidra) needs libstdc++.so.6 at runtime.
+  # On NixOS the FHS path is not available to uvx, so we inject
+  # LD_LIBRARY_PATH from the system gcc lib output.
+  gccLib = pkgs.stdenv.cc.cc.lib;
+in
 {
   programs.aiAgents = {
     androidReMcpServers = {
@@ -13,27 +19,14 @@
         args = [ "pyghidra-mcp" ];
         env = {
           GHIDRA_INSTALL_DIR = "${pkgs.ghidra-bin}/lib/ghidra";
+          LD_LIBRARY_PATH = "${gccLib}/lib";
         };
-      };
-
-      jadx-mcp-server = {
-        enable = true;
-        command = "uvx";
-        args = [
-          "--from"
-          "git+https://github.com/zinja-coder/jadx-mcp-server"
-          "jadx_mcp_server"
-        ];
       };
 
       apktool-mcp-server = {
         enable = true;
         command = "uvx";
-        args = [
-          "--from"
-          "git+https://github.com/zinja-coder/apktool-mcp-server"
-          "apktool_mcp_server"
-        ];
+        args = [ "apktool-mcp" ];
       };
     };
   };
