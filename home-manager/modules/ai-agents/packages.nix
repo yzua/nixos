@@ -33,10 +33,9 @@ let
     AI_AGENT_LOG_DIR=${lib.escapeShellArg cfg.logging.directory} \
       exec ${scriptsDir}/ai/agent-dashboard.sh "$@"
   '';
-  androidReLaunchers = import ./helpers/_android-re-launchers.nix {
+  androidReLaunchers = import ./android-re/_launchers.nix {
     inherit
       config
-      constants
       lib
       pkgs
       scriptsDir

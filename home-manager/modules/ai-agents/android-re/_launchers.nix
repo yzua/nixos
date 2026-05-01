@@ -1,6 +1,5 @@
 {
   config,
-  constants,
   lib,
   pkgs,
   scriptsDir,
@@ -9,7 +8,7 @@
 let
   launcherScript = "${scriptsDir}/ai/android-re/opencode-android-re.sh";
   inherit (secretLoader) loadSecretFn;
-  zaiEnv = import ./_zai-env.nix;
+  zaiEnv = import ../helpers/_zai-env.nix;
 
   mkAndroidReLauncher =
     {
@@ -22,7 +21,7 @@ let
     '';
 
   # Android-re prompt text assembled from the markdown files at Nix eval time.
-  promptLib = import ../android-re/_prompt.nix {
+  promptLib = import ./_prompt.nix {
     inherit lib;
     homeDir = config.home.homeDirectory;
   };

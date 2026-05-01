@@ -1,6 +1,6 @@
 # Shared ZAI provider environment variables.
 # Single source of truth for the env var block used by claude_glm (functions.nix)
-# and Android RE launchers (_android-re-launchers.nix).
+# and Android RE launchers (android-re/_launchers.nix).
 # The API key must be set separately by the caller (different loading mechanisms).
 
 let
