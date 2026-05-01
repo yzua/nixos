@@ -20,9 +20,18 @@
       nikto # Web server vulnerability scanner
       sqlmap # SQL injection detection and exploitation
       subfinder # Passive subdomain discovery
+      amass # In-depth DNS enumeration and network mapping
 
       # === Web reconnaissance ===
+      httpx # Fast HTTP prober (live hosts, titles, tech stack, TLS)
+      katana # Web crawler/spider with JS parsing and endpoint extraction
+      ffuf # Fast web fuzzer (directories, vhosts, parameters)
+      arjun # HTTP parameter discovery
       whatweb # Website technology fingerprinter
+
+      # === Web app testing ===
+      dalfox # XSS scanner with WAF bypass payloads
+      zap # OWASP ZAP web proxy and vulnerability scanner
 
       # === Crypto / cert analysis ===
       # openssl — already in home-manager/packages/networking.nix
