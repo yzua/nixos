@@ -2,6 +2,12 @@
 # Shared command/file requirement helpers.
 # Source this file after sourcing logging.sh.
 
+if [[ "$(type -t log_error)" != "function" ]]; then
+  echo "require.sh: must be sourced after logging.sh" >&2
+  # shellcheck disable=SC2317
+  return 1 2>/dev/null || exit 1
+fi
+
 error_exit() {
 	log_error "$1"
 	exit "${2:-1}"
