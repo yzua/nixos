@@ -59,7 +59,7 @@
     ./docker.nix # Docker container engine
     ./libvirt.nix # libvirt/QEMU virtual machines
     ./waydroid.nix # Waydroid Android emulation
-    ./nix-ld.nix # Dynamic linker for non-Nix binaries
+    ./nix-ld # Dynamic linker for non-Nix binaries
 
     # Notifications
     ./ntfy.nix # Alertmanager → ntfy.sh push notifications
