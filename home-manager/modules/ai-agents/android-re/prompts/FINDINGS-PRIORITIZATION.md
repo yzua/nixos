@@ -156,3 +156,92 @@ Combine the four axes:
 - Effective sanitizer exists on all paths with no known bypass
 - Code path is unreachable (dead code, commented out, behind a false config flag)
 - The "vulnerability" is intentional behavior (e.g., an auth endpoint that is supposed to be public)
+
+## MITRE ATT&CK Mobile Mapping
+
+Map every confirmed finding to the relevant ATT&CK Mobile technique:
+
+| Priority Category              | ATT&CK Technique                            | Description                                                |
+| ------------------------------ | ------------------------------------------- | ---------------------------------------------------------- |
+| Secrets in local storage       | **T1530** Data from Local System            | Tokens/keys accessible in SharedPreferences, SQLite, files |
+| Hardcoded secrets              | **T1552** Unsecured Credentials             | API keys, signing keys, backend URLs with creds in code    |
+| SQL injection                  | **T1190** Exploit Public-Facing Application | Injection via exported content providers                   |
+| Command injection              | **T1059** Command and Scripting Interpreter | `Runtime.exec` with attacker-controlled input              |
+| Deep link abuse                | **T1407** / **T1412** via Application Data  | Malicious URIs triggering sensitive app flows              |
+| WebView XSS                    | **T1477** Abuse Accessibility Features      | JS bridge exploitation for data access                     |
+| Exported component abuse       | **T1525** Install Insecure Configuration    | Unprotected activities/services/receivers                  |
+| Auth bypass                    | **T1078** Valid Accounts                    | Session reuse, token theft, credential stuffing            |
+| Privilege escalation           | **T1548** Abuse Elevation Control Mechanism | IDOR, missing authorization checks                         |
+| Weak crypto                    | **T1600** Weaken Encryption                 | ECB mode, hardcoded keys, MD5/SHA-1                        |
+| Certificate pinning bypass     | **T1526** Install Root Certificate          | Custom CA injection, TrustManager bypass                   |
+| Cleartext traffic              | **T1512** Downgrade to Insecure Protocol    | HTTP fallback, missing network security config             |
+| Root/emulator detection bypass | **T1536** Exploit Vulnerability in App      | Anti-analysis circumvention enabling deeper access         |
+
+## Common Weakness Enumeration (CWE)
+
+Attach CWE IDs to findings for standardized classification:
+
+| Finding Type                       | CWE     | Name                                        |
+| ---------------------------------- | ------- | ------------------------------------------- |
+| Hardcoded credentials              | CWE-798 | Use of Hard-coded Credentials               |
+| Hardcoded crypto keys              | CWE-321 | Use of Hard-coded Cryptographic Key         |
+| Cleartext storage                  | CWE-312 | Cleartext Storage of Sensitive Information  |
+| Cleartext in memory                | CWE-316 | Cleartext Storage in Memory                 |
+| SQL injection                      | CWE-89  | SQL Injection                               |
+| XSS via WebView                    | CWE-79  | Cross-site Scripting                        |
+| Intent injection                   | CWE-925 | Improper Intent Verification                |
+| Exported components                | CWE-926 | Improper Export of Components               |
+| Implicit intent for sensitive data | CWE-927 | Implicit Intent for Sensitive Communication |
+| Path traversal                     | CWE-22  | Path Traversal                              |
+| Command injection                  | CWE-78  | OS Command Injection                        |
+| Weak crypto                        | CWE-327 | Broken Cryptographic Algorithm              |
+| Insufficient randomness            | CWE-330 | Insufficient Random Values                  |
+| Certificate validation bypass      | CWE-295 | Improper Certificate Validation             |
+| Missing auth                       | CWE-287 | Improper Authentication                     |
+| Missing authorization              | CWE-862 | Missing Authorization                       |
+| Incorrect authorization            | CWE-863 | Incorrect Authorization                     |
+| Insecure data storage (mobile)     | CWE-919 | Improper Storage of Sensitive Data          |
+| Information exposure               | CWE-200 | Information Exposure                        |
+
+## Chain Scoring
+
+When combining findings into exploit chains, score each chain on five dimensions:
+
+| Dimension       | Weight | What to Assess                                                                                      |
+| --------------- | ------ | --------------------------------------------------------------------------------------------------- |
+| **Reach**       | 30%    | How many users/systems can this chain reach? Single user vs all users vs device-level               |
+| **Reliability** | 25%    | Does every step work reliably? Are there timing dependencies, race conditions, or fragile bypasses? |
+| **Stealth**     | 20%    | Will this chain trigger detection? Log entries, network anomalies, app crashes                      |
+| **Speed**       | 15%    | How quickly can the full chain execute? One-shot vs multi-step requiring user interaction           |
+| **Impact**      | 10%    | What is the final business impact? Data exposure, account takeover, code execution                  |
+
+**Scoring:** Rate each dimension 1-5, multiply by weight, sum for total score. Chains scoring 4.0+ are Critical, 3.0-3.9 High, 2.0-2.9 Medium, below 2.0 Low.
+
+Record chain scores in `memory.json` under `strategy` knowledge with the chain name, steps, and total score.
+
+## Findings Database Integration
+
+When `findings.db` exists in the workspace, use it as the authoritative data
+source for findings queries.
+
+### Querying for priority assessment
+
+```bash
+# All open findings sorted by severity
+findings-android list-vulns ~/Documents/<target> --status open
+
+# Critical and High findings requiring immediate attention
+findings-android query ~/Documents/<target> "SELECT * FROM vulns WHERE severity IN ('Critical','High') AND status != 'false_positive' ORDER BY created DESC"
+
+# Chains scored 4.0+ (Critical severity)
+findings-android query ~/Documents/<target> "SELECT * FROM chains WHERE total_score >= 4.0"
+
+# Credentials found across all hosts
+findings-android query ~/Documents/<target> "SELECT c.*, h.hostname FROM credentials c JOIN hosts h ON c.host_id = h.id"
+```
+
+### Recording chain scores
+
+After scoring a chain per the 5-dimension model above, insert it into the
+`chains` table using `findings-android add-chain`. The `total_score` field
+stores the weighted sum for automatic severity classification.

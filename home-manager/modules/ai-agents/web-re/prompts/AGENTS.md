@@ -47,6 +47,33 @@ Bias every session toward:
 Treat reconnaissance and mapping as a means to reach real findings, not as the
 final deliverable.
 
+## OPSEC Tagging
+
+Tag every command against the target with a noise level before executing:
+
+- **QUIET** — passive, unlikely to trigger alerts: DNS lookups, WHOIS,
+  certificate transparency, `whatweb`, reading public JS/source, analyzing
+  downloaded content offline
+- **MODERATE** — active but common traffic: HTTP requests, directory enumeration
+  at moderate rate, parameter fuzzing, API probing, chrome-devtools navigation
+- **LOUD** — likely to trigger IDS/WAF/SOC alerts: aggressive vulnerability
+  scanning (nuclei, sqlmap), brute force, mass enumeration, rapid automated
+  requests, exploit payloads
+
+For compound commands, tag the highest applicable level. When a quieter
+alternative achieves the same result, prefer it. Default to `--rate-limit`
+or equivalent throttling on all scanning tools.
+
+## Pre-Execution Checklist
+
+Before every command that touches the target:
+
+- [ ] Target URL/IP falls within the defined scope
+- [ ] Command will not perform destructive actions (DoS, data deletion, DB drops)
+- [ ] Command will not modify production data beyond proving the vulnerability
+- [ ] Network callbacks target only operator-controlled infrastructure
+- [ ] Rate limiting is set to avoid accidental denial of service
+
 ## Scope
 
 - Web application testing via Chrome DevTools MCP
@@ -137,7 +164,8 @@ aligned with OWASP Top 10 2021:
     metadata endpoints, port scanning via server
 
 For the full adversarial priority order with severity adjudication, see
-FINDINGS-PRIORITIZATION.md.
+FINDINGS-PRIORITIZATION.md. For structured exploitation verification
+and per-type evidence requirements, see EXPLOIT-VERIFICATION.md.
 
 Secondary priorities:
 
@@ -232,9 +260,14 @@ For actual findings, also include:
 - impact statement
 - trust boundary crossed
 - confidence: proven / likely / suspected
+- MITRE ATT&CK technique ID — see FINDINGS-PRIORITIZATION.md for mapping table
+- CWE ID — see FINDINGS-PRIORITIZATION.md for common weakness mapping
 - dataflow validation (if performed): source control verdict, sanitizer
   effectiveness, reachability, attack payload concept, false positive
   classification — see DATAFLOW-VALIDATION.md for the structured schema
+- exploitation level reached (1-4) — see EXPLOIT-VERIFICATION.md for definitions
+- strategic intelligence notes (WAF behavior, DB technology, CSP bypass, cookie
+  security) — see STRATEGIC-INTEL.md
 
 Confidence model:
 
@@ -298,6 +331,13 @@ All paths relative to repo root (`/home/yz/System`):
 - `home-manager/modules/ai-agents/web-re/prompts/SESSION-MEMORY.md`:
   JSON-based persistent learning system that remembers strategies, bypasses,
   payloads, and WAF evasion techniques across sessions with confidence scoring
+- `home-manager/modules/ai-agents/web-re/prompts/EXPLOIT-VERIFICATION.md`:
+  proof-of-exploitation levels (1-4), bypass exhaustion protocol, per-type
+  evidence checklists, critical decision test for classification
+- `home-manager/modules/ai-agents/web-re/prompts/STRATEGIC-INTEL.md`:
+  backward taint analysis, advanced XSS/SSRF patterns, 9-step auth testing,
+  3-category authz with formal guard criteria, strategic intelligence
+  section pattern, secure-by-design documentation
 - `scripts/ai/web-re/web-re.sh`: environment validation, Chrome DevTools, and
   mitmproxy helper
 - `scripts/ai/web-re/workspace-init.sh`: target workspace initialization
@@ -305,6 +345,18 @@ All paths relative to repo root (`/home/yz/System`):
 - `scripts/ai/web-re/opencode-web-re.sh`: OpenCode Web RE session launcher
 - `home-manager/modules/ai-agents/web-re/_launchers.nix`: Nix wrapper
   definitions for `oc*wre` launchers
+- `home-manager/modules/ai-agents/web-re/prompts/DETECTION-PAIRING.md`:
+  mandatory detection content (YARA, Sigma, IOC, SIEM) for confirmed findings
+- `home-manager/modules/ai-agents/web-re/prompts/EXPLOITATION-QUEUE.md`:
+  JSON schema and workflow for structured vuln-to-exploit handoff
+- `home-manager/modules/ai-agents/web-re/prompts/FINDINGS-DB.md`:
+  SQLite findings database schema, query patterns, and CLI integration
+- `scripts/ai/web-re/findings.sh`:
+  SQLite findings database CLI (init, add, list, update, query)
+- `scripts/ai/web-re/generate-totp.sh`:
+  TOTP code generation for 2FA testing
+- `scripts/ai/web-re/web-re-doctor.sh`:
+  comprehensive tool audit for all TOOLS.md tools
 
 ## Target Workspace
 

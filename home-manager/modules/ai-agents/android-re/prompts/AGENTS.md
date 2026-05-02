@@ -47,6 +47,33 @@ Bias every session toward:
 Treat anti-analysis work as a means to reach real findings, not as the final
 deliverable.
 
+## OPSEC Tagging
+
+Tag every command against the target with a noise level before executing:
+
+- **QUIET** — passive, no network traffic to target: `aapt dump`, `jadx` on local
+  APK, `strings`, `grep` on extracted sources, reading manifest or smali
+- **MODERATE** — active but normal app behavior: `adb install`, `am start`,
+  `adb shell content query`, UI interaction via `agent-device`, Frida hooks
+  that observe without modifying app flow, mitmproxy passive capture
+- **LOUD** — likely to trigger detection: aggressive Frida hooks that change
+  return values, bypass scripts that disable security checks, mass content
+  provider enumeration, rapid automated component testing, fuzzing native libs
+
+For compound commands, tag the highest applicable level. When a quieter
+alternative achieves the same result, prefer it.
+
+## Pre-Execution Checklist
+
+Before every command that touches the emulator or target app:
+
+- [ ] Target is the correct app/package (not system or unrelated app)
+- [ ] Command will not delete AVD state, system certs, or Magisk data
+- [ ] Command will not permanently modify the device beyond the test scope
+- [ ] Frida/adb operations target the intended process only
+- [ ] Network callbacks (reverse shells, exfil) target operator-controlled
+      infrastructure only
+
 ## Scope
 
 - Dynamic analysis on rooted AVD `re-pixel7-api34`
@@ -138,7 +165,8 @@ Prioritize these bug classes first when the target surface supports them:
 8. anti-analysis protections only when they block access to one of the above
 
 For the full adversarial priority order with severity adjudication, see
-FINDINGS-PRIORITIZATION.md.
+FINDINGS-PRIORITIZATION.md. For structured exploitation verification
+and per-type evidence requirements, see EXPLOIT-VERIFICATION.md.
 
 Secondary priorities:
 
@@ -244,9 +272,12 @@ For actual findings, also include:
 - impact statement
 - trust boundary crossed
 - confidence: proven / likely / suspected
+- MITRE ATT&CK technique ID — see FINDINGS-PRIORITIZATION.md for mapping table
+- CWE ID — see FINDINGS-PRIORITIZATION.md for common weakness mapping
 - dataflow validation (if performed): source control verdict, sanitizer
   effectiveness, reachability, attack payload concept, false positive
   classification — see DATAFLOW-VALIDATION.md for the structured schema
+- exploitation level reached (1-4) — see EXPLOIT-VERIFICATION.md for definitions
 
 Confidence model:
 
@@ -325,6 +356,9 @@ All paths relative to repo root (`/home/yz/System`):
 - `home-manager/modules/ai-agents/android-re/prompts/SESSION-MEMORY.md`:
   JSON-based persistent learning system that remembers strategies, bypasses,
   and payloads across sessions with confidence scoring
+- `home-manager/modules/ai-agents/android-re/prompts/EXPLOIT-VERIFICATION.md`:
+  proof-of-exploitation levels (1-4), bypass exhaustion protocol, per-type
+  evidence checklists, critical decision test for classification
 - `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, cert, and
   spoofing helper
 - `scripts/ai/android-re/re-static.sh`: static APK analysis helper (includes
@@ -337,6 +371,16 @@ All paths relative to repo root (`/home/yz/System`):
   launcher
 - `home-manager/modules/ai-agents/android-re/_launchers.nix`: Nix wrapper
   definitions for `oc*are` launchers
+- `home-manager/modules/ai-agents/android-re/prompts/DETECTION-PAIRING.md`:
+  mandatory detection content (YARA, Sigma, IOC, SIEM) for confirmed findings
+- `home-manager/modules/ai-agents/android-re/prompts/EXPLOITATION-QUEUE.md`:
+  JSON schema and workflow for structured vuln-to-exploit handoff
+- `home-manager/modules/ai-agents/android-re/prompts/FINDINGS-DB.md`:
+  SQLite findings database schema, query patterns, and CLI integration
+- `scripts/ai/android-re/findings.sh`:
+  SQLite findings database CLI (init, add, list, update, query)
+- `scripts/ai/android-re/re-doctor.sh`:
+  comprehensive tool audit for all TOOLS.md tools
 
 ## Target Workspace
 

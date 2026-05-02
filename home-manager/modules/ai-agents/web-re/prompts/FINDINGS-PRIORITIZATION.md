@@ -177,3 +177,97 @@ When two findings can be combined, the resulting chain inherits the higher sever
 - Effective sanitizer/encoding exists on all paths with no known bypass
 - The endpoint is not reachable from the attacker's position
 - The "vulnerability" is intentional behavior (e.g., a public health check endpoint)
+
+## MITRE ATT&CK Enterprise Mapping
+
+Map every confirmed finding to the relevant ATT&CK technique:
+
+| Priority Category        | ATT&CK Technique                            | Description                                     |
+| ------------------------ | ------------------------------------------- | ----------------------------------------------- |
+| Exposed API keys/creds   | **T1552** Unsecured Credentials             | Keys in JS, config files, source code           |
+| SQL injection            | **T1190** Exploit Public-Facing Application | Injection via web parameters or API inputs      |
+| XSS                      | **T1189** Drive-by Compromise               | Reflected/stored/DOM XSS for session hijack     |
+| Command injection        | **T1059** Command and Scripting Interpreter | OS command execution via user input             |
+| SSRF                     | **T1190** Exploit Public-Facing Application | Internal service access, cloud metadata         |
+| Path traversal           | **T1083** File and Directory Discovery      | Unauthorized file access via `../`              |
+| Broken access control    | **T1078** Valid Accounts                    | IDOR, privilege escalation, missing auth checks |
+| IDOR                     | **T1530** Data from Local System            | Accessing other users' data via predictable IDs |
+| JWT/session manipulation | **T1537** Transfer Data to Cloud Account    | Token theft, session fixation, replay           |
+| CSRF                     | **T1531** Account Access Removal            | Forged state-changing requests                  |
+| CORS misconfiguration    | **T1190** Exploit Public-Facing Application | Cross-origin data theft                         |
+| Weak TLS                 | **T1573** Encrypted Channel                 | Outdated protocols, weak cipher suites          |
+| Broken crypto            | **T1600** Weaken Encryption                 | Weak hashing, hardcoded keys                    |
+| Open redirect            | **T1200** Hardware Additions                | Redirect-based token theft                      |
+| Insecure deserialization | **T1059** Command and Scripting Interpreter | RCE via pickle/YAML/JSON deserialization        |
+| Information disclosure   | **T1082** System Information Discovery      | Verbose errors, version leaks, debug mode       |
+| Missing security headers | **T1525** Install Insecure Configuration    | CSP, HSTS, X-Frame-Options absent               |
+
+## Common Weakness Enumeration (CWE)
+
+Attach CWE IDs to findings for standardized classification:
+
+| Finding Type                      | CWE     | Name                                             |
+| --------------------------------- | ------- | ------------------------------------------------ |
+| SQL injection                     | CWE-89  | SQL Injection                                    |
+| XSS (reflected/stored)            | CWE-79  | Cross-site Scripting                             |
+| XSS (DOM-based)                   | CWE-79  | Cross-site Scripting                             |
+| Command injection                 | CWE-78  | OS Command Injection                             |
+| Path traversal                    | CWE-22  | Path Traversal                                   |
+| CSRF                              | CWE-352 | Cross-Site Request Forgery                       |
+| SSRF                              | CWE-918 | Server-Side Request Forgery                      |
+| IDOR                              | CWE-639 | Authorization Bypass Through User-Controlled Key |
+| Broken access control             | CWE-862 | Missing Authorization                            |
+| Incorrect authorization           | CWE-863 | Incorrect Authorization                          |
+| Hardcoded credentials             | CWE-798 | Use of Hard-coded Credentials                    |
+| Weak crypto                       | CWE-327 | Broken Cryptographic Algorithm                   |
+| Missing encryption                | CWE-311 | Missing Encryption of Sensitive Data             |
+| Insecure deserialization          | CWE-502 | Deserialization of Untrusted Data                |
+| Open redirect                     | CWE-601 | URL Redirection to Untrusted Site                |
+| Information exposure              | CWE-200 | Information Exposure                             |
+| Session fixation                  | CWE-613 | Session Expiration Not Enforced                  |
+| Insufficiently protected creds    | CWE-522 | Insufficiently Protected Credentials             |
+| Origin validation error           | CWE-346 | Origin Validation Error                          |
+| Uncontrolled resource consumption | CWE-400 | Uncontrolled Resource Consumption                |
+
+## Chain Scoring
+
+When combining findings into exploit chains, score each chain on five dimensions:
+
+| Dimension       | Weight | What to Assess                                                                                      |
+| --------------- | ------ | --------------------------------------------------------------------------------------------------- |
+| **Reach**       | 30%    | How many users/systems can this chain reach? Single user vs all users vs infrastructure             |
+| **Reliability** | 25%    | Does every step work reliably? Are there timing dependencies, race conditions, or fragile bypasses? |
+| **Stealth**     | 20%    | Will this chain trigger WAF/IDS/SIEM detection? Rate limiting, log entries, network anomalies       |
+| **Speed**       | 15%    | How quickly can the full chain execute? One-shot vs multi-step requiring user interaction           |
+| **Impact**      | 10%    | What is the final business impact? Data exposure, account takeover, RCE, lateral movement           |
+
+**Scoring:** Rate each dimension 1-5, multiply by weight, sum for total score. Chains scoring 4.0+ are Critical, 3.0-3.9 High, 2.0-2.9 Medium, below 2.0 Low.
+
+Record chain scores in `memory.json` under `strategy` knowledge with the chain name, steps, and total score.
+
+## Findings Database Integration
+
+When `findings.db` exists in the workspace, use it as the authoritative data
+source for findings queries.
+
+### Querying for priority assessment
+
+```bash
+# All open findings sorted by severity
+findings-web list-vulns ~/Documents/<target> --status open
+
+# Critical and High findings requiring immediate attention
+findings-web query ~/Documents/<target> "SELECT * FROM vulns WHERE severity IN ('Critical','High') AND status != 'false_positive' ORDER BY created DESC"
+
+# Chains scored 4.0+ (Critical severity)
+findings-web query ~/Documents/<target> "SELECT * FROM chains WHERE total_score >= 4.0"
+
+# Credentials found across all hosts
+findings-web query ~/Documents/<target> "SELECT c.*, h.hostname FROM credentials c JOIN hosts h ON c.host_id = h.id"
+```
+
+### Recording chain scores
+
+After scoring a chain per the 5-dimension model above, insert it into the
+`chains` table using `findings-web add-chain`. The `total_score` field
+stores the weighted sum for automatic severity classification.

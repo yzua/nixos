@@ -57,6 +57,9 @@ need or when you need speed for bulk operations.
   software, JavaScript libraries, and other technologies from HTTP responses
 - `katana` — web crawler/spider: discover URLs, endpoints, JavaScript files,
   and API paths from web applications with JavaScript rendering support
+- `rustscan` — fast port scanner: rapid discovery of open ports on target
+  infrastructure (10x faster than nmap for initial sweep); pipe results to
+  nmap for service fingerprinting
 
 ### Vulnerability scanning
 
@@ -83,6 +86,8 @@ need or when you need speed for bulk operations.
   need to prove a specific source-to-sink path. Supports JavaScript, Python,
   Java, Go. See CODEQL-GUIDE.md for setup, database creation, and custom
   web queries.
+- `commix` — command injection scanner: automated detection and exploitation
+  of OS command injection vulnerabilities in web applications
 
 ### Fuzzing
 
@@ -92,6 +97,11 @@ need or when you need speed for bulk operations.
 - `arjun` — HTTP parameter discovery: find hidden query parameters, POST
   body fields, and headers that the server accepts; useful for mapping API
   attack surface
+- `gobuster` — directory/file/DNS/VHost brute-forcing: discover hidden
+  paths, files, subdomains, and virtual hosts using wordlist-based enumeration
+- `feroxbuster` — recursive content discovery: brute-force directories and
+  files with automatic recursion, heuristic filtering of false positives,
+  and response size/code filtering
 
 ### Network
 
@@ -103,6 +113,31 @@ need or when you need speed for bulk operations.
   analysis and evidence collection
 - `wireshark-cli` (`tshark`) — CLI network protocol analyzer: capture and
   decode packets, filter by protocol/field, export to PCAP
+
+### TLS analysis
+
+- `testssl` — TLS testing tool: comprehensive SSL/TLS cipher, protocol,
+  and certificate analysis; checks for Heartbleed, POODLE, CRIME, BEAST,
+  and other known TLS vulnerabilities with color-coded severity output
+
+### OOB interaction
+
+- `interactsh` — OOB interaction server (ProjectDiscovery): detect blind
+  vulnerabilities (blind XSS, blind SSRF, blind injection) by monitoring
+  DNS, HTTP, and HTTPS callback requests from the target to your
+  interactsh instance; provides unique subdomains per test for correlation
+
+### Supply chain scanning
+
+- `trivy` — vulnerability and secret scanner: scan container images, file
+  systems, git repositories, and Kubernetes clusters for CVEs, misconfigs,
+  and embedded secrets
+
+### Historical analysis
+
+- `waybackpy` (Python) — Wayback Machine API client: retrieve archived
+  versions of target URLs, discover historical endpoints and URL patterns,
+  analyze how the target changed over time
 
 ### HTTP clients
 
@@ -126,6 +161,9 @@ need or when you need speed for bulk operations.
   tokens captured during testing
 - `jq` — JSON processor: parse, filter, transform, and extract data from
   JSON API responses and log files
+- `linkfinder` — JavaScript endpoint discovery (install with `pip install linkfinder`):
+  parse JavaScript files to discover hidden API endpoints, paths, and parameters
+  not visible in the application UI
 
 ### Brute force
 
@@ -151,6 +189,14 @@ Use the smallest tool that gives a reliable answer:
 - **Need repeated proof?** Write a Bash/Python/Node/Bun script
 - **Need to scan source for vulnerability patterns?** Use `semgrep --config auto`
 - **Need deep taint tracking on a specific path?** Use `codeql database analyze`
+- **Need to fuzz directories recursively?** Use `feroxbuster`, `gobuster`
+- **Need fast port discovery?** Use `rustscan`, then `nmap` for detail
+- **Need to test TLS/SSL?** Use `testssl`
+- **Need blind vuln detection?** Use `interactsh`
+- **Need command injection testing?** Use `commix`
+- **Need to find JS endpoints?** Use `linkfinder`
+- **Need historical URL analysis?** Use `waybackpy` (Python)
+- **Need supply chain CVE scanning?** Use `trivy`
 
 ## Fast Vulnerability Playbooks
 
@@ -363,6 +409,41 @@ Common JWT weaknesses:
 - predictable token values
 - missing issuer/audience binding
 - token replay across sessions or users
+
+### API schema fuzzing with schemathesis
+
+Goal: automatically fuzz API endpoints based on their OpenAPI schema.
+
+Step 1: Discover the OpenAPI schema URL
+
+```bash
+# Common schema locations
+curl -s https://target.com/openapi.json | jq '.info'
+curl -s https://target.com/swagger.json | jq '.info'
+curl -s https://target.com/api/docs | jq '.'
+```
+
+Step 2: Run schemathesis against the schema
+
+```bash
+# From a schema URL (uvx runs without install)
+uvx schemathesis run https://target.com/openapi.json
+
+# With authentication
+uvx schemathesis run --header "Authorization: Bearer $TOKEN" https://target.com/openapi.json
+
+# Target specific endpoints
+uvx schemathesis run --endpoint "/api/users" --method POST https://target.com/openapi.json
+
+# From a saved schema file
+uvx schemathesis run schema.json
+```
+
+Step 3: Analyze results and verify findings
+
+Check server error responses (5xx) for unhandled inputs, 4xx for
+unexpected validation bypass, and anomalous response times for timing
+attacks.
 
 ## Tmux Session Layout
 

@@ -66,6 +66,20 @@ cat ~/Documents/com.example.target/memory.json 2>/dev/null | jq '.knowledge[] | 
 If `memory.json` exists, load learned strategies and bypasses to avoid repeating
 dead ends. See SESSION-MEMORY.md for the full schema and update rules.
 
+If the workspace has a findings database, check its state:
+
+```bash
+findings-android list-vulns ~/Documents/<target> --status open
+findings-android list-chains ~/Documents/<target>
+```
+
+The workspace is a git repository. Create checkpoint commits at major milestones:
+
+```bash
+git -C ~/Documents/<target> add -A
+git -C ~/Documents/<target> commit -m "checkpoint: <description>"
+```
+
 If any baseline check fails, stop and use `TROUBLESHOOTING.md` before touching a
 target app.
 
@@ -167,6 +181,13 @@ grep -R "TrustManager\|CertificatePinner\|X509TrustManager" ~/.cache/android-re/
 grep -R "frida\|magisk\|su\|test-keys\|ro.debuggable" ~/.cache/android-re/out/<app>/jadx
 grep -R "okhttp\|retrofit\|cronet\|quic" ~/.cache/android-re/out/<app>/jadx
 grep -R "root\|emulator\|isDebuggerConnected\|ptrace" ~/.cache/android-re/out/<app>/jadx
+```
+
+As you discover hosts and services, record them in the findings database:
+
+```bash
+findings-android add-host ~/Documents/<target> <ip> <hostname>
+findings-android add-service ~/Documents/<target> <host_id> <port> <proto> <service>
 ```
 
 ## Phase 3.5: Version Diff (If Two Versions Available)
@@ -655,6 +676,10 @@ describing the finding. Follow the exploit development methodology in
 EXPLOIT-METHODOLOGY.md: working code only, complete and executable, documented,
 with a quality checklist.
 
+Before writing a PoC, add the finding to the exploitation queue in
+`exploitation_queue.json` with status `in_progress`. After proving,
+update to `exploited`. See EXPLOITATION-QUEUE.md.
+
 Only write PoCs for findings validated as EXPLOITABLE or NEEDS TESTING in
 Phase 3.8. FALSE POSITIVE findings are documented but not proven.
 
@@ -682,6 +707,11 @@ frida -U -n com.example.target -l /tmp/hook.js -q
 ```
 
 The final deliverable should be operator-usable evidence, not just notes.
+
+Follow the proof-of-exploitation levels and bypass exhaustion protocol in
+EXPLOIT-VERIFICATION.md. You MUST reach Level 3 (confirmed exploitation with
+data/access) to classify a finding as EXPLOITED. Attempt minimum 5-6 distinct
+bypass techniques before classifying as FALSE POSITIVE.
 
 ## Phase 9.5: Content Provider SQL Injection
 
@@ -729,6 +759,14 @@ Then ask:
 - what trust boundary did it cross?
 - what does it unlock next?
 - what is the next best operator action if the session continues?
+
+Apply the Critical Decision Test from EXPLOIT-VERIFICATION.md for each finding:
+is the prevention a security feature (FALSE POSITIVE) or an external constraint
+like emulator limitation (POTENTIAL)?
+
+For every confirmed finding (proven or likely confidence), generate detection
+content per DETECTION-PAIRING.md: at minimum one YARA rule, Sigma rule,
+network IOC, or SIEM query. Store in the findings database detection fields.
 
 ## Phase 10.5: Traffic Correlation
 

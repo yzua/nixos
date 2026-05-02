@@ -53,6 +53,26 @@ analysis interface whenever they cover the task. Fall back to bash `jadx` and
 
 - `nmap` — port scanning and service fingerprinting: discover open ports, running
   services, and OS detection on backend servers discovered during traffic analysis
+- `masscan` — fast port scanner: internet-scale port scanning for rapid
+  discovery of open ports across large IP ranges; useful for scanning backend
+  servers discovered during traffic analysis
+
+### Backend and vulnerability scanning
+
+- `nuclei` — template-based vulnerability scanner: fast detection of known
+  CVEs, misconfigurations, exposed panels, and default credentials using
+  community templates; useful for scanning backend endpoints discovered
+  during traffic analysis
+- `subfinder` — subdomain discovery tool: find subdomains from passive DNS
+  sources; useful for mapping backend service infrastructure
+- `whatweb` — web technology fingerprinter: identify server software,
+  frameworks, and technologies on backend endpoints
+- `interactsh` — OOB interaction server (ProjectDiscovery): detect blind
+  vulnerabilities (blind SSRF, blind XSS, blind command injection) by
+  monitoring DNS, HTTP, and HTTPS callback requests from the target
+- `testssl` — TLS testing tool: comprehensive SSL/TLS cipher, protocol,
+  and certificate analysis against backend HTTPS endpoints; checks for
+  Heartbleed, POODLE, CRIME, and other known TLS vulnerabilities
 
 ### Static analysis
 
@@ -84,6 +104,22 @@ analysis interface whenever they cover the task. Fall back to bash `jadx` and
   entry points, protobuf parsers, and custom protocol handlers. Supports QEMU
   mode for binary-only fuzzing. See NATIVE-FUZZING.md for corpus generation,
   harness construction, and crash analysis.
+- `yara` — pattern matching engine: write and apply YARA rules to detect
+  malware signatures, hardcoded patterns, and suspicious code in APKs and
+  native libraries
+
+### Binary analysis
+
+- `checksec` — binary security property checker: verify NX, PIE, RELRO,
+  stack canaries, and Fortify Source on native `.so` libraries extracted
+  from APKs
+- `objdump` — disassembler (from binutils via gcc package): disassemble
+  native `.so` files, inspect ELF sections, symbols, and relocations
+- `readelf` — ELF analyzer (from binutils via gcc package): inspect ELF
+  headers, sections, segments, dynamic symbols, and note sections of
+  native libraries
+- `nm` — symbol listing (from binutils via gcc package): list symbols from
+  native `.so` files to identify JNI entry points and exported functions
 
 ### Web app testing
 
@@ -116,6 +152,9 @@ analysis interface whenever they cover the task. Fall back to bash `jadx` and
 - `androguard` — Python APK analysis library: parse AndroidManifest, DEX
   bytecode, certificates, and resources programmatically; extract permissions,
   activities, services, strings, and class information without external tools
+- `z3-solver` (Python) — SMT constraint solver: analyze cryptographic
+  constraints, verify security property assumptions, and solve key
+  generation logic; useful for validating dataflow path feasibility
 - `cyberchef` — universal data transformation tool (via `cyberchef` CLI or
   browser): encode/decode/hash/encrypt/compress data, convert between formats,
   analyze base64/hex/JWT tokens captured during testing
@@ -138,6 +177,17 @@ analysis interface whenever they cover the task. Fall back to bash `jadx` and
   with syntax-highlighted output, session management, and authentication helpers;
   easier than curl for ad-hoc API testing during traffic analysis
 
+### Supply chain scanning
+
+- `trivy` — vulnerability and secret scanner: scan APKs, native libraries,
+  and container images for known CVEs, misconfigurations, and embedded secrets
+
+### Code coverage
+
+- `gcovr` — code coverage report generator: generate coverage reports for
+  native code fuzzing sessions (see NATIVE-FUZZING.md), visualize which
+  code paths AFL++ exercised
+
 ## Tool Selection Guide
 
 Use the smallest tool that gives a reliable answer:
@@ -152,6 +202,14 @@ Use the smallest tool that gives a reliable answer:
 - **Need to scan source for vulnerability patterns?** Use `semgrep --config auto`
 - **Need deep taint tracking on a specific path?** Use `codeql database analyze`
 - **Need to fuzz native .so libraries?** Use `afl++` with QEMU mode
+- **Need to scan backend endpoints for known CVEs?** Use `nuclei`
+- **Need to find backend subdomains or services?** Use `subfinder`, `amass`
+- **Need to test for blind vulnerabilities?** Use `interactsh`
+- **Need to check TLS configuration?** Use `testssl`
+- **Need to analyze binary security properties?** Use `checksec`, `readelf`
+- **Need to match patterns in binary data?** Use `yara`
+- **Need to scan for CVEs in dependencies?** Use `trivy`
+- **Need to check fuzzing code coverage?** Use `gcovr`
 
 ## Fast Vulnerability Playbooks
 

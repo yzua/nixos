@@ -41,7 +41,8 @@ The memory file is a JSON object with these top-level sections:
     "payload": [],
     "target_quirk": [],
     "tool_config": [],
-    "crash_pattern": []
+    "crash_pattern": [],
+    "findings_db": []
   },
   "session_history": []
 }
@@ -153,6 +154,25 @@ Records tool configurations that produced useful results.
 
 Categories: `frida`, `objection`, `mitmproxy`, `adb`, `semgrep`, `codeql`,
 `nmap`, `burp`, `custom_script`
+
+### Findings Database Knowledge
+
+Records patterns about findings database usage across sessions.
+
+```json
+{
+  "type": "findings_db",
+  "category": "query_pattern",
+  "description": "Useful query for finding chains across sessions",
+  "query": "SELECT * FROM chains WHERE total_score >= 3.0",
+  "confidence": 0.8,
+  "success_count": 3,
+  "failure_count": 0,
+  "last_seen": "2026-01-15T14:30:00Z"
+}
+```
+
+Categories: `schema_adaptation`, `query_pattern`, `correlation_pattern`, `data_quality`
 
 ### Crash Pattern Knowledge
 
@@ -302,3 +322,6 @@ jq '[.knowledge.tool_config[] | select(.confidence >= 0.7)]' memory.json
 - **FINDINGS-PRIORITIZATION.md** — Use memory to inform severity adjudication
 - **SEMGREP-GUIDE.md** — Record effective Semgrep rules as tool_config knowledge
 - **CODEQL-GUIDE.md** — Record effective CodeQL queries as tool_config knowledge
+- **FINDINGS-DB.md** — Record effective query patterns and schema adaptations
+- **DETECTION-PAIRING.md** — Record detection content that proved useful
+- **EXPLOITATION-QUEUE.md** — Record exploitation strategies and outcomes

@@ -24,8 +24,14 @@ operational guidance here, not hardcoded in shell wrappers.
 - `CODEQL-GUIDE.md`: CodeQL setup, database creation, and custom web queries
 - `DATAFLOW-VALIDATION.md`: 5-step source-to-sink validation framework
 - `EXPLOIT-METHODOLOGY.md`: structured PoC development with per-vuln strategies
+- `EXPLOIT-VERIFICATION.md`: proof-of-exploitation levels, bypass exhaustion protocol, per-type evidence checklists
 - `FINDINGS-PRIORITIZATION.md`: adversarial priority order and severity adjudication
 - `SEMGREP-GUIDE.md`: Semgrep setup and custom web rules
+- `SESSION-MEMORY.md`: persistent learning across sessions with confidence scoring
+- `DETECTION-PAIRING.md`: mandatory detection content for confirmed findings
+- `EXPLOITATION-QUEUE.md`: structured vuln-to-exploit handoff JSON schema
+- `FINDINGS-DB.md`: SQLite findings database schema and CLI integration
+- `STRATEGIC-INTEL.md`: backward taint analysis, advanced XSS/SSRF, structured auth/authz methodology
 - `SESSION-MEMORY.md`: persistent learning across sessions with confidence scoring
 - `TOOLS.md`: task-oriented command recipes and tool guidance
 - `TROUBLESHOOTING.md`: symptom-driven failure recovery
@@ -195,4 +201,25 @@ Target workspace:
 
 ```bash
 bash scripts/ai/web-re/workspace-init.sh init example.target.com
+```
+
+Findings database:
+
+```bash
+findings-web init ~/Documents/<target>
+findings-web list-vulns ~/Documents/<target>
+findings-web add-vuln ~/Documents/<target> FIND-001 "Title" High A01 open
+findings-web list-chains ~/Documents/<target>
+```
+
+Tool audit:
+
+```bash
+web-re-doctor
+```
+
+TOTP testing:
+
+```bash
+generate-totp <base32-secret>
 ```

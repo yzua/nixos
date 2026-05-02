@@ -70,6 +70,20 @@ If `memory.json` exists, load learned strategies, bypasses, and WAF evasion
 techniques to avoid repeating dead ends. See SESSION-MEMORY.md for the full
 schema and update rules.
 
+If the workspace has a findings database, check its state:
+
+```bash
+findings-web list-vulns ~/Documents/<target> --status open
+findings-web list-chains ~/Documents/<target>
+```
+
+The workspace is a git repository. Create checkpoint commits at major milestones:
+
+```bash
+git -C ~/Documents/<target> add -A
+git -C ~/Documents/<target> commit -m "checkpoint: <description>"
+```
+
 If any baseline check fails, stop and use `TROUBLESHOOTING.md` before touching
 the target.
 
@@ -253,6 +267,13 @@ Pivot rule:
   or forms that submit to interesting backends, prioritize those in vulnerability
   testing.
 
+As you discover hosts and services, record them in the findings database:
+
+```bash
+findings-web add-host ~/Documents/<target> <ip> <hostname>
+findings-web add-service ~/Documents/<target> <host_id> <port> <proto> <service>
+```
+
 ## Phase 3.5: Semgrep Scan
 
 If JavaScript source files or server-side code was discovered during Phase 3,
@@ -414,6 +435,10 @@ Pivot rule:
 - if authentication tokens are predictable, lack expiration, or can be forged,
   move immediately to authorization testing and privilege escalation.
 
+For structured auth testing, apply the 9-step ordered methodology and 3-category
+authorization analysis from STRATEGIC-INTEL.md. Test nOAuth (mutable `email` vs
+immutable `sub` claim) if OAuth/SSO is present.
+
 ## Phase 5.5: Dataflow Validation
 
 Before investing in full exploitation, validate each suspected vulnerability
@@ -438,6 +463,10 @@ Only invest in PoC development for EXPLOITABLE or NEEDS TESTING findings.
 Test for OWASP Top 10 vulnerabilities systematically. Follow the exploit
 development methodology in EXPLOIT-METHODOLOGY.md for each vulnerability type:
 working code only, complete PoC with quality checklist, documented impact.
+
+Before writing a PoC, add the finding to the exploitation queue in
+`exploitation_queue.json` with status `in_progress`. After proving,
+update to `exploited`. See EXPLOITATION-QUEUE.md.
 
 ### XSS testing
 
@@ -518,9 +547,147 @@ Pivot rule:
 - for every confirmed vulnerability, write a PoC script and add to
   `FINDINGS.md` immediately. Do not wait until the end of the phase.
 
+## Phase 6.5: Business Logic Testing
+
+Standard scanners catch injection and XSS. Business logic flaws require
+understanding what the application is supposed to do and finding ways to
+break those rules. Map the intended workflow before attacking it.
+
+### Workflow Mapping
+
+Before testing, understand the intended application flows:
+
+```
+APPLICATION WORKFLOW ANALYSIS
+═══════════════════════════════════
+Application: {Name}
+Critical Workflows:
+  1. Registration -> Email Verification -> Profile Setup
+  2. Browse -> Add to Cart -> Checkout -> Payment -> Confirmation
+  3. User -> Request Action -> Approval -> Execution
+  4. Transfer -> MFA Confirmation -> Processing -> Complete
+
+For each workflow test:
+  - Step skipping (can you jump ahead?)
+  - Step replay (can you repeat a step for extra benefit?)
+  - State manipulation (can you change workflow state directly?)
+  - Race conditions (can concurrent requests break the logic?)
+  - Parameter tampering (can you modify values in transit?)
+```
+
+### Price and Payment Manipulation
+
+- Intercept checkout requests and modify price/quantity/discount fields
+- Test negative quantities and negative prices
+- Apply discount codes multiple times or stack beyond limits
+- Modify currency parameters
+- Test integer overflow on quantity fields
+- Check if price is recalculated server-side or trusted from client
+
+### Workflow and State Bypass
+
+- Skip mandatory steps in multi-step processes (registration, checkout, approval)
+- Submit a form at step N without completing steps 1 to N-1
+- Replay completed workflow steps
+- Modify workflow state parameters (status, step_number, approval_status)
+- Test backward navigation in a forward-only workflow
+- Test cancellation — does it properly reverse all associated state changes?
+
+### Race Conditions
+
+- Send concurrent requests to transfer funds (double-spend)
+- Race coupon or gift card redemption simultaneously
+- Race account creation with the same email
+- Test concurrent voting, rating, or inventory claims
+- Use parallel curl or a threading script for concurrency testing
+
+```bash
+# Race condition test: 5 concurrent identical requests
+for i in $(seq 1 5); do
+  curl -s -b "session=$TOKEN" -X POST "$TARGET/api/transfer" \
+    -d '{"from":"A","to":"B","amount":100}' &
+done
+wait
+```
+
+### Authorization Boundary Testing
+
+- Access another user's resources by changing IDs in requests (IDOR)
+- Test horizontal privilege escalation (user A accesses user B's data)
+- Test vertical privilege escalation (regular user accesses admin functions)
+- Check if role changes take effect immediately or require re-auth
+- Test if deleted/disabled accounts retain API access
+- Test multi-tenant isolation (can tenant A see tenant B's data?)
+- Check if API endpoints enforce the same authorization as the UI
+
+### Feature Abuse
+
+- Abuse referral systems (self-referral, referral loops)
+- Exploit loyalty point accumulation (earn points on refunded purchases)
+- Test trial period extension (re-register with different email)
+- Bypass rate limiting (rotate User-Agent, add X-Forwarded-For)
+- Test export functionality for data harvesting (set page_size to 999999)
+- Test password reset for account enumeration
+
+Pivot rule:
+
+- if business logic testing reveals workflow bypasses or race conditions,
+  these are often Critical or High severity. Prioritize PoC development for
+  confirmed logic flaws.
+
 ## Phase 7: API Testing
 
 Test API endpoints systematically, parameter by parameter.
+
+### OWASP API Security Top 10 (2023)
+
+Map API testing to the OWASP API Top 10 categories:
+
+**API1 — Broken Object Level Authorization (BOLA):**
+Test every endpoint that accepts an object ID. Replace the ID with another
+user's ID. If the response returns the other user's data, BOLA is confirmed.
+Test both integer IDs and UUIDs — predictable UUIDs (v1) may be enumerable.
+
+**API2 — Broken Authentication:**
+Test token handling — does the endpoint accept expired tokens? Does it accept
+tokens from a different application? Test credential stuffing, token replay,
+and MFA bypass. Check if password reset tokens are single-use.
+
+**API3 — Broken Object Property Level Authorization:**
+Send extra fields in requests (`{"role": "admin"}` during registration).
+Check if responses expose more data than needed (mass assignment, excessive
+data exposure). Test if you can read or write properties you shouldn't access.
+
+**API4 — Unrestricted Resource Consumption:**
+Test pagination abuse (`?page_size=999999`), regex DoS with pathological
+patterns, and unbounded list queries. Check if rate limiting is per-user or
+per-IP (easily bypassable if per-IP via X-Forwarded-For).
+
+**API5 — Broken Function Level Authorization (BFLA):**
+Try accessing admin endpoints as a regular user. Test HTTP method switching
+(GET instead of DELETE, POST instead of PUT). Enumerate admin API routes
+with ffuf using admin-specific wordlists.
+
+**API6 — Unrestricted Access to Sensitive Business Flows:**
+Test business logic abuse via API — automated account creation, bulk data
+export, coupon brute force, reservation hoarding. See Phase 6.5.
+
+**API7 — Server-Side Request Forgery:**
+Test URL parameters that cause the server to fetch resources. Probe
+`http://127.0.0.1`, `http://169.254.169.254`, and internal hostnames.
+Try protocol smuggling (`gopher://`, `file://`).
+
+**API8 — Security Misconfiguration:**
+Check for verbose errors, unnecessary HTTP methods (OPTIONS, TRACE), default
+credentials, missing rate limiting, CORS misconfiguration on API endpoints.
+
+**API9 — Improper Inventory Management:**
+Look for shadow APIs — endpoints not in documentation. Test older API versions
+(`/api/v1/` vs `/api/v2/`) for bypasses. Check for undocumented parameters.
+
+**API10 — Unsafe Consumption of APIs:**
+If the target integrates with third-party APIs, test if third-party responses
+are validated. Can a compromised third-party inject malicious data?
 
 ### Parameter discovery
 
@@ -558,22 +725,57 @@ For every endpoint discovered in mapping:
 
 ### GraphQL testing (if detected)
 
+**Introspection and schema dumping:**
+
 ```bash
-# Introspection query
+# Full introspection query
 curl -s -X POST "https://example.target.com/graphql" \
   -H "Content-Type: application/json" \
   -d '{"query":"{__schema{types{name,fields{name}}}}"}' | jq .
 
-# Test for unauthorized access
+# Dump all mutations
 curl -s -X POST "https://example.target.com/graphql" \
   -H "Content-Type: application/json" \
-  -d '{"query":"{users{id,email,password}}"}' | jq .
+  -d '{"query":"{__schema{mutationType{fields{name,description}}}}"}' | jq .
 ```
+
+**When introspection is disabled:**
+
+- Use field suggestion errors: send typo queries (`{usr}` instead of `{user}`)
+  and read the "Did you mean?" suggestions to enumerate field names
+- Use alias-based brute forcing: `{ a: user1, b: user2, c: user3 }` — test many
+  field names in a single request
+- Check for persisted queries or saved query IDs in JS source
+
+**Depth and complexity attacks:**
+
+```bash
+# Nested query DoS (test if depth limiting exists)
+curl -s -X POST "https://example.target.com/graphql" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{users{friends{friends{friends{friends{id}}}}}}"}'
+```
+
+**Batch query abuse:**
+
+```bash
+# Send multiple queries in one request to bypass rate limiting
+curl -s -X POST "https://example.target.com/graphql" \
+  -H "Content-Type: application/json" \
+  -d '[{"query":"{user(id:1){email}}"},{"query":"{user(id:2){email}}"}]'
+```
+
+**Mutation abuse:**
+
+Test if mutations that should be admin-only can be called by regular users.
+Test if mutations accept extra fields for mass assignment.
 
 Pivot rule:
 
-- if endpoint testing reveals authentication or authorization issues on specific
-  routes, focus exploitation there before moving to broader testing.
+- if API testing reveals BOLA, BFLA, or mass assignment on critical endpoints,
+  prioritize exploitation there before broader testing.
+- if GraphQL introspection reveals sensitive types (users, payments, admin),
+  test each field for authorization bypass.
 
 ## Phase 8: Client-Side Analysis
 
@@ -659,6 +861,18 @@ Then ask:
 - can findings be chained? (e.g., XSS to steal token from localStorage, then
   token to access admin API, then admin API to extract all user data)
 - what is the next best operator action if the session continues?
+
+Apply the Critical Decision Test from EXPLOIT-VERIFICATION.md for each finding:
+is the prevention a security feature (FALSE POSITIVE) or an external constraint (POTENTIAL)?
+
+For every confirmed finding (proven or likely confidence), generate detection
+content per DETECTION-PAIRING.md: at minimum one YARA rule, Sigma rule,
+network IOC, or SIEM query. Store in the findings database detection fields.
+
+Include a Strategic Intelligence section in the session report (see STRATEGIC-INTEL.md)
+with WAF behavior, confirmed DB technology, cookie security, CSP bypass possibilities,
+and token format analysis. Record "Secure by Design" findings (parameters tested and
+confirmed safe) to prevent re-testing in future sessions.
 
 ## Phase 10: Report and POC
 

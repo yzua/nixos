@@ -60,12 +60,32 @@ For each sanitizer or encoding between source and sink, determine if it is effec
 | `CORS configuration`                          | Cross-origin requests  | Check: is `Access-Control-Allow-Origin: *` used? Are credentials allowed with wildcard? Is the origin reflected without validation?         |
 | `rate limiting`                               | Brute force            | Does not prevent the vulnerability itself; only slows exploitation                                                                          |
 
+**Slot Type Labeling (classify before evaluating sanitizers):**
+
+Before assessing sanitizer effectiveness, classify the injection slot type — this determines what correct sanitization looks like:
+
+| Slot Type             | Description                                          | Correct Sanitizer                                              |
+| --------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
+| `SQL-val`             | String value in SQL query (`WHERE name='INPUT'`)     | Parameterized query / `mysqli_real_escape_string()`            |
+| `SQL-like`            | Pattern in LIKE clause (`WHERE name LIKE '%INPUT%'`) | Escape `%` and `_` wildcards in addition to quotes             |
+| `SQL-num`             | Numeric context (`WHERE id=INPUT`)                   | `parseInt()` / type cast BEFORE concatenation                  |
+| `SQL-enum`            | Enumerated value (`ORDER BY INPUT`)                  | Strict allowlist of valid column names                         |
+| `SQL-ident`           | Identifier (table/column name)                       | Strict allowlist — escaping is insufficient                    |
+| `CMD-argument`        | Command argument (`ping INPUT`)                      | Argument array (no shell interpolation)                        |
+| `CMD-part-of-string`  | Inside a command string (`exec("ls " + INPUT)`)      | Shell escaping (`escapeshellarg()`) — fragile                  |
+| `FILE-path`           | File path parameter (`open(INPUT)`)                  | `getCanonicalPath()` + prefix check AFTER canonicalization     |
+| `FILE-include`        | Include/require path                                 | Allowlist of includable files — path validation insufficient   |
+| `TEMPLATE-expression` | Template engine input (`render(INPUT)`)              | Sandbox mode / auto-escaping — never raw interpolation         |
+| `DESERIALIZE-object`  | Deserialization input (`unserialize(INPUT)`)         | Type whitelist / signed serialization — no input filtering     |
+| `PATH-component`      | URL path segment (`/users/INPUT/profile`)            | Regex allowlist for valid patterns — URL encoding insufficient |
+
 **For each sanitizer in the path, answer:**
 
 1. What does it actually do (code-level or configuration-level)?
 2. Is it appropriate for the injection context (HTML body, HTML attribute, JS, CSS, URL, SQL, OS command)?
 3. Can it be bypassed? If so, how specifically?
 4. Is it applied on ALL paths or just some code branches?
+5. **Post-sanitization mutation check**: Has any string concatenation, encoding, or transformation occurred BETWEEN this sanitizer and the sink? If yes, the sanitizer may be invalidated even if it was correct for the slot type. A sanitizer followed by concatenation is not effective.
 
 ### Step 3: Reachability Analysis
 
@@ -249,3 +269,19 @@ For each validated finding, produce this structured output:
 - **During Phase 6 (Vulnerability Testing):** Before writing a full PoC, validate each suspected vulnerability with the 5-step framework. Only invest in PoC development for EXPLOITABLE or NEEDS TESTING findings.
 - **During Phase 9 (Confidence Review):** Update validation verdicts based on testing evidence. Upgrade NEEDS TESTING to EXPLOITABLE or downgrade to FALSE POSITIVE based on observed behavior.
 - **During Phase 10 (Report and POC):** Include the structured validation output for each finding in the final report.
+
+## False Positive Detection Heuristics
+
+Before classifying a finding as EXPLOITABLE, check for these common false positive patterns:
+
+1. **Works with one tool but not others.** sqlmap reports injection but manual curl with the same payload returns a normal response. Some tools inject via different encodings or HTTP methods. Reproduce with a plain curl request before confirming.
+
+2. **Requires exact timing or race condition.** A race condition that only triggers with precise concurrent timing. If you cannot reproduce it consistently (3/3 attempts), classify as NEEDS TESTING, not EXPLOITABLE.
+
+3. **Payload reflected but in a safe context.** A string that appears in response HTML but inside a `<textarea>`, a JSON string value, or after server-side encoding. Reflection alone is not XSS — check the output context and whether the browser will execute it.
+
+4. **WAF/tool artifact.** nuclei reports a vulnerability based on a regex match in the response body, but the match is in a comment, documentation text, or error template — not in the actual application logic. Verify the finding with a targeted manual test.
+
+5. **Authenticated-only impact reported as unauthenticated.** A finding that requires a logged-in session but was reported as if no auth is needed. Check whether the endpoint is truly public or requires a valid session cookie/token.
+
+6. **Scanner noise from generic responses.** Error messages like "an error occurred" or "invalid input" that scanners flag as SQL injection evidence, but are actually generic validation rejections. Confirm with a payload that produces a distinctly different response.

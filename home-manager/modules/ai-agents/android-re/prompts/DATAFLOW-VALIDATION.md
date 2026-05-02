@@ -59,12 +59,27 @@ For each sanitizer or validation between source and sink, determine if it is eff
 | `WebViewClient.shouldOverrideUrlLoading()` filter | URL loading          | Depends on filter quality; bypassable with URL encoding, redirect chains, scheme variations                           |
 | `CertificatePinner` / custom pinning              | MITM                 | **Effective** if implemented correctly; bypassable if the pinning check has logic errors or is applied to wrong hosts |
 
+**Slot Type Labeling (classify before evaluating sanitizers):**
+
+Before assessing sanitizer effectiveness, classify the injection slot type — this determines what correct sanitization looks like:
+
+| Slot Type        | Description                                          | Correct Sanitizer                                                              |
+| ---------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `SQL-val`        | String value in query (`WHERE name='INPUT'`)         | Parameterized query with bound `?` params                                      |
+| `SQL-enum`       | Enumerated value (sort column, projection)           | Strict allowlist of valid column names                                         |
+| `INTENT-extra`   | Intent extra value used in sensitive operations      | Type validation + origin verification (calling package check)                  |
+| `URI-param`      | Deep link URI parameter (`myapp://open?param=INPUT`) | Scheme/host/path validation before processing + URL decoding before validation |
+| `FILE-path`      | File path parameter (`openFileInput(INPUT)`)         | `getCanonicalPath()` + prefix check AFTER canonicalization                     |
+| `WEBVIEW-js-arg` | JavaScript bridge argument from WebView              | Input validation on Java side — JS-side validation is not a guard              |
+| `BUNDLE-extra`   | Bundle extra in exported components                  | Type + value range validation before use                                       |
+
 **For each sanitizer in the path, answer:**
 
 1. What does it actually do (code-level)?
 2. Is it appropriate for the vulnerability type?
 3. Can it be bypassed? If so, how specifically?
 4. Is it applied to ALL paths or just some?
+5. **Post-sanitization mutation check**: Has any string concatenation, encoding, or transformation occurred BETWEEN this sanitizer and the sink? If yes, the sanitizer may be invalidated even if it was correct for the slot type. A sanitizer followed by concatenation is not effective.
 
 ### Step 3: Reachability Analysis
 
@@ -231,3 +246,19 @@ For each validated finding, produce this structured output:
 - **After Phase 3 (Static Triage):** Apply the 5-step validation to each suspected finding from jadx output and Semgrep scan. Classify as EXPLOITABLE, FALSE POSITIVE, or NEEDS TESTING.
 - **Before Phase 9 (Prove Findings):** Only invest in PoC development for findings validated as EXPLOITABLE or NEEDS TESTING with confidence ≥ 0.6. FALSE POSITIVE findings are documented but not proven.
 - **During Phase 10 (Confidence Review):** Update validation verdicts based on dynamic testing evidence. A finding that was NEEDS TESTING may be upgraded to EXPLOITABLE or downgraded to FALSE POSITIVE based on runtime behavior.
+
+## False Positive Detection Heuristics
+
+Before classifying a finding as EXPLOITABLE, check for these common false positive patterns:
+
+1. **Works in one context but not another.** A SQL injection that works via `adb shell content query` but not from a third-party app because the content provider requires a permission. Check reachability from the actual attacker position, not just root/adb.
+
+2. **Requires exact timing or race condition.** A finding that only triggers under precise timing (e.g., tapping a button while a specific network request is in flight). If you cannot reproduce it consistently (3/3 attempts), it stays NEEDS TESTING, not EXPLOITABLE.
+
+3. **Payload reflected but in a safe context.** A string that appears in output but inside a CDATA block, a JSON string value (not a key), or after `Html.encodeHtml()`. Reflection alone is not exploitation — check the output context.
+
+4. **Static analysis noise.** `rawQuery()` calls where the parameter is a constant or build-time value, not runtime user input. The string concatenation is real but the source is internal-only. Apply Step 1 (Source Control) rigorously.
+
+5. **Dead code path.** A vulnerable method that exists in the APK but is never called from any reachable path (no callers, no xrefs, behind a disabled feature flag). Use jadx xref to confirm the path is live.
+
+6. **Emulator-specific behavior.** A behavior that only manifests on the emulator (e.g., missing hardware keystore, different SELinux policy) and would not occur on a real device. Flag as NEEDS TESTING with a note about the emulator limitation.
