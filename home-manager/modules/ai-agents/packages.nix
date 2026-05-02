@@ -46,6 +46,21 @@ let
       scriptsDir
       ;
   };
+  findingsAndroid = pkgs.writeShellScriptBin "findings-android" ''
+    exec ${scriptsDir}/ai/android-re/findings.sh "$@"
+  '';
+  findingsWeb = pkgs.writeShellScriptBin "findings-web" ''
+    exec ${scriptsDir}/ai/web-re/findings.sh "$@"
+  '';
+  generateTotp = pkgs.writeShellScriptBin "generate-totp" ''
+    exec ${scriptsDir}/ai/web-re/generate-totp.sh "$@"
+  '';
+  reDoctor = pkgs.writeShellScriptBin "re-doctor" ''
+    exec ${scriptsDir}/ai/android-re/re-doctor.sh "$@"
+  '';
+  webReDoctor = pkgs.writeShellScriptBin "web-re-doctor" ''
+    exec ${scriptsDir}/ai/web-re/web-re-doctor.sh "$@"
+  '';
   aliasLib = import ./helpers/_aliases.nix {
     inherit
       lib
@@ -86,6 +101,11 @@ in
       aiAgentLauncher
       aiAgentInventory
       pkgs.bubblewrap
+      findingsAndroid
+      findingsWeb
+      generateTotp
+      reDoctor
+      webReDoctor
     ]
     ++ androidReLaunchers
     ++ webReLaunchers

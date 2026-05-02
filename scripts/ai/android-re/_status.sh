@@ -72,9 +72,67 @@ status() {
 
 doctor() {
 	_try_init_mitm_ca_vars || true
-	for tool in adb emulator avdmanager sdkmanager mitmproxy mitmdump frida frida-ps apktool jadx sqlite3 unzip xz; do
+	echo ""
+	log_info "=== Android RE Doctor ==="
+
+	log_info "--- Emulator and device ---"
+	for tool in adb emulator avdmanager sdkmanager scrcpy; do
 		check_tool "$tool"
 	done
+
+	log_info "--- Dynamic analysis ---"
+	for tool in frida frida-ps objection; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Proxy and network ---"
+	for tool in mitmproxy mitmdump tshark httpx katana amass nmap masscan; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Static analysis ---"
+	for tool in jadx apktool radare2 binwalk semgrep afl-fuzz yara; do
+		check_tool "$tool"
+	done
+	check_tool ghidra || check_tool analyzeHeadless
+	check_tool codeql || log_info "codeql: optional (uvx codeql for on-demand install)"
+
+	log_info "--- Web and vuln testing ---"
+	for tool in nuclei subfinder whatweb ffuf dalfox arjun zap interactsh testssl gobuster feroxbuster commix rustscan; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Binary analysis ---"
+	for tool in checksec objdump readelf nm; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Supply chain ---"
+	check_tool trivy
+
+	log_info "--- Coverage ---"
+	check_tool gcovr
+
+	log_info "--- Android build tools ---"
+	for tool in aapt2 apksigner zipalign; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Core utils ---"
+	for tool in curl jq sqlite3 unzip xz git; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Python modules ---"
+	for pymod in androguard waybackpy z3; do
+		if python3 -c "import ${pymod}" 2>/dev/null; then
+			log_success "python module present: ${pymod}"
+		else
+			log_warning "python module missing: ${pymod}"
+		fi
+	done
+
+	echo ""
 	if [[ -d "${HOME}/.android/avd/${AVD_NAME}.avd" ]]; then
 		log_success "avd directory exists"
 	else

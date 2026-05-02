@@ -72,13 +72,61 @@ status_report() {
 doctor() {
 	echo ""
 	log_info "=== Web RE Doctor ==="
+
+	log_info "--- Browser ---"
 	check_tool google-chrome-stable || check_tool chromium
+
+	log_info "--- Proxy ---"
 	check_tool mitmdump
-	check_tool nuclei
-	check_tool sqlmap
-	check_tool nmap
-	check_tool curl
-	check_tool jq
+	check_tool burpsuite 2>/dev/null || true
+
+	log_info "--- Reconnaissance ---"
+	for tool in subfinder amass httpx whatweb katana rustscan; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Vulnerability scanning ---"
+	for tool in nuclei nikto sqlmap dalfox zap semgrep commix; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Fuzzing ---"
+	for tool in ffuf arjun gobuster feroxbuster; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Network ---"
+	for tool in nmap masscan tcpdump tshark wireshark-cli; do
+		check_tool "$tool"
+	done
+
+	log_info "--- HTTP clients ---"
+	for tool in curl httpie hurl bruno grpcurl; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Analysis ---"
+	for tool in cyberchef jq linkfinder trivy testssl interactsh hydra; do
+		check_tool "$tool"
+	done
+
+	log_info "--- Core ---"
+	check_tool git
+
+	log_info "--- Python modules ---"
+	if python3 -c "import waybackpy" 2>/dev/null; then
+		log_success "python module present: waybackpy"
+	else
+		log_warning "python module missing: waybackpy"
+	fi
+
+	log_info "--- External tools ---"
+	if command -v uvx >/dev/null 2>&1; then
+		log_success "uvx available (schemathesis: uvx schemathesis)"
+	else
+		log_warning "uvx not available (needed for schemathesis)"
+	fi
+
 	echo ""
 }
 
