@@ -7,6 +7,7 @@
   opencodeConfigPathList,
   opencodeZaiFilter,
   claudeZaiFilter,
+  ompZaiFilter,
   geminiZaiFilter,
   githubPlaceholderFilter,
   openrouterPlaceholderFilter,
@@ -73,6 +74,10 @@ lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "set
         "__ZAI_API_KEY_PLACEHOLDER__" \
         '\[mcp_servers.zai-mcp-server.env\]' \
         "Z.AI API key + remote MCPs"
+      if [[ -f "$HOME/.omp/agent/mcp.json" ]]; then
+        patch_json_file "$HOME/.omp/agent/mcp.json" key "$ZAI_KEY" ${lib.escapeShellArg ompZaiFilter}
+        echo "✓ Patched .omp/agent/mcp.json with Z.AI API key + remote MCPs"
+      fi
       unset ZAI_KEY
     else
       echo "⚠ ${cfg.secrets.zaiApiKeyFile} not found - run 'just nixos' first"
@@ -106,6 +111,10 @@ lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "set
         "__CONTEXT7_API_KEY_PLACEHOLDER__" \
         "" \
         "Context7 API key"
+      if [[ -f "$HOME/.omp/agent/mcp.json" ]]; then
+        patch_json_file "$HOME/.omp/agent/mcp.json" key "$CONTEXT7_KEY" ${lib.escapeShellArg context7PlaceholderFilter}
+        echo "✓ Patched .omp/agent/mcp.json with Context7 API key"
+      fi
       unset CONTEXT7_KEY
     else
       echo "⚠ ${cfg.secrets.context7ApiKeyFile} not found - run 'just nixos' first"
@@ -123,6 +132,10 @@ lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "setupCodexConfig" "set
       "__GITHUB_TOKEN_PLACEHOLDER__" \
       "" \
       "GitHub token from gh CLI"
+    if [[ -f "$HOME/.omp/agent/mcp.json" ]]; then
+      patch_json_file "$HOME/.omp/agent/mcp.json" token "$GH_TOKEN" ${lib.escapeShellArg githubPlaceholderFilter}
+      echo "✓ Patched .omp/agent/mcp.json with GitHub token"
+    fi
     unset GH_TOKEN
   else
     echo "⚠ gh CLI not authenticated - GitHub MCP will not work (run 'gh auth login')"

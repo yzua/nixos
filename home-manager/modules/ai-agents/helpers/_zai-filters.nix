@@ -68,6 +68,12 @@ in
     type = "http";
   };
 
+  ompZaiFilter = mkZaiFilter {
+    mcpRoot = "mcpServers";
+    nativeKey = "zai-mcp-server";
+    type = "http";
+  };
+
   geminiZaiFilter = mkZaiFilter {
     mcpRoot = "mcpServers";
     nativeKey = "zai-mcp-server";

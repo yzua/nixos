@@ -95,7 +95,7 @@ let
     }
     {
       alias = "oc";
-      command = "opencode";
+      command = "opencode --log-level WARN";
       workflowPromptMode = "flag";
     }
     {
@@ -141,6 +141,11 @@ let
     {
       alias = "oczen";
       command = "opencode_zen";
+      workflowPromptMode = "flag";
+    }
+    {
+      alias = "opi";
+      command = "omp_glm";
       workflowPromptMode = "flag";
     }
   ];

@@ -21,10 +21,13 @@ let
   opencodeProfiles = import ./helpers/_opencode-profiles.nix { inherit config; };
   inherit (settingsBuilders)
     geminiSettings
+    ompSettings
     opencodeSettingsByProfile
     opencodeAndroidReMcpServers
     opencodeWebReMcpServers
     ;
+
+  ompRePrompts = import ./omp-re/_prompt.nix { inherit config lib; };
 
   opencodeProfileNames = opencodeProfiles.names;
   opencodeGruvboxDarkTheme = toJSON (
@@ -128,6 +131,68 @@ in
         // (mkTextFiles ".gemini/commands" fileTemplates.geminiCommands)
         // (mkTextFiles ".gemini/policies" geminiPolicies)
       ))
+
+      # === oh-my-pi Files (MCP, Config, Models, Agent Definitions) ===
+      (lib.mkIf cfg.omp.enable {
+        ".omp/agent/mcp.json" = {
+          text = toJSON ompSettings;
+          force = true;
+        };
+        ".omp/agent/models.yml" = {
+          text = ''
+            providers:
+              zai:
+                baseUrl: https://api.z.ai/api/anthropic
+                apiKey: ZAI_API_KEY
+                api: anthropic-messages
+                authHeader: true
+                models:
+                  - id: glm-5.1
+                    name: GLM-5.1
+                    reasoning: true
+                    input:
+                      - text
+                    contextWindow: 200000
+                    maxTokens: 32768
+                  - id: glm-5-turbo
+                    name: GLM-5 Turbo
+                    reasoning: false
+                    input:
+                      - text
+                    contextWindow: 128000
+                    maxTokens: 16384
+          '';
+          force = true;
+        };
+        ".omp/agent/config.yml" = {
+          text = ''
+            theme:
+              dark: ${cfg.omp.theme}
+            modelRoles:
+              default: ${cfg.omp.defaultModel}
+              plan: ${cfg.omp.planModel}
+              smol: ${cfg.omp.smolModel}
+            defaultThinkingLevel: high
+            compaction:
+              enabled: true
+              reserveTokens: 16384
+            skills:
+              enabled: true
+            task:
+              isolation:
+                mode: none
+          '';
+          force = true;
+        };
+        ".omp/agent/agents/android-re.md" = {
+          text = ompRePrompts.androidRe.agentDef;
+          force = true;
+        };
+        ".omp/agent/agents/web-re.md" = {
+          text = ompRePrompts.webRe.agentDef;
+          force = true;
+        };
+      })
     ];
 
     xdg.configFile = lib.mkMerge [
@@ -154,6 +219,18 @@ in
       })
       # OpenCode profile configs
       (lib.mkIf cfg.opencode.enable (opencodeConfigFiles // opencodeImpeccableCommandFiles))
+
+      # oh-my-pi RE launcher prompt files (read by opiare/opiwre launcher scripts)
+      (lib.mkIf cfg.omp.enable {
+        "omp/android-re-prompt.txt" = {
+          text = ompRePrompts.androidRe.launcherPrompt;
+          force = true;
+        };
+        "omp/web-re-prompt.txt" = {
+          text = ompRePrompts.webRe.launcherPrompt;
+          force = true;
+        };
+      })
     ];
   };
 }

@@ -26,6 +26,7 @@ let
   inherit (zaiFilters)
     opencodeZaiFilter
     claudeZaiFilter
+    ompZaiFilter
     geminiZaiFilter
     ;
   githubPlaceholderFilter = ''
@@ -48,6 +49,7 @@ let
       opencodeConfigPathList
       opencodeZaiFilter
       claudeZaiFilter
+      ompZaiFilter
       geminiZaiFilter
       githubPlaceholderFilter
       openrouterPlaceholderFilter
@@ -88,6 +90,7 @@ let
       lib
       pkgs
       toJSON
+      opencodeProfileNames
       ;
   };
 

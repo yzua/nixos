@@ -159,6 +159,7 @@ in
     screens = "Screens";
     opencodeLogDir = ".local/share/opencode/log";
     codexLogDir = ".codex/log";
+    aiAgentsLogDir = ".local/share/ai-agents/logs";
     sopsKeyDir = ".config/sops/age/keys.txt";
     androidSdk = "Android/Sdk";
     systemRepo = "System";

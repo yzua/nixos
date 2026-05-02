@@ -12,6 +12,9 @@ let
   opencodeProfiles = import ./_opencode-profiles.nix { inherit config; };
   inherit (mcpTransforms)
     opencodeMcpServers
+    ompMcpServers
+    ompAndroidReMcpServers
+    ompWebReMcpServers
     geminiMcpServers
     opencodeAndroidReMcpServers
     opencodeWebReMcpServers
@@ -47,6 +50,11 @@ let
   }
   // (lib.optionalAttrs (cfg.claude.extraSettings != { }) cfg.claude.extraSettings);
 
+  ompSettings = {
+    mcpServers = ompMcpServers // ompAndroidReMcpServers // ompWebReMcpServers;
+  }
+  // (lib.optionalAttrs (cfg.omp.extraSettings != { }) cfg.omp.extraSettings);
+
   opencodeSettings = {
     "$schema" = "https://opencode.ai/config.json";
     inherit (cfg.opencode) model;
@@ -55,6 +63,14 @@ let
     provider = cfg.opencode.providers;
     # Disable snapshot system to prevent tmp_pack_* file leaks and disk bloat (#14811)
     snapshot = false;
+    # Suppress INFO permission spam (128KB per check × thousands per message)
+    logLevel = "WARN";
+    # Auto-compact context to prevent overflow on long sessions
+    compaction = {
+      auto = true;
+      prune = true;
+      reserved = 10000;
+    };
     watcher.ignore = [
       "node_modules/**"
       "dist/**"
@@ -125,6 +141,7 @@ in
 {
   inherit
     claudeSettings
+    ompSettings
     opencodeSettings
     geminiSettings
     opencodeSettingsByProfile

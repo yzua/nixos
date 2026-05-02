@@ -29,4 +29,9 @@
   aider-model = "claude-sonnet-4-7";
   aider-editor = "claude-haiku-4-5";
 
+  # oh-my-pi (provider-prefixed IDs match models.yml provider definitions)
+  omp-default = "zai/glm-5.1";
+  omp-plan = "zai/glm-5.1";
+  omp-smol = "zai/glm-5-turbo";
+
 }

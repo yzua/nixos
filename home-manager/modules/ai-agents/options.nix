@@ -332,5 +332,16 @@ in
       sandboxMode = mkStrOption "cautious" "Sandbox mode (none, cautious, strict)";
       extraSettings = mkAttrsOption { } "Additional Gemini CLI settings";
     };
+
+    # === oh-my-pi Options ===
+    omp = {
+      enable = lib.mkEnableOption "oh-my-pi AI coding agent configuration";
+
+      defaultModel = mkStrOption "zai/glm-5.1" "Default model for oh-my-pi";
+      planModel = mkStrOption "zai/glm-5.1" "Model for planning tasks";
+      smolModel = mkStrOption "zai/glm-5-turbo" "Lightweight model for simple tasks";
+      theme = mkStrOption "gruvbox-dark" "Theme for oh-my-pi";
+      extraSettings = mkAttrsOption { } "Additional oh-my-pi settings merged into mcp.json";
+    };
   };
 }

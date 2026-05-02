@@ -50,12 +50,18 @@ in
       export GEMINI_API_KEY="$_gemini_key"
     fi
 
+    # Export Z.AI key for omp models.yml resolution (non-fatal)
+    if _zai_key_export="$(_load_zai_key 2>/dev/null)" && [[ -n "$_zai_key_export" ]]; then
+      export ZAI_API_KEY="$_zai_key_export"
+    fi
+
     # === AI agent wrappers ===
     _ai_tab_icon() {
       case "$1" in
         cl*|ocl*|hcl*) printf '\uf1b0 ' ;;                   #  Claude — cl, clu, clglm, ocl, hcl + all workflow suffixes
         oc*|locgpt*|mocgpt*|xocgpt*) printf '\ue7a4 ' ;;     #  OpenCode — oc, ocglm, ocgem, ocgpt, ocs, oczen + all workflow suffixes
         cx*|lcx*|mcx*|hcx*|xcx*) printf '\uf1c0 ' ;;         #  Codex — cx, lcx, mcx, hcx, xcx + all workflow suffixes
+        opi*) printf '\uf135 ' ;;                              #  oh-my-pi — opi + all workflow suffixes
         gem*) printf '\uf529 ' ;;                              #  Gemini — gem + all workflow suffixes
         *) ;;
       esac
@@ -76,15 +82,29 @@ in
         shift
       fi
       _zellij_rename_tab "$tab_name"
+      # Inject --debug-file for Claude Code sessions
+      if [[ "$1" == "claude" ]]; then
+        local debug_dir="''${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agents/logs}"
+        mkdir -p "$debug_dir"
+        set -- "$@" "--debug-file" "$debug_dir/claude-debug-$(date +%Y-%m-%d).log"
+      fi
       "$@"
     }
 
     claude_glm() {
       local key; key="$(_load_zai_key)" || return 1
       _zellij_rename_tab "clglm"
+      local debug_dir="''${AI_AGENT_LOG_DIR:-$HOME/.local/share/ai-agents/logs}"
+      mkdir -p "$debug_dir"
       ANTHROPIC_AUTH_TOKEN="$key" \
       ${zaiEnv.inlinePrefix} \
-      claude --dangerously-skip-permissions "$@"
+      claude --dangerously-skip-permissions --debug-file "$debug_dir/claude-debug-$(date +%Y-%m-%d).log" "$@"
+    }
+
+    omp_glm() {
+      local key; key="$(_load_zai_key)" || return 1
+      _zellij_rename_tab "opi"
+      ZAI_API_KEY="$key" omp "$@"
     }
 
     _opencode_profile() {
@@ -92,7 +112,7 @@ in
       local tab_name="$2"
       shift 2
       _zellij_rename_tab "$tab_name"
-      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-$profile" opencode "$@"
+      OPENCODE_CONFIG_DIR="$HOME/.config/opencode-$profile" opencode --log-level WARN "$@"
     }
 
     ${lib.concatStringsSep "\n\n" (
@@ -162,7 +182,7 @@ in
           # Build command with prompt injection per agent family
           if [[ -n "$prompt" ]]; then
             case "$agent" in
-              oc|ocglm|ocgem|ocgpt|ocor|ocs|oczen|occm|ocrf|ocsa|ocmd|opencode*)
+              oc|ocglm|ocgem|ocgpt|ocor|ocs|oczen|opi|opencode*)
                 cmd="$agent --prompt '$kdl_prompt'" ;;
               *)
                 cmd="$agent '$kdl_prompt'" ;;

@@ -122,9 +122,12 @@ _def oczen   "OPENCODE_CONFIG_DIR=$HOME/.config/opencode-zen"    "opencode"     
 # Gemini
 _def gem   -    "gemini --approval-mode=yolo"         "gemini --approval-mode=yolo --prompt"
 
+# oh-my-pi
+_def opi   ZAI_OMP  "omp"    "omp --prompt"
+
 # --- Supported tools (single source of truth) ---
 # shellcheck disable=SC2034 # Used by agent-analyze.sh, agent-inventory.sh, _inventory-collectors.sh
-SUPPORTED_TOOLS=(claude opencode codex gemini)
+SUPPORTED_TOOLS=(claude opencode codex gemini omp)
 
 # --- Supported base aliases ---
 
@@ -187,6 +190,13 @@ openrouter_opencode_env() {
   printf '%s\n' "OPENCODE_CONFIG_DIR=${HOME}/.config/opencode-openrouter"
 }
 
+# Z.AI env vars for omp (just the API key — routing is handled by models.yml).
+zai_omp_env() {
+  local key
+  key="$(zai_key)"
+  printf '%s\n' "ZAI_API_KEY=${key}"
+}
+
 # --- Workflow suffix resolution ---
 
 resolve_workflow_prompt() {
@@ -213,6 +223,7 @@ resolve_env_marker() {
 	case "$env_marker" in
 	"-") ;;
 	"ZAI") zai_claude_env | tr '\n' ' ' ;;
+	"ZAI_OMP") zai_omp_env | tr '\n' ' ' ;;
 	"OPENROUTER") openrouter_opencode_env | tr '\n' ' ' ;;
 	*) printf '%s' "$env_marker" ;;
 	esac

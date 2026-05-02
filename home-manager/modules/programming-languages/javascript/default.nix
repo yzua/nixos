@@ -17,6 +17,7 @@ let
   bunGlobalPackages = [
     "@anthropic-ai/claude-code"
     "@google/gemini-cli"
+    "@oh-my-pi/pi-coding-agent"
     "@openai/codex"
     "opencode-ai"
     "skills"

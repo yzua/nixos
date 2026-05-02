@@ -6,6 +6,7 @@
 let
   ol = "~/${constants.paths.opencodeLogDir}";
   cl = "~/${constants.paths.codexLogDir}";
+  al = "~/${constants.paths.aiAgentsLogDir}";
 in
 (
   if cfg.logging.enable then
@@ -15,14 +16,12 @@ in
       "oc-port" = "opencode --port 4096";
       "codex-log" = "ai-agent-log-wrapper codex codex";
       "gemini-log" = "ai-agent-log-wrapper gemini gemini";
+      "opi-log" = "ai-agent-log-wrapper omp omp";
 
-      "ai-logs" = "tail -f ${ol}/*.log ${cl}/*.log 2>/dev/null";
-      "ai-errors-all" =
-        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ${ol}/ ${cl}/ 2>/dev/null | tail -100";
-      "ai-errors" =
-        "grep -rn --color=always -i 'error\\|panic\\|fatal\\|exception' ${ol}/ ${cl}/ 2>/dev/null | grep -vi 'Method not found: prompts/list\\|Method not found: resources/list\\|Method not found failed to get prompts' | tail -50";
-      "ai-errors-runtime" =
-        "grep -rn --color=always -i 'not connected failed to get prompts\\|EIO: i/o error\\|setRawMode failed\\|tui bootstrap failed\\|bun info failed' ${ol}/ ${cl}/ 2>/dev/null | tail -50";
+      "ai-logs" = "tail -f ${al}/*.log ${ol}/*.log ${cl}/*.log 2>/dev/null";
+      "ai-errors" = "ai-agent-analyze errors";
+      "ai-errors-all" = "ai-agent-analyze patterns";
+      "ai-errors-runtime" = "ai-agent-analyze errors";
 
       "ai-stats" = "ai-agent-analyze stats";
       "ai-report" = "ai-agent-analyze report";
