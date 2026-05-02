@@ -46,12 +46,6 @@ let
       scriptsDir
       ;
   };
-  ompReLaunchers = import ./omp-re/_launchers.nix {
-    inherit
-      pkgs
-      ;
-  };
-
   aliasLib = import ./helpers/_aliases.nix {
     inherit
       lib
@@ -95,7 +89,6 @@ in
     ]
     ++ androidReLaunchers
     ++ webReLaunchers
-    ++ ompReLaunchers
     ++ (lib.optional cfg.logging.enable (
       pkgs.writeShellScriptBin "ai-agent-log-cleanup" ''
         ${logCleanupCommand}

@@ -13,8 +13,6 @@ let
   inherit (mcpTransforms)
     opencodeMcpServers
     ompMcpServers
-    ompAndroidReMcpServers
-    ompWebReMcpServers
     geminiMcpServers
     opencodeAndroidReMcpServers
     opencodeWebReMcpServers
@@ -51,7 +49,7 @@ let
   // (lib.optionalAttrs (cfg.claude.extraSettings != { }) cfg.claude.extraSettings);
 
   ompSettings = {
-    mcpServers = ompMcpServers // ompAndroidReMcpServers // ompWebReMcpServers;
+    mcpServers = ompMcpServers;
   }
   // (lib.optionalAttrs (cfg.omp.extraSettings != { }) cfg.omp.extraSettings);
 
@@ -70,6 +68,8 @@ let
       auto = true;
       prune = true;
       reserved = 10000;
+      tail_turns = 3;
+      preserve_recent_tokens = 8000;
     };
     watcher.ignore = [
       "node_modules/**"

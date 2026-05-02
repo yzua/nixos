@@ -27,8 +27,6 @@ let
     opencodeWebReMcpServers
     ;
 
-  ompRePrompts = import ./omp-re/_prompt.nix { inherit config lib; };
-
   opencodeProfileNames = opencodeProfiles.names;
   opencodeGruvboxDarkTheme = toJSON (
     import ./helpers/_opencode-gruvbox-theme.nix { inherit (constants) color; }
@@ -184,14 +182,6 @@ in
           '';
           force = true;
         };
-        ".omp/agent/agents/android-re.md" = {
-          text = ompRePrompts.androidRe.agentDef;
-          force = true;
-        };
-        ".omp/agent/agents/web-re.md" = {
-          text = ompRePrompts.webRe.agentDef;
-          force = true;
-        };
       })
     ];
 
@@ -219,18 +209,6 @@ in
       })
       # OpenCode profile configs
       (lib.mkIf cfg.opencode.enable (opencodeConfigFiles // opencodeImpeccableCommandFiles))
-
-      # oh-my-pi RE launcher prompt files (read by opiare/opiwre launcher scripts)
-      (lib.mkIf cfg.omp.enable {
-        "omp/android-re-prompt.txt" = {
-          text = ompRePrompts.androidRe.launcherPrompt;
-          force = true;
-        };
-        "omp/web-re-prompt.txt" = {
-          text = ompRePrompts.webRe.launcherPrompt;
-          force = true;
-        };
-      })
     ];
   };
 }

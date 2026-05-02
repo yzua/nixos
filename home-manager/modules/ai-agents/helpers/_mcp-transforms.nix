@@ -104,38 +104,12 @@ let
     servers = webReMcpServers;
   };
 
-  ompAndroidReMcpServers = mkMcpTransform {
-    localAttrs = server: {
-      inherit (server) command;
-      args = server.args or [ ];
-    };
-    remoteAttrs = server: {
-      type = "http";
-      inherit (server) url;
-    };
-    servers = androidReMcpServers;
-  };
-
-  ompWebReMcpServers = mkMcpTransform {
-    localAttrs = server: {
-      inherit (server) command;
-      args = server.args or [ ];
-    };
-    remoteAttrs = server: {
-      type = "http";
-      inherit (server) url;
-    };
-    servers = webReMcpServers;
-  };
-
 in
 {
   inherit
     sharedMcpServers
     claudeMcpServers
     ompMcpServers
-    ompAndroidReMcpServers
-    ompWebReMcpServers
     opencodeMcpServers
     geminiMcpServers
     opencodeAndroidReMcpServers
