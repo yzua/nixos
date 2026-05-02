@@ -64,7 +64,6 @@ For a newly added host, use explicit `nh` commands instead of the hardcoded `jus
 | `just sops-view`          | View secrets (read-only)                                                                                      |
 | `just secrets-add KEY`    | Add a single secret (prompted securely)                                                                       |
 | `just security-audit`     | Systemd hardening + CVE scan                                                                                  |
-| `just skills-sync`        | Sync AI agent skills from GitHub                                                                              |
 
 ---
 

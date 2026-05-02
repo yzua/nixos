@@ -124,11 +124,6 @@ home:
     @echo -e "\n➤ Switching Home-Manager…"
     home-manager switch --flake path:.#yz@desktop -b backup
 
-# Sync skills from GitHub to ~/.local/share/skills/
-skills-sync:
-    @echo -e "\n➤ Syncing skills from GitHub…"
-    @./scripts/ai/skills-sync.sh
-
 # Switch NixOS generation
 nixos:
     @echo -e "\n➤ Rebuilding NixOS…"

@@ -1,55 +1,9 @@
-# Skill installations and omissions for all AI agents.
+# Skill installations for all AI agents.
 # Imported by config/defaults.nix.
 
 {
   skills = [
-    # Repo-level installs (all skills from repo)
-    "obra/superpowers"
-    "anthropics/skills"
-    "alirezarezvani/claude-skills"
-    "microsoft/playwright-cli"
-
-    # Individual skills (--skill flag)
-    {
-      repo = "vercel-labs/skills";
-      skill = "find-skills";
-    }
-    {
-      repo = "vercel-labs/agent-skills";
-      skill = "vercel-react-best-practices";
-    }
-    {
-      repo = "vercel-labs/agent-skills";
-      skill = "vercel-composition-patterns";
-    }
-    {
-      repo = "obra/superpowers";
-      skill = "systematic-debugging";
-    }
-    {
-      repo = "obra/superpowers";
-      skill = "verification-before-completion";
-    }
-    {
-      repo = "obra/superpowers";
-      skill = "writing-plans";
-    }
-    {
-      repo = "anthropics/skills";
-      skill = "webapp-testing";
-    }
-    {
-      repo = "vercel-labs/agent-skills";
-      skill = "web-design-guidelines";
-    }
-    {
-      repo = "remotion-dev/skills";
-      skill = "remotion-best-practices";
-    }
-    {
-      repo = "anthropics/skills";
-      skill = "frontend-design";
-    }
+    # Real tools — browser, device, and web app testing
     {
       repo = "vercel-labs/agent-browser";
       skill = "agent-browser";
@@ -58,32 +12,101 @@
       repo = "callstackincubator/agent-device";
       skill = "agent-device";
     }
-  ];
+    {
+      repo = "anthropics/skills";
+      skill = "webapp-testing";
+    }
 
-  # Keep broad repo installs, then remove language/framework-specific skills.
-  omitSkills = [
-    # Language/framework-specific skills to omit.
-    "django-patterns"
-    "django-security"
-    "django-tdd"
-    "django-verification"
-    "springboot-patterns"
-    "springboot-security"
-    "springboot-tdd"
-    "springboot-verification"
-    "java-coding-standards"
-    "jpa-patterns"
-    "kotlin-coroutines-flows"
-    "kotlin-exposed-patterns"
-    "kotlin-ktor-patterns"
-    "kotlin-patterns"
-    "kotlin-testing"
-    "swift-actor-persistence"
-    "swift-concurrency-6-2"
-    "swift-protocol-di-testing"
-    "swiftui-patterns"
-    "perl-patterns"
-    "perl-security"
-    "perl-testing"
+    # Methodology — Matt Pocock's engineering skills
+    {
+      repo = "mattpocock/skills";
+      skill = "diagnose";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "tdd";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "grill-with-docs";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "grill-me";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "to-prd";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "to-issues";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "triage";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "zoom-out";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "improve-codebase-architecture";
+    }
+    {
+      repo = "mattpocock/skills";
+      skill = "caveman";
+    }
+
+    # Domain rules
+    {
+      repo = "vercel-labs/agent-skills";
+      skill = "vercel-react-best-practices";
+    }
+    {
+      repo = "vercel-labs/skills";
+      skill = "find-skills";
+    }
+    {
+      repo = "vercel-labs/agent-skills";
+      skill = "web-design-guidelines";
+    }
+    {
+      repo = "anthropics/skills";
+      skill = "frontend-design";
+    }
+
+    # Browser testing
+    {
+      repo = "microsoft/playwright-cli";
+      skill = "playwright-cli";
+    }
+
+    # Coding methodology — multi-agent analysis
+    {
+      repo = "michaelboeding/skills";
+      skill = "debug-council";
+    }
+    {
+      repo = "michaelboeding/skills";
+      skill = "parallel-builder";
+    }
+
+    # Practical dev tools
+    {
+      repo = "mxyhi/ok-skills";
+      skill = "gh-fix-ci";
+    }
+    {
+      repo = "mxyhi/ok-skills";
+      skill = "find-docs";
+    }
+
+    # Security
+    {
+      repo = "TerminalSkills/skills";
+      skill = "security-audit";
+    }
   ];
 }

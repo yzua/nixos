@@ -13,6 +13,6 @@ in
     agencyAgents.enable = false;
     impeccable.enable = true;
 
-    inherit (skillDefs) skills omitSkills;
+    inherit (skillDefs) skills;
   };
 }
