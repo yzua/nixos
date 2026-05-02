@@ -49,6 +49,14 @@ scripts/
 │       ├── _status.sh       # Status check helper functions
 │       ├── _tmux.sh         # tmux helper functions
 │       └── workspace-init.sh # Android RE workspace initialization
+│   └── web-re/
+│       ├── web-re.sh          # Web RE workflow launcher
+│       ├── opencode-web-re.sh # OpenCode Web RE workspace launcher
+│       ├── _chrome.sh         # Chrome DevTools helper functions
+│       ├── _helpers.sh        # Shared helpers for web RE workflows
+│       ├── _mitm.sh           # mitmproxy helper functions
+│       ├── _tmux.sh           # tmux helper functions
+│       └── workspace-init.sh  # Web RE workspace initialization
 ├── apps/
 │   ├── browser-select.sh    # Browser profile selector (wofi menu)
 │   ├── element-desktop-keyring.sh # Element Desktop keyring helper

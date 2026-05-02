@@ -25,9 +25,13 @@ Parent: `scripts/ai/AGENTS.md`
 | `frida-spoof-build.js`               | Frida gadget: overrides Build fields to Pixel 7, hides emulator files                                    |
 | `frida-bypass-certificate-pinner.js` | Frida: bypasses OkHttp CertificatePinner + Conscrypt TrustManagerImpl                                    |
 | `frida-hook-build-fields.js`         | Frida: logs android.os.Build fields (read-only diagnostic)                                               |
+| `frida-hook-crypto.js`               | Frida: hooks cryptographic operations for analysis                                                       |
 | `frida-hook-file-exists.js`          | Frida: logs File.exists calls matching root/emulator/frida patterns                                      |
+| `frida-hook-intent.js`               | Frida: logs Intent creation and dispatch                                                                 |
+| `frida-hook-network.js`              | Frida: logs network traffic and socket connections                                                       |
 | `frida-hook-shared-prefs.js`         | Frida: logs SharedPreferences reads/writes                                                               |
 | `frida-hook-url-log.js`              | Frida: logs URL construction and OkHttp requests                                                         |
+| `frida-hook-webview.js`              | Frida: hooks WebView load and JavaScript interface calls                                                 |
 | `frida-hooks-test.sh`                | Unit tests verifying hook files exist and use `Java.perform`                                             |
 
 ---

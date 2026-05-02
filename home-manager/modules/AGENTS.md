@@ -53,6 +53,10 @@ modules/
 │   │   ├── _launchers.nix # Android RE emulator/script launchers (not a module, imported by packages)
 │   │   ├── _prompt.nix # Prompt templates (not a module, imported by services)
 │   │   └── prompts/    # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
+│   ├── web-re/         # Web RE workflow prompts and config
+│   │   ├── _launchers.nix # Web RE launchers (not a module, imported by packages)
+│   │   ├── _prompt.nix # Prompt templates (not a module, imported by services)
+│   │   └── prompts/    # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 │   └── config/         # Split configuration values
 │       ├── default.nix      # Import hub (defaults, mcp-servers, models, claude)
 │       ├── defaults.nix     # Default values for agent options
@@ -60,6 +64,7 @@ modules/
 │       ├── _skills.nix      # Skill installations and omissions (not a module)
 │       ├── mcp-servers.nix  # MCP server definitions + logging
 │       ├── mcp-servers-android-re.nix # Android RE MCP server definitions
+│       ├── mcp-servers-web-re.nix # Web RE MCP server definitions
 │       ├── claude/          # Claude Code configuration
 │       │   ├── default.nix  # Permissions, hooks, settings (import hub)
 │       │   ├── _hooks.nix   # Lifecycle hooks aggregation (imports helpers + per-stage modules)
@@ -76,7 +81,9 @@ modules/
 │           ├── _opencode-agents.nix # OpenCode agent definitions
 │           ├── _opencode-commands.nix # OpenCode slash command definitions
 │           ├── _opencode-android-re.nix # OpenCode Android RE agent definition
-│           └── _opencode-lsp.nix # OpenCode LSP tool configuration
+│           ├── _opencode-web-re.nix # OpenCode Web RE agent definition
+│           ├── _opencode-lsp.nix # OpenCode LSP tool configuration
+│           └── omp.nix       # OMP CLI configuration
 ├── apps/               # App configs (OBS, Syncthing, KeePassXC, Discord, ActivityWatch, browsers, desktop entries)
 │   ├── activitywatch.nix # ActivityWatch app usage tracking (Wayland)
 │   ├── chromium.nix    # Chromium launch wrapper with Wayland crash workaround

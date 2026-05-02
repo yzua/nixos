@@ -99,13 +99,38 @@ ai-agents/
 │       ├── README.md        # Operator guide and workflow map
 │       ├── WORKFLOW.md      # End-to-end RE workflow
 │       ├── TOOLS.md         # Installed tools and recommendations
-│       └── TROUBLESHOOTING.md # Known issues and recovery
+│       ├── TROUBLESHOOTING.md # Known issues and recovery
+│       ├── CODEQL-GUIDE.md  # CodeQL query writing guide
+│       ├── SEMGREP-GUIDE.md # Semgrep rule authoring guide
+│       ├── EXPLOIT-METHODOLOGY.md # Exploit development methodology
+│       ├── FINDINGS-PRIORITIZATION.md # Vulnerability severity classification
+│       ├── DATAFLOW-VALIDATION.md # Data flow analysis and validation
+│       ├── SESSION-MEMORY.md # Session context persistence
+│       └── workflow/        # Workflow-specific prompt fragments
+├── web-re/                  # Web RE workflow prompts and config
+│   ├── _launchers.nix       # Web RE launchers (not a module, imported by packages)
+│   ├── _prompt.nix          # Prompt templates (not a module, imported by services)
+│   └── prompts/             # RE session prompts and operator guides
+│       ├── AGENTS.md        # Quick rules for RE sessions
+│       ├── README.md        # Operator guide and workflow map
+│       ├── WORKFLOW.md      # End-to-end RE workflow
+│       ├── TOOLS.md         # Installed tools and recommendations
+│       ├── TROUBLESHOOTING.md # Known issues and recovery
+│       ├── CODEQL-GUIDE.md  # CodeQL query writing guide
+│       ├── SEMGREP-GUIDE.md # Semgrep rule authoring guide
+│       ├── EXPLOIT-METHODOLOGY.md # Exploit development methodology
+│       ├── FINDINGS-PRIORITIZATION.md # Vulnerability severity classification
+│       ├── DATAFLOW-VALIDATION.md # Data flow analysis and validation
+│       ├── SESSION-MEMORY.md # Session context persistence
+│       └── NATIVE-FUZZING.md # Native binary fuzzing guide
 └── config/                  # Split configuration values
     ├── default.nix          # Import hub
     ├── defaults.nix         # Default values for agent options
     ├── global-instructions.md # Global instructions text (not a module)
     ├── _skills.nix          # Skill installations and omissions
     ├── mcp-servers.nix      # MCP server definitions + logging
+    ├── mcp-servers-android-re.nix # Android RE MCP server definitions
+    ├── mcp-servers-web-re.nix # Web RE MCP server definitions
     ├── claude/              # Claude Code configuration
     │   ├── default.nix      # Import hub (permissions, hooks, settings)
     │   ├── _hooks.nix       # Lifecycle hooks aggregation (imports helpers + per-stage modules)
@@ -122,7 +147,9 @@ ai-agents/
         ├── _opencode-agents.nix # OpenCode agent definitions
         ├── _opencode-commands.nix # OpenCode slash command definitions
         ├── _opencode-android-re.nix # OpenCode Android RE agent definition
-        └── _opencode-lsp.nix # OpenCode LSP tool configuration
+        ├── _opencode-web-re.nix # OpenCode Web RE agent definition
+        ├── _opencode-lsp.nix # OpenCode LSP tool configuration
+        └── omp.nix          # OMP CLI configuration
 ```
 
 ---
