@@ -14,7 +14,7 @@ The module system follows a strict layout:
 - **validation.nix**: The safety layer. It uses assertions to stop conflicting services.
 - **Feature Modules**: Single files like `gaming.nix`, `nvidia.nix`, or `backup.nix` that manage specific subsystems.
 - **Sub-module Directories**: Paths like `security/`, `cleanup/`, `glance/`, `prometheus-grafana/`, `system-report/`, `nix-ld/` that have their own internal hubs.
-- **helpers/**: Internal helpers (`_systemd-helpers.nix`). Not in the hub; import manually. Service URLs are now `constants.urls`.
+- **helpers/**: Internal helpers (`_systemd-helpers.nix`). Not in the hub; passed into modules via `specialArgs.systemdHelpers` from `flake.nix`.
 - **`../shared/`**: Cross-cutting helpers (`constants.nix` for identity/defaults/ports/URLs, `_option-helpers.nix` for typed option constructors). Lives at repo root, not inside this directory. Import via `../shared/`. HM-specific helpers (`_secret-loader.nix`, `_systemd-helpers.nix`) live in `home-manager/_helpers/`, not `shared/`.
 
 ## WHERE TO LOOK

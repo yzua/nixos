@@ -58,7 +58,7 @@ Tools that require API keys or tokens (for example AI agents) use Zsh wrappers d
 - **Aliases**: Define tool-specific aliases within the tool's `.nix` file using `programs.<tool>.shellAliases`.
 - **Theming**: Prefer Stylix auto-theming. If manual overrides are required, use `constants.color.*` mappings.
 - **Git Aliases**: Git-specific aliases (st, co, br, etc.) live in `git/config.nix`, not Zsh aliases.
-- **Scripts**: Complex tool wrappers belong in `terminal/scripts.nix` or the `scripts/` root directory.
+- **Scripts**: Complex tool wrappers belong in `terminal/scripts.nix` (Nix-wrapped) or the repo-level `scripts/` directory (standalone Bash).
 
 ---
 

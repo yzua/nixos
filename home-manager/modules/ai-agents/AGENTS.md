@@ -106,6 +106,7 @@ ai-agents/
 │       ├── FINDINGS-PRIORITIZATION.md # Vulnerability severity classification
 │       ├── DATAFLOW-VALIDATION.md # Data flow analysis and validation
 │       ├── SESSION-MEMORY.md # Session context persistence
+│       ├── NATIVE-FUZZING.md # Native binary fuzzing guide
 │       └── workflow/        # Workflow-specific prompt fragments
 ├── web-re/                  # Web RE workflow prompts and config
 │   ├── _launchers.nix       # Web RE launchers (not a module, imported by packages)
@@ -121,8 +122,7 @@ ai-agents/
 │       ├── EXPLOIT-METHODOLOGY.md # Exploit development methodology
 │       ├── FINDINGS-PRIORITIZATION.md # Vulnerability severity classification
 │       ├── DATAFLOW-VALIDATION.md # Data flow analysis and validation
-│       ├── SESSION-MEMORY.md # Session context persistence
-│       └── NATIVE-FUZZING.md # Native binary fuzzing guide
+│       └── SESSION-MEMORY.md # Session context persistence
 └── config/                  # Split configuration values
     ├── default.nix          # Import hub
     ├── defaults.nix         # Default values for agent options

@@ -22,7 +22,7 @@ Package declarations for `home.packages`. This directory is chunked by domain an
 - `privacy.nix` — Privacy/security user tools
 - `system-monitoring.nix` — Observability user tools
 - `utilities.nix` — General utility packages
-- `custom/beads.nix`, `custom/chrome-devtools.nix`, `custom/cursor.nix`, `custom/kiro.nix`, `custom/prayer.nix` — Local/custom package definitions
+- `custom/` — Import hub + local/custom package definitions (`beads`, `chrome-devtools`, `cursor`, `kiro`, `prayer`)
 - `_egl-wrap.nix` — Helper at `../_helpers/_egl-wrap.nix`, imported manually by chunks; not imported by `default.nix`
 
 ---

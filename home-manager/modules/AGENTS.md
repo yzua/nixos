@@ -212,11 +212,11 @@ Packages live separately from modules. Each chunk is a Home Manager module:
 
 ### Stylix-Exempt Modules
 
-These manage their own theming (Stylix `autoEnable` disabled):
+Stylix has `autoEnable = false` — individual targets must be explicitly opted in. Currently enabled: ghostty, gtk, neovim, zellij.
 
-- Noctalia Shell
+- Noctalia Shell manages its own theming (not in the Stylix target list).
 
-When adding a new program: Stylix auto-applies theme. Override only if custom styling needed.
+When adding a new program: add it to the explicit target list in `stylix.nix` if theming is desired. Skip if the program handles its own styling.
 
 ---
 
@@ -273,6 +273,7 @@ More detailed module-level guidance exists at:
 - `ai-agents/AGENTS.md` — Multi-agent architecture, profile variants, activation, hooks
 - `neovim/AGENTS.md` — Neovim module boundaries, Lua/plugin wiring patterns
 - `terminal/AGENTS.md` — Shell, multiplexer, CLI tools, one-per-tool pattern
+- `terminal/zsh/AGENTS.md` — Zsh + OMZ, aliases, agent wrappers, privacy history
 - `terminal/tools/AGENTS.md` — CLI tools (atuin, bat, fzf, gh, git, lazygit, yazi, etc.)
 - `niri/AGENTS.md` — Compositor keybindings, workspaces, window rules
 - `noctalia/AGENTS.md` — Noctalia Shell bar, settings, Stylix-exempt theming

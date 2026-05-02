@@ -26,7 +26,7 @@ Zsh + Oh My Zsh with Starship prompt, privacy-filtered history, agent wrapper fu
 
 Agent wrappers (`claude_glm`, `opencode_*`, etc.) are zsh functions that:
 
-1. Load API keys from `/run/secrets/` via `_load_secret` (from `shared/_secret-loader.nix`).
+1. Load API keys from `/run/secrets/` via `_load_secret` (from `home-manager/_helpers/_secret-loader.nix`).
 2. Rename the current Zellij tab with an agent icon.
 3. Launch the agent with the correct environment variables.
 
