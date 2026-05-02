@@ -295,6 +295,29 @@ Common characters: `"`, `'`, `` ` ``, `(`, `)`, `[`, `]`, `{`, `}`, `<`, `>`, `t
 
 ---
 
+## Debugging (nvim-dap)
+
+Debug Adapter Protocol support with a UI overlay. Supports Go (Delve), C/C++/Rust (GDB), and Python (debugpy).
+
+DAP UI opens automatically when a debug session starts and closes when it ends.
+
+| Key         | Mode | Action                     |
+| ----------- | ---- | -------------------------- |
+| `F5`        | N    | Continue / start debugging |
+| `F10`       | N    | Step over                  |
+| `F11`       | N    | Step into                  |
+| `F12`       | N    | Step out                   |
+| `Space d b` | N    | Toggle breakpoint          |
+| `Space d B` | N    | Conditional breakpoint     |
+| `Space d r` | N    | Open debug REPL            |
+| `Space d u` | N    | Toggle DAP UI              |
+
+Go debug configurations: launch current file, launch test file, launch specific test function.
+
+Python detects virtual environments automatically for the debug Python path.
+
+---
+
 ## Comments
 
 | Key                 | What It Does                                  |

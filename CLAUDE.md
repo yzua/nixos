@@ -19,9 +19,17 @@ just home             # home-manager switch for yz@desktop
 just nixos            # nh os switch for desktop
 just all              # Full pipeline: modules/pkgs/lint parallel -> format -> test -> check -> nixos -> home
 just install-hooks    # Install repo-local pre-commit/pre-push hooks
+just update           # nix flake update (with pre/post check)
+just upgrade          # update -> nixos -> home -> security-audit
+just clean            # nh clean all --keep 1 + HM expire + store optimise
+just diff             # NVD diff between current and previous NixOS generation
+just security-audit   # systemd-analyze security + vulnix
+just sops-edit        # Edit sops-encrypted secrets
+just sops-view        # View sops-encrypted secrets
+just secrets-add KEY  # Add a new secret key
 ```
 
-No traditional unit-test suite — validation is import/lint/eval/apply. Shell tests live beside their scripts as `*-test.sh`.
+No traditional unit-test suite — validation is import/lint/eval/apply. Shell tests live beside their scripts as `*-test.sh`. The root dev shell (`nix develop`) only provides `statix`, `deadnix`, `shellcheck`, and `nixfmt-tree`; `home-manager` and `nh` come from the host system.
 
 ## Architecture
 
@@ -73,13 +81,14 @@ Bash scripts in `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`. Share
 ## Repo-Enforced Rules
 
 - Every module directory needs a `default.nix` import hub. `modules-check.sh` validates this.
-- Helper files are `_*.nix`, imported manually. If `default.nix` references one, add a `# modules-check: manual-helper` comment.
+- Helper files are `_*.nix`, imported manually. If `default.nix` references one, add a `# modules-check: manual-helper` or `# imported manually` comment on that line.
 - `niri` must **not** follow `nixpkgs` in `flake.nix` (mesa compatibility).
+- `homeStateVersion` is hardcoded to `"25.11"` in `flake.nix`, separate from per-host NixOS `stateVersion` in `_inventory.nix`.
 - Secrets use sops — never plaintext. Access via `just sops-edit`, `just sops-view`, or `just secrets-add KEY`.
 - Secret-backed features read `/run/secrets/*`; run `just nixos` before `just home` if those files are missing.
-- Pre-commit hook runs: modules-check -> statix -> deadnix -> format check -> flake check (no pkgs/shellcheck/markdownlint).
+- Pre-commit hook runs: modules-check -> statix -> deadnix -> format check -> flake check (no pkgs/shellcheck/markdownlint). Deadnix excludes `home-manager/modules/terminal/zellij/layouts.nix` — do not "fix" dead code there (note: `just lint` does not exclude this file).
 - Pre-push hook enforces GPG-signed commits.
 
 ## Scoped AGENTS.md Files
 
-Area-specific guidance exists in nested `AGENTS.md` files under `hosts/`, `nixos-modules/`, `home-manager/`, `scripts/`, `dev-shells/`, and `themes/`. Read the nearest one before editing in that area.
+Area-specific guidance exists in nested `AGENTS.md` files under `hosts/`, `nixos-modules/`, `home-manager/`, `scripts/`, `dev-shells/`, `shared/`, and `themes/`. Read the nearest one before editing in that area.
