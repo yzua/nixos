@@ -6,58 +6,6 @@ reverse engineering on this machine.
 The Markdown files here are injected into the `android-re` OpenCode agent. Keep
 operational guidance here, not hardcoded in shell wrappers.
 
-## What This Workspace Is For
-
-Use this workspace when you need to:
-
-- triage an APK or installed package
-- map endpoints, auth flows, or network protocols
-- verify whether traffic can be intercepted
-- locate root, emulator, Frida, or pinning defenses
-- build Frida hooks or small POC scripts
-- diagnose why proxying, root, spoofing, or instrumentation is failing
-
-This workspace is not for broad exploit development without target evidence.
-The expectation is: prove each step, then escalate.
-
-## What Great Output Looks Like
-
-The best sessions do not end with "I checked root, Frida, and pinning." They
-end with compact, operator-usable answers such as:
-
-- the login flow uses OkHttp against `api.example.tld`, bearer tokens are stored
-  in SharedPreferences, and request replay appears weakly bound
-- an exported receiver or deep link reaches privileged behavior with minimal
-  attacker prerequisites
-- the app bypasses explicit proxy via Cronet/native TLS, and the next best pivot
-  is JNI/native trust analysis rather than more Java hooks
-- Frida attach works but Java hooks stay silent because the interesting path is
-  native-backed
-
-If the session cannot reach a finding, it should still leave behind a precise
-map of what was proven, what was blocked, and the next highest-value move.
-
-## What "Good Hacker" Means Here
-
-In this workspace, "good hacker" means:
-
-- thinks adversarially but stays evidence-driven
-- hunts for real vulnerabilities, not just indicators
-- understands Android trust boundaries
-- can pivot between static, network, runtime, and native layers
-- prefers small proofs that demonstrate impact
-- avoids getting stuck on anti-analysis theater with no security outcome
-
-The strongest outputs are not giant notes dumps. They are compact findings such
-as:
-
-- an exported component that can be abused cross-app
-- a replayable authenticated request that bypasses intended checks
-- a WebView bridge or deep link issue with reachable impact
-- a local token or secret exposure that changes attacker capability
-- a pinning or crypto flaw that exposes meaningful sensitive traffic or trust
-  failure
-
 ## Current Baseline
 
 - Emulator: `re-pixel7-api34`
@@ -77,10 +25,17 @@ as:
 
 ## Prompt Source Layout
 
-- `AGENTS.md`: strict session contract and default assumptions
-- `WORKFLOW.md`: phased RE workflow and pivot logic
+- `AGENTS.md`: session contract, priorities, workflow rules, evidence templates
+- `CODEQL-GUIDE.md`: CodeQL setup, database creation, and custom Android queries
+- `DATAFLOW-VALIDATION.md`: 5-step source-to-sink validation framework
+- `EXPLOIT-METHODOLOGY.md`: structured PoC development with per-vuln strategies
+- `FINDINGS-PRIORITIZATION.md`: adversarial priority order and severity adjudication
+- `NATIVE-FUZZING.md`: AFL++ fuzzing, corpus generation, and crash analysis
+- `SEMGREP-GUIDE.md`: Semgrep setup and custom Android rules
+- `SESSION-MEMORY.md`: persistent learning across sessions with confidence scoring
 - `TOOLS.md`: task-oriented command recipes and tool guidance
 - `TROUBLESHOOTING.md`: symptom-driven failure recovery
+- `WORKFLOW.md`: phased static and dynamic RE workflow with pivot logic
 
 Operator-owned scripts stay outside this prompt bundle:
 
@@ -192,9 +147,6 @@ points elsewhere:
 - `ocglmare` -> anti-analysis, pinning, and repeated bypass tries
 - `ocare` -> balanced default when the target is not yet classified
 
-Do not stay attached to the original launcher choice once the evidence says a
-different branch is now dominant.
-
 ## Vulnerability-First Heuristics
 
 When choosing what to investigate next, prefer this order:
@@ -206,33 +158,7 @@ When choosing what to investigate next, prefer this order:
 5. can I prove a replay, IDOR, or weak binding issue from captured traffic?
 6. do I need Frida or anti-analysis bypass to reach one of those outcomes?
 
-This keeps the agent focused on real vulnerability work instead of endless setup.
-
-## Escalation Rules
-
-Escalate deeper when one of these becomes true:
-
-- you found a likely trust-boundary crossing and need a POC script
-- traffic capture is blocked by pinning, Cronet, QUIC, or native TLS
-- Java hooks only hit wrappers or never fire on the exercised path
-- static analysis shows JNI/native ownership of auth, trust, or anti-analysis
-- component, deep-link, or WebView paths look reachable and attacker-usable
-
-De-escalate when a branch has no fresh evidence after repeated small proof
-steps. Switch to the next best proof loop instead of forcing the same tactic.
-
-## What "Ready" Means
-
-Before dynamic RE, the baseline is considered ready only if all are true:
-
-- AVD exists and is online in `adb devices`
-- `sys.boot_completed=1`
-- `adb shell 'su 0 sh -c id'` works
-- proxy state is known (`8084` or intentionally disabled)
-- Frida server status is known
-- you know where to read tmux panes: `mitm`, `frida`, `logs`, `logcat`
-
-## Focused Manual Commands
+## Manual Commands
 
 Health and boot:
 
@@ -266,16 +192,6 @@ bash scripts/ai/android-re/re-avd.sh frida-start
 bash scripts/ai/android-re/re-avd.sh frida-stop
 ```
 
-Device UI automation (load the `agent-device` skill first):
-
-```bash
-agent-device open Settings --platform android
-agent-device snapshot -i
-agent-device find "Network" click
-agent-device screenshot --out /tmp/screen.png
-agent-device close
-```
-
 Device spoofing:
 
 ```bash
@@ -292,30 +208,3 @@ bash scripts/ai/android-re/re-avd.sh unspoof
 ```
 
 Override with `OUTPUT_ROOT=/path/to/out` when you want a custom location.
-
-## Architecture Notes
-
-This workspace is designed around a rooted `x86_64` AVD because that is the
-stable path on this machine.
-
-Confirmed host constraint:
-
-```text
-Avd's CPU Architecture 'arm64' is not supported by the QEMU2 emulator on x86_64 host. System image must match the host architecture.
-```
-
-Implication:
-
-- use the rooted `x86_64` AVD as the default RE device on this host
-- if a target app is ARM-only, it may rely on translation on `google_apis/x86_64`
-- translation can be good enough for many tasks but should not be mistaken for
-  a native ARM guest
-
-## Editing Rules For This Prompt Bundle
-
-- Put reusable baseline guidance here
-- Keep target-specific exploit logic in temporary scripts or a target-specific
-  workspace
-- Prefer exact commands, expected outputs, and pivot rules over narrative text
-- When guidance changes because the machine changed, update the prompt files
-  instead of burying facts in wrapper scripts

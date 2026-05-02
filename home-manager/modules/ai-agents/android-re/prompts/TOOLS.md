@@ -70,6 +70,20 @@ analysis interface whenever they cover the task. Fall back to bash `jadx` and
 - `binwalk` — firmware/binary analysis tool: scan for embedded files,
   signatures, and compressed data; extract filesystems and hidden payloads
   from APKs and native binaries
+- `semgrep` — static analysis with pattern-matching and taint-tracking rules:
+  scan jadx output for SQL injection, hardcoded secrets, weak crypto, path
+  traversal, TLS bypass, and Android-specific vulnerability patterns without
+  requiring a build. Install with `pip install --user semgrep`. See
+  SEMGREP-GUIDE.md for setup, commands, and custom Android rules.
+- `codeql` — deep semantic code analysis with full taint tracking and dataflow
+  path validation. Use when Semgrep cannot resolve ambiguous dataflow or you
+  need to prove a specific source-to-sink path. Requires compilable source or
+  jadx output for structural analysis. See CODEQL-GUIDE.md for setup, database
+  creation, and custom Android queries.
+- `afl++` — coverage-guided binary fuzzer for native `.so` libraries. Fuzz JNI
+  entry points, protobuf parsers, and custom protocol handlers. Supports QEMU
+  mode for binary-only fuzzing. See NATIVE-FUZZING.md for corpus generation,
+  harness construction, and crash analysis.
 
 ### Web app testing
 
@@ -135,6 +149,9 @@ Use the smallest tool that gives a reliable answer:
 - **Need runtime values or bypasses?** Use Frida attach or spawn
 - **Need to click through the app reliably?** Use `agent-device`
 - **Need repeated proof?** Write a small Bash/Python/Node/Bun/Frida script
+- **Need to scan source for vulnerability patterns?** Use `semgrep --config auto`
+- **Need deep taint tracking on a specific path?** Use `codeql database analyze`
+- **Need to fuzz native .so libraries?** Use `afl++` with QEMU mode
 
 ## Fast Vulnerability Playbooks
 
@@ -279,6 +296,68 @@ grep -R "frida\|magisk\|su\|test-keys\|ro.debuggable\|emulator\|qemu" ~/.cache/a
 # Interesting exported components and deeplinks
 grep -R "android.intent.action.VIEW\|BROWSABLE\|exported=\"true\"" ~/.cache/android-re/out/<app>
 ```
+
+### Semgrep scan of jadx output
+
+```bash
+# Install if needed
+pip install --user semgrep
+
+# Scan with community rules (fast)
+semgrep --config auto ~/.cache/android-re/out/<app>/jadx/sources/ --text
+
+# JSON output for automated processing
+semgrep --config auto --json ~/.cache/android-re/out/<app>/jadx/sources/ \
+  -o ~/Documents/<app>/analysis/semgrep-results.json
+
+# Review findings
+cat ~/Documents/<app>/analysis/semgrep-results.json | jq '.results[] | {rule: .check_id, file: .path, line: .start.line, message: .extra.message}'
+```
+
+Validate each Semgrep finding with the dataflow framework in
+DATAFLOW-VALIDATION.md before investing in PoC development.
+
+### CodeQL deep analysis of jadx output
+
+```bash
+# Create database (structural analysis — taint tracking limited without build)
+codeql database create ~/Documents/<app>/analysis/codeql-db \
+  --language=java \
+  --source-root=~/.cache/android-re/out/<app>/jadx/sources/ \
+  --overwrite
+
+# Run all security queries
+codeql database analyze ~/Documents/<app>/analysis/codeql-db \
+  codeql/java-queries:Security \
+  --format=sarif-latest \
+  --output=~/Documents/<app>/analysis/codeql-results.sarif
+
+# Review results
+cat ~/Documents/<app>/analysis/codeql-results.sarif | \
+  jq '.runs[].results[] | {rule: .ruleId, location: .locations[0].physicalLocation.artifactLocation.uri, line: .locations[0].physicalLocation.region.startLine}'
+```
+
+See CODEQL-GUIDE.md for custom Android taint-tracking queries.
+
+### AFL++ fuzzing of native libraries
+
+```bash
+# Identify target functions
+nm -D ~/Documents/<app>/analysis/native-libs/libtarget.so | grep -iE 'Java_|JNI_'
+strings ~/Documents/<app>/analysis/native-libs/libtarget.so | grep -iE 'parse|decode|read'
+
+# Generate smart corpus (see NATIVE-FUZZING.md for full script)
+strings -n 4 ~/Documents/<app>/analysis/native-libs/libtarget.so | \
+  grep -iE '<|>|xml|json|http' | sort -u \
+  > ~/Documents/<app>/analysis/native-strings-formats.txt
+
+# Run AFL++ in QEMU mode
+afl-fuzz -i ~/Documents/<app>/analysis/fuzz-corpus/ \
+  -o ~/Documents/<app>/analysis/fuzz-findings/ \
+  -- ./harness @@
+```
+
+See NATIVE-FUZZING.md for harness construction, crash triage, and ASan integration.
 
 ### What static analysis should answer
 

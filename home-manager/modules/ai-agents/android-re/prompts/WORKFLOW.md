@@ -30,10 +30,6 @@ Inside every phase, repeat this loop:
 Do not advance phases just because a tool succeeded. Advance because a question
 was answered with evidence.
 
-**Critical: context compaction can erase earlier discoveries at any time.**
-Every endpoint, vulnerability, defense, screenshot, and test result must be
-written to the workspace file immediately after capture. Never batch writes.
-
 ## Phase 0: Environment Validation
 
 Run:
@@ -64,7 +60,11 @@ If resuming, read workspace state first:
 ```bash
 cat ~/Documents/com.example.target/SESSIONS.md
 cat ~/Documents/com.example.target/NOTES.md
+cat ~/Documents/com.example.target/memory.json 2>/dev/null | jq '.knowledge[] | select(.confidence >= 0.7)'
 ```
+
+If `memory.json` exists, load learned strategies and bypasses to avoid repeating
+dead ends. See SESSION-MEMORY.md for the full schema and update rules.
 
 If any baseline check fails, stop and use `TROUBLESHOOTING.md` before touching a
 target app.
@@ -169,6 +169,98 @@ grep -R "okhttp\|retrofit\|cronet\|quic" ~/.cache/android-re/out/<app>/jadx
 grep -R "root\|emulator\|isDebuggerConnected\|ptrace" ~/.cache/android-re/out/<app>/jadx
 ```
 
+## Phase 3.5: Version Diff (If Two Versions Available)
+
+If comparing an update or two builds of the same app:
+
+```bash
+bash scripts/ai/android-re/re-static.sh prepare old_version.apk
+bash scripts/ai/android-re/re-static.sh prepare new_version.apk
+bash scripts/ai/android-re/re-static.sh diff old_version new_version
+```
+
+Focus on:
+
+- new or removed manifest permissions
+- new or removed native libraries
+- class count changes (significant growth or shrinkage)
+- new endpoint strings in the updated version
+
+Update `~/Documents/{app}/NOTES.md` with diff findings.
+
+## Phase 3.7: Semgrep Scan
+
+Run Semgrep against jadx output to catch vulnerability patterns that manual
+grep misses. See SEMGREP-GUIDE.md for setup and custom rules.
+
+```bash
+pip install --user semgrep 2>/dev/null || true
+semgrep --config auto --json ~/.cache/android-re/out/<app>/jadx/sources/ \
+  -o ~/Documents/<app>/analysis/semgrep-results.json
+semgrep --config auto --text ~/.cache/android-re/out/<app>/jadx/sources/
+```
+
+Write Semgrep findings to `~/Documents/<app>/analysis/semgrep-results.md`.
+
+## Phase 3.8: Dataflow Validation
+
+Apply the 5-step validation framework (see DATAFLOW-VALIDATION.md) to each
+suspected finding from Phase 3 grep and Phase 3.7 Semgrep. For each finding:
+
+1. **Source control:** Is the input attacker-controlled? (Intent extras from
+   exported components? Deep link params? Hardcoded strings?)
+2. **Sanitizer effectiveness:** Can sanitizers be bypassed? Or are there
+   parameterized queries (effective)?
+3. **Reachability:** Is the component exported? Permission-protected?
+4. **Exploitability:** What is the full source-to-sink path? What are the
+   prerequisites?
+5. **Impact:** What does the attacker achieve? OWASP Mobile Top 10 category.
+
+Classify each finding: EXPLOITABLE / FALSE POSITIVE / NEEDS TESTING
+
+Write validated findings to `~/Documents/<app>/analysis/validated-findings.md`.
+
+## Phase 3.9: CodeQL Deep Analysis
+
+For high-value candidates where Semgrep cannot resolve the dataflow, run CodeQL
+with targeted taint-tracking queries. See CODEQL-GUIDE.md for setup, database
+creation, and custom Android queries.
+
+```bash
+# Create database from jadx output (structural analysis only)
+codeql database create ~/Documents/<app>/analysis/codeql-db \
+  --language=java \
+  --source-root=~/.cache/android-re/out/<app>/jadx/sources/ \
+  --overwrite
+
+# Run security queries
+codeql database analyze ~/Documents/<app>/analysis/codeql-db \
+  codeql/java-queries:Security \
+  --format=sarif-latest \
+  --output=~/Documents/<app>/analysis/codeql-results.sarif
+```
+
+Save results to `~/Documents/<app>/analysis/codeql-*.sarif`.
+
+## Phase 3.10: Native Library Fuzzing
+
+If the APK contains native `.so` libraries (identified in Phase 3 static triage),
+run AFL++ fuzzing on identified JNI entry points. See NATIVE-FUZZING.md for
+corpus generation, harness construction, and crash analysis.
+
+```bash
+# Extract native libs
+cp ~/.cache/android-re/out/<app>/extracted/lib/arm64-v8a/*.so \
+  ~/Documents/<app>/analysis/native-libs/
+
+# Generate format-aware seeds from binary strings
+strings -n 4 ~/Documents/<app>/analysis/native-libs/*.so | \
+  grep -iE '<|>|xml|json|\{|}|\[|\]|http|content:' | sort -u \
+  > ~/Documents/<app>/analysis/native-strings-formats.txt
+```
+
+Save crashes to `~/Documents/<app>/analysis/fuzz-findings/`.
+
 Static triage questions:
 
 1. Is the app likely Java-heavy, native-heavy, or mixed?
@@ -188,25 +280,6 @@ High-value static branches to rank:
 3. WebView configuration, bridges, and file/origin trust
 4. local storage of tokens, credentials, keys, SQLite, prefs, or cached API data
 5. native libraries that own trust, crypto, auth, or anti-analysis decisions
-
-## Phase 3.5: Version Diff (If Two Versions Available)
-
-If comparing an update or two builds of the same app:
-
-```bash
-bash scripts/ai/android-re/re-static.sh prepare old_version.apk
-bash scripts/ai/android-re/re-static.sh prepare new_version.apk
-bash scripts/ai/android-re/re-static.sh diff old_version new_version
-```
-
-Focus on:
-
-- new or removed manifest permissions
-- new or removed native libraries
-- class count changes (significant growth or shrinkage)
-- new endpoint strings in the updated version
-
-Update `~/Documents/{app}/NOTES.md` with diff findings.
 
 ## Phase 4: Install, Launch, And Smoke Test
 
@@ -578,7 +651,12 @@ Focus on SDKs that:
 ## Phase 9: Prove Findings With POC Scripts
 
 When you find interesting behavior, write a script to prove it. Do not stop at
-describing the finding.
+describing the finding. Follow the exploit development methodology in
+EXPLOIT-METHODOLOGY.md: working code only, complete and executable, documented,
+with a quality checklist.
+
+Only write PoCs for findings validated as EXPLOITABLE or NEEDS TESTING in
+Phase 3.8. FALSE POSITIVE findings are documented but not proven.
 
 Available runtimes:
 
@@ -632,12 +710,18 @@ frida -U -n com.example.target -l scripts/ai/android-re/frida-hook-intent.js -q
 
 ## Phase 10: Confidence And Chaining Review
 
-Before ending the session, classify each branch as:
+Before ending the session, classify each branch. Where dataflow validation
+was performed, use the richer verdict from DATAFLOW-VALIDATION.md:
 
-- `proven`
-- `likely`
-- `suspected`
-- `blocked`
+- `proven` (dataflow verdict: EXPLOITABLE, confidence ≥ 0.8)
+- `likely` (dataflow verdict: EXPLOITABLE or NEEDS TESTING, confidence 0.5-0.8)
+- `suspected` (dataflow verdict: NEEDS TESTING, confidence < 0.5)
+- `blocked` (promising path halted by a proven technical blocker)
+- `false_positive` (dataflow verdict: FALSE POSITIVE — document but do not PoC)
+
+Apply the adversarial priority order from FINDINGS-PRIORITIZATION.md:
+secrets first, then input validation, then auth/authz, then crypto, then
+configuration.
 
 Then ask:
 

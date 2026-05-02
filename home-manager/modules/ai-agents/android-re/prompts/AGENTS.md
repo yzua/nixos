@@ -137,6 +137,9 @@ Prioritize these bug classes first when the target surface supports them:
    replayable requests, weak device binding, insecure update paths
 8. anti-analysis protections only when they block access to one of the above
 
+For the full adversarial priority order with severity adjudication, see
+FINDINGS-PRIORITIZATION.md.
+
 Secondary priorities:
 
 - root/emulator/Frida detection quality
@@ -241,6 +244,9 @@ For actual findings, also include:
 - impact statement
 - trust boundary crossed
 - confidence: proven / likely / suspected
+- dataflow validation (if performed): source control verdict, sanitizer
+  effectiveness, reachability, attack payload concept, false positive
+  classification — see DATAFLOW-VALIDATION.md for the structured schema
 
 Confidence model:
 
@@ -300,6 +306,25 @@ All paths relative to repo root (`/home/yz/System`):
   command recipes, tmux usage, and POC guidance
 - `home-manager/modules/ai-agents/android-re/prompts/TROUBLESHOOTING.md`:
   failure modes and recovery paths
+- `home-manager/modules/ai-agents/android-re/prompts/DATAFLOW-VALIDATION.md`:
+  5-step source-to-sink validation framework for separating real vulns from
+  false positives
+- `home-manager/modules/ai-agents/android-re/prompts/EXPLOIT-METHODOLOGY.md`:
+  structured PoC development with per-vuln-type strategies and quality
+  checklist
+- `home-manager/modules/ai-agents/android-re/prompts/SEMGREP-GUIDE.md`:
+  Semgrep setup, commands, and custom Android rules for SAST on jadx output
+- `home-manager/modules/ai-agents/android-re/prompts/FINDINGS-PRIORITIZATION.md`:
+  adversarial priority order and severity adjudication process
+- `home-manager/modules/ai-agents/android-re/prompts/CODEQL-GUIDE.md`:
+  CodeQL setup, database creation, query suites, and custom Android taint
+  tracking queries for deep source-to-sink validation
+- `home-manager/modules/ai-agents/android-re/prompts/NATIVE-FUZZING.md`:
+  AFL++ fuzzing for native .so libraries, autonomous corpus generation,
+  crash analysis with GDB, crash dedup, and ASan integration
+- `home-manager/modules/ai-agents/android-re/prompts/SESSION-MEMORY.md`:
+  JSON-based persistent learning system that remembers strategies, bypasses,
+  and payloads across sessions with confidence scoring
 - `scripts/ai/android-re/re-avd.sh`: emulator, root, Frida, proxy, cert, and
   spoofing helper
 - `scripts/ai/android-re/re-static.sh`: static APK analysis helper (includes
@@ -315,121 +340,21 @@ All paths relative to repo root (`/home/yz/System`):
 
 ## Target Workspace
 
-All target-specific work goes in `~/Documents/{app-name}/`. This directory
-persists across sessions and is the single source of truth for the target.
-
-Initialize on first contact:
+All target-specific work goes in `~/Documents/{app-name}/`. Initialize on first
+contact:
 
 ```bash
 bash scripts/ai/android-re/workspace-init.sh init com.example.target [/path/to/app.apk]
 ```
 
-Workspace structure:
-
-- `README.md` — target overview, package metadata, session log pointer
-- `FINDINGS.md` — OWASP Mobile Top 10 classified findings (M1–M10)
-- `NOTES.md` — running notes, hypotheses, blocked items, next steps
-- `ENDPOINTS.md` — discovered API endpoints and backend surface
-- `ANTI-ANALYSIS.md` — defense inventory and bypass status
-- `COMPONENTS.md` — exported components analysis and test results
-- `ATTACK-SURFACE.md` — high-level attack surface map
-- `SESSIONS.md` — per-session history with goals, findings, blockers, next steps
-- `scripts/` — target-specific Frida hooks, PoC scripts, automation
-- `evidence/` — screenshots, logs, pcaps, memory dumps
-- `analysis/` — static/dynamic analysis outputs
-
-### Session Continuity Rules
-
-On session resume:
-
-1. read `SESSIONS.md` for what previous sessions did and found
-2. read `NOTES.md` for hypotheses, blocked items, and next steps
-3. read `FINDINGS.md` for already-discovered vulnerabilities
-4. read `ANTI-ANALYSIS.md` for known defenses and bypass status
-
 ### Write Incrementally — Do Not Batch
 
-Context compaction can erase earlier discoveries at any time. To prevent data
-loss, write to workspace files immediately after every result — do not wait
-until a phase is complete or the session is ending.
+Context compaction can erase earlier discoveries at any time. Write to workspace
+files immediately after every result. Never hold more than one finding in memory
+unwritten. Update `SESSIONS.md` progressively, not just at the end.
 
-**After every single result or observation, write it down immediately:**
-
-- discovered an endpoint or saw a request in mitmproxy → append to
-  `ENDPOINTS.md` right now
-- found a vulnerability or confirmed a bug → add to `FINDINGS.md` right now
-- identified a defense (root check, pinning, anti-Frida) → update
-  `ANTI-ANALYSIS.md` right now
-- tested an exported component → record result in `COMPONENTS.md` right now
-- formed a hypothesis or hit a blocker → note it in `NOTES.md` right now
-- captured a screenshot, log, or pcap → save to `evidence/` right now and
-  note the path in the relevant file
-- wrote a hook, script, or PoC → save to `scripts/` right now
-
-**Never hold more than one finding in memory unwritten.** If you discover
-something, write it to the workspace file before moving to the next step. This
-is the most important rule for data survival across context compaction.
-
-**Update `SESSIONS.md` progressively**, not just at the end: append a line
-after each phase or major step completes, so partial progress survives even if
-the session is cut short.
-
-After discovering defenses:
-
-- update `ANTI-ANALYSIS.md` with detection method and bypass status
-
-All target-specific scripts, hooks, and PoCs must go in `~/Documents/{app}/scripts/`.
-
-### Full Assessment Prompt Example
-
-When the operator asks for a full assessment, the session should:
-
-1. initialize or resume the workspace
-2. run baseline health checks — write status to `SESSIONS.md`
-3. perform complete static triage — write results to `NOTES.md`,
-   `ENDPOINTS.md`, `COMPONENTS.md`, `ANTI-ANALYSIS.md` as you find them
-4. install and smoke test the app — screenshot to `evidence/`, note in
-   `SESSIONS.md`
-5. set up traffic interception — write proxy result to `NOTES.md`
-6. exercise every UI screen and feature with `agent-device` — after each
-   screen, append discovered endpoints to `ENDPOINTS.md`, screenshot to
-   `evidence/`
-7. run Frida hooks for crypto, network, WebView, and intent analysis — write
-   each observation to `NOTES.md` and relevant workspace file immediately
-8. test all exported components, deep links, and content providers — record
-   each test result in `COMPONENTS.md` as you go
-9. analyze local storage, backup extraction, and token handling — write
-   findings to `FINDINGS.md` immediately
-10. classify all findings by OWASP Mobile Top 10 — update `FINDINGS.md` as
-    each is confirmed
-11. write PoC scripts for every confirmed finding — save to `scripts/` as
-    each is completed
-12. spawn subagents for parallel deep-dive work as needed — each subagent
-    writes directly to workspace files
-
-Example operator prompt:
-
-```
-full assessment of com.example.target at ~/Documents/mythingapp:
-read the dir to learn context from previous sessions, then do
-complete static + dynamic analysis, test all UI screens and features,
-find vulnerabilities, zero-days, and bugs, document everything in the
-workspace, put all scripts/hooks/PoC there, spawn subagents for
-parallel work
-```
-
-### Multi-App And Ecosystem Analysis
-
-When the target is part of an app ecosystem:
-
-- **Split APKs**: analyze each split independently, then correlate permissions
-  and components across the set
-- **sharedUserId**: apps sharing a Linux UID share data directories and trust
-  boundaries — check `android:sharedUserId` in the manifest
-- **Companion apps**: check the manifest for references to other packages,
-  check `adb shell pm list packages` for related apps from the same developer
-- **SDK reuse**: if the target uses the same auth/payment SDK as another app
-  you have analyzed, carry forward known findings
+When the target is part of an app ecosystem, check `android:sharedUserId`,
+correlate split APKs, and look for companion apps and shared SDKs.
 
 ## agent-device Skill
 
