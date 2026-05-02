@@ -16,10 +16,10 @@
         {{ range .JSON.Array "" }}
           <li>
             <div class="flex items-center gap-5">
-              {{ if eq .String "reason" "assign" }}<span class="color-positive">A</span>
-              {{ else if eq .String "reason" "mention" }}<span class="color-highlight">@</span>
-              {{ else if eq .String "reason" "review_requested" }}<span class="color-primary">R</span>
-              {{ else if eq .String "reason" "subscribed" }}<span class="color-subdue">S</span>
+              {{ if eq (.String "reason") "assign" }}<span class="color-positive">A</span>
+              {{ else if eq (.String "reason") "mention" }}<span class="color-highlight">@</span>
+              {{ else if eq (.String "reason") "review_requested" }}<span class="color-primary">R</span>
+              {{ else if eq (.String "reason") "subscribed" }}<span class="color-subdue">S</span>
               {{ else }}<span class="color-subdue">&bull;</span>
               {{ end }}
               <a class="color-primary-if-not-visited" href="{{ .String "subject.url" | replaceAll "api.github.com/repos" "github.com" | replaceAll "/pulls/" "/pull/" }}">{{ .String "subject.title" }}</a>

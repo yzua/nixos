@@ -226,11 +226,11 @@
       let
         ghBin = lib.getExe pkgs.gh;
         extractToken = pkgs.writeShellScriptBin "glance-github-token" ''
-          if GH_TOKEN=$(/run/wrappers/bin/su - ${user} -c "${ghBin} auth token" 2>/dev/null); then
+          if GH_TOKEN=$(systemd-run --user --uid=${user} --pipe ${ghBin} auth token 2>/dev/null); then
             printf 'GITHUB_TOKEN=%s\n' "$GH_TOKEN" > /run/glance/github-token.env
           else
             echo "⚠ gh CLI not authenticated - GitHub widgets will not work"
-            : > /run/glance/github-token.env
+            printf 'GITHUB_TOKEN=\n' > /run/glance/github-token.env
           fi
         '';
       in
