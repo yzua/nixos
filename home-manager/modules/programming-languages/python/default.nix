@@ -83,6 +83,8 @@ in
       python3Packages.setuptools
       python3Packages.wheel
       python3Packages.ipython
+      python3Packages.waybackpy # Wayback Machine API client for archived URL lookups
+      python3Packages.z3-solver # SMT solver for constraint solving and crypto analysis
     ];
 
     sessionVariables = {

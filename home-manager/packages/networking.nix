@@ -43,6 +43,10 @@
     hydra
     mitmproxy # HTTP/HTTPS proxy for traffic analysis
 
+    # Code coverage and binary hardening analysis
+    gcovr # Code coverage report generator (gcov front-end)
+    checksec # Binary security property checker (NX, PIE, RELRO, canaries, Fortify)
+
     # VPN tools
     openvpn
     proton-vpn-cli

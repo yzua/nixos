@@ -33,6 +33,22 @@
       dalfox # XSS scanner with WAF bypass payloads
       zap # OWASP ZAP web proxy and vulnerability scanner
 
+      # === OOB interaction and callback ===
+      interactsh # OOB interaction server for blind vuln detection (ProjectDiscovery)
+
+      # === TLS and crypto analysis ===
+      testssl # TLS cipher and protocol testing against web servers
+
+      # === Directory and endpoint fuzzing ===
+      gobuster # Directory/file/DNS/VHost brute-forcing tool
+      feroxbuster # Recursive content discovery with heuristic filter
+
+      # === Injection testing ===
+      commix # Automated command injection detection and exploitation
+
+      # === Port scanning ===
+      rustscan # Fast port scanner (nmap wrapper for rapid discovery)
+
       # === Crypto / cert analysis ===
       # openssl — already in home-manager/packages/networking.nix
     ];

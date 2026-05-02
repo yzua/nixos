@@ -101,6 +101,11 @@ let
     radare2
     scrcpy
 
+    # Security and pattern analysis
+    yara # Pattern matching engine for malware/rules detection
+    hashid # Hash type identification from hash strings
+    cewl # Custom wordlist generator by spidering target sites
+
     # Rust development
     bacon
     cargo-deny
