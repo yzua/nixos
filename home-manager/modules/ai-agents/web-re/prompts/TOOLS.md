@@ -73,6 +73,16 @@ need or when you need speed for bulk operations.
   blind XSS testing
 - `zap` — OWASP ZAP web proxy/scanner: automated and manual security testing
   for web applications, active/passive scanning, spidering, and fuzzing
+- `semgrep` — static analysis with pattern-matching and taint-tracking rules:
+  scan discovered JavaScript files and server-side code for SQL injection, XSS,
+  command injection, hardcoded secrets, SSRF, and DOM-based vulnerability
+  patterns. Install with `pip install --user semgrep`. See SEMGREP-GUIDE.md
+  for setup, commands, and custom web rules.
+- `codeql` — deep semantic code analysis with full taint tracking and dataflow
+  path validation. Use when Semgrep cannot resolve ambiguous dataflow or you
+  need to prove a specific source-to-sink path. Supports JavaScript, Python,
+  Java, Go. See CODEQL-GUIDE.md for setup, database creation, and custom
+  web queries.
 
 ### Fuzzing
 
@@ -139,6 +149,8 @@ Use the smallest tool that gives a reliable answer:
 - **Need to send crafted HTTP requests?** Use `curl`, `httpie`
 - **Need to brute-force auth?** Use `hydra`
 - **Need repeated proof?** Write a Bash/Python/Node/Bun script
+- **Need to scan source for vulnerability patterns?** Use `semgrep --config auto`
+- **Need deep taint tracking on a specific path?** Use `codeql database analyze`
 
 ## Fast Vulnerability Playbooks
 

@@ -136,6 +136,9 @@ aligned with OWASP Top 10 2021:
 10. **A10: Server-Side Request Forgery (SSRF)** — internal service access, cloud
     metadata endpoints, port scanning via server
 
+For the full adversarial priority order with severity adjudication, see
+FINDINGS-PRIORITIZATION.md.
+
 Secondary priorities:
 
 - CORS misconfiguration
@@ -229,6 +232,9 @@ For actual findings, also include:
 - impact statement
 - trust boundary crossed
 - confidence: proven / likely / suspected
+- dataflow validation (if performed): source control verdict, sanitizer
+  effectiveness, reachability, attack payload concept, false positive
+  classification — see DATAFLOW-VALIDATION.md for the structured schema
 
 Confidence model:
 
@@ -276,6 +282,22 @@ All paths relative to repo root (`/home/yz/System`):
   command recipes, and PoC guidance
 - `home-manager/modules/ai-agents/web-re/prompts/TROUBLESHOOTING.md`:
   failure modes and recovery paths
+- `home-manager/modules/ai-agents/web-re/prompts/DATAFLOW-VALIDATION.md`:
+  5-step source-to-sink validation framework for separating real vulns from
+  false positives
+- `home-manager/modules/ai-agents/web-re/prompts/EXPLOIT-METHODOLOGY.md`:
+  structured PoC development with per-vuln-type strategies and quality
+  checklist
+- `home-manager/modules/ai-agents/web-re/prompts/SEMGREP-GUIDE.md`: Semgrep
+  setup, commands, and custom web rules for SAST on JS/source
+- `home-manager/modules/ai-agents/web-re/prompts/FINDINGS-PRIORITIZATION.md`:
+  adversarial priority order and severity adjudication process
+- `home-manager/modules/ai-agents/web-re/prompts/CODEQL-GUIDE.md`:
+  CodeQL setup, database creation, query suites, and custom web taint
+  tracking queries for deep source-to-sink validation
+- `home-manager/modules/ai-agents/web-re/prompts/SESSION-MEMORY.md`:
+  JSON-based persistent learning system that remembers strategies, bypasses,
+  payloads, and WAF evasion techniques across sessions with confidence scoring
 - `scripts/ai/web-re/web-re.sh`: environment validation, Chrome DevTools, and
   mitmproxy helper
 - `scripts/ai/web-re/workspace-init.sh`: target workspace initialization
@@ -286,94 +308,15 @@ All paths relative to repo root (`/home/yz/System`):
 
 ## Target Workspace
 
-All target-specific work goes in `~/Documents/{target-name}/`. This directory
-persists across sessions and is the single source of truth for the target.
-
-Initialize on first contact:
+All target-specific work goes in `~/Documents/{target-name}/`. Initialize on
+first contact:
 
 ```bash
 bash scripts/ai/web-re/workspace-init.sh init example.target.com
 ```
 
-Workspace structure:
-
-- `README.md` — target overview, URL metadata, session log pointer
-- `FINDINGS.md` — OWASP Top 10 2021 classified findings (A01–A10)
-- `NOTES.md` — running notes, hypotheses, blocked items, next steps
-- `ENDPOINTS.md` — discovered API endpoints and URL surface
-- `ATTACK-SURFACE.md` — high-level attack surface map
-- `TECH-STACK.md` — identified technologies, frameworks, versions
-- `SESSIONS.md` — per-session history with goals, findings, blockers, next steps
-- `scripts/` — target-specific PoC scripts, automation, fuzzing tools
-- `evidence/` — screenshots, request/response pairs, pcaps, tool output
-- `analysis/` — scan outputs, JS analysis, mapping results
-
-### Session Continuity Rules
-
-On session resume:
-
-1. read `SESSIONS.md` for what previous sessions did and found
-2. read `NOTES.md` for hypotheses, blocked items, and next steps
-3. read `FINDINGS.md` for already-discovered vulnerabilities
-4. read `ENDPOINTS.md` for already-discovered API surface
-5. read `ATTACK-SURFACE.md` for the current attack surface map
-
 ### Write Incrementally — Do Not Batch
 
-Context compaction can erase earlier discoveries at any time. To prevent data
-loss, write to workspace files immediately after every result — do not wait
-until a phase is complete or the session is ending.
-
-**After every single result or observation, write it down immediately:**
-
-- discovered an endpoint or saw a request in mitmproxy → append to
-  `ENDPOINTS.md` right now
-- found a vulnerability or confirmed a bug → add to `FINDINGS.md` right now
-- identified a technology or framework → update `TECH-STACK.md` right now
-- tested an endpoint or parameter → record result in `NOTES.md` right now
-- formed a hypothesis or hit a blocker → note it in `NOTES.md` right now
-- captured a screenshot or request/response pair → save to `evidence/` right
-  now and note the path in the relevant file
-- wrote a script or PoC → save to `scripts/` right now
-
-**Never hold more than one finding in memory unwritten.** If you discover
-something, write it to the workspace file before moving to the next step. This
-is the most important rule for data survival across context compaction.
-
-**Update `SESSIONS.md` progressively**, not just at the end: append a line
-after each phase or major step completes, so partial progress survives even if
-the session is cut short.
-
-### Full Assessment Prompt Example
-
-When the operator asks for a full assessment, the session should:
-
-1. initialize or resume the workspace
-2. run baseline health checks — write status to `SESSIONS.md`
-3. perform technology fingerprinting — write results to `TECH-STACK.md`
-4. run reconnaissance (subdomains, live hosts, URLs) — write to `ENDPOINTS.md`
-   as you find them
-5. map the full application surface with chrome-devtools — after each page,
-   append discovered endpoints to `ENDPOINTS.md`, screenshot to `evidence/`
-6. set up traffic interception — write proxy result to `NOTES.md`
-7. test authentication flows — write each test result to `NOTES.md` and
-   `FINDINGS.md` immediately
-8. test for OWASP Top 10 vulnerabilities — update `FINDINGS.md` as each
-   is confirmed
-9. test API endpoints parameter by parameter — record in `ENDPOINTS.md`
-10. analyze client-side code — write findings to `FINDINGS.md` immediately
-11. write PoC scripts for every confirmed finding — save to `scripts/` as
-    each is completed
-12. spawn subagents for parallel deep-dive work as needed — each subagent
-    writes directly to workspace files
-
-Example operator prompt:
-
-```
-full assessment of https://example.target.com at ~/Documents/example-target:
-read the dir to learn context from previous sessions, then do
-complete recon + mapping + vuln testing, test all endpoints and
-auth flows, find vulnerabilities, document everything in the
-workspace, put all scripts/PoC there, spawn subagents for
-parallel work
-```
+Context compaction can erase earlier discoveries at any time. Write to workspace
+files immediately after every result. Never hold more than one finding in memory
+unwritten. Update `SESSIONS.md` progressively, not just at the end.

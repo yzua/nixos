@@ -6,58 +6,6 @@ security testing on this machine.
 The Markdown files here are injected into the `web-re` OpenCode agent. Keep
 operational guidance here, not hardcoded in shell wrappers.
 
-## What This Workspace Is For
-
-Use this workspace when you need to:
-
-- test a web application for security vulnerabilities
-- map API surfaces, endpoints, and parameters
-- verify authentication and authorization mechanisms
-- discover and exploit XSS, SQLi, IDOR, SSRF, and other web vulns
-- analyze client-side JavaScript for security issues
-- intercept and manipulate HTTP(S) traffic
-- build PoC scripts for confirmed vulnerabilities
-- diagnose why interception, bypass, or exploitation is failing
-
-This workspace is not for broad network penetration testing without target
-evidence. The expectation is: prove each step, then escalate.
-
-## What Great Output Looks Like
-
-The best sessions do not end with "I ran some scanners and found headers missing."
-They end with compact, operator-usable answers such as:
-
-- an XSS chain from a reflected parameter through a stored payload that reaches
-  an admin dashboard
-- an IDOR vulnerability where incrementing an object ID in the API returns
-  another user's private data without authorization checks
-- an auth bypass via JWT algorithm confusion that allows forging admin tokens
-- an exposed API endpoint that returns full user records without authentication
-- an SSRF that reaches cloud metadata endpoints and extracts service credentials
-
-If the session cannot reach a finding, it should still leave behind a precise
-map of what was proven, what was blocked, and the next highest-value move.
-
-## What "Good Hacker" Means Here
-
-In this workspace, "good hacker" means:
-
-- thinks adversarially but stays evidence-driven
-- hunts for real vulnerabilities, not just informational findings
-- understands web trust boundaries and authentication models
-- can pivot between reconnaissance, mapping, exploitation, and post-exploitation
-- prefers small proofs that demonstrate impact
-- avoids getting stuck on reconnaissance theater with no security outcome
-
-The strongest outputs are not giant scan reports. They are compact findings such
-as:
-
-- an API endpoint that returns unauthorized data
-- a reflected XSS that bypasses the WAF and CSP
-- a token handling flaw that enables session hijacking
-- a business logic bug that bypasses payment or access controls
-- an SSRF that exposes internal infrastructure
-
 ## Current Baseline
 
 - Browser: Chrome with DevTools Protocol on port 9222
@@ -72,10 +20,16 @@ as:
 
 ## Prompt Source Layout
 
-- `AGENTS.md`: strict session contract and default assumptions
-- `WORKFLOW.md`: phased web testing workflow and pivot logic
+- `AGENTS.md`: session contract, priorities, workflow rules, evidence templates
+- `CODEQL-GUIDE.md`: CodeQL setup, database creation, and custom web queries
+- `DATAFLOW-VALIDATION.md`: 5-step source-to-sink validation framework
+- `EXPLOIT-METHODOLOGY.md`: structured PoC development with per-vuln strategies
+- `FINDINGS-PRIORITIZATION.md`: adversarial priority order and severity adjudication
+- `SEMGREP-GUIDE.md`: Semgrep setup and custom web rules
+- `SESSION-MEMORY.md`: persistent learning across sessions with confidence scoring
 - `TOOLS.md`: task-oriented command recipes and tool guidance
 - `TROUBLESHOOTING.md`: symptom-driven failure recovery
+- `WORKFLOW.md`: phased web testing workflow and pivot logic
 
 Operator-owned scripts stay outside this prompt bundle:
 
@@ -184,9 +138,6 @@ points elsewhere:
 - `ocgemwre` -> fast multi-angle scanning and cross-validation
 - `ocwre` -> balanced default when the target is not yet classified
 
-Do not stay attached to the original launcher choice once the evidence says a
-different branch is now dominant.
-
 ## Vulnerability-First Heuristics
 
 When choosing what to investigate next, prefer this order:
@@ -197,33 +148,6 @@ When choosing what to investigate next, prefer this order:
 4. can I make the server fetch internal resources? (SSRF)
 5. can I extract sensitive data from responses or errors? (information disclosure)
 6. can I manipulate tokens, sessions, or cookies? (auth/session flaws)
-
-This keeps the agent focused on real vulnerability work instead of endless
-reconnaissance.
-
-## Escalation Rules
-
-Escalate deeper when one of these becomes true:
-
-- you found a likely trust-boundary crossing and need a PoC script
-- traffic interception is blocked by certificate issues or proxy problems
-- automated scanning found potential vulnerabilities that need manual validation
-- an endpoint responds differently based on parameter manipulation
-- authentication bypass seems possible based on token or session behavior
-
-De-escalate when a branch has no fresh evidence after repeated small proof
-steps. Switch to the next best proof loop instead of forcing the same tactic.
-
-## What "Ready" Means
-
-Before web testing, the baseline is considered ready only if all are true:
-
-- Chrome is running with DevTools Protocol on port 9222
-- chrome-devtools MCP is connected and responsive
-- mitmproxy/mitmdump is available on port 8084
-- target URL is reachable
-- scope is defined
-- workspace is initialized or existing workspace state is loaded
 
 ## Manual Commands
 
@@ -272,27 +196,3 @@ Target workspace:
 ```bash
 bash scripts/ai/web-re/workspace-init.sh init example.target.com
 ```
-
-## Architecture Notes
-
-This workspace is designed around browser-based testing via Chrome DevTools
-Protocol because that is the stable and most capable path for web application
-security testing on this machine.
-
-Key architectural decisions:
-
-- chrome-devtools MCP is the primary interaction tool — it replaces manual
-  browser interaction with structured, reproducible access
-- mitmproxy handles traffic interception — it captures, inspects, and modifies
-  HTTP(S) traffic independently of the browser
-- CLI tools handle reconnaissance, scanning, and fuzzing — they complement
-  browser-based testing with speed and automation
-- all tools are available on the host directly — no container or VM boundary
-
-## Editing Rules For This Prompt Bundle
-
-- Put reusable baseline guidance here
-- Keep target-specific exploit logic in the target workspace
-- Prefer exact commands, expected outputs, and pivot rules over narrative text
-- When guidance changes because the machine changed, update the prompt files
-  instead of burying facts in wrapper scripts

@@ -31,10 +31,6 @@ Inside every phase, repeat this loop:
 Do not advance phases just because a tool succeeded. Advance because a question
 was answered with evidence.
 
-**Critical: context compaction can erase earlier discoveries at any time.**
-Every endpoint, vulnerability, finding, screenshot, and test result must be
-written to the workspace file immediately after capture. Never batch writes.
-
 ## Phase 0: Environment Validation
 
 Run:
@@ -67,7 +63,12 @@ cat ~/Documents/example.target.com/SESSIONS.md
 cat ~/Documents/example.target.com/NOTES.md
 cat ~/Documents/example.target.com/FINDINGS.md
 cat ~/Documents/example.target.com/ENDPOINTS.md
+cat ~/Documents/example.target.com/memory.json 2>/dev/null | jq '.knowledge[] | select(.confidence >= 0.7)'
 ```
+
+If `memory.json` exists, load learned strategies, bypasses, and WAF evasion
+techniques to avoid repeating dead ends. See SESSION-MEMORY.md for the full
+schema and update rules.
 
 If any baseline check fails, stop and use `TROUBLESHOOTING.md` before touching
 the target.
@@ -252,6 +253,43 @@ Pivot rule:
   or forms that submit to interesting backends, prioritize those in vulnerability
   testing.
 
+## Phase 3.5: Semgrep Scan
+
+If JavaScript source files or server-side code was discovered during Phase 3,
+run Semgrep to catch vulnerability patterns before dynamic testing. See
+SEMGREP-GUIDE.md for setup and custom rules.
+
+```bash
+pip install --user semgrep 2>/dev/null || true
+semgrep --config auto --json ~/Documents/<target>/analysis/js-source/ \
+  -o ~/Documents/<target>/analysis/semgrep-results.json
+semgrep --config auto --text ~/Documents/<target>/analysis/js-source/
+```
+
+Write Semgrep findings to `~/Documents/<target>/analysis/semgrep-results.md`.
+
+## Phase 3.6: CodeQL Deep Analysis
+
+For high-value candidates where Semgrep cannot resolve the dataflow, run CodeQL
+with targeted taint-tracking queries. See CODEQL-GUIDE.md for setup, database
+creation, and custom web queries.
+
+```bash
+# Create database from discovered JS/source
+codeql database create ~/Documents/<target>/analysis/codeql-db \
+  --language=javascript \
+  --source-root=~/Documents/<target>/analysis/js-source/ \
+  --overwrite
+
+# Run security queries
+codeql database analyze ~/Documents/<target>/analysis/codeql-db \
+  codeql/javascript-queries:Security \
+  --format=sarif-latest \
+  --output=~/Documents/<target>/analysis/codeql-results.sarif
+```
+
+Save results to `~/Documents/<target>/analysis/codeql-*.sarif`.
+
 ## Phase 4: Traffic Interception
 
 Set up mitmproxy to capture and analyze all HTTP(S) traffic.
@@ -376,9 +414,30 @@ Pivot rule:
 - if authentication tokens are predictable, lack expiration, or can be forged,
   move immediately to authorization testing and privilege escalation.
 
+## Phase 5.5: Dataflow Validation
+
+Before investing in full exploitation, validate each suspected vulnerability
+with the 5-step framework (see DATAFLOW-VALIDATION.md). For each finding from
+Phase 3 mapping and Phase 3.5 Semgrep:
+
+1. **Source control:** Is the HTTP parameter/header/cookie attacker-controlled?
+2. **Sanitizer effectiveness:** Is there output encoding? Is it appropriate for
+   the injection context? Can it be bypassed?
+3. **Reachability:** Is the endpoint public? Auth required? WAF present?
+4. **Exploitability:** What is the complete HTTP attack chain?
+5. **Impact:** OWASP Top 10 category, data sensitivity, account takeover?
+
+Classify each finding: EXPLOITABLE / FALSE POSITIVE / NEEDS TESTING
+
+Write validated findings to `~/Documents/<target>/analysis/validated-findings.md`.
+
+Only invest in PoC development for EXPLOITABLE or NEEDS TESTING findings.
+
 ## Phase 6: Vulnerability Testing
 
-Test for OWASP Top 10 vulnerabilities systematically.
+Test for OWASP Top 10 vulnerabilities systematically. Follow the exploit
+development methodology in EXPLOIT-METHODOLOGY.md for each vulnerability type:
+working code only, complete PoC with quality checklist, documented impact.
 
 ### XSS testing
 
@@ -578,12 +637,19 @@ Pivot rule:
 
 ## Phase 9: Confidence and Chaining Review
 
-Before ending the session, classify each finding as:
+Before ending the session, classify each finding. Where dataflow validation
+was performed, use the richer verdict from DATAFLOW-VALIDATION.md:
 
-- `proven`
-- `likely`
-- `suspected`
-- `blocked`
+- `proven` (dataflow verdict: EXPLOITABLE, confidence ≥ 0.8)
+- `likely` (dataflow verdict: EXPLOITABLE or NEEDS TESTING, confidence 0.5-0.8)
+- `suspected` (dataflow verdict: NEEDS TESTING, confidence < 0.5)
+- `blocked` (promising path halted by a proven technical blocker)
+- `false_positive` (dataflow verdict: FALSE POSITIVE — document but do not PoC)
+
+Apply the adversarial priority order from FINDINGS-PRIORITIZATION.md:
+secrets first, then input validation, then auth/authz, then crypto, then
+configuration. When two findings can be chained, the chain inherits the
+higher severity.
 
 Then ask:
 
