@@ -33,7 +33,7 @@ in
 
     command = opencodeCommands;
 
-    agent = {} // androidReAgent // webReAgent;
+    agent = { } // androidReAgent // webReAgent;
 
     lsp = import ./_opencode-lsp.nix;
 

@@ -36,6 +36,8 @@ in
       scripts/ai/android-re/re-static.sh       — static APK analysis (includes diff for version comparison)
       scripts/ai/android-re/workspace-init.sh  — target workspace initialization (~/Documents/{app-name}/)
       scripts/ai/android-re/opencode-android-re.sh — OpenCode launcher (used by oc*are aliases)
+      scripts/ai/android-re/findings.sh        — SQLite findings database CLI (init, add, list, update, query)
+      scripts/ai/android-re/re-doctor.sh       — comprehensive tool audit for all TOOLS.md tools
       scripts/ai/android-re/_helpers.sh        — shared logging helpers
       scripts/ai/android-re/_spoof-table.sh    — declarative spoofing data (Pixel 7 profile)
 

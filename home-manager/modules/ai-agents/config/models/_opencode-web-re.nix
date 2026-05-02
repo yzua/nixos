@@ -35,6 +35,9 @@ in
       scripts/ai/web-re/web-re.sh             — environment validation, tool checks, Chrome DevTools proxy management
       scripts/ai/web-re/workspace-init.sh     — target workspace initialization (~/Documents/{target-name}/)
       scripts/ai/web-re/opencode-web-re.sh    — OpenCode launcher (used by oc*wre aliases)
+      scripts/ai/web-re/findings.sh           — SQLite findings database CLI (init, add, list, update, query)
+      scripts/ai/web-re/generate-totp.sh      — TOTP code generation for 2FA testing
+      scripts/ai/web-re/web-re-doctor.sh      — comprehensive tool audit for all TOOLS.md tools
 
       ## Primary tool: chrome-devtools MCP
       The chrome-devtools MCP is your PRIMARY interaction tool for web targets.
