@@ -22,19 +22,20 @@ Think of it like a web page that scrolls sideways. The focused column centers it
 
 ## Your Workspaces
 
-Six named workspaces are preconfigured, plus unnamed numeric slots:
+Seven named workspaces are preconfigured, plus two unnamed numeric slots:
 
-| #      | Workspace   | Apps                           | Access              |
-| ------ | ----------- | ------------------------------ | ------------------- |
-| 1      | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`           |
-| 2      | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`           |
-| 3      | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`           |
-| 4      | 󰎆 media     | Music/Video players (rules)    | `Super+4`           |
-| 05-vpn | 󰦝 vpn       | VPN tools (window rules only)  | `Super+5`           |
-| 6      | 󰀲 android   | Android tools (rules only)     | `Super+6`           |
-| 7–9    | _(unnamed)_ | General use                    | `Super+7`–`Super+9` |
+| #         | Workspace   | Apps                           | Access              |
+| --------- | ----------- | ------------------------------ | ------------------- |
+| 1         | 󰖟 browser   | LibreWolf (auto-start)         | `Super+1`           |
+| 2         | 󰨞 editor    | VSCode, Ghostty (auto-start)   | `Super+2`           |
+| 3         | 󰍡 social    | Vesktop, Telegram (auto-start) | `Super+3`           |
+| 4         | 󰎆 media     | Music/Video players (rules)    | `Super+4`           |
+| 05-vpn    | 󰦝 vpn       | VPN tools (window rules only)  | `Super+5`           |
+| 6         | 󰀲 android   | Android tools (rules only)     | `Super+6`           |
+| 07-web-re | 󰖩 web-re    | Web RE tools (rules only)      | `Super+7`           |
+| 8–9       | _(unnamed)_ | General use                    | `Super+8`–`Super+9` |
 
-Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open on the vpn workspace via window rules.
+Mullvad VPN, KeePassXC, and librewolf-i2pd auto-open on the vpn workspace via window rules. The vpn bind uses a positional reference (workspace index 5) rather than a named target.
 
 Apps are assigned to workspaces via window rules — when Brave opens, it goes to browser workspace automatically. You never have to manually place them.
 
@@ -151,7 +152,8 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+4`         | Go to 󰎆 media workspace                       |
 | `Super+5`         | Go to 󰦝 vpn workspace                         |
 | `Super+6`         | Go to 󰀲 android workspace                     |
-| `Super+7–9`       | Go to unnamed workspaces 7–9                  |
+| `Super+7`         | Go to 󰖩 web-re workspace                      |
+| `Super+8–9`       | Go to unnamed workspaces 8–9                  |
 | `Super+Page_Up`   | Go to workspace above                         |
 | `Super+Page_Down` | Go to workspace below                         |
 | `Super+U`         | Go to previous workspace (back-and-forth)     |
@@ -165,9 +167,10 @@ Niri's unique feature: columns can hold multiple windows stacked vertically, and
 | `Super+Shift+2`         | Move column to 󰨞 editor workspace     |
 | `Super+Shift+3`         | Move column to 󰍡 social workspace     |
 | `Super+Shift+4`         | Move column to 󰎆 media workspace      |
-| `Super+Shift+5`         | Move column to 󰖟 vpn workspace        |
+| `Super+Shift+5`         | Move column to 󰦝 vpn workspace        |
 | `Super+Shift+6`         | Move column to 󰀲 android workspace    |
-| `Super+Shift+7–9`       | Move column to unnamed workspaces 7–9 |
+| `Super+Shift+7`         | Move column to 󰖩 web-re workspace     |
+| `Super+Shift+8–9`       | Move column to unnamed workspaces 8–9 |
 | `Super+Shift+Page_Up`   | Move column to workspace above        |
 | `Super+Shift+Page_Down` | Move column to workspace below        |
 
@@ -358,6 +361,7 @@ These apps open floating instead of tiled:
 | KeePassXC         | 󰦝 vpn     | Floating      |
 | librewolf-i2pd    | 󰦝 vpn     | Full width    |
 | android-re        | 󰀲 android | Default (50%) |
+| web-re            | 󰖩 web-re  | Default       |
 | Emulator          | 󰀲 android | Floating      |
 
 ### Visual Rules
@@ -578,8 +582,10 @@ Press `Super+Shift+Print`. It captures the focused window and saves to `~/Screen
 | `Super+1–4`                | Focus named workspaces (browser–media) |
 | `Super+5`                  | Focus 󰦝 vpn workspace                  |
 | `Super+6`                  | Focus 󰀲 android workspace              |
-| `Super+7–9`                | Focus unnamed workspaces 7–9           |
-| `Super+Shift+1–9`          | Move column to workspace 1–9           |
+| `Super+7`                  | Focus 󰖩 web-re workspace               |
+| `Super+8–9`                | Focus unnamed workspaces 8–9           |
+| `Super+Shift+1–7`          | Move column to named workspaces 1–7    |
+| `Super+Shift+8–9`          | Move column to unnamed workspaces 8–9  |
 | `Super+Page_Up/Down`       | Focus workspace above/below            |
 | `Super+Shift+Page_Up/Down` | Move column to workspace above/below   |
 | `Super+Ctrl+Page_Up/Down`  | Move workspace up/down                 |

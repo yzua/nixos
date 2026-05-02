@@ -427,6 +427,10 @@ ai-agents/
 │   ├── _launchers.nix          # Android RE agent launcher helpers (not a module, imported by packages)
 │   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
 │   └── prompts/               # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
+├── web-re/                  # Web RE workflow prompts and config
+│   ├── _launchers.nix          # Web RE agent launcher helpers (not a module, imported by packages)
+│   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
+│   └── prompts/               # RE prompt docs (AGENTS.md, README, TOOLS, WORKFLOW, TROUBLESHOOTING)
 ├── files.nix                # home.file + xdg.configFile declarations
 ├── packages.nix             # Packages, zsh aliases, systemd user services/timers, log analysis
 └── config/
@@ -436,6 +440,7 @@ ai-agents/
     ├── _skills.nix          # Individual skill entries for skills.sh (not a module)
     ├── mcp-servers.nix      # MCP server definitions + logging
     ├── mcp-servers-android-re.nix # Android RE MCP server definitions
+    ├── mcp-servers-web-re.nix # Web RE MCP server definitions
     ├── claude/              # Claude Code configuration
     │   ├── default.nix        # Permissions, hooks, settings (import hub)
     │   ├── _hooks.nix         # Lifecycle hooks aggregation (imports helpers + per-stage modules)
@@ -451,8 +456,10 @@ ai-agents/
         ├── opencode.nix       # OpenCode model config (owns all let bindings)
         ├── _opencode-agents.nix # OpenCode agent definitions
         ├── _opencode-android-re.nix # OpenCode Android RE agent definitions
+        ├── _opencode-web-re.nix # OpenCode Web RE agent definitions
         ├── _opencode-commands.nix # OpenCode slash command definitions
-        └── _opencode-lsp.nix  # OpenCode LSP tool configuration
+        ├── _opencode-lsp.nix  # OpenCode LSP tool configuration
+        └── omp.nix            # OMP CLI model config
 ```
 
 ### How It Works

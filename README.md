@@ -169,15 +169,15 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### Privacy & Network
 
-| Service         | Port | Purpose                      |
-| --------------- | ---- | ---------------------------- |
-| Tor SOCKS       | 9050 | SOCKS proxy                  |
-| Tor DNS         | 9053 | DNS over Tor                 |
-| I2PD Webconsole | 7070 | I2P router web UI            |
-| I2PD HTTP       | 4444 | I2P HTTP proxy               |
-| I2PD SOCKS      | 4447 | I2P SOCKS proxy              |
-| I2PD Transport  | \*   | I2P transport (configurable) |
-| Yggdrasil       | —    | Mesh network (outbound only) |
+| Service         | Port | Purpose                                                   |
+| --------------- | ---- | --------------------------------------------------------- |
+| Tor SOCKS       | 9050 | SOCKS proxy                                               |
+| Tor DNS         | 9053 | DNS over Tor                                              |
+| I2PD Webconsole | 7070 | I2P router web UI                                         |
+| I2PD HTTP       | 4444 | I2P HTTP proxy (upstream default, not in `constants.nix`) |
+| I2PD SOCKS      | 4447 | I2P SOCKS proxy                                           |
+| I2PD Transport  | \*   | I2P transport (configurable)                              |
+| Yggdrasil       | —    | Mesh network (outbound only)                              |
 
 ### System Services & Features
 
@@ -205,10 +205,10 @@ All local, no cloud. Toggle via `mySystem.*`:
 
 ### User-level (Home Manager)
 
-| Service       | Port | Purpose              |
-| ------------- | ---- | -------------------- |
-| ActivityWatch | 5600 | App usage tracking   |
-| Syncthing     | 8384 | File synchronization |
+| Service       | Port | Purpose                                                         |
+| ------------- | ---- | --------------------------------------------------------------- |
+| ActivityWatch | 5600 | App usage tracking                                              |
+| Syncthing     | 8384 | File synchronization (upstream default, not in `constants.nix`) |
 
 ---
 

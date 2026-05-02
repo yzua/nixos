@@ -45,6 +45,7 @@ HM is standalone — it cannot access NixOS `config.*`. Shared values arrive onl
 - `shared/_option-helpers.nix` — typed option constructors for `mySystem.*` toggles
 - `home-manager/_helpers/_secret-loader.nix` — reads from `/run/secrets/*` (sops-nix)
 - `home-manager/_helpers/_systemd-helpers.nix` — systemd unit helpers for HM services
+- `home-manager/_helpers/_egl-wrap.nix` — Mesa EGL vendor override wrapper for GUI binaries
 
 ### NixOS Modules (`nixos-modules/`)
 
@@ -67,7 +68,7 @@ Sub-module directories (`security/`, `cleanup/`, `glance/`, `prometheus-grafana/
 
 ### Scripts (`scripts/`)
 
-Bash scripts in `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`. Shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`, `require.sh`, `error-patterns.sh`, `log-dirs.sh`, `fzf-theme.sh`, `extract-nix-packages.awk`, `extract-nix-shell.awk`, `awk-utils.awk`). All scripts must use `#!/usr/bin/env bash` + `set -euo pipefail`. Scripts referenced from Nix are wrapped via `pkgs.writeShellApplication`.
+Bash scripts in `ai/`, `apps/`, `build/`, `hardware/`, `sops/`, `system/`. Shared libraries in `lib/` (`logging.sh`, `test-helpers.sh`, `require.sh`, `error-patterns.sh`, `log-dirs.sh`, `fzf-theme.sh`, `extract-nix-packages.awk`, `extract-nix-shell.awk`, `awk-utils.awk`). Directly-executable scripts must use `#!/usr/bin/env bash` + `set -euo pipefail` (library/sourced scripts omit `set`). Scripts referenced from Nix are wrapped via `pkgs.writeShellScriptBin` (primary) or `pkgs.writeShellApplication`.
 
 ## Repo-Enforced Rules
 

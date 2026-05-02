@@ -11,7 +11,7 @@ This directory provides reusable Nix flake templates for development shells.
 - `nodejs`: Node.js JavaScript/TypeScript environment
 - `python-venv`: Python shell with `venv` workflow
 - `rust-nightly`: Rust nightly toolchain via Fenix (includes `cargo-audit` when `Cargo.lock` exists)
-- `rust-stable`: Rust stable toolchain
+- `rust-stable`: Rust stable toolchain (includes `cargo-audit` when `Cargo.lock` exists)
 
 ## Quickstart
 
