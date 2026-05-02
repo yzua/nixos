@@ -100,6 +100,9 @@ in
         hideTips = true;
         hideBanner = true;
         showLineNumbers = true;
+        showCitations = true;
+        compactToolOutput = true;
+        showModelInfoInChat = true;
         customThemes = {
           Gruvbox = {
             name = "Gruvbox";
@@ -143,6 +146,10 @@ in
       experimental = {
         enableAgents = true;
         worktrees = true;
+        contextManagement = {
+          distillation = true;
+          outputMasking = true;
+        };
       };
       skills.enabled = true;
       agents = {
@@ -176,13 +183,18 @@ in
       tools = {
         sandbox = false;
         sandboxNetworkAccess = false;
-        shell.showColor = true;
         useRipgrep = true;
+        truncateToolOutputThreshold = 50000;
+        shell = {
+          showColor = true;
+          enableShellOutputEfficiency = true;
+        };
       };
       # --- Model Defaults And Compression ---
       model = {
         name = models.gemini-pro;
-        compressionThreshold = 0.75; # Wait until 75% full before compressing (was 0.5)
+        compressionThreshold = 0.80;
+        summarizeToolOutput = true;
       };
       # --- Hooks ---
       hooks = {

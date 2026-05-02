@@ -78,17 +78,27 @@ in
       };
     };
     extraToml = ''
+      plan_mode_reasoning_effort = "high"
+      web_search = "cached"
+      model_verbosity = "low"
+
       [agents]
-      max_threads = 4
+      max_threads = 6
 
       [agents.explorer]
       description = "Read-only style codebase exploration, file tracing, and evidence gathering."
+      sandbox_mode = "read-only"
+      model_reasoning_effort = "medium"
 
       [agents.worker]
       description = "Targeted implementation and fixes after the task is understood."
+      sandbox_mode = "workspace-write"
+      model_reasoning_effort = "medium"
 
       [agents.monitor]
       description = "Long-running command, build, and polling monitor with concise status updates."
+      sandbox_mode = "workspace-write"
+      model_reasoning_effort = "low"
     '';
   };
 }
