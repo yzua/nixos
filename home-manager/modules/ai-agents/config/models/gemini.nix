@@ -89,6 +89,12 @@ in
       privacy = {
         usageStatisticsEnabled = false;
       };
+      # --- Telemetry (local file logging) ---
+      telemetry = {
+        enabled = true;
+        target = "local";
+        outfile = "${config.home.homeDirectory}/.local/share/ai-agents/logs/gemini-telemetry.jsonl";
+      };
       # --- UI and Theming ---
       ui = {
         hideTips = true;
