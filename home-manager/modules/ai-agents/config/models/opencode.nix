@@ -47,12 +47,7 @@ in
     extraSettings = {
       share = "disabled";
       autoupdate = true;
-      small_model = models.claude-haiku; # Cheap model for titles, summaries
-      compaction = {
-        auto = true;
-        prune = true; # Remove old tool outputs during compaction
-        reserved = 10000; # Reserved tokens after compaction
-      };
+      small_model = models.zen; # Free model for titles, summaries
     };
 
     providers = {

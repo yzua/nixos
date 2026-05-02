@@ -25,7 +25,6 @@ Parent: `scripts/AGENTS.md`
 | `agent-iter.sh`                | Headless iterative agent runner with rate-limit retry                                                     |
 | `agent-iter-test.sh`           | Unit tests for agent-iter.sh                                                                              |
 | `agent-registry-drift-test.sh` | Unit tests for agent registry drift detection                                                             |
-| `skills-sync.sh`               | Syncs 28 AI skills from GitHub repos to `~/.local/share/skills/`                                          |
 | `android-re/`                  | Android RE toolkit (see `android-re/AGENTS.md`)                                                           |
 
 ---

@@ -200,35 +200,32 @@ Valid Gemini discovery endpoints as of 2026-04-08:
 | Tech                      | Docs                                                  | GitHub                                         |
 | ------------------------- | ----------------------------------------------------- | ---------------------------------------------- |
 | skills CLI                | <https://skills.sh>                                   | <https://github.com/vercel-labs/skills>        |
-| obra superpowers          | <https://github.com/obra/superpowers#readme>          | <https://github.com/obra/superpowers>          |
+| mattpocock/skills         | <https://github.com/mattpocock/skills#readme>         | <https://github.com/mattpocock/skills>         |
 | anthropics/skills         | <https://github.com/anthropics/skills#readme>         | <https://github.com/anthropics/skills>         |
 | vercel-labs/agent-skills  | <https://github.com/vercel-labs/agent-skills#readme>  | <https://github.com/vercel-labs/agent-skills>  |
-| remotion-dev/skills       | <https://github.com/remotion-dev/skills#readme>       | <https://github.com/remotion-dev/skills>       |
 | vercel-labs/agent-browser | <https://github.com/vercel-labs/agent-browser#readme> | <https://github.com/vercel-labs/agent-browser> |
 | playwright-cli            | <https://playwright.dev>                              | <https://github.com/microsoft/playwright-cli>  |
 
-### Skill Curation (Keep Broad, Omit Specific)
+### Skill Installation (Individual Installs, All Agents)
 
-This repo keeps broad skill-pack installs (for example full repo syncs) and then removes language/framework-specific skills with a denylist.
+Skills are installed individually (no full repo syncs) via `skills.sh` with `--global --all`, which installs to all detected agents (Claude Code, Codex, OpenCode, Gemini, Pi, etc.). After installation, skills are symlinked from `~/.claude/skills/` into all OpenCode profile directories.
 
-Current policy: keep generic engineering skills; omit language/framework-specific families (for example Python/Django, TypeScript/Next.js/React, Java/Spring, Go, Kotlin, Swift, Perl, and C++ language-specialized packs).
+Source config: `home-manager/modules/ai-agents/config/_skills.nix`
+Activation: `home-manager/modules/ai-agents/activation/skills.nix`
 
-- Source config: `home-manager/modules/ai-agents/config/_skills.nix`
-- Option definition: `home-manager/modules/ai-agents/options.nix` (`programs.aiAgents.omitSkills`)
-- Activation cleanup: `home-manager/modules/ai-agents/activation/skills.nix` (`skills remove --global --yes ...`)
+Current skill categories:
 
-Why this pattern exists:
-
-- `skills add` is convenient for large repos with `--all`.
-- skills CLI behavior currently does not provide a reliable native exclude flow for repo-wide sync.
-- Post-install removal keeps the desired state declarative, but activation now treats skills sync as best-effort so `just home` can continue when the skills CLI or network is unavailable.
+| Category     | Skills                                                                                                                                    |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Real tools   | `agent-browser`, `agent-device`, `webapp-testing`, `playwright-cli`                                                                       |
+| Methodology  | `diagnose`, `tdd`, `grill-with-docs`, `grill-me`, `to-prd`, `to-issues`, `triage`, `zoom-out`, `improve-codebase-architecture`, `caveman` |
+| Domain rules | `vercel-react-best-practices`, `find-skills`, `web-design-guidelines`, `frontend-design`                                                  |
 
 Maintenance workflow:
 
-1. Keep broad sources in `programs.aiAgents.skills`.
-2. Add unwanted specific names to `programs.aiAgents.omitSkills`.
-3. Run `just home`.
-4. Verify with `ait --tool all --section skills` (or inspect `~/.agents/skills`).
+1. Edit individual skill entries in `_skills.nix`.
+2. Run `just home`.
+3. Verify with `npx skills ls -g` or `ait --tool all --section skills`.
 
 ### CLI Commands to Pull Docs/Metadata
 
@@ -425,7 +422,7 @@ ai-agents/
 │   ├── _plugin-everything-claude-code.nix # ECC skill install
 │   ├── _cleanup-agency-agents.nix # Agency agents cleanup on disable
 │   ├── _cleanup-everything-claude-code.nix # ECC cleanup on disable
-│   └── skills.nix             # Skill installations and omissions
+│   └── skills.nix             # Skill installation via skills.sh --global --all + OpenCode profile mirroring
 ├── android-re/              # Android RE workflow prompts and config
 │   ├── _launchers.nix          # Android RE agent launcher helpers (not a module, imported by packages)
 │   ├── _prompt.nix            # Prompt templates (not a module, imported by services)
@@ -436,7 +433,7 @@ ai-agents/
     ├── default.nix          # Import hub (claude + models + flat files)
     ├── defaults.nix         # Default values for agent options
     ├── global-instructions.md # Global instructions text (not a module)
-    ├── _skills.nix          # Skill installations and omissions (not a module)
+    ├── _skills.nix          # Individual skill entries for skills.sh (not a module)
     ├── mcp-servers.nix      # MCP server definitions + logging
     ├── mcp-servers-android-re.nix # Android RE MCP server definitions
     ├── claude/              # Claude Code configuration

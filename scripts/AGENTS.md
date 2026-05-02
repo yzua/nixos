@@ -24,7 +24,6 @@ scripts/
 │   ├── agent-iter.sh        # Run an AI agent command N times (iterative loop)
 │   ├── agent-iter-test.sh   # Unit tests for agent-iter.sh
 │   ├── agent-registry-drift-test.sh # Unit tests for agent registry drift detection
-│   ├── skills-sync.sh       # Sync AI agent skills from GitHub to ~/.local/share/skills/
 │   └── android-re/
 │       ├── re-avd.sh        # Android emulator management (AVD create/start/snapshot)
 │       ├── re-avd-test.sh   # Unit tests for re-avd.sh
@@ -156,7 +155,6 @@ source "$(dirname "$0")/../lib/logging.sh"
 | `ai/android-re/re-avd.sh`                          | `home-manager/modules/ai-agents/config/models/_opencode-android-re.nix` (prompt docs), called at runtime by `opencode-android-re.sh` |
 | `ai/android-re/opencode-android-re.sh`             | `home-manager/modules/ai-agents/android-re/_launchers.nix` (launcher for `oc*are` wrapper binaries)                                  |
 | `ai/android-re/re-static.sh`                       | Manual Android RE static-analysis workflow usage                                                                                     |
-| `ai/skills-sync.sh`                                | `justfile` (`just skills-sync`)                                                                                                      |
 | `sops/sops-edit.sh`                                | `justfile` (`just sops-edit`)                                                                                                        |
 | `apps/browser-select.sh`                           | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (`browser-select` wrapper)                                               |
 | `apps/element-desktop-keyring.sh`                  | `home-manager/modules/apps/_desktop-local-bin-wrappers.nix` (local bin wrapper)                                                      |
