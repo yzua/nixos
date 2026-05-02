@@ -3,9 +3,6 @@
 # Source this file to get consistent error matching across all consumers.
 # Usage: source "${SCRIPT_DIR}/../lib/error-patterns.sh"
 
+# Broad pattern: keyword matches + log-level prefixes (used by Codex, Claude debug, OpenCode).
 # shellcheck disable=SC2034
-ERROR_PATTERN='\b(error|panic|fatal|exception|failed|invalid|deprecated|certificate|ssl|tls)\b'
-
-# Codex CLI emits plain " WARN " and " ERROR " prefixes not matched by ERROR_PATTERN.
-# shellcheck disable=SC2034
-CODEX_ERROR_PATTERN="${ERROR_PATTERN}| WARN | ERROR "
+ERROR_PATTERN='\b(error|panic|fatal|exception|failed|invalid|deprecated|certificate|ssl|tls)\b| WARN | ERROR '
