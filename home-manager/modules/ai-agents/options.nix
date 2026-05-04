@@ -73,6 +73,27 @@ let
       }
       // extraOpts;
     };
+
+  mcpServerType = lib.types.submodule {
+    options = {
+      enable = mkBoolOption true "Enable this MCP server";
+      type = mkTypedOption (lib.types.enum [
+        "local"
+        "remote"
+      ]) "local" "Server type (local stdio or remote HTTP)";
+      command = mkStrOption "" "Command to run for local servers";
+      args = mkStrListOption [ ] "Arguments for the command";
+      url = mkNullOrStrOption null "URL for remote MCP servers";
+      headers = mkNullableOption (lib.types.attrsOf lib.types.str) null "Headers for remote MCP servers";
+      env = mkAttrsOfStrOption { } "Environment variables for the server";
+    };
+  };
+
+  mkMcpServersOption = description: {
+    type = lib.types.attrsOf mcpServerType;
+    default = { };
+    inherit description;
+  };
 in
 {
   options.programs.aiAgents = {
@@ -165,68 +186,13 @@ in
 
     };
 
-    mcpServers = lib.mkOption {
-      type = lib.types.attrsOf (
-        lib.types.submodule {
-          options = {
-            enable = mkBoolOption true "Enable this MCP server";
-            type = mkTypedOption (lib.types.enum [
-              "local"
-              "remote"
-            ]) "local" "Server type (local stdio or remote HTTP)";
-            command = mkStrOption "" "Command to run for local servers";
-            args = mkStrListOption [ ] "Arguments for the command";
-            url = mkNullOrStrOption null "URL for remote MCP servers";
-            headers = mkNullableOption (lib.types.attrsOf lib.types.str) null "Headers for remote MCP servers";
-            env = mkAttrsOfStrOption { } "Environment variables for the server";
-          };
-        }
-      );
-      default = { };
-      description = "Shared MCP server definitions used by all agents";
-    };
+    mcpServers = lib.mkOption (mkMcpServersOption "Shared MCP server definitions used by all agents");
 
-    androidReMcpServers = lib.mkOption {
-      type = lib.types.attrsOf (
-        lib.types.submodule {
-          options = {
-            enable = mkBoolOption true "Enable this MCP server";
-            type = mkTypedOption (lib.types.enum [
-              "local"
-              "remote"
-            ]) "local" "Server type (local stdio or remote HTTP)";
-            command = mkStrOption "" "Command to run for local servers";
-            args = mkStrListOption [ ] "Arguments for the command";
-            url = mkNullOrStrOption null "URL for remote MCP servers";
-            headers = mkNullableOption (lib.types.attrsOf lib.types.str) null "Headers for remote MCP servers";
-            env = mkAttrsOfStrOption { } "Environment variables for the server";
-          };
-        }
-      );
-      default = { };
-      description = "MCP servers only loaded for the android-re agent (not shared globally)";
-    };
+    androidReMcpServers = lib.mkOption (
+      mkMcpServersOption "MCP servers only loaded for the android-re agent (not shared globally)"
+    );
 
-    webReMcpServers = lib.mkOption {
-      type = lib.types.attrsOf (
-        lib.types.submodule {
-          options = {
-            enable = mkBoolOption true "Enable this MCP server";
-            type = mkTypedOption (lib.types.enum [
-              "local"
-              "remote"
-            ]) "local" "Server type (local stdio or remote HTTP)";
-            command = mkStrOption "" "Command to run for local servers";
-            args = mkStrListOption [ ] "Arguments for the command";
-            url = mkNullOrStrOption null "URL for remote MCP servers";
-            headers = mkNullableOption (lib.types.attrsOf lib.types.str) null "Headers for remote MCP servers";
-            env = mkAttrsOfStrOption { } "Environment variables for the server";
-          };
-        }
-      );
-      default = { };
-      description = "MCP servers only loaded for the web-re agent.";
-    };
+    webReMcpServers = lib.mkOption (mkMcpServersOption "MCP servers only loaded for the web-re agent.");
 
     logging = {
       enable = lib.mkEnableOption "centralized logging for AI agents";
