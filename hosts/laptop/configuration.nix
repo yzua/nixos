@@ -13,6 +13,7 @@
   mySystem = {
     hostProfile = "laptop";
     observability.enable = false; # Save ~150MB RAM — no dashboards/alerts justify it on laptop
+    ntfy.enable = false; # Requires observability/Alertmanager integration.
   };
 
   services.avahi.allowInterfaces = [ "wlp0s20f3" ];
