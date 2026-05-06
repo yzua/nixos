@@ -39,7 +39,7 @@ in
       glance.enable = mkDefaultTrue;
       netdata.enable = mkDefaultTrue;
       nixLd.enable = mkDefaultTrue;
-      opensnitch.enable = mkDefaultTrue;
+      opensnitch.enable = mkDefaultFalse;
       scrutiny.enable = mkDefaultTrue;
       waydroid.enable = mkDefaultTrue;
       kdeconnect.enable = mkDefaultTrue;
