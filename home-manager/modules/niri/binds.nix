@@ -148,6 +148,7 @@ in
       "Mod+Ctrl+Right".action.set-column-width = "+10%";
       "Mod+Ctrl+Up".action.set-window-height = "-10%";
       "Mod+Ctrl+Down".action.set-window-height = "+10%";
+      "Mod+Ctrl+F".action.expand-column-to-available-width = [ ];
       "Mod+Ctrl+R".action.reset-window-height = [ ];
 
       # Workspace navigation
@@ -254,14 +255,17 @@ in
       };
 
       # Multi-monitor
+      "Mod+Alt+Tab".action.focus-monitor-next = [ ];
       "Mod+Alt+Left".action.focus-monitor-left = [ ];
       "Mod+Alt+Right".action.focus-monitor-right = [ ];
       "Mod+Alt+Up".action.focus-monitor-up = [ ];
       "Mod+Alt+Down".action.focus-monitor-down = [ ];
+      "Mod+Alt+Space".action.move-column-to-monitor-next = [ ];
       "Mod+Alt+Shift+Left".action.move-column-to-monitor-left = [ ];
       "Mod+Alt+Shift+Right".action.move-column-to-monitor-right = [ ];
       "Mod+Alt+Shift+Up".action.move-column-to-monitor-up = [ ];
       "Mod+Alt+Shift+Down".action.move-column-to-monitor-down = [ ];
+      "Mod+Alt+Shift+Space".action.move-workspace-to-monitor-next = [ ];
       "Mod+Alt+Shift+Page_Up".action.move-workspace-to-monitor-up = [ ];
       "Mod+Alt+Shift+Page_Down".action.move-workspace-to-monitor-down = [ ];
 

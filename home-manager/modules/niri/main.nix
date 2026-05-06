@@ -9,6 +9,7 @@
 
 let
   ws = import ./_workspace-names.nix;
+  mainOutput = "HDMI-A-1";
   mkSpring =
     {
       dampingRatio,
@@ -31,27 +32,64 @@ in
     hotkey-overlay.skip-at-startup = true;
     screenshot-path = "~/Screens/screenshot-%Y-%m-%d-%H-%M-%S.png";
 
+    outputs = {
+      "HDMI-A-1" = {
+        mode = {
+          width = 2560;
+          height = 1080;
+          refresh = 59.978;
+        };
+        position = {
+          x = 1080;
+          y = 540;
+        };
+        scale = 1;
+        focus-at-startup = true;
+      };
+
+      "DP-1" = {
+        mode = {
+          width = 1920;
+          height = 1080;
+          refresh = 120.0;
+        };
+        transform.rotation = 90;
+        position = {
+          x = 0;
+          y = 0;
+        };
+        scale = 1;
+      };
+    };
+
     workspaces = {
       "01-browser" = {
         name = ws.browser; # nf-md-web
+        open-on-output = mainOutput;
       };
       "02-code" = {
         name = ws.editor; # nf-md-code-braces
+        open-on-output = mainOutput;
       };
       "03-social" = {
         name = ws.social; # nf-md-chat
+        open-on-output = mainOutput;
       };
       "04-media" = {
         name = ws.media; # nf-md-music
+        open-on-output = mainOutput;
       };
       "05-vpn" = {
         name = ws.vpn; # nf-md-shield-lock
+        open-on-output = mainOutput;
       };
       "06-android" = {
         name = ws.android; # nf-md-android
+        open-on-output = mainOutput;
       };
       "07-web-re" = {
         name = ws.web-re;
+        open-on-output = mainOutput;
       };
     };
 
