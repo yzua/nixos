@@ -102,6 +102,7 @@ in
       aiAgentInventory
       pkgs.bubblewrap
       pkgs.github-mcp-server
+      pkgs.ripgrep
       findingsAndroid
       findingsWeb
       generateTotp

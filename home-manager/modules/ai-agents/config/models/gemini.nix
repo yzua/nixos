@@ -38,9 +38,6 @@ in
       searchGrounding = true;
       # --- Security ---
       security = {
-        auth = {
-          selectedType = "gemini-api-key";
-        };
         folderTrust = {
           enabled = true;
         };
@@ -76,7 +73,7 @@ in
       # --- General Settings ---
       general = {
         vimMode = true;
-        defaultApprovalMode = "yolo";
+        defaultApprovalMode = "auto_edit";
         enableAutoUpdate = true;
         enableAutoUpdateNotification = true;
         checkpointing.enabled = false; # NixOS: simple-git .env() strips PATH → git ENOENT (upstream bug)
@@ -92,7 +89,7 @@ in
       };
       # --- Telemetry (local file logging) ---
       telemetry = {
-        enabled = true;
+        enabled = false;
         target = "local";
         outfile = "${config.home.homeDirectory}/.local/share/ai-agents/logs/gemini-telemetry.jsonl";
       };
@@ -200,6 +197,7 @@ in
         };
       };
       # --- Tool Settings ---
+      systemInstruction = "IMPORTANT: When using the run_shell_command tool, you MUST provide the required 'command' property.";
       tools = {
         sandbox = false;
         sandboxNetworkAccess = true;

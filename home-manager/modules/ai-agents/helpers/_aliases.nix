@@ -66,7 +66,7 @@ let
     {
       alias = "gem";
       command = "gemini --approval-mode=yolo";
-      workflowPromptMode = "positional";
+      workflowPromptMode = "flag";
     }
     {
       alias = "cx";

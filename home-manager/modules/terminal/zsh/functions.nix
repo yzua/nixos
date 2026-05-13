@@ -41,14 +41,8 @@ in
     # === Sops secret loading ===
     ${loadSecretFn}
 
-    _load_gemini_key() { _load_secret gemini_api_key; }
     _load_zai_key() { _load_secret zai_api_key; }
     _load_openrouter_key() { _load_secret openrouter_api_key; }
-
-    # Export Gemini key for gemini CLI (non-fatal — CLI is optional)
-    if _gemini_key="$(_load_gemini_key 2>/dev/null)" && [[ -n "$_gemini_key" ]]; then
-      export GEMINI_API_KEY="$_gemini_key"
-    fi
 
     # Export Z.AI key for omp models.yml resolution (non-fatal)
     if _zai_key_export="$(_load_zai_key 2>/dev/null)" && [[ -n "$_zai_key_export" ]]; then
@@ -182,7 +176,7 @@ in
           # Build command with prompt injection per agent family
           if [[ -n "$prompt" ]]; then
             case "$agent" in
-              oc|ocglm|ocgem|ocgpt|ocor|ocs|oczen|opi|opencode*)
+              oc|ocglm|ocgem|ocgpt|ocor|ocs|oczen|opi|opencode*|gem*|gemini*)
                 cmd="$agent --prompt '$kdl_prompt'" ;;
               *)
                 cmd="$agent '$kdl_prompt'" ;;
