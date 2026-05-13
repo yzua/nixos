@@ -37,7 +37,7 @@ in
         mode = {
           width = 2560;
           height = 1080;
-          refresh = 59.978;
+          refresh = 74.991;
         };
         position = {
           x = 1080;
@@ -47,11 +47,11 @@ in
         focus-at-startup = true;
       };
 
-      "DP-1" = {
+      "Samsung Electric Company C24FG70 HTHJ200179" = {
         mode = {
           width = 1920;
           height = 1080;
-          refresh = 120.0;
+          refresh = 144.0;
         };
         transform.rotation = 90;
         position = {
