@@ -122,6 +122,30 @@ in
       OPENROUTER_API_KEY="$key" _opencode_profile "openrouter" "ocor" "$@"
     }
 
+    za() {
+      if [[ -n "''${ZELLIJ:-}" ]]; then
+        zellij-ai-panel "$@"
+      else
+        zellij --layout ai
+      fi
+    }
+
+    zac() {
+      if [[ -n "''${ZELLIJ:-}" ]]; then
+        zellij action new-tab --name "󰚩 council" --layout "$HOME/.config/zellij/layouts/ai-council.kdl"
+      else
+        zellij --layout ai-council
+      fi
+    }
+
+    zalogs() {
+      if [[ -n "''${ZELLIJ:-}" ]]; then
+        zellij action new-tab --name "󰙨 ai-logs" --layout "$HOME/.config/zellij/layouts/ai-observe.kdl"
+      else
+        zellij --layout ai-observe
+      fi
+    }
+
     # === AI multi-pane launcher ===
     # Launch multiple AI agents side-by-side in Zellij panes
     # Prompt injection: claude/codex/gemini use positional, opencode uses --prompt
@@ -210,11 +234,43 @@ in
 
     # === Auto-rename Zellij tab to running command ===
     if [[ -n "''${ZELLIJ:-}" ]]; then
+      _zellij_tab_name_for_command() {
+        local raw="$1"
+        local cmd="''${raw%% *}"
+        cmd="''${cmd:t}"
+        case "$raw" in
+          just\ check*) printf "󱓞 check" ;;
+          just\ lint*) printf "󰁨 lint" ;;
+          just\ test*) printf "󰙨 test" ;;
+          just\ home*) printf "󱄅 home" ;;
+          just\ nixos*) printf "󱄅 nixos" ;;
+          just*) printf "just" ;;
+          nix\ build*) printf "󱄅 nix build" ;;
+          nix\ flake*) printf "󱄅 flake" ;;
+          home-manager*) printf "󱄅 home" ;;
+          nvim*|vim*|vi*) printf " edit" ;;
+          lazygit*|git*) printf " git" ;;
+          btop*|nvtop*|htop*) printf "󰍛 monitor" ;;
+          docker*|podman*) printf "󰡨 containers" ;;
+          pnpm\ dev*|npm\ run\ dev*|bun\ run\ dev*) printf "󰜎 dev" ;;
+          pnpm*|npm*|bun*) printf "󰎙 js" ;;
+          cargo\ test*) printf "󱘗 rs test" ;;
+          cargo*) printf "󱘗 rust" ;;
+          python*|uv*) printf " py" ;;
+          cl*|claude*) printf "$(_ai_tab_icon cl)cl" ;;
+          oc*|opencode*) printf "$(_ai_tab_icon oc)oc" ;;
+          cx*|codex*) printf "$(_ai_tab_icon cx)cx" ;;
+          gem*|gemini*) printf "$(_ai_tab_icon gem)gem" ;;
+          za|zac|zalogs|aip*) printf "󰚩 ai" ;;
+          *) printf "%s" "$cmd" ;;
+        esac
+      }
+
       _zellij_auto_tab_preexec() {
-        local name="''${2%% *}"
-        name="''${name:t}"
+        local name
+        name="$(_zellij_tab_name_for_command "$2")"
         case "$name" in
-          cd|ls|ll|la|l|clear|cls|exit|source|\.|zellij) return 0 ;;
+          cd|ls|ll|la|l|clear|cls|exit|source|\.|zellij|"") return 0 ;;
         esac
         command zellij action rename-tab "$name" >/dev/null 2>&1 || true
       }
