@@ -76,15 +76,7 @@ in
     }
 
     # === Observability Stack Dependencies ===
-    {
-      assertion = !config.mySystem.ntfy.enable || config.mySystem.observability.enable;
-      message = "ntfy alert bridge requires observability stack (mySystem.observability.enable = true) for Alertmanager integration. Either enable observability or disable ntfy.";
-    }
-
-    {
-      assertion = !config.mySystem.observability.enable || config.mySystem.loki.enable;
-      message = "Observability stack requires Loki (mySystem.loki.enable = true) for log aggregation. Grafana provisions a Loki datasource that would be unreachable without it.";
-    }
+    # Moved to prometheus-grafana/_validation.nix (module-registered assertions)
 
     # === Local Dashboard Bindings ===
     {
@@ -128,36 +120,8 @@ in
       message = "Loki gRPC must bind to localhost. Set services.loki.configuration.server.grpc_listen_address = constants.localhost.";
     }
 
-    {
-      assertion =
-        !config.mySystem.observability.enable || config.services.prometheus.listenAddress == localhost;
-      message = "Prometheus must bind to localhost. Set services.prometheus.listenAddress = constants.localhost.";
-    }
-
-    {
-      assertion =
-        !config.mySystem.observability.enable
-        || config.services.prometheus.alertmanager.listenAddress == localhost;
-      message = "Alertmanager must bind to localhost. Set services.prometheus.alertmanager.listenAddress = constants.localhost.";
-    }
-
-    {
-      assertion =
-        !config.mySystem.observability.enable
-        || config.services.grafana.settings.server.http_addr == localhost;
-      message = "Grafana must bind to localhost. Set services.grafana.settings.server.http_addr = constants.localhost.";
-    }
-
     # === Enabled Feature Secret Inventory ===
-    {
-      assertion = !config.mySystem.observability.enable || hasSecret "grafana_admin_password";
-      message = "mySystem.observability.enable requires grafana_admin_password in secrets/secrets.yaml.";
-    }
-
-    {
-      assertion = !config.mySystem.ntfy.enable || hasSecret "ntfy_topic";
-      message = "mySystem.ntfy.enable requires ntfy_topic in secrets/secrets.yaml.";
-    }
+    # grafana_admin_password and ntfy_topic checks moved to prometheus-grafana/_validation.nix
 
     {
       assertion = !config.mySystem.systemReport.enable || hasSecret "noctalia_location";
@@ -169,8 +133,9 @@ in
         hasSecret "zai_api_key"
         && hasSecret "openrouter_api_key"
         && hasSecret "context7_api_key"
-        && hasSecret "gemini_api_key";
-      message = "AI agent configuration requires zai_api_key, openrouter_api_key, context7_api_key, and gemini_api_key in secrets/secrets.yaml.";
+        && hasSecret "gemini_api_key"
+        && hasSecret "zellij_web_password";
+      message = "AI agent configuration requires zai_api_key, openrouter_api_key, context7_api_key, gemini_api_key, and zellij_web_password in secrets/secrets.yaml.";
     }
   ];
 

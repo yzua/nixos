@@ -4,7 +4,6 @@
   config,
   constants,
   inputs,
-  lib,
   user,
   ...
 }:
@@ -40,14 +39,9 @@ in
             "openrouter_api_key"
             "context7_api_key"
             "gemini_api_key"
+            "zellij_web_password"
           ]
       ))
-      // lib.optionalAttrs config.mySystem.observability.enable {
-        grafana_admin_password = {
-          owner = "grafana";
-          mode = "0400";
-        };
-      }
       // {
         ntfy_topic = {
           mode = "0444"; # DynamicUser service — no persistent user/group to grant access
