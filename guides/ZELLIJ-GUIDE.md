@@ -19,6 +19,18 @@ zellij kill-all-sessions        # Kill all sessions
 
 Home Manager enables Zellij itself, but `programs.zellij.enableZshIntegration` is disabled in `home-manager/modules/terminal/zellij/config.nix`. Start or attach sessions explicitly with the commands above.
 
+For phone access, use `zphone` from the desktop shell. It starts the local Zellij Web server, ensures Tailscale Serve is on, recreates and resaves the `mobile` session with the stripped phone layout, reads the stored Zellij login token from SOPS, and prints the iPhone URL in one command.
+
+```bash
+zphone
+```
+
+The printed phone URL should be opened on the iPhone browser. The mobile layout uses a stripped-down session with no status bar noise and plain text tab names, so the screen stays focused on panes.
+
+The browser login uses the stored token from `secrets/secrets.yaml` via `/run/secrets/zellij_web_password`.
+
+`zphone` does not change your current desktop Zellij session. It only refreshes the dedicated phone session. To start or reset the phone session layout manually, use `zm` from a separate shell.
+
 ---
 
 ## Modes
@@ -199,6 +211,35 @@ Two tabs for system monitoring:
 
 - **system** (focused): btop and nvtop side by side
 - **logs**: Live `journalctl -f` output
+
+### Mobile Layout
+
+```bash
+zm
+```
+
+Phone-first layout for Zellij Web:
+
+- single shell pane
+- log pane below it
+- no zjstatus bar
+- ASCII-only labels on mobile so iPhone fonts do not break icons
+
+Use the shell pane to create more panes with `zp`, `zpr`, and `zpd`:
+
+```bash
+zp
+zpr
+zpd
+```
+
+If you want an AI tab from mobile, use:
+
+```bash
+zac
+zalogs
+za
+```
 
 ---
 
