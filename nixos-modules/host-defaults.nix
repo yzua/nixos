@@ -28,6 +28,7 @@ in
       cleanup.enable = mkDefaultTrue;
       flatpak.enable = mkDefaultTrue;
       mullvadVpn.enable = mkDefaultTrue;
+      tailscale.enable = mkDefaultFalse;
       tor.enable = mkDefaultTrue;
       i2pd.enable = mkDefaultFalse;
       yggdrasil.enable = mkDefaultFalse;

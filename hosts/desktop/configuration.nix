@@ -16,6 +16,7 @@
     kdeconnect.enable = false; # Desktop has no Bluetooth adapter; avoids repetitive Bluez warnings.
     opensnitch.enable = false;
     i2pd.enable = true;
+    tailscale.enable = true;
     yggdrasil.enable = true;
     vnc = {
       enable = false;
