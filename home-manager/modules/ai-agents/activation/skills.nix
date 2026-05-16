@@ -170,17 +170,31 @@ lib.mkIf (cfg.skills != [ ]) (
       echo "✓ Skills installation complete"
     fi
 
-    # Mirror Claude skills to all OpenCode profiles.
-    # skills.sh only installs to the default opencode profile,
-    # so we symlink from ~/.claude/skills into every profile's skills dir.
-    if [[ -d "$HOME/.claude/skills" ]]; then
+    # skills.sh writes global skills under ~/.agents/skills. Mirror them into
+    # Claude Code and every OpenCode profile so all configured agents see the
+    # same skill inventory.
+    if [[ -d "$HOME/.agents/skills" ]]; then
+      mkdir -p "$HOME/.claude/skills"
+      find "$HOME/.claude/skills" -maxdepth 1 -type l ! -exec test -e {} \; -delete 2>/dev/null || true
+      shopt -s nullglob
+      for skill_dir in "$HOME/.agents/skills"/*; do
+        [[ -d "$skill_dir" ]] || continue
+        skill_name="$(basename "$skill_dir")"
+        link="$HOME/.claude/skills/$skill_name"
+        if [[ ! -e "$link" ]]; then
+          ln -sfn "$skill_dir" "$link"
+        fi
+      done
+      shopt -u nullglob
+      echo "✓ Mirrored skills to Claude Code"
+
       for profile in ${lib.concatStringsSep " " (map lib.escapeShellArg opencodeProfileNames)}; do
         profile_skills="$HOME/.config/$profile/skills"
         mkdir -p "$profile_skills"
         # Remove stale dead symlinks first
         find "$profile_skills" -maxdepth 1 -type l ! -exec test -e {} \; -delete 2>/dev/null || true
         shopt -s nullglob
-        for skill_dir in "$HOME/.claude/skills"/*; do
+        for skill_dir in "$HOME/.agents/skills"/*; do
           [[ -d "$skill_dir" ]] || continue
           skill_name="$(basename "$skill_dir")"
           link="$profile_skills/$skill_name"
